@@ -1,0 +1,85 @@
+{
+  "_comment": "Maps facility IDs to pack type destination tags. Used by PlanEx locked-dest routing.",
+
+  "chinatownRestaurant": "food",
+  "diner": "food",
+  "greenPier": "food",
+  "turboBurger": "food",
+  "bcmTelepizza": "food",
+
+  "chinaStoreA": "retail",
+  "chinaStoreB": "retail",
+  "chinaStoreC": "retail",
+  "liquorStore": "retail",
+  "mountainviewMotel": "retail",
+  "plazaA": "retail",
+  "plazaB": "retail",
+  "plazaC": "retail",
+
+  "officeA": "office",
+  "officeB": "office",
+  "officeC": "office",
+  "officeD": "office",
+  "officeE": "office",
+  "officeF": "office",
+  "office_garden": "office",
+
+  "cityCentral": "residential",
+  "cityNorth": "residential",
+  "citySouth": "residential",
+  "cityWest": "residential",
+  "suburbsCentral": "residential",
+  "suburbsEast": "residential",
+  "suburbsWest": "residential",
+  "forest_house_a": "residential",
+  "forest_house_b": "residential",
+  "sealbrik": "residential",
+
+  "industrialWarehouse": "warehouse",
+  "rentabox": "warehouse",
+  "spearleafLogistics": "warehouse",
+  "shuffleboardLogistics": "warehouse",
+
+  "belascoAuto": "mechanic",
+  "belascoGarage": "mechanic",
+  "exhaustShop": "mechanic",
+  "fastAutomotive": "mechanic",
+  "jeffersonMotors": "mechanic",
+  "jerryRigs": "mechanic",
+  "quarrysideAutoSales": "mechanic",
+  "richsMotorCompany": "mechanic",
+  "shuffleboardGarage": "mechanic",
+  "smashAutoRepairs": "mechanic",
+  "torresTires": "mechanic",
+
+  "apex_fuel": "fuel",
+  "nodeoline_fuel": "fuel",
+  "trilobite_city_fuel": "fuel",
+  "trilobite_garage_fuel": "fuel",
+  "tyranos_island_fuel": "fuel",
+
+  "hospital": "medical",
+
+  "policeStation": "government",
+
+  "quarry": "industrial",
+  "refinery_logistics": "industrial",
+  "spearleaf_refinery": "industrial",
+  "steelFactory": "industrial",
+
+  "constructionCity": "construction",
+  "construction_overpass": "construction",
+  "construction_toll": "construction",
+
+  "lensflareLogistics": "media",
+  "lensflareStudios": "media",
+  "snoozeNews": "media",
+
+  "city_garden": "retail",
+  "pier": "retail",
+  "dirt_track_a": "retail",
+  "dirt_track_b": "retail",
+  "bcmNeedle": "media",
+  "bcm_church": "residential",
+  "bcm_depots_main": "warehouse"
+}

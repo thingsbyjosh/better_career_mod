@@ -1,0 +1,2 @@
+{"position":[-204.03761291504,-206.83009338379,118.80884552002],"name":"bcm_dragstrip_icon","__parent":"bcm_dragstrip","class":"BeamNGPointOfInterest"}
+{"name":"bcm_dragstrip_area","__parent":"bcm_dragstrip","position":[-204.25073242188,-207.12948608398,118.80884552002],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

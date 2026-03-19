@@ -1,0 +1,82 @@
+{
+  "steel": {
+    "senderNames": ["Hot Rolled Inc.", "Pacific Steel Co.", "West Coast Metals"],
+    "receiverTags": ["construction", "industrial", "mechanic"],
+    "category": "construction"
+  },
+  "food_supply": {
+    "senderNames": ["FreshCo Distribution", "Valley Farms Wholesale", "Harbor Catch Logistics"],
+    "receiverTags": ["food", "retail"],
+    "category": "food"
+  },
+  "office_supply": {
+    "senderNames": ["OfficeMax Wholesale", "Paper Trail Inc.", "Stationery Direct"],
+    "receiverTags": ["retail", "office", "media"],
+    "category": "office"
+  },
+  "electronics": {
+    "senderNames": ["TechWare Logistics", "Silicon Bay Distribution"],
+    "receiverTags": ["retail", "office", "media"],
+    "category": "electronics"
+  },
+  "medical_supply": {
+    "senderNames": ["MedLine Express", "PharmaShip Inc.", "CarePoint Distribution"],
+    "receiverTags": ["medical"],
+    "category": "medical"
+  },
+  "fuel_chemical": {
+    "senderNames": ["PetroChem Distribution", "Apex Fuel Supply"],
+    "receiverTags": ["fuel", "industrial"],
+    "category": "hazmat"
+  },
+  "auto_parts": {
+    "senderNames": ["AutoZone Wholesale", "PitStop Distribution", "GearHead Supply Co."],
+    "receiverTags": ["mechanic"],
+    "category": "auto"
+  },
+  "home_goods": {
+    "senderNames": ["HomeStuff Logistics", "Comfort Living Supply"],
+    "receiverTags": ["residential", "retail"],
+    "category": "household"
+  },
+  "luxury_goods": {
+    "senderNames": ["LuxLine Couriers", "Prestige Logistics"],
+    "receiverTags": ["retail", "residential", "office"],
+    "category": "luxury"
+  },
+  "legal_docs": {
+    "senderNames": ["DocuFast Express", "Legal Runner Corp."],
+    "receiverTags": ["office", "government"],
+    "category": "legal"
+  },
+  "construction_material": {
+    "senderNames": ["BuildRight Supply", "Heavy Haul Materials", "Concrete Kings Logistics"],
+    "receiverTags": ["construction"],
+    "category": "construction"
+  },
+  "glassware": {
+    "senderNames": ["Crystal Clear Logistics", "Glass & Frame Co."],
+    "receiverTags": ["retail", "residential"],
+    "category": "glassware"
+  },
+  "media_equipment": {
+    "senderNames": ["ProGear Rentals", "Studio Supply Co."],
+    "receiverTags": ["media"],
+    "category": "electronics"
+  },
+  "general_cargo": {
+    "senderNames": ["PlanEx Consolidated", "MultiCargo Inc.", "Route Express"],
+    "receiverTags": ["retail", "residential", "office", "warehouse"],
+    "category": "household"
+  },
+  "government_supply": {
+    "senderNames": ["Federal Logistics Corp.", "Municipal Supply Chain"],
+    "receiverTags": ["government"],
+    "category": "legal"
+  },
+  "warehouse_transfer": {
+    "senderNames": ["InterWarehouse Express", "Bulk Transfer Co."],
+    "receiverTags": ["warehouse", "industrial"],
+    "category": "household"
+  }
+}

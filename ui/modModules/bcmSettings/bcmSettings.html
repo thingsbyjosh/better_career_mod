@@ -1,0 +1,311 @@
+<link rel="stylesheet" type="text/css" href="/ui/modModules/bcmSettings/bcmSettings.css" />
+
+<div class="bcm-settings-container" ng-if="loaded">
+  <!-- Header -->
+  <div class="bcm-settings-header">
+    <div class="bcm-logo-accent"></div>
+    <h1>Better Career Mod</h1>
+    <p class="bcm-subtitle">Settings</p>
+  </div>
+
+  <!-- Content -->
+  <div class="bcm-settings-content">
+
+    <!-- TIME Section -->
+    <div class="bcm-section">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#9200;</span>
+        <span>TIME</span>
+      </div>
+
+      <!-- Time Speed -->
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Time Speed</span>
+          <span class="bcm-setting-desc">How fast the in-game clock runs. Affects day/night cycle duration.</span>
+        </div>
+        <div class="bcm-preset-group">
+          <button class="bcm-preset-btn" ng-class="{'active': settings.timeSpeed === 'veryslow'}" ng-click="setPreset('timeSpeed', 'veryslow')">Very Slow</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.timeSpeed === 'slow'}" ng-click="setPreset('timeSpeed', 'slow')">Slow</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.timeSpeed === 'normal'}" ng-click="setPreset('timeSpeed', 'normal')">Normal</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.timeSpeed === 'fast'}" ng-click="setPreset('timeSpeed', 'fast')">Fast</button>
+        </div>
+      </div>
+
+      <!-- Skip Nights toggle -->
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Skip Nights</span>
+          <span class="bcm-setting-desc">Skip nighttime entirely (~30s transition).</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="toggleSetting('skipNights')">
+          <span class="bcm-toggle-slider" ng-class="{'active': settings.skipNights}"></span>
+        </div>
+      </div>
+
+      <!-- Night Speed (hidden when Skip Nights is on) -->
+      <div class="bcm-setting-item" ng-show="!settings.skipNights">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Night Speed</span>
+          <span class="bcm-setting-desc">How fast nights pass relative to daytime.</span>
+        </div>
+        <div class="bcm-preset-group">
+          <button class="bcm-preset-btn" ng-class="{'active': settings.nightDuration === 'realistic'}" ng-click="setPreset('nightDuration', 'realistic')">Realistic</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.nightDuration === 'slow'}" ng-click="setPreset('nightDuration', 'slow')">Slow</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.nightDuration === 'normal'}" ng-click="setPreset('nightDuration', 'normal')">Normal</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.nightDuration === 'fast'}" ng-click="setPreset('nightDuration', 'fast')">Fast</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.nightDuration === 'veryfast'}" ng-click="setPreset('nightDuration', 'veryfast')">Very Fast</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEATHER Section -->
+    <div class="bcm-section">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#9748;</span>
+        <span>WEATHER</span>
+      </div>
+
+      <!-- Weather Enabled -->
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Dynamic Weather</span>
+          <span class="bcm-setting-desc">Enable realistic weather changes with rain, storms, and snow. Turn off for permanent clear skies.</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="toggleSetting('weatherEnabled')">
+          <span class="bcm-toggle-slider" ng-class="{'active': settings.weatherEnabled}"></span>
+        </div>
+      </div>
+
+      <!-- Season Lock -->
+      <div class="bcm-setting-item" ng-class="{'disabled': !settings.weatherEnabled}">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Season</span>
+          <span class="bcm-setting-desc">Lock weather to a specific season or let it follow the game calendar.</span>
+        </div>
+        <div class="bcm-preset-group">
+          <button class="bcm-preset-btn" ng-class="{'active': settings.seasonLock === 'auto'}" ng-click="setPreset('seasonLock', 'auto')" ng-disabled="!settings.weatherEnabled">Auto</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.seasonLock === 'spring'}" ng-click="setPreset('seasonLock', 'spring')" ng-disabled="!settings.weatherEnabled">Spring</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.seasonLock === 'summer'}" ng-click="setPreset('seasonLock', 'summer')" ng-disabled="!settings.weatherEnabled">Summer</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.seasonLock === 'autumn'}" ng-click="setPreset('seasonLock', 'autumn')" ng-disabled="!settings.weatherEnabled">Fall</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.seasonLock === 'winter'}" ng-click="setPreset('seasonLock', 'winter')" ng-disabled="!settings.weatherEnabled">Winter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LANGUAGE Section -->
+    <div class="bcm-section">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#127760;</span>
+        <span>LANGUAGE / IDIOMA</span>
+      </div>
+
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Language</span>
+          <span class="bcm-setting-desc">Select the mod language. This syncs with the phone settings inside career mode.</span>
+        </div>
+        <div class="bcm-preset-group">
+          <button class="bcm-preset-btn" ng-class="{'active': settings.language === 'en'}" ng-click="setPreset('language', 'en')">English</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.language === 'es'}" ng-click="setPreset('language', 'es')">Español</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLICE Section -->
+    <div class="bcm-section">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#128680;</span>
+        <span>POLICE</span>
+      </div>
+
+      <!-- Police Enabled -->
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Police</span>
+          <span class="bcm-setting-desc">Enable police vehicles in career traffic. They will patrol and pursue you for infractions.</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="toggleSetting('policeEnabled')">
+          <span class="bcm-toggle-slider" ng-class="{'active': settings.policeEnabled}"></span>
+        </div>
+      </div>
+
+      <!-- Police Spawn Mode -->
+      <div class="bcm-setting-item" ng-class="{'disabled': !settings.policeEnabled}">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Spawn Mode</span>
+          <span class="bcm-setting-desc">Flexible: fewer police when idle, reinforcements arrive during pursuits. Static: fixed count always active.</span>
+        </div>
+        <div class="bcm-preset-group">
+          <button class="bcm-preset-btn" ng-class="{'active': settings.policeSpawnMode === 'flexible'}" ng-click="setSpawnMode('flexible')" ng-disabled="!settings.policeEnabled">Flexible</button>
+          <button class="bcm-preset-btn" ng-class="{'active': settings.policeSpawnMode === 'static'}" ng-click="setSpawnMode('static')" ng-disabled="!settings.policeEnabled">Static</button>
+        </div>
+      </div>
+
+      <!-- Police Count (static mode only) -->
+      <div class="bcm-setting-item" ng-class="{'disabled': !settings.policeEnabled}" ng-show="settings.policeSpawnMode === 'static'">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Police Units</span>
+          <span class="bcm-setting-desc">Number of police vehicles in traffic.</span>
+        </div>
+        <div class="bcm-preset-group">
+          <button class="bcm-preset-btn" ng-repeat="n in policeCountOptions" ng-class="{'active': settings.policeCount === n}" ng-click="setPoliceCount(n)" ng-disabled="!settings.policeEnabled">{{n}}</button>
+        </div>
+      </div>
+
+      <!-- Flex Min (flexible mode only) -->
+      <div class="bcm-setting-item" ng-class="{'disabled': !settings.policeEnabled}" ng-show="settings.policeSpawnMode === 'flexible'">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Minimum Police</span>
+          <span class="bcm-setting-desc">Active patrol units when no pursuit is happening.</span>
+        </div>
+        <div class="bcm-slider-group">
+          <input type="range" min="1" max="3" step="1"
+            ng-model="settings.policeFlexMin"
+            ng-change="setFlexValue('policeFlexMin', settings.policeFlexMin)"
+            ng-disabled="!settings.policeEnabled" />
+          <span class="bcm-slider-value">{{ settings.policeFlexMin }}</span>
+        </div>
+      </div>
+
+      <!-- Flex Max (flexible mode only) -->
+      <div class="bcm-setting-item" ng-class="{'disabled': !settings.policeEnabled}" ng-show="settings.policeSpawnMode === 'flexible'">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Maximum Police</span>
+          <span class="bcm-setting-desc">Maximum units during an active pursuit. Reinforcements arrive based on your heat level.</span>
+        </div>
+        <div class="bcm-slider-group">
+          <input type="range" min="2" max="6" step="1"
+            ng-model="settings.policeFlexMax"
+            ng-change="setFlexValue('policeFlexMax', settings.policeFlexMax)"
+            ng-disabled="!settings.policeEnabled" />
+          <span class="bcm-slider-value">{{ settings.policeFlexMax }}</span>
+        </div>
+      </div>
+
+      <!-- Police Additive -->
+      <div class="bcm-setting-item" ng-class="{'disabled': !settings.policeEnabled}">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Extra Vehicles</span>
+          <span class="bcm-setting-desc">When ON, police are added on top of your traffic count. When OFF, they replace regular traffic slots to keep total vehicle count stable.</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="settings.policeEnabled && toggleSetting('policeAdditive')">
+          <span class="bcm-toggle-slider" ng-class="{'active': settings.policeAdditive}"></span>
+        </div>
+      </div>
+
+      <!-- Pursuit HUD -->
+      <div class="bcm-setting-item" ng-class="{'disabled': !settings.policeEnabled}">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Pursuit HUD</span>
+          <span class="bcm-setting-desc">Show the pursuit status overlay during police chases. Stars, evasion timer, and offense alerts.</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="settings.policeEnabled && toggleSetting('pursuitHudEnabled')">
+          <span class="bcm-toggle-slider" ng-class="{'active': settings.pursuitHudEnabled}"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLANEX DELIVERY Section -->
+    <div class="bcm-section">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#128230;</span>
+        <span>PLANEX DELIVERY</span>
+      </div>
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Time Multiplier</span>
+          <span class="bcm-setting-desc">
+            Adjusts timer pressure for urgent and cold-chain packs. 0.5x = more time, 2.0x = high pressure.
+          </span>
+        </div>
+        <div class="bcm-slider-group">
+          <input type="range" min="0.5" max="2.0" step="0.1"
+            ng-model="settings.planexTimeMultiplier"
+            ng-change="onSliderChange('planexTimeMultiplier', settings.planexTimeMultiplier)" />
+          <span class="bcm-slider-value">{{ settings.planexTimeMultiplier | number:1 }}x</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TUTORIALS Section -->
+    <div class="bcm-section">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#127891;</span>
+        <span>TUTORIALS</span>
+      </div>
+
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Contextual Tutorials</span>
+          <span class="bcm-setting-desc">Show guided tutorials the first time you open each feature.</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="toggleContextualTutorials()">
+          <span class="bcm-toggle-slider" ng-class="{'active': !settings.contextualTutorialsDisabled}"></span>
+        </div>
+      </div>
+
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Reset Tutorials</span>
+          <span class="bcm-setting-desc">Re-enables all contextual tutorials. They'll show again next time you visit each feature.</span>
+        </div>
+        <div ng-if="!resetTutorialsConfirming">
+          <button class="bcm-btn-action" ng-click="resetTutorials()" ng-disabled="!hasActiveSave">Reset All Tutorials</button>
+          <span class="bcm-setting-note" ng-if="!hasActiveSave">Requires an active career save.</span>
+        </div>
+        <div ng-if="resetTutorialsConfirming" class="bcm-confirm-inline">
+          <span class="bcm-confirm-text">All contextual tutorials will show again. Continue?</span>
+          <button class="bcm-btn-confirm" ng-click="confirmResetTutorials()">Yes, Reset</button>
+          <button class="bcm-btn-cancel" ng-click="cancelResetTutorials()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEBUG Section -->
+    <div class="bcm-section" ng-class="{'bcm-section-experimental': settings.debugMode}">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#128736;</span>
+        <span>DEVELOPER</span>
+      </div>
+
+      <!-- Debug Mode -->
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Debug Mode</span>
+          <span class="bcm-setting-desc">Enables developer tools, diagnostics, and verbose logging. Not recommended for normal gameplay.</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="toggleSetting('debugMode')">
+          <span class="bcm-toggle-slider" ng-class="{'active': settings.debugMode}"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPERIMENTAL Section (joke) -->
+    <div class="bcm-section bcm-section-experimental">
+      <div class="bcm-section-header">
+        <span class="bcm-section-icon">&#9889;</span>
+        <span>EXPERIMENTAL</span>
+      </div>
+
+      <!-- Turbo Encabulator (joke setting) -->
+      <div class="bcm-setting-item">
+        <div class="bcm-setting-info">
+          <span class="bcm-setting-label">Turbo Encabulator</span>
+          <span class="bcm-setting-desc">Enables the reciprocating dingle arm to reduce sinusoidal repleneration. Recommended for vehicles with prefabulated amulite.</span>
+        </div>
+        <div class="bcm-toggle-switch" ng-click="toggleSetting('turboEncabulator')">
+          <span class="bcm-toggle-slider" ng-class="{'active': settings.turboEncabulator}"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back button -->
+    <div class="bcm-back-container">
+      <button class="bcm-btn-back" ng-click="goBack()">
+        <span class="bcm-back-arrow">&#8592;</span> Back to Menu
+      </button>
+    </div>
+
+  </div>
+</div>

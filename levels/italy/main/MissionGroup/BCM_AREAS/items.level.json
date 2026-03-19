@@ -1,0 +1,3 @@
+{"name":"bcm_it_villa","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"bcm_it_portino","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"bcm_it_fbx","__parent":"BCM_AREAS","class":"SimGroup"}

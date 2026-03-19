@@ -1,0 +1,2 @@
+{"position":[-215.82055664063,-22.589059829712,121.79148864746],"name":"bcm_depot_icon","__parent":"bcm_depot","class":"BeamNGPointOfInterest"}
+{"name":"bcm_depot_area","__parent":"bcm_depot","position":[-215.86799621582,-22.858386993408,121.79148864746],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

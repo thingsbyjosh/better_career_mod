@@ -1,0 +1,2 @@
+{"position":[-816.23443603516,599.57281494141,117.45568947792],"name":"bcmGarage_23_icon","__parent":"bcmGarage_23","class":"BeamNGPointOfInterest"}
+{"name":"bcmGarage_23_area","__parent":"bcmGarage_23","position":[-682.5498046875,34.052627563477,103.51264953613],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

@@ -1,0 +1,2 @@
+{"position":[905.041015625,-541.4453125,163.64583915472],"name":"bcm_belasco_icon","__parent":"bcm_belasco","class":"BeamNGPointOfInterest"}
+{"name":"bcm_belasco_area","__parent":"bcm_belasco","position":[905.041015625,-541.4453125,163.64583915472],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

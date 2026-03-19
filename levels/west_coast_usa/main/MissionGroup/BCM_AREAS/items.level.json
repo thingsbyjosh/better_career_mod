@@ -1,0 +1,9 @@
+{"name":"bcmGarage_23","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_chinatown","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_trackside","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_dragstrip","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_cameras","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"bcm_radarzones","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_culdesac","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_depot","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"bcm_belasco","__parent":"BCM_AREAS","class":"SimGroup"}
