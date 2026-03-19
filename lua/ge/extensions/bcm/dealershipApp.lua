@@ -23,6 +23,8 @@ local onBCMPurchaseVehicleReady
 local buildReceiptEmailBody
 local formatCentsForEmail
 local resolveGarageList
+local sendInsuranceOptionsForCheckout
+local getDealershipMult
 
 -- ============================================================================
 -- Pending context tables (mirrors marketplaceApp pattern)
@@ -53,6 +55,16 @@ local COLOR_PALETTE = {
   { r = 0.90, g = 0.85, b = 0.05, name = "Yellow" },
 }
 
+-- Per-class dealership price multiplier (replaces flat Truck x1.5)
+-- Applied on top of the 200% base markup to correct for class-level demand.
+local CLASS_DEALERSHIP_MULT = {
+  Economy   = 1.0, Sedan   = 1.0, Coupe    = 1.0,
+  Sports    = 1.0, Muscle  = 1.0, Supercar = 1.0,
+  Luxury    = 1.0, Family  = 1.0, OffRoad  = 1.0,
+  SUV       = 1.0, Pickup  = 1.2, Van      = 1.2,
+  Special   = 1.3, HeavyDuty = 1.5,
+}
+
 -- Tax rates (matches marketplace)
 local REGISTRATION_TAX_RATE = 0.025
 local SALES_TAX_RATE = 0.07
@@ -63,6 +75,19 @@ local EXPRESS_SURCHARGE_CENTS = 200000  -- $2,000
 -- ============================================================================
 -- Helpers
 -- ============================================================================
+
+-- Get BCM dealership price multiplier for a pool entry.
+-- Calls classifyVehicle from listingGenerator if available; falls back to BeamNG Type.
+getDealershipMult = function(entry)
+  local lg = extensions.isExtensionLoaded("career_modules_bcm_listingGenerator") and career_modules_bcm_listingGenerator
+  if lg and lg.classifyVehicle then
+    local bcmClass = lg.classifyVehicle(entry)
+    return CLASS_DEALERSHIP_MULT[bcmClass] or 1.0
+  end
+  -- Fallback: use BeamNG raw Type field
+  if (entry.Type or "") == "Truck" then return 1.5 end
+  return 1.0
+end
 
 getLanguage = function()
   if bcm_settings and bcm_settings.getSetting then
@@ -417,7 +442,7 @@ requestVehicleDetail = function(brandKey, modelKey)
         configKey = entry.key,
         name = entry.Name or "Base",
         value = configValue,
-        priceCents = math.floor(configValue * 100 * 2 * (entry.Type == "Truck" and 1.5 or 1.0)),  -- 200% base, x1.5 for trucks
+        priceCents = math.floor(configValue * 100 * 2 * getDealershipMult(entry)),  -- 200% base, per-class multiplier
         years = entry.Years,
         preview = cfgPreview,
         power = cfgPower,
@@ -494,8 +519,8 @@ requestDealershipCheckout = function(modelKey, configKey, colorIndex, deliveryTy
     configValue = 5000  -- $5k floor
   end
 
-  local truckMult = (entryType == "Truck") and 1.5 or 1.0
-  local priceCents = math.floor(configValue * 100 * 2 * truckMult)  -- 200% base, x1.5 for trucks
+  local dealerMult = getDealershipMult({ Type = entryType, Value = configValue })
+  local priceCents = math.floor(configValue * 100 * 2 * dealerMult)  -- 200% base, per-class multiplier
 
   -- Express surcharge
   local expressCents = 0
@@ -507,14 +532,41 @@ requestDealershipCheckout = function(modelKey, configKey, colorIndex, deliveryTy
   local registrationTaxCents = math.floor(priceCents * REGISTRATION_TAX_RATE)
   local salesTaxCents = math.floor(priceCents * SALES_TAX_RATE)
 
-  -- Insurance options (same as marketplace)
+  -- Insurance options (filtered by vehicle insurance class — same as vanilla)
   local insuranceOptions = {}
   table.insert(insuranceOptions, { id = -1, name = "Sin seguro / No Insurance", premium = 0 })
+
+  -- Determine applicable insurance class from vehicle config
+  -- NOTE: configList.configs keys use format "modelKey_configKey", not bare configKey.
+  -- We search by config.key field to handle the format mismatch.
+  local applicableClassId = nil
+  if configKey and career_modules_insurance_insurance then
+    local configList = core_vehicles and core_vehicles.getConfigList and core_vehicles.getConfigList()
+    if configList and configList.configs then
+      local configData = nil
+      for _, cfg in pairs(configList.configs) do
+        if cfg.key == configKey then configData = cfg break end
+      end
+      if configData then
+        local ok, insuranceClass = pcall(career_modules_insurance_insurance.getInsuranceClassFromVehicleShoppingData, configData)
+        if ok and insuranceClass then
+          applicableClassId = insuranceClass.id
+        end
+      else
+        log("W", logTag, "requestDealershipCheckout: no configList entry for configKey='" .. tostring(configKey) .. "'")
+      end
+    end
+  end
+
   if career_modules_insurance_insurance then
     for id = 1, 20 do
       local ok, card = pcall(function()
         local raw = career_modules_insurance_insurance.getInsuranceDataById(id)
         if not raw then return nil end
+        -- Filter: skip insurances that don't match the vehicle's class
+        if applicableClassId and raw.class and raw.class ~= applicableClassId then
+          return nil
+        end
         return { id = id, name = raw.name or ("Policy " .. tostring(id)), premium = 0 }
       end)
       if ok and card then
@@ -592,8 +644,8 @@ confirmDealershipPurchase = function(modelKey, configKey, colorIndex, garageId, 
   end
   if configValue <= 0 then configValue = 5000 end
 
-  local truckMult = (entryType2 == "Truck") and 1.5 or 1.0
-  local priceCents = math.floor(configValue * 100 * 2 * truckMult)  -- 200% base, x1.5 for trucks
+  local dealerMult = getDealershipMult({ Type = entryType2, Value = configValue })
+  local priceCents = math.floor(configValue * 100 * 2 * dealerMult)  -- 200% base, per-class multiplier
 
   -- Express surcharge
   local expressCents = 0
@@ -966,6 +1018,121 @@ onCareerModulesActivated = function()
 end
 
 -- ============================================================================
+-- Vanilla insurance popup bridge (mirrors marketplaceApp pattern)
+-- Sends filtered insurance cards to ChooseInsuranceMain.vue popup.
+-- ============================================================================
+
+sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsuranceId, vehicleConfigKey)
+  local vehInfo = { Name = vehName or "Vehicle", Value = vehValueDollars or 0 }
+  local cards = {}
+
+  -- "No insurance" card (always first)
+  table.insert(cards, {
+    id = -1,
+    name = "No insurance",
+    perks = {
+      { id = "noInsurance", intro = "Full repair cost", value = 0, valueType = "boolean" },
+      { id = "noInsurance", intro = "No coverage", value = 0, valueType = "boolean" },
+      { id = "noInsurance", intro = "Not recommended", value = 0, valueType = "boolean" },
+    },
+    addVehiclePrice = 0,
+    amountDue = 0,
+    carsInsuredCount = 0,
+    groupDiscountData = { currentTierData = { id = 0, discount = 0 } },
+    paperworkFees = 0,
+  })
+
+  if career_modules_insurance_insurance then
+    -- Determine applicable insurance class from vehicle config
+    local applicableClassId = nil
+    if vehicleConfigKey then
+      -- NOTE: configList.configs keys use format "modelKey_configKey", not bare configKey.
+      -- We search by config.key field to handle the format mismatch.
+      local configList = core_vehicles and core_vehicles.getConfigList and core_vehicles.getConfigList()
+      if configList and configList.configs then
+        local configData = nil
+        for _, cfg in pairs(configList.configs) do
+          if cfg.key == vehicleConfigKey then configData = cfg break end
+        end
+        if configData then
+          local ok, insuranceClass = pcall(career_modules_insurance_insurance.getInsuranceClassFromVehicleShoppingData, configData)
+          if ok and insuranceClass then
+            applicableClassId = insuranceClass.id
+            log("I", logTag, "Insurance class for config '" .. tostring(vehicleConfigKey) .. "': " .. tostring(applicableClassId))
+          end
+        else
+          log("W", logTag, "sendInsuranceOptionsForCheckout: no configList entry for configKey='" .. tostring(vehicleConfigKey) .. "'")
+        end
+      end
+    end
+
+    for id = 1, 20 do
+      local ok, card = pcall(function()
+        local raw = career_modules_insurance_insurance.getInsuranceDataById(id)
+        if not raw then return nil end
+
+        -- Filter: skip insurances that don't match the vehicle's class
+        if applicableClassId and raw.class and raw.class ~= applicableClassId then
+          return nil
+        end
+
+        local premium = career_modules_insurance_insurance.calculateAddVehiclePrice(id, vehValueDollars) or 0
+
+        local baseDeductiblePrice = 0
+        if raw.coverageOptions and raw.coverageOptions.deductible and raw.coverageOptions.deductible.choices then
+          local choice = raw.coverageOptions.deductible.choices[2]
+          if choice then baseDeductiblePrice = choice.value or 0 end
+        end
+
+        local perksArray = {}
+        if raw.perks then
+          for perkId, perkData in pairs(raw.perks) do
+            local p = deepcopy(perkData)
+            p.id = perkId
+            table.insert(perksArray, p)
+          end
+        end
+
+        return {
+          id = raw.id,
+          name = raw.name,
+          slogan = raw.slogan,
+          color = raw.color or "#666",
+          image = raw.image and ("gameplay/insurance/providers/" .. raw.image .. ".png") or nil,
+          perks = perksArray,
+          paperworkFees = raw.paperworkFees or 0,
+          addVehiclePrice = premium,
+          amountDue = premium,
+          vehicleName = vehInfo.Name,
+          vehicleValue = vehInfo.Value,
+          baseDeductibledData = { price = baseDeductiblePrice },
+          futurePremiumDetails = career_modules_insurance_insurance.calculateInsurancePremium(id, nil, nil, vehValueDollars) or { totalPriceWithDriverScore = 0 },
+          carsInsuredCount = 0,
+          groupDiscountData = { currentTierData = { id = 0, discount = 0 } },
+        }
+      end)
+      if ok and card then
+        table.insert(cards, card)
+      end
+    end
+  end
+
+  table.sort(cards, function(a, b) return (a.id or 0) < (b.id or 0) end)
+
+  local driverScore = 0
+  pcall(function() driverScore = career_modules_insurance_insurance.getDriverScore() or 0 end)
+
+  guihooks.trigger('chooseInsuranceData', {
+    applicableInsurancesData = cards,
+    purchaseData = {},
+    vehicleInfo = vehInfo,
+    driverScoreData = { score = driverScore, tier = {} },
+    defaultInsuranceId = currentInsuranceId,
+    currentInsuranceId = nil,
+  })
+end
+
+-- ============================================================================
 -- Module exports
 -- ============================================================================
 
@@ -977,5 +1144,6 @@ M.confirmDealershipPurchase   = confirmDealershipPurchase
 M.onBCMPurchaseVehicleReady   = onBCMPurchaseVehicleReady
 M.onCareerModulesActivated    = onCareerModulesActivated
 M.onAddedVehiclePartsToInventory = onAddedVehiclePartsToInventory
+M.sendInsuranceOptionsForCheckout = sendInsuranceOptionsForCheckout
 
 return M

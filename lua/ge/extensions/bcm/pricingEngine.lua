@@ -18,11 +18,19 @@ local REFERENCE_YEAR    = 2025           -- NPC vehicles sell "today"
 
 local CLASS_AVG_HP = {
   Economy   = 120,
+  Sedan     = 160,
+  Coupe     = 200,
   Sports    = 280,
-  Truck     = 300,
-  SUV       = 250,
   Muscle    = 350,
   Supercar  = 550,
+  SUV       = 250,
+  Family    = 180,
+  Pickup    = 300,
+  Van       = 200,
+  HeavyDuty = 350,
+  Luxury    = 300,
+  OffRoad   = 200,
+  Special   = 250,
   default   = 200,
 }
 
@@ -30,36 +38,58 @@ local CLASSIC_ELIGIBLE = {
   Sports   = true,
   Muscle   = true,
   Supercar = true,
+  Luxury   = true,
+  Coupe    = true,
+  Pickup   = true,
 }
 
 -- Class-based appreciation rates per year (for classic-eligible vehicles)
 -- High enough that pre-1990 Sports/Muscle can exceed base price (ageFactor > 1.0)
 local CLASSIC_APPRECIATION_RATES = {
-  Supercar = 0.04,
-  Muscle   = 0.03,
+  Supercar = 0.040,
+  Luxury   = 0.035,
+  Muscle   = 0.030,
   Sports   = 0.025,
+  Coupe    = 0.020,
+  Pickup   = 0.015,
 }
 
 -- Market sigma (price dispersion) base by vehicle class
 local CLASS_MARKET_SIGMA = {
-  Economy  = 0.08,
-  Sports   = 0.12,
-  Truck    = 0.09,
-  SUV      = 0.09,
-  Muscle   = 0.15,
-  Supercar = 0.20,
-  default  = 0.10,
+  Economy   = 0.08,
+  Sedan     = 0.08,
+  Coupe     = 0.10,
+  Sports    = 0.12,
+  Muscle    = 0.15,
+  Supercar  = 0.20,
+  SUV       = 0.09,
+  Family    = 0.07,
+  Pickup    = 0.10,
+  Van       = 0.08,
+  HeavyDuty = 0.12,
+  Luxury    = 0.18,
+  OffRoad   = 0.15,
+  Special   = 0.22,
+  default   = 0.10,
 }
 
 -- Liquidity (demand) base by vehicle class
 local CLASS_LIQUIDITY = {
-  Economy  = 0.80,
-  Sports   = 0.50,
-  Truck    = 0.70,
-  SUV      = 0.65,
-  Muscle   = 0.40,
-  Supercar = 0.20,
-  default  = 0.50,
+  Economy   = 0.80,
+  Sedan     = 0.75,
+  Coupe     = 0.50,
+  Sports    = 0.50,
+  Muscle    = 0.40,
+  Supercar  = 0.20,
+  SUV       = 0.65,
+  Family    = 0.70,
+  Pickup    = 0.60,
+  Van       = 0.55,
+  HeavyDuty = 0.30,
+  Luxury    = 0.25,
+  OffRoad   = 0.35,
+  Special   = 0.15,
+  default   = 0.50,
 }
 
 -- Old uniform archetype bands (kept for backward compat alias)
@@ -117,12 +147,17 @@ local ARCHETYPE_ORDER = { "private_seller", "flipper", "dealer_pro", "grandmothe
 
 -- Seasonality lookup: [vehicleType][season] = multiplier
 local SEASONALITY_TABLE = {
-  Sports      = { spring = 1.0,  summer = 1.10, autumn = 1.0,  winter = 0.92 },
-  Convertible = { spring = 1.05, summer = 1.10, autumn = 0.95, winter = 0.92 },
-  Truck       = { spring = 1.0,  summer = 0.95, autumn = 1.0,  winter = 1.10 },
-  SUV         = { spring = 1.0,  summer = 0.95, autumn = 1.0,  winter = 1.10 },
-  ["4x4"]     = { spring = 1.0,  summer = 0.95, autumn = 1.0,  winter = 1.10 },
-  Pickup      = { spring = 1.0,  summer = 0.95, autumn = 1.0,  winter = 1.08 },
+  Sports    = { spring = 1.0,  summer = 1.10, autumn = 1.0,  winter = 0.92 },
+  Coupe     = { spring = 1.0,  summer = 1.05, autumn = 1.0,  winter = 0.95 },
+  Muscle    = { spring = 1.05, summer = 1.10, autumn = 1.0,  winter = 0.90 },
+  Supercar  = { spring = 1.0,  summer = 1.08, autumn = 1.0,  winter = 0.95 },
+  Pickup    = { spring = 1.0,  summer = 0.95, autumn = 1.0,  winter = 1.08 },
+  SUV       = { spring = 1.0,  summer = 0.95, autumn = 1.0,  winter = 1.10 },
+  HeavyDuty = { spring = 1.0,  summer = 1.0,  autumn = 1.0,  winter = 1.05 },
+  OffRoad   = { spring = 1.05, summer = 1.10, autumn = 1.0,  winter = 0.95 },
+  Van       = { spring = 1.0,  summer = 1.0,  autumn = 1.0,  winter = 1.0  },
+  Family    = { spring = 1.0,  summer = 1.0,  autumn = 1.0,  winter = 1.0  },
+  Luxury    = { spring = 1.0,  summer = 1.0,  autumn = 1.0,  winter = 1.0  },
 }
 
 -- Color category multipliers (base)
@@ -168,6 +203,7 @@ local dynamicFloorCents
 local computeMarketSigma
 local computeLiquidity
 local computeCarDesirability
+local computeMarketRange
 
 -- ============================================================================
 -- LCG (Linear Congruential Generator)
@@ -275,9 +311,18 @@ ageFactor_v2 = function(params)
       -- Sports/Muscle/Supercar: use class-specific rates (1.5-3% per year)
       appreciationRate = CLASSIC_APPRECIATION_RATES[vehicleClass] or 0.015
     else
-      -- Economy/Truck/SUV: slow vintage appreciation (0.8% per year)
-      -- An old Covet or D-Series still has vintage charm at 40+
-      appreciationRate = 0.008
+      -- Non-classic vehicles: per-class slow vintage appreciation
+      local NON_CLASSIC_RATES = {
+        SUV     = 0.010,
+        OffRoad = 0.010,
+        Sedan   = 0.008,
+        Van     = 0.005,
+        Economy = 0.005,
+        Special = 0.005,
+        Family  = 0.003,
+        HeavyDuty = 0.002,
+      }
+      appreciationRate = NON_CLASSIC_RATES[vehicleClass] or 0.005
     end
 
     -- Smooth blend into appreciation (S-curve from age 25 to 35)
@@ -335,9 +380,9 @@ powerFactor_v2 = function(params)
   local mult = 0.85 + (ratio - 0.5) * 0.30
   mult = math.max(0.80, math.min(1.30, mult))
 
-  -- Slow car penalty: economy cars with <275HP get extra depreciation
+  -- Slow car penalty: economy/sedan cars with <275HP get extra depreciation
   -- At 275HP: 0% penalty. At 100HP: -15% penalty. Linear interpolation.
-  if vehicleClass == "Economy" and hp < 275 then
+  if (vehicleClass == "Economy" or vehicleClass == "Sedan") and hp < 275 then
     local penaltyT = math.max(0, math.min(1, (275 - hp) / 175))  -- 0 at 275, 1 at 100
     local penalty = penaltyT * 0.15  -- max -15%
     mult = mult * (1.0 - penalty)
@@ -462,7 +507,7 @@ end
 
 -- Clamp price to floor/ceiling
 clampPrice = function(cents)
-  return math.max(PRICE_FLOOR_CENTS, math.min(PRICE_CEIL_CENTS, cents))
+  return math.max(0, math.min(PRICE_CEIL_CENTS, cents))
 end
 
 -- Dynamic floor based on power-to-weight ratio: a light powerful car is worth more
@@ -503,7 +548,7 @@ end
 --   configBaseValue (number, dollars)
 --   yearMade (number)
 --   mileageKm (number)
---   vehicleClass (string: "Economy", "Sports", "Truck", "SUV", "Muscle", "Supercar")
+--   vehicleClass (string: "Economy", "Sedan", "Coupe", "Sports", "Muscle", "Supercar", "SUV", "Family", "Pickup", "Van", "HeavyDuty", "Luxury", "OffRoad", "Special")
 --   powerHP (number)
 --   weightKg (number, for fallback)
 --   partsValueCents (number, additive)
@@ -693,7 +738,7 @@ getInstantSalePrice = function(priceCents, seed)
   -- Deterministic multiplier between 0.60 and 0.70 via LCG
   local multiplier = 0.60 + lcgFloat(seed * 54321 + 98765) * 0.10
   local result = math.floor(priceCents * multiplier)
-  return math.max(PRICE_FLOOR_CENTS, result)
+  return math.max(0, result)
 end
 
 -- Supply/demand multiplier (Phase 46) — applied by marketplace state
@@ -782,7 +827,10 @@ computeCarDesirability = function(params)
   -- Class appeal
   if vclass == "Supercar" then score = score + 0.15
   elseif vclass == "Muscle" then score = score + 0.10
+  elseif vclass == "Luxury" then score = score + 0.10
   elseif vclass == "Sports" then score = score + 0.05
+  elseif vclass == "OffRoad" then score = score + 0.05
+  elseif vclass == "Special" then score = score + 0.05
   end
 
   -- Classic bonus (25+ years)
@@ -850,6 +898,35 @@ M.applyDemandMultiplier   = applyDemandMultiplier
 M.computeMarketSigma      = computeMarketSigma
 M.computeLiquidity        = computeLiquidity
 M.computeCarDesirability  = computeCarDesirability
+
+-- Market value range — imprecise bracket shown to player instead of exact value
+-- Asymmetric ±10-15%, rounded to "nice" numbers based on price tier
+computeMarketRange = function(valueCents)
+  if not valueCents or valueCents <= 0 then
+    return { low = 0, high = 0 }
+  end
+  -- Spread: 12% below, 12% above (total ~24% band)
+  local rawLow = math.floor(valueCents * 0.88)
+  local rawHigh = math.ceil(valueCents * 1.12)
+  -- Round to "nice" numbers based on price tier
+  local roundTo
+  if valueCents < 500000 then        -- < $5k: round to $250
+    roundTo = 25000
+  elseif valueCents < 2000000 then   -- < $20k: round to $500
+    roundTo = 50000
+  elseif valueCents < 10000000 then  -- < $100k: round to $1,000
+    roundTo = 100000
+  else                               -- $100k+: round to $5,000
+    roundTo = 500000
+  end
+  local low = math.floor(rawLow / roundTo) * roundTo
+  local high = math.ceil(rawHigh / roundTo) * roundTo
+  -- Ensure minimum spread
+  if high <= low then high = low + roundTo end
+  return { low = math.max(0, low), high = high }
+end
+
+M.computeMarketRange      = computeMarketRange
 
 -- Expose constants for tests and listing generator
 M.PRICE_FLOOR_CENTS       = PRICE_FLOOR_CENTS

@@ -29,7 +29,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "gem_grandma_truck",
-    vehicleType = "Truck",
+    vehicleType = "Pickup",
     vehicleBrand = "Gavril",
     vehicleModel = nil,
     archetype = "grandmother",
@@ -211,7 +211,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "gem_kid_upgrade",
-    vehicleType = "Car",
+    vehicleType = nil,  -- was "Car" — not a valid BCM class; nil matches any class
     vehicleBrand = nil,
     vehicleModel = nil,
     archetype = "private_seller",
@@ -241,7 +241,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "scam_km_rollback_sedan",
-    vehicleType = "Car",
+    vehicleType = nil,  -- was "Car" — not a valid BCM class; nil matches any class
     vehicleBrand = nil,
     vehicleModel = nil,
     archetype = "scammer",
@@ -319,7 +319,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "scam_broken_parts",
-    vehicleType = "Car",
+    vehicleType = nil,  -- was "Car" — not a valid BCM class; nil matches any class
     vehicleBrand = nil,
     vehicleModel = nil,
     archetype = "scammer",
@@ -479,7 +479,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "ambig_looks_gem_has_catch",
-    vehicleType = "Car",
+    vehicleType = nil,  -- was "Car" — not a valid BCM class; nil matches any class
     vehicleBrand = nil,
     vehicleModel = nil,
     archetype = "clueless",
@@ -531,7 +531,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "ambig_cheap_boring",
-    vehicleType = "Car",
+    vehicleType = nil,  -- was "Car" — not a valid BCM class; nil matches any class
     vehicleBrand = "Ibishu",
     vehicleModel = nil,
     archetype = "private_seller",
@@ -691,7 +691,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "char_overexplainer",
-    vehicleType = "Car",
+    vehicleType = nil,  -- was "Car" — not a valid BCM class; nil matches any class
     vehicleBrand = nil,
     vehicleModel = nil,
     archetype = "enthusiast",
@@ -769,7 +769,7 @@ M.CURATED_LISTINGS = {
 
   {
     id = "char_first_timer",
-    vehicleType = "Car",
+    vehicleType = nil,  -- was "Car" — not a valid BCM class; nil matches any class
     vehicleBrand = nil,
     vehicleModel = nil,
     archetype = "clueless",

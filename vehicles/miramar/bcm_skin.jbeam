@@ -1,0 +1,12 @@
+{
+"miramar_skin_bcm": {
+    "information":{
+        "authors":"Better Career Mod",
+        "name":"BCM Livery",
+        "value":0
+    },
+    "slotType" : "skin_miramar_ute",
+    "skinType" : "paint_design",
+    "globalSkin" : "bcm"
+}
+}

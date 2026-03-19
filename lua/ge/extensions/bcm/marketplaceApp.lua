@@ -38,6 +38,7 @@ local sendPlayerInitMessage
 local deliverSellerGreeting
 local requestCheckoutData
 local sendInsuranceOptionsForCheckout
+local getInsuranceClassForConfig
 local buildReceiptEmailBody
 local formatCentsForEmail
 -- Phase 52: Defect integration
@@ -795,12 +796,21 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
     end
   end
 
-  -- Insurance options
+  -- Insurance options (filtered by vehicle insurance class)
   local insuranceOptions = {}
   local defaultInsuranceId = -1
   local insurancePremiumCents = 0
   -- "No insurance" is always the first option
   table.insert(insuranceOptions, { id = -1, name = "Sin seguro / No Insurance", premium = 0 })
+
+  -- Determine which insurance class applies to this vehicle
+  local applicableClassId = nil
+  if listing.vehicleConfigKey and career_modules_insurance_insurance then
+    local insuranceClass = getInsuranceClassForConfig(listing.vehicleConfigKey)
+    if insuranceClass then
+      applicableClassId = insuranceClass.id
+    end
+  end
 
   if career_modules_insurance_insurance then
     local playerInsurances = nil
@@ -811,12 +821,15 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
       for id, _ in pairs(playerInsurances) do
         -- playerInsurances has player stats, not provider info — get name from availableInsurances
         local providerInfo = career_modules_insurance_insurance.getInsuranceDataById(id)
-        local displayName = providerInfo and providerInfo.name or ("Policy " .. tostring(id))
-        table.insert(insuranceOptions, {
-          id = id,
-          name = displayName,
-          premium = 0,  -- Will be calculated below if selected
-        })
+        -- Filter: only show insurances matching the vehicle's class
+        if providerInfo and (not applicableClassId or providerInfo.class == applicableClassId) then
+          local displayName = providerInfo.name or ("Policy " .. tostring(id))
+          table.insert(insuranceOptions, {
+            id = id,
+            name = displayName,
+            premium = 0,  -- Will be calculated below if selected
+          })
+        end
       end
     end
     -- Calculate premium for selected insurance (PITFALL 2: value in dollars, not cents)
@@ -844,6 +857,7 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
     vehicleTitle = listing.title or "",
     vehicleBrand = listing.vehicleBrand,
     vehicleModel = listing.vehicleModel,
+    vehicleConfigKey = listing.vehicleConfigKey,
     year = listing.year,
     preview = listing.preview,
     listPriceCents = listing.priceCents,
@@ -865,10 +879,42 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
 end
 
 -- ============================================================================
+-- Insurance class helper: determines which insurance class a vehicle config
+-- belongs to (dailyDriver / commercial / prestige) using vanilla's own logic.
+-- Returns the class object (with .id field) or nil.
+-- ============================================================================
+
+getInsuranceClassForConfig = function(configKey)
+  if not configKey or not career_modules_insurance_insurance then return nil end
+  local configList = core_vehicles and core_vehicles.getConfigList and core_vehicles.getConfigList()
+  if not configList or not configList.configs then return nil end
+
+  -- NOTE: configList.configs keys use format "modelKey_configKey" (e.g. "covet_covet_turbo_evolution"),
+  -- NOT the bare configKey from the pool (e.g. "covet_turbo_evolution").
+  -- Direct lookup by bare configKey will always fail, so we search by config.key field.
+  local configData = nil
+  for _, cfg in pairs(configList.configs) do
+    if cfg.key == configKey then
+      configData = cfg
+      break
+    end
+  end
+
+  if not configData then
+    log("W", "bcm_marketplaceApp", "getInsuranceClassForConfig: no configList entry found for key='" .. tostring(configKey) .. "'")
+    return nil
+  end
+
+  local ok, result = pcall(career_modules_insurance_insurance.getInsuranceClassFromVehicleShoppingData, configData)
+  if ok and result then return result end
+  return nil
+end
+
+-- ============================================================================
 -- Vanilla insurance popup bridge (Phase 49.3)
 -- ============================================================================
 
-sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsuranceId)
+sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsuranceId, vehicleConfigKey)
   -- Build the data shape that ChooseInsuranceMain.vue / chooseInsuranceComposable expects
   -- via the 'chooseInsuranceData' guihook event.
   -- InsuranceCard.vue needs sanitized data: id, name, perks, color, image (full path),
@@ -893,14 +939,28 @@ sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsu
     paperworkFees = 0,
   })
 
-  -- Build cards for ALL available insurances using getInsuranceDataById (exported).
-  -- We iterate a range of IDs because getInsurancesByClass is not exported.
-  -- Vanilla IDs: dailyDriver 1-3, commercial 4-6, prestige 7-9.
+  -- Build cards for insurances matching the vehicle's insurance class.
+  -- Uses getInsuranceClassForConfig to determine applicable class, then filters
+  -- by raw.class == classId (vanilla IDs: dailyDriver 1-3, commercial 4-6, prestige 7-9).
   if career_modules_insurance_insurance then
+    local applicableClassId = nil
+    if vehicleConfigKey then
+      local insuranceClass = getInsuranceClassForConfig(vehicleConfigKey)
+      if insuranceClass then
+        applicableClassId = insuranceClass.id
+        log("I", "bcm_marketplaceApp", "Insurance class for config '" .. tostring(vehicleConfigKey) .. "': " .. tostring(applicableClassId))
+      end
+    end
+
     for id = 1, 20 do
       local ok, card = pcall(function()
         local raw = career_modules_insurance_insurance.getInsuranceDataById(id)
         if not raw then return nil end
+
+        -- Filter: skip insurances that don't match the vehicle's class
+        if applicableClassId and raw.class and raw.class ~= applicableClassId then
+          return nil
+        end
 
         -- Build sanitized card matching the shape InsuranceCard.vue expects
         -- (mirrors getInsuranceSanitizedData + getSanitizedInsuranceDataForPurchase)
@@ -1654,72 +1714,15 @@ end
 -- ============================================================================
 
 -- Compute market value for selling.
--- Priority: use stored listing price from BCM purchase (most accurate).
--- Fallback: re-compute with pricingEngine (for vanilla vehicles or pre-fix saves).
+-- Always recalculates from current vehicle state (odometer, condition, class, age).
+-- bcmListingPriceCents is informational only ("you paid X") and is NOT used for pricing.
+-- This ensures realistic depreciation: a vehicle driven 200k km sells for much less than
+-- its purchase price, while a nearly-new vehicle retains most of its value.
 computeVehicleMarketValue = function(inventoryId)
   local vehicles = career_modules_inventory and career_modules_inventory.getVehicles and career_modules_inventory.getVehicles() or {}
   local vehicleData = vehicles[tonumber(inventoryId)]
   if not vehicleData then return 0 end
 
-  -- Best source: the listing price when purchased through eBoy Motors
-  -- This IS the market-adjusted value (same pricingEngine + archetype + demand + clustering)
-  if vehicleData.bcmListingPriceCents and vehicleData.bcmListingPriceCents > 0 then
-    local baseCents = vehicleData.bcmListingPriceCents
-
-    -- Apply parts modification bonus: added/upgraded parts increase value at 120% of part value
-    local vc = career_modules_valueCalculator
-    local partInv = career_modules_partInventory
-    if vc and vc.getPartDifference and vc.getPartValue and partInv and partInv.getInventory and partInv.getPart then
-      local inventory = partInv.getInventory() or {}
-      local invId = tonumber(inventoryId)
-      local newParts = {}
-      for _, part in pairs(inventory) do
-        if part.location == invId then
-          newParts[part.containingSlot] = part.name
-        end
-      end
-      local originalParts = vehicleData.originalParts
-      local changedSlots = vehicleData.changedSlots or {}
-      local addedParts, removedParts = vc.getPartDifference(originalParts, newParts, changedSlots)
-
-      local addedValueDollars = 0
-      if addedParts then
-        for slot, _ in pairs(addedParts) do
-          local part = partInv.getPart(invId, slot)
-          if part then
-            -- Use catalog value (part.value) — what the player paid for the part
-            addedValueDollars = addedValueDollars + (part.value or 0)
-          end
-        end
-      end
-      local removedValueDollars = 0
-      if removedParts and originalParts then
-        for slot, _ in pairs(removedParts) do
-          local orig = originalParts[slot]
-          if orig then
-            removedValueDollars = removedValueDollars + (orig.value or 0)
-          end
-        end
-      end
-
-      -- 120% of what player paid for added parts, minus removed parts value, converted to cents
-      local partsDeltaCents = math.floor((addedValueDollars * 1.20 - removedValueDollars) * 100)
-      if partsDeltaCents ~= 0 then
-        baseCents = math.max(baseCents + partsDeltaCents, 100) -- floor $1
-        log('D', 'marketplaceApp', 'computeVehicleMarketValue: parts delta $'
-          .. string.format("%.0f", partsDeltaCents / 100)
-          .. ' (added=$' .. string.format("%.0f", addedValueDollars)
-          .. ' removed=$' .. string.format("%.0f", removedValueDollars)
-          .. ') final=' .. tostring(baseCents))
-      end
-    end
-
-    log('D', 'marketplaceApp', 'computeVehicleMarketValue: inv=' .. tostring(inventoryId)
-      .. ' using bcmListingPriceCents=' .. tostring(baseCents))
-    return baseCents
-  end
-
-  -- Fallback: re-compute from vehicle data (vanilla vehicles, starter cars, pre-fix saves)
   local pe = getPricingEngine()
   local lg = getListingGenerator()
 
@@ -1816,6 +1819,17 @@ computeVehicleMarketValue = function(inventoryId)
     end
   end
 
+  -- Apply price overrides (same JSON as listing generator — consistent buy/sell values)
+  if configShortKey and lg.applyPriceOverride then
+    local adjustedValue, forcedClass = lg.applyPriceOverride(configShortKey, configBaseValue)
+    if adjustedValue ~= configBaseValue then
+      configBaseValue = adjustedValue
+    end
+    if forcedClass then
+      vehicleClass = forcedClass
+    end
+  end
+
   local seed = pe.lcg((tonumber(inventoryId) or 0) * 31337)
 
   log('D', 'marketplaceApp', 'computeVehicleMarketValue: inv=' .. tostring(inventoryId)
@@ -1842,10 +1856,71 @@ computeVehicleMarketValue = function(inventoryId)
     vehicleType = vehicleClass,
   })
 
+  -- Per-class marketplace multiplier: work vehicles (Pickup, Van, HeavyDuty) hold value better
+  local CLASS_SELL_MULT = {
+    Economy   = 1.0, Sedan   = 1.0, Coupe    = 1.0,
+    Sports    = 1.0, Muscle  = 1.0, Supercar = 1.0,
+    Luxury    = 1.0, Family  = 1.0, OffRoad  = 1.0,
+    SUV       = 1.1, Pickup  = 1.3, Van      = 1.3,
+    Special   = 1.5, HeavyDuty = 2.0,
+  }
+  local classMult = CLASS_SELL_MULT[vehicleClass] or 1.0
+  if classMult ~= 1.0 then
+    valueCents = math.floor(valueCents * classMult)
+  end
+
+  -- Parts modification delta: added parts increase value at 120%; removed parts reduce it
+  local vc = career_modules_valueCalculator
+  local partInv = career_modules_partInventory
+  if vc and vc.getPartDifference and vc.getPartValue and partInv and partInv.getInventory and partInv.getPart then
+    local inventory = partInv.getInventory() or {}
+    local invId = tonumber(inventoryId)
+    local newParts = {}
+    for _, part in pairs(inventory) do
+      if part.location == invId then
+        newParts[part.containingSlot] = part.name
+      end
+    end
+    local originalParts = vehicleData.originalParts
+    local changedSlots = vehicleData.changedSlots or {}
+    local addedParts, removedParts = vc.getPartDifference(originalParts, newParts, changedSlots)
+
+    local addedValueDollars = 0
+    if addedParts then
+      for slot, _ in pairs(addedParts) do
+        local part = partInv.getPart(invId, slot)
+        if part then
+          -- Use catalog value (part.value) — what the player paid for the part
+          addedValueDollars = addedValueDollars + (part.value or 0)
+        end
+      end
+    end
+    local removedValueDollars = 0
+    if removedParts and originalParts then
+      for slot, _ in pairs(removedParts) do
+        local orig = originalParts[slot]
+        if orig then
+          removedValueDollars = removedValueDollars + (orig.value or 0)
+        end
+      end
+    end
+
+    -- 120% of what player paid for added parts, minus removed parts value, converted to cents
+    local partsDeltaCents = math.floor((addedValueDollars * 1.20 - removedValueDollars) * 100)
+    if partsDeltaCents ~= 0 then
+      valueCents = math.max(valueCents + partsDeltaCents, 100) -- floor $1
+      log('D', 'marketplaceApp', 'computeVehicleMarketValue: parts delta $'
+        .. string.format("%.0f", partsDeltaCents / 100)
+        .. ' (added=$' .. string.format("%.0f", addedValueDollars)
+        .. ' removed=$' .. string.format("%.0f", removedValueDollars)
+        .. ') final=' .. tostring(valueCents))
+    end
+  end
+
   log('D', 'marketplaceApp', 'computeVehicleMarketValue result: ' .. tostring(valueCents) .. ' cents')
 
-  -- Ensure floor
-  if valueCents <= 0 then valueCents = 150000 end -- $1,500 minimum
+  -- Ensure non-negative
+  if valueCents < 0 then valueCents = 0 end
   return valueCents
 end
 
@@ -1890,7 +1965,7 @@ getVehicleSellData = function(inventoryId)
 
   local pe = getPricingEngine()
   local instantSellCents = pe.getInstantSalePrice(valueCents, inventoryId)
-  local suggestedListingCents = math.floor(valueCents * 0.90) -- 10% below market
+  local suggestedListingCents = math.max(math.floor(valueCents * 0.90), instantSellCents) -- 10% below market, but never less than instant sell
 
   -- Try to find purchase price from transaction log
   local purchasePriceCents = nil
@@ -1949,6 +2024,9 @@ getVehicleSellData = function(inventoryId)
     end
   end
 
+  -- paidPriceCents: informational "you paid X" from stored BCM purchase price — NOT used for sell calculations
+  local paidPriceCents = vehicleData and vehicleData.bcmListingPriceCents or nil
+
   local payload = {
     inventoryId = inventoryId,
     canSell = preconditions.canSell,
@@ -1958,7 +2036,10 @@ getVehicleSellData = function(inventoryId)
     vehicleModel = vehicleModel,
     thumbnail = thumbnail,
     purchasePriceCents = purchasePriceCents,
+    paidPriceCents = paidPriceCents,
     currentValueCents = valueCents,
+    marketRangeLowCents = pe.computeMarketRange and pe.computeMarketRange(valueCents).low or math.floor(valueCents * 0.88),
+    marketRangeHighCents = pe.computeMarketRange and pe.computeMarketRange(valueCents).high or math.ceil(valueCents * 1.12),
     instantSellPriceCents = instantSellCents,
     suggestedListingPriceCents = suggestedListingCents,
     netProfitLossCents = netProfitLossCents,
@@ -1989,11 +2070,14 @@ requestSellableVehicles = function()
     local valueCents = computeVehicleMarketValue(invId)
     local pe = getPricingEngine()
     local instantSellCents = pe.getInstantSalePrice(valueCents, invId)
+    local range = pe.computeMarketRange and pe.computeMarketRange(valueCents) or { low = math.floor(valueCents * 0.88), high = math.ceil(valueCents * 1.12) }
     table.insert(result, {
       inventoryId = invId,
       niceName = niceName,
       thumbnail = thumbnail,
       currentValueCents = valueCents,
+      marketRangeLowCents = range.low,
+      marketRangeHighCents = range.high,
       instantSellPriceCents = instantSellCents,
       canSell = preconditions.canSell,
       reasons = preconditions.reasons,
@@ -2127,6 +2211,7 @@ confirmInstantSell = function(inventoryId)
 end
 
 createPlayerListing = function(inventoryId, priceCents, description)
+  log('I', logTag, 'createPlayerListing called: inv=' .. tostring(inventoryId) .. ' price=' .. tostring(priceCents) .. ' desc=' .. tostring(description))
   local preconditions = getSellPreconditions(inventoryId)
   if not preconditions.canSell then
     guihooks.trigger('BCMPlayerListings', { error = "precondition_failed", reasons = preconditions.reasons })
@@ -2254,13 +2339,12 @@ createPlayerListing = function(inventoryId, priceCents, description)
     carDesirability = carDesirability,
   }
 
-  -- Charge non-refundable listing fee (3% of asking price)
   local listingFeeCents = math.floor(priceCents * SELLER_LISTING_FEE_RATE)
   local feeCharged = false
   if listingFeeCents > 0 and bcm_banking and bcm_banking.removeFunds then
     local personalAccount = bcm_banking.getPersonalAccount and bcm_banking.getPersonalAccount()
     if personalAccount then
-      local balance = bcm_banking.getBalance and bcm_banking.getBalance(personalAccount.id) or 0
+      local balance = personalAccount.balance or 0
       if balance < listingFeeCents then
         guihooks.trigger('BCMPlayerListings', {
           error = "insufficient_funds",
@@ -2768,6 +2852,18 @@ end
 
 -- Debug / dev tools
 M.ensureMarketplacePopulated = ensureMarketplacePopulated
+
+-- Debug: wipe all marketplace listings and repopulate from scratch.
+-- Usage: extensions.bcm_marketplaceApp.debugResetListings()
+M.debugResetListings = function()
+  local mp = getMarketplace()
+  if not mp then log('E', logTag, 'debugResetListings: marketplace not loaded') return end
+  mp.resetMarketplace()
+  local gameDay = getCurrentGameDay()
+  ensureMarketplacePopulated(gameDay)
+  requestListings(nil)
+  log('I', logTag, 'debugResetListings: marketplace wiped and repopulated')
+end
 M.debugForceBuyerOffer = function()
   local mp = getMarketplace()
   if not mp then log('E', logTag, 'debugForceBuyerOffer: marketplace not loaded') return end

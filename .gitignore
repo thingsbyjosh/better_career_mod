@@ -1,9 +1,0 @@
-*.map
-.planning/
-baseUI/
-ui-vue-src/
-ui-build-temp/
-build_ui.bat
-node_modules/
-package-lock.json
-*.log

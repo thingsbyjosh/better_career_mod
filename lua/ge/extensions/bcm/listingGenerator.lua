@@ -13,6 +13,49 @@ local templates = require('lua/ge/extensions/bcm/listingTemplates')
 local curatedPool = require('lua/ge/extensions/bcm/curatedListings')
 
 -- ============================================================================
+-- Price Overrides (loaded from JSON — per-mod value multipliers and class overrides)
+-- ============================================================================
+
+local _priceOverrides = nil  -- lazy-loaded cache
+
+local function getPriceOverrides()
+  if _priceOverrides then return _priceOverrides end
+  local data = jsonReadFile('gameplay/bcm_priceOverrides.json')
+  _priceOverrides = data or {}
+  return _priceOverrides
+end
+
+-- Apply price override for a vehicle config.
+-- Returns: adjustedValue, forcedClass (or nil)
+local function applyPriceOverride(configKey, baseValue)
+  local overrides = getPriceOverrides()
+  if not overrides or #overrides == 0 then return baseValue, nil end
+
+  local keyLower = (configKey or ""):lower()
+
+  for _, modEntry in ipairs(overrides) do
+    -- Check individual config override first
+    if modEntry.configs and modEntry.configs[configKey] then
+      local cfg = modEntry.configs[configKey]
+      local mult = cfg.valueMultiplier or 1.0
+      return math.floor(baseValue * mult), cfg.forceClass or nil
+    end
+
+    -- Check fallback match
+    if modEntry.fallback and modEntry.fallback.match then
+      for _, pattern in ipairs(modEntry.fallback.match) do
+        if keyLower:find(pattern:lower(), 1, true) then
+          local mult = modEntry.fallback.valueMultiplier or 1.0
+          return math.floor(baseValue * mult), nil
+        end
+      end
+    end
+  end
+
+  return baseValue, nil
+end
+
+-- ============================================================================
 -- Constants
 -- ============================================================================
 
@@ -248,6 +291,17 @@ generateMileage = function(year, archetypeKey, seed)
   return baseKm
 end
 
+-- Per-class marketplace price multiplier (replaces flat Truck x2.0)
+-- Trucks/commercial vehicles are underpriced by pricingEngine due to high mileage depreciation;
+-- these multipliers correct for real-world second-hand demand.
+local CLASS_MARKETPLACE_MULT = {
+  Economy   = 1.0, Sedan   = 1.0, Coupe    = 1.0,
+  Sports    = 1.0, Muscle  = 1.0, Supercar = 1.0,
+  Luxury    = 1.0, Family  = 1.0, OffRoad  = 1.0,
+  SUV       = 1.1, Pickup  = 1.3, Van      = 1.3,
+  Special   = 1.5, HeavyDuty = 2.0,
+}
+
 -- v2 mileage generation: per-class Gaussian distribution with logistic saturation.
 -- Each vehicle class defines its own annual km curve and a ceiling.
 -- The Gaussian generates annual km, multiplied by age for raw km.
@@ -255,13 +309,20 @@ end
 -- the class ceiling without ever reaching it. No hard caps, no clamps.
 local CLASS_KM_CURVE = {
   --               annualMin  annualMax   ceiling  (max km the class can ever approach)
-  Supercar = { min = 500,    max = 5000,   ceiling = 200000   },
-  Sports   = { min = 2000,   max = 12000,  ceiling = 400000   },
-  Muscle   = { min = 3000,   max = 14000,  ceiling = 500000   },
-  Luxury   = { min = 3000,   max = 15000,  ceiling = 600000   },
-  Economy  = { min = 5000,   max = 25000,  ceiling = 800000   },
-  SUV      = { min = 8000,   max = 30000,  ceiling = 1200000  },
-  Truck    = { min = 15000,  max = 50000,  ceiling = 2000000  },
+  Economy   = { min = 8000,   max = 25000,  ceiling = 600000   },
+  Sedan     = { min = 8000,   max = 22000,  ceiling = 500000   },
+  Coupe     = { min = 3000,   max = 15000,  ceiling = 350000   },
+  Sports    = { min = 2000,   max = 12000,  ceiling = 300000   },
+  Muscle    = { min = 3000,   max = 14000,  ceiling = 400000   },
+  Supercar  = { min = 500,    max = 5000,   ceiling = 150000   },
+  SUV       = { min = 8000,   max = 28000,  ceiling = 800000   },
+  Family    = { min = 10000,  max = 30000,  ceiling = 900000   },
+  Pickup    = { min = 12000,  max = 35000,  ceiling = 1200000  },
+  Van       = { min = 15000,  max = 40000,  ceiling = 1500000  },
+  HeavyDuty = { min = 20000,  max = 60000,  ceiling = 2500000  },
+  Luxury    = { min = 3000,   max = 10000,  ceiling = 300000   },
+  OffRoad   = { min = 2000,   max = 8000,   ceiling = 200000   },
+  Special   = { min = 1000,   max = 5000,   ceiling = 100000   },
 }
 
 -- Archetype position within class range: 0.0 = low end, 1.0 = high end
@@ -455,8 +516,10 @@ end
 -- ============================================================================
 -- Vehicle Classification
 -- ============================================================================
--- Classify vehicle into pricing classes: Economy, Sports, Muscle, Supercar, Truck, SUV
--- Priority: Derby Class (from aggregates) → Body Style → heuristic (power/value/weight)
+-- Classify vehicle into 14 BCM classes: Economy, Sedan, Coupe, Sports, Muscle, Supercar,
+-- SUV, Family, Pickup, Van, HeavyDuty, Luxury, OffRoad, Special
+-- Priority: Body Style (primary) → Derby Class (fallback) → heuristic (power/value/weight)
+-- Heuristic upgrades only apply to Economy, Sedan, Coupe base classes.
 
 -- Helper: get first key from an aggregates sub-table (they're stored as {key=true,...})
 local function firstAggregateKey(vehicleData, field)
@@ -467,75 +530,76 @@ local function firstAggregateKey(vehicleData, field)
   return nil
 end
 
--- Derby Class → vehicleClass mapping
-local DERBY_TO_CLASS = {
+-- Derby Class → vehicleClass fallback mapping (only used when Body Style is absent)
+local DERBY_FALLBACK = {
   ["Sports Car"]      = "Sports",
   ["Sub-Compact Car"] = "Economy",
   ["Sub-Compact"]     = "Economy",
   ["Compact Car"]     = "Economy",
-  ["Mid-Size Car"]    = "Economy",   -- may be overridden by heuristic
-  ["Full-Size Car"]   = "Economy",   -- may be overridden by heuristic
-  ["Light Truck"]     = "Truck",
-  ["Medium Truck"]    = "Truck",
-  ["Heavy Truck"]     = "Truck",
-  ["Wheel Loader"]    = "Truck",
+  ["Mid-Size Car"]    = "Sedan",
+  ["Full-Size Car"]   = "Sedan",
+  ["Light Truck"]     = "Pickup",
+  ["Medium Truck"]    = "HeavyDuty",
+  ["Heavy Truck"]     = "HeavyDuty",
+  ["Wheel Loader"]    = "HeavyDuty",
 }
 
--- Body Style → vehicleClass mapping (used as secondary signal)
-local BODY_TO_CLASS = {
-  ["SUV"]       = "SUV",
-  ["Pickup"]    = "Truck",
-  ["Roadster"]  = "Sports",
-  ["Van"]       = "Truck",
-  ["Minivan"]   = "SUV",
-  ["ATV"]       = "Truck",
-  ["Buggy"]     = "Sports",
-  ["Bus"]       = "Truck",
+-- Body Style → vehicleClass primary mapping (28 Body Style values from vanilla)
+local BODY_STYLE_TO_CLASS = {
+  ["Hatchback"]         = "Economy",
+  ["Liftback"]          = "Economy",
+  ["Sedan"]             = "Sedan",
+  ["Wagon"]             = "Sedan",
+  ["Coupe"]             = "Coupe",
+  ["Shooting Brake"]    = "Coupe",
+  ["Roadster"]          = "Sports",
+  ["Buggy"]             = "OffRoad",
+  ["SUV"]               = "SUV",
+  ["Minivan"]           = "Family",
+  ["Pickup"]            = "Pickup",
+  ["Van"]               = "Van",
+  ["Ambulance"]         = "Van",
+  ["ATV"]               = "OffRoad",
+  ["Limousine"]         = "Luxury",
+  ["Armored"]           = "Special",
+  ["Bus"]               = "HeavyDuty",
+  ["Box Truck"]         = "HeavyDuty",
+  ["Flatbed"]           = "HeavyDuty",
+  ["Dump Truck"]        = "HeavyDuty",
+  ["Tanker Truck"]      = "HeavyDuty",
+  ["Mixer Truck"]       = "HeavyDuty",
+  ["Chassis Cab"]       = "HeavyDuty",
+  ["Logging Truck"]     = "HeavyDuty",
+  ["Fifth Wheel Truck"] = "HeavyDuty",
+  ["Haul Truck"]        = "HeavyDuty",
+  ["JATO truck"]        = "HeavyDuty",
+  ["Wheel Loader"]      = "HeavyDuty",
 }
 
 classifyVehicle = function(vehicleData)
-  local derbyClass = firstAggregateKey(vehicleData, "Derby Class")
   local bodyStyle  = firstAggregateKey(vehicleData, "Body Style")
   local hp         = vehicleData.Power or 0
   local value      = vehicleData.Value or 0
   local weight     = vehicleData.Weight or 1500
 
-  -- Step 1: Derby Class direct mapping
-  local baseClass = derbyClass and DERBY_TO_CLASS[derbyClass] or nil
+  -- Step 1: Body Style primary mapping
+  local baseClass = bodyStyle and BODY_STYLE_TO_CLASS[bodyStyle] or nil
 
-  -- Step 2: Body Style override (SUV, Pickup etc. take priority)
-  local bodyClass = bodyStyle and BODY_TO_CLASS[bodyStyle] or nil
-  if bodyClass then
-    -- SUV/Pickup override even if Derby says "Mid-Size Car"
-    if bodyClass == "SUV" or bodyClass == "Truck" then
-      baseClass = bodyClass
-    elseif not baseClass then
-      baseClass = bodyClass
-    end
+  -- Step 2: Derby Class fallback (only if no Body Style)
+  if not baseClass then
+    local derbyClass = firstAggregateKey(vehicleData, "Derby Class")
+    baseClass = derbyClass and DERBY_FALLBACK[derbyClass] or nil
   end
 
-  -- Step 3: Heuristic upgrade for Cars that are actually Sports/Muscle/Supercar
-  -- Only apply if current class is Economy or nil (don't downgrade Trucks/SUVs)
-  if not baseClass or baseClass == "Economy" then
-    -- Supercar: very high value AND high power
-    if value >= 150000 and hp >= 400 then
-      return "Supercar"
-    end
-    -- Muscle: high power, moderate-high value
-    if hp >= 350 and value >= 40000 then
-      return "Muscle"
-    end
-    -- Sports: elevated power or great power-to-weight or high value coupe/roadster
-    if hp >= 250 then
-      return "Sports"
-    end
-    if weight > 0 and hp > 0 and (hp / (weight / 1000)) >= 200 then
-      -- >200 HP/ton = sporty
-      return "Sports"
-    end
-    if value >= 60000 and (bodyStyle == "Coupe" or bodyStyle == "Shooting Brake") then
-      return "Sports"
-    end
+  -- Step 3: Heuristic upgrade (only for Economy, Sedan, Coupe)
+  if baseClass == "Economy" or baseClass == "Sedan" or baseClass == "Coupe" then
+    if value >= 150000 and hp >= 400 then return "Supercar" end
+    if value >= 150000 and hp >= 300 then return "Supercar" end
+    if hp >= 350 and value >= 40000 then return "Muscle" end
+    if hp >= 300 and baseClass == "Coupe" then return "Muscle" end
+    if hp >= 250 then return "Sports" end
+    if weight > 0 and hp > 0 and (hp / (weight / 1000)) >= 200 then return "Sports" end
+    if value >= 60000 and baseClass == "Coupe" then return "Sports" end
   end
 
   -- Step 4: Default
@@ -790,8 +854,18 @@ generateListing = function(params)
     archetypeKey = pricingEngine.pickArchetype(seed)
   end
 
+  -- Apply price overrides (per-mod value adjustments and forced class)
+  local forcedClass = nil
+  if vehicleData.key then
+    local adjustedValue, fc = applyPriceOverride(vehicleData.key, vehicleData.Value or 0)
+    if adjustedValue ~= (vehicleData.Value or 0) then
+      vehicleData.Value = adjustedValue
+    end
+    forcedClass = fc
+  end
+
   -- Generate vehicle properties
-  local vehicleClass = classifyVehicle(vehicleData)
+  local vehicleClass = forcedClass or classifyVehicle(vehicleData)
   local year = generateYear(vehicleData, lcgChain(seed, 40))
   local mileageKm = generateMileage_v2(year, archetypeKey, lcgChain(seed, 41), vehicleClass)
   -- Scammer listed km must be under 100k (the lie)
@@ -925,9 +999,10 @@ generateListing = function(params)
     priceCents = pricingEngine.applyDemandMultiplier(priceCents, demandMult)
   end
 
-  -- Truck class multiplier: trucks are underpriced due to high mileage depreciation — x2 corrects this
-  if vehicleClass == "Truck" then
-    priceCents = math.floor(priceCents * 2.0)
+  -- Per-class marketplace multiplier: corrects pricingEngine underpricing for commercial/utility classes
+  local classMult = CLASS_MARKETPLACE_MULT[vehicleClass] or 1.0
+  if classMult ~= 1.0 then
+    priceCents = math.floor(priceCents * classMult)
   end
 
   -- Final clamp: dynamic floor based on power-to-weight (no sporty car should be dirt cheap)
@@ -1370,5 +1445,7 @@ M.detectSuspiciousMileage = detectSuspiciousMileage
 M.computeFreshnessScore = computeFreshnessScore
 M.computeZipfWeights = computeZipfWeights
 M.classifyVehicle = classifyVehicle
+M.applyPriceOverride = applyPriceOverride
+M.reloadPriceOverrides = function() _priceOverrides = nil end
 
 return M

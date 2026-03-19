@@ -372,15 +372,15 @@ end
 
 getNudgeHintForStep = function(step)
   local hints = {
-    [1] = "Walk to the red car and press the enter-vehicle prompt.",
-    [2] = "Follow the GPS route to reach the garage.",
-    [3] = "Enter the garage and interact with the computer terminal.",
-    [4] = "Pick up your cargo at the depot, then deliver it to the marked location.",
-    [5] = "Hold the radial menu key and select 'Retrieve favorite vehicle'.",
-    [6] = "Use the garage computer and select a sleep time.",
-    [7] = "Check the dealerships once you have enough money.",
+    [1] = t("Walk to the red car and press the enter-vehicle prompt.", "Acércate al coche rojo y pulsa el botón para subir."),
+    [2] = t("Follow the GPS route to reach the garage.", "Sigue la ruta GPS para llegar al garaje."),
+    [3] = t("Enter the garage and interact with the computer terminal.", "Entra al garaje e interactúa con la terminal del ordenador."),
+    [4] = t("Pick up your cargo at the depot, then deliver it to the marked location.", "Recoge tu carga en el depósito y llévala al punto marcado."),
+    [5] = t("Hold the radial menu key and select 'Retrieve favorite vehicle'.", "Mantén pulsada la tecla del menú radial y selecciona 'Recuperar vehículo favorito'."),
+    [6] = t("Use the garage computer and select a sleep time.", "Usa el ordenador del garaje y selecciona una hora para dormir."),
+    [7] = t("Check the dealerships once you have enough money.", "Revisa los concesionarios cuando tengas suficiente dinero."),
   }
-  return hints[step] or "Check the tasklist for your current objective."
+  return hints[step] or t("Check the tasklist for your current objective.", "Consulta la lista de tareas para ver tu objetivo actual.")
 end
 
 -- ============================================================
@@ -443,8 +443,8 @@ advanceToStep = function(n)
   -- Clear existing tasklist and set new header + task
   guihooks.trigger("ClearTasklist", {})
   guihooks.trigger("SetTasklistHeader", {
-    label   = "Tutorial",
-    subtext = "Step " .. tostring(n) .. " of 7",
+    label   = t("Tutorial", "Tutorial"),
+    subtext = t("Step " .. tostring(n) .. " of 7", "Paso " .. tostring(n) .. " de 7"),
   })
 
   local step = STEPS[n]
@@ -648,7 +648,7 @@ patchInventorySell = function()
       and tutorialData.miramarInventoryId
       and inventoryId == tutorialData.miramarInventoryId
     then
-      ui_message("You can't sell the Miramar during the tutorial.", 4, "warning", "warning")
+      ui_message(t("You can't sell the Miramar during the tutorial.", "No puedes vender el Miramar durante el tutorial."), 4, "warning", "warning")
       return false
     end
     return originalSellVehicle(inventoryId, price)
@@ -1094,8 +1094,8 @@ restoreStepUI = function()
 
   -- ── Re-fire tasklist UI ───────────────────────────────────────────────
   guihooks.trigger("SetTasklistHeader", {
-    label   = "Tutorial",
-    subtext = "Step " .. tostring(step) .. " of 7",
+    label   = t("Tutorial", "Tutorial"),
+    subtext = t("Step " .. tostring(step) .. " of 7", "Paso " .. tostring(step) .. " de 7"),
   })
 
   local stepDef = STEPS[step]

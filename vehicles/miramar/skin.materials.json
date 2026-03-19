@@ -1,0 +1,41 @@
+{
+  "miramar_ute.skin.bcm": {
+    "name": "miramar_ute.skin.bcm",
+    "mapTo": "miramar_ute.skin.bcm",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/vehicles/miramar/miramar_main_ao.data.png",
+        "baseColorMap": "/vehicles/miramar/miramar_main_b.color.png",
+        "metallicFactor": 1,
+        "metallicMap": "/vehicles/miramar/miramar_main_m.data.png",
+        "normalMap": "/vehicles/miramar/miramar_main_n.normal.png",
+        "opacityFactor": 0,
+        "pixelSpecular": true,
+        "roughnessMap": "/vehicles/miramar/miramar_main_r.data.png"
+      },
+      {
+        "ambientOcclusionMap": "/vehicles/miramar/miramar_main_ao.data.png",
+        "baseColorMap": "/vehicles/miramar/miramar_skin_bcm.color.png",
+        "clearCoatFactor": 1,
+        "clearCoatMap": "/vehicles/miramar/miramar_main_cc.data.png",
+        "clearCoatRoughnessFactor": 0,
+        "colorPaletteMap": "/vehicles/miramar/miramar_skin_bcm_p.color.png",
+        "colorPaletteMapUseUV": 1,
+        "diffuseMapUseUV": 1,
+        "instanceDiffuse": true,
+        "metallicFactor": 1,
+        "normalMap": "/vehicles/miramar/miramar_main_n.normal.png",
+        "opacityMap": "/vehicles/miramar/miramar_main_o.data.png",
+        "pixelSpecular": true
+      },
+      {},
+      {}
+    ],
+    "activeLayers": 2,
+    "dynamicCubemap": true,
+    "materialTag0": "beamng",
+    "materialTag1": "vehicle",
+    "version": 1.5
+  }
+}

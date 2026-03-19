@@ -204,6 +204,14 @@ local function forceReloadOverride(extensionName)
   end
 
   if existingM and type(existingM) == 'table' then
+    -- Preserve internal BeamNG metadata fields before wiping
+    local preserved = {}
+    for k, v in pairs(existingM) do
+      if type(k) == 'string' and k:sub(1, 2) == '__' and k:sub(-2) == '__' then
+        preserved[k] = v
+      end
+    end
+
     -- Patch the existing M table in-place: remove old keys, copy override keys
     -- This preserves the table reference in the extension registry and hook dispatch
     for k in pairs(existingM) do
@@ -211,6 +219,13 @@ local function forceReloadOverride(extensionName)
     end
     for k, v in pairs(overrideM) do
       existingM[k] = v
+    end
+
+    -- Restore internal BeamNG metadata (e.g. __extensionName__, __virtual__)
+    for k, v in pairs(preserved) do
+      if existingM[k] == nil then
+        existingM[k] = v
+      end
     end
     -- Ensure the global points to the patched registry table (not overrideM)
     rawset(_G, extensionName, existingM)

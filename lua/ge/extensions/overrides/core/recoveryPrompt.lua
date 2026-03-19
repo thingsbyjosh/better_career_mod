@@ -137,7 +137,7 @@ local function getPriceFunction(basePrice)
 end
 
 local buttonOptions = {
-  -- available durign regular career gameplay
+  -- available during regular career gameplay
   towToRoad = {
     label = "Tow to Nearest Road",
     type = "vehicle",

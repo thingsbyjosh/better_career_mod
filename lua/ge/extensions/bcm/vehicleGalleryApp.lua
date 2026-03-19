@@ -12,6 +12,7 @@ local getAllVehiclesForGallery
 local getPerformanceClass
 local getVehicleValue
 local getVehiclePermissions
+local computeMarketRangeDollars
 
 -- ============================================================================
 -- Constants
@@ -32,6 +33,21 @@ getPerformanceClass = function(peakHP)
   if peakHP >= 100 then return "C" end
   if peakHP >= 50 then return "D" end
   return nil
+end
+
+-- Compute imprecise market range in dollars (shown to player instead of exact value)
+computeMarketRangeDollars = function(valueDollars)
+  if not valueDollars or valueDollars <= 0 then return nil end
+  local roundTo
+  if valueDollars < 5000 then roundTo = 250
+  elseif valueDollars < 20000 then roundTo = 500
+  elseif valueDollars < 100000 then roundTo = 1000
+  else roundTo = 5000
+  end
+  local low = math.floor(valueDollars * 0.88 / roundTo) * roundTo
+  local high = math.ceil(valueDollars * 1.12 / roundTo) * roundTo
+  if high <= low then high = low + roundTo end
+  return { low = math.max(0, low), high = high }
 end
 
 -- Get vehicle value safely using vanilla valueCalculator
@@ -338,6 +354,7 @@ getAllVehiclesForGallery = function()
       configWeightKg = configWeightKg,
       performanceClass = getPerformanceClass(hasDynoData and peakHP or configHP),
       currentValue = vehicleValue,
+      marketRange = computeMarketRangeDollars(vehicleValue),
       -- Permission/status fields for options menu
       needsRepair = perms.needsRepair,
       owned = perms.owned,

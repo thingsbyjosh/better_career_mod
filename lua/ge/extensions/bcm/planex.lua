@@ -4367,6 +4367,27 @@ initModule = function()
   loadPlanexData()
   refreshDriverLevel()
 
+  -- Clean up orphaned loaner vehicles from previous sessions.
+  -- If the player saved and quit while a loaner was active, the vehicle object is gone
+  -- but the inventory entry persists forever. Remove ALL non-owned vehicles with
+  -- owningOrganization='planex' to prevent ghost loaners accumulating.
+  if career_modules_inventory and career_modules_inventory.getVehicles and career_modules_inventory.removeVehicle then
+    local allVehicles = career_modules_inventory.getVehicles() or {}
+    for invId, vehData in pairs(allVehicles) do
+      if not vehData.owned and vehData.owningOrganization == 'planex' then
+        pcall(function()
+          career_modules_inventory.removeVehicle(invId)
+        end)
+        log('I', logTag, 'Cleaned up orphaned PlanEx loaner: inventoryId=' .. tostring(invId))
+      end
+    end
+  end
+
+  -- Clear loaner state (loaner was cleaned up or never existed after reload)
+  planexState.loanerInventoryId = nil
+  planexState.loanerVehId = nil
+  planexState.loanerSelectedTier = nil
+
   -- Clear candidate cache and regenerate pool fresh on every init (map load / career start)
   cachedStopCandidates = {}
   distanceCache = {}

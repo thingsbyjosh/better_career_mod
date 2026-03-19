@@ -223,13 +223,14 @@ end
 
 -- Returns an array of vehicleInventoryIds assigned to the given garage.
 -- Reads vehicle.location directly from career inventory (single source of truth).
+-- Excludes non-owned vehicles (loaners) — they don't occupy garage slots.
 getVehiclesInGarage = function(garageId)
   local result = {}
   local vehicles = career_modules_inventory and career_modules_inventory.getVehicles and career_modules_inventory.getVehicles()
   if not vehicles then return result end
   local garageIdStr = tostring(garageId)
   for invId, vehInfo in pairs(vehicles) do
-    if vehInfo.location and tostring(vehInfo.location) == garageIdStr then
+    if vehInfo.owned ~= false and vehInfo.location and tostring(vehInfo.location) == garageIdStr then
       table.insert(result, tostring(invId))
     end
   end
