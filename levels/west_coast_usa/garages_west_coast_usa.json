@@ -1,156 +1,168 @@
 [
-  {
-    "baseCapacity":2,
-    "basePrice":105000,
-    "description":"",
-    "flavorText":{
-      "en":"Property seized by Belasco County.",
-      "es":"Propiedad embargada por el Condado de Belasco."
-    },
-    "id":"bcmGarage_23",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"west_coast_usa",
-    "maxCapacity":6,
-    "name":"Test1",
-    "slotUpgradeBasePrice":10500,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":31500,
-      "t2":73500
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":2,
-    "basePrice":105000,
-    "description":"",
-    "flavorText":{
-      "en":"Property seized by Belasco County.",
-      "es":"Propiedad embargada por el Condado de Belasco."
-    },
-    "id":"bcm_chinatown",
-    "images":{},
-    "isStarterGarage":true,
-    "mapName":"west_coast_usa",
-    "maxCapacity":6,
-    "name":"The chinatown",
-    "slotUpgradeBasePrice":10500,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":31500,
-      "t2":73500
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":2,
-    "basePrice":125000,
-    "description":"",
-    "flavorText":{
-      "en":"Just outside the racetrack, where podium dreams meet unpaid bills. No fancy floors here — just real oil stains and tools that have survived more failures than successes.If it breaks, we fix it. If we can’t fix it… we pretend it’s not a problem until race day.",
-      "es":"Propiedad embargada por el Condado de Belasco."
-    },
-    "id":"bcm_trackside",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"west_coast_usa",
-    "maxCapacity":6,
-    "name":"Trackside Private Workshop",
-    "slotUpgradeBasePrice":12500,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":37500,
-      "t2":87500
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":2,
-    "basePrice":175500,
-    "description":"",
-    "flavorText":{
-      "en":"Property seized by Belasco County.",
-      "es":"Propiedad embargada por el Condado de Belasco."
-    },
-    "id":"bcm_dragstrip",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"west_coast_usa",
-    "maxCapacity":4,
-    "name":"Drag Strip Performance Shed",
-    "slotUpgradeBasePrice":17550,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":52650,
-      "t2":122849
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":4,
-    "basePrice":750000,
-    "description":"",
-    "flavorText":{
-      "en":"Located at the end of a quiet cul-de-sac, this elegant home offers more than just a beautiful façade and perfectly trimmed lawn. It offers enough space for all those cars you promised were “just a quick project.”\n\nWith a spacious garage and a driveway capable of holding more vehicles than you’d comfortably admit, this property is ideal for anyone who wants suburban comfort while collecting engines, tools and questionable financial decisions.\n\nThe neighbors say it’s a very peaceful place. Except on weekends.",
-      "es":"Propiedad embargada por el Condado de Belasco."
-    },
-    "id":"bcm_culdesac",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"west_coast_usa",
-    "maxCapacity":10,
-    "name":"Cul-de-Sac Executive Garage",
-    "slotUpgradeBasePrice":75000,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":225000,
-      "t2":525000
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":5,
-    "basePrice":1000000,
-    "description":"",
-    "flavorText":{
-      "en":"Welcome to the place where cars come when they need space, attention… or a place to hide from their previous owner. With room for dozens of vehicles and enough concrete to lose a car for weeks, this depot is the logistical heart of any serious operation.\n\nFrom quick inspections to “creative solutions” for mechanical problems, something is always moving here. Usually cars. Sometimes invoices.",
-      "es":"Propiedad embargada por el Condado de Belasco."
-    },
-    "id":"bcm_depot",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"west_coast_usa",
-    "maxCapacity":15,
-    "name":"Industrial Vehicle Depot",
-    "slotUpgradeBasePrice":100000,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":300000,
-      "t2":700000
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":2,
-    "basePrice":100000,
-    "description":"",
-    "flavorText":{
-      "en":"Property seized by Belasco County.",
-      "es":"Propiedad embargada por el Condado de Belasco."
-    },
-    "id":"bcm_belasco",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"west_coast_usa",
-    "maxCapacity":6,
-    "name":"Belasco City Garage",
-    "slotUpgradeBasePrice":10000,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":30000,
-      "t2":70000
-    },
-    "type":"garage"
-  }
+ {
+ "baseCapacity":2,
+ "basePrice":105000,
+ "description":"",
+ "flavorText":{
+ "en":"Property seized by Belasco County.",
+ "es":"Propiedad embargada por el Condado de Belasco."
+ },
+ "id":"bcmGarage_23",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"west_coast_usa",
+ "maxCapacity":6,
+ "name":"Test1",
+ "slotUpgradeBasePrice":10500,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":31500,
+ "t2":73500
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":105000,
+ "description":"",
+ "dropOffZone":{
+ "dir":[
+ -0.087463968457794,
+ 0.99242869587409,
+ -0.086228404990895
+ ],
+ "pos":[
+ -816.80346679688,
+ 608.15881347656,
+ 117.01475924253
+ ]
+ },
+ "flavorText":{
+ "en":"Property seized by Belasco County.",
+ "es":"Propiedad embargada por el Condado de Belasco."
+ },
+ "id":"bcm_chinatown",
+ "images":{},
+ "isStarterGarage":true,
+ "mapName":"west_coast_usa",
+ "maxCapacity":6,
+ "name":"The chinatown",
+ "slotUpgradeBasePrice":10500,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":31500,
+ "t2":73500
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":125000,
+ "description":"",
+ "flavorText":{
+ "en":"Just outside the racetrack, where podium dreams meet unpaid bills. No fancy floors here — just real oil stains and tools that have survived more failures than successes.If it breaks, we fix it. If we can’t fix it… we pretend it’s not a problem until race day.",
+ "es":"Propiedad embargada por el Condado de Belasco."
+ },
+ "id":"bcm_trackside",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"west_coast_usa",
+ "maxCapacity":6,
+ "name":"Trackside Private Workshop",
+ "slotUpgradeBasePrice":12500,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":37500,
+ "t2":87500
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":175500,
+ "description":"",
+ "flavorText":{
+ "en":"Property seized by Belasco County.",
+ "es":"Propiedad embargada por el Condado de Belasco."
+ },
+ "id":"bcm_dragstrip",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"west_coast_usa",
+ "maxCapacity":4,
+ "name":"Drag Strip Performance Shed",
+ "slotUpgradeBasePrice":17550,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":52650,
+ "t2":122849
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":4,
+ "basePrice":750000,
+ "description":"",
+ "flavorText":{
+ "en":"Located at the end of a quiet cul-de-sac, this elegant home offers more than just a beautiful façade and perfectly trimmed lawn. It offers enough space for all those cars you promised were “just a quick project.”\n\nWith a spacious garage and a driveway capable of holding more vehicles than you’d comfortably admit, this property is ideal for anyone who wants suburban comfort while collecting engines, tools and questionable financial decisions.\n\nThe neighbors say it’s a very peaceful place. Except on weekends.",
+ "es":"Propiedad embargada por el Condado de Belasco."
+ },
+ "id":"bcm_culdesac",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"west_coast_usa",
+ "maxCapacity":10,
+ "name":"Cul-de-Sac Executive Garage",
+ "slotUpgradeBasePrice":75000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":225000,
+ "t2":525000
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":5,
+ "basePrice":1000000,
+ "description":"",
+ "flavorText":{
+ "en":"Welcome to the place where cars come when they need space, attention… or a place to hide from their previous owner. With room for dozens of vehicles and enough concrete to lose a car for weeks, this depot is the logistical heart of any serious operation.\n\nFrom quick inspections to “creative solutions” for mechanical problems, something is always moving here. Usually cars. Sometimes invoices.",
+ "es":"Propiedad embargada por el Condado de Belasco."
+ },
+ "id":"bcm_depot",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"west_coast_usa",
+ "maxCapacity":15,
+ "name":"Industrial Vehicle Depot",
+ "slotUpgradeBasePrice":100000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":300000,
+ "t2":700000
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":100000,
+ "description":"",
+ "flavorText":{
+ "en":"Property seized by Belasco County.",
+ "es":"Propiedad embargada por el Condado de Belasco."
+ },
+ "id":"bcm_belasco",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"west_coast_usa",
+ "maxCapacity":6,
+ "name":"Belasco City Garage",
+ "slotUpgradeBasePrice":10000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":30000,
+ "t2":70000
+ },
+ "type":"garage"
+ }
 ]

@@ -1,422 +1,422 @@
 /* BCM Settings — Dark glass-morphism with neon magenta #ff2d78 accent */
 
 /* ==========================================
-   CONTAINER
-   ========================================== */
+ CONTAINER
+ ========================================== */
 
 .bcm-settings-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.55);
-  color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 2rem 1rem 3rem;
-  overflow-y: auto;
-  box-sizing: border-box;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ height: 100vh;
+ background: rgba(0, 0, 0, 0.55);
+ color: white;
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ padding: 2rem 1rem 3rem;
+ overflow-y: auto;
+ box-sizing: border-box;
 }
 
 /* ==========================================
-   HEADER
-   ========================================== */
+ HEADER
+ ========================================== */
 
 .bcm-settings-header {
-  text-align: center;
-  margin-bottom: 1.25rem;
-  padding: 0.75rem 2.5rem;
-  background: rgba(0, 0, 0, 0.65);
-  border-radius: 14px;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 45, 120, 0.3);
-  box-shadow: 0 0 24px rgba(255, 45, 120, 0.1);
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  max-width: 700px;
-  flex-shrink: 0;
+ text-align: center;
+ margin-bottom: 1.25rem;
+ padding: 0.75rem 2.5rem;
+ background: rgba(0, 0, 0, 0.65);
+ border-radius: 14px;
+ backdrop-filter: blur(12px);
+ border: 1px solid rgba(255, 45, 120, 0.3);
+ box-shadow: 0 0 24px rgba(255, 45, 120, 0.1);
+ position: relative;
+ overflow: hidden;
+ width: 100%;
+ max-width: 700px;
+ flex-shrink: 0;
 }
 
 .bcm-logo-accent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #ff2d78, transparent);
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ height: 3px;
+ background: linear-gradient(90deg, transparent, #ff2d78, transparent);
 }
 
 .bcm-settings-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 0.25rem;
-  color: #fff;
-  letter-spacing: 0.05em;
-  text-shadow: 0 0 20px rgba(255, 45, 120, 0.4);
+ font-size: 2rem;
+ font-weight: 700;
+ margin: 0 0 0.25rem;
+ color: #fff;
+ letter-spacing: 0.05em;
+ text-shadow: 0 0 20px rgba(255, 45, 120, 0.4);
 }
 
 .bcm-subtitle {
-  font-size: 0.85rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: #ff2d78;
-  margin: 0;
-  font-weight: 500;
+ font-size: 0.85rem;
+ letter-spacing: 0.25em;
+ text-transform: uppercase;
+ color: #ff2d78;
+ margin: 0;
+ font-weight: 500;
 }
 
 /* ==========================================
-   CONTENT AREA
-   ========================================== */
+ CONTENT AREA
+ ========================================== */
 
 .bcm-settings-content {
-  width: 100%;
-  max-width: 700px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+ width: 100%;
+ max-width: 700px;
+ display: flex;
+ flex-direction: column;
+ gap: 1.25rem;
 }
 
 /* ==========================================
-   SECTIONS
-   ========================================== */
+ SECTIONS
+ ========================================== */
 
 .bcm-section {
-  background: rgba(0, 0, 0, 0.55);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  transition: border-color 0.2s ease;
+ background: rgba(0, 0, 0, 0.55);
+ border-radius: 12px;
+ backdrop-filter: blur(10px);
+ border: 1px solid rgba(255, 255, 255, 0.08);
+ overflow: hidden;
+ transition: border-color 0.2s ease;
 }
 
 .bcm-section:hover {
-  border-color: rgba(255, 45, 120, 0.2);
+ border-color: rgba(255, 45, 120, 0.2);
 }
 
 .bcm-section-experimental {
-  border-color: rgba(255, 45, 120, 0.15);
+ border-color: rgba(255, 45, 120, 0.15);
 }
 
 .bcm-section-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.25rem;
-  background: rgba(255, 45, 120, 0.08);
-  border-left: 3px solid #ff2d78;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #ff2d78;
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ padding: 0.6rem 1.25rem;
+ background: rgba(255, 45, 120, 0.08);
+ border-left: 3px solid #ff2d78;
+ font-size: 0.7rem;
+ font-weight: 700;
+ letter-spacing: 0.2em;
+ text-transform: uppercase;
+ color: #ff2d78;
 }
 
 .bcm-section-icon {
-  font-size: 0.9rem;
+ font-size: 0.9rem;
 }
 
 /* ==========================================
-   SETTING ROWS
-   ========================================== */
+ SETTING ROWS
+ ========================================== */
 
 .bcm-setting-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: background 0.2s ease;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 1.5rem;
+ padding: 1rem 1.25rem;
+ border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+ transition: background 0.2s ease;
 }
 
 .bcm-setting-item:last-child {
-  border-bottom: none;
+ border-bottom: none;
 }
 
 .bcm-setting-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+ background: rgba(255, 255, 255, 0.03);
 }
 
 .bcm-setting-item.disabled {
-  opacity: 0.45;
-  pointer-events: none;
+ opacity: 0.45;
+ pointer-events: none;
 }
 
 .bcm-setting-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
-  min-width: 0;
+ display: flex;
+ flex-direction: column;
+ gap: 0.25rem;
+ flex: 1;
+ min-width: 0;
 }
 
 .bcm-setting-label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #f0f0f0;
+ font-size: 1rem;
+ font-weight: 600;
+ color: #f0f0f0;
 }
 
 .bcm-setting-desc {
-  font-size: 0.8rem;
-  color: #888;
-  line-height: 1.4;
+ font-size: 0.8rem;
+ color: #888;
+ line-height: 1.4;
 }
 
 /* ==========================================
-   PRESET BUTTONS
-   ========================================== */
+ PRESET BUTTONS
+ ========================================== */
 
 .bcm-preset-group {
-  display: flex;
-  gap: 0.35rem;
-  flex-shrink: 0;
+ display: flex;
+ gap: 0.35rem;
+ flex-shrink: 0;
 }
 
 .bcm-preset-btn {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ccc;
-  padding: 0.4rem 0.85rem;
-  font-size: 0.82rem;
-  font-weight: 500;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-  white-space: nowrap;
+ background: rgba(255, 255, 255, 0.07);
+ border: 1px solid rgba(255, 255, 255, 0.12);
+ color: #ccc;
+ padding: 0.4rem 0.85rem;
+ font-size: 0.82rem;
+ font-weight: 500;
+ border-radius: 20px;
+ cursor: pointer;
+ transition: all 0.2s ease;
+ font-family: inherit;
+ white-space: nowrap;
 }
 
 .bcm-preset-btn:hover:not([disabled]) {
-  background: rgba(255, 45, 120, 0.15);
-  border-color: rgba(255, 45, 120, 0.4);
-  color: #ff2d78;
+ background: rgba(255, 45, 120, 0.15);
+ border-color: rgba(255, 45, 120, 0.4);
+ color: #ff2d78;
 }
 
 .bcm-preset-btn.active {
-  background: #ff2d78;
-  border-color: #ff2d78;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(255, 45, 120, 0.4);
+ background: #ff2d78;
+ border-color: #ff2d78;
+ color: #fff;
+ box-shadow: 0 0 10px rgba(255, 45, 120, 0.4);
 }
 
 .bcm-preset-btn[disabled] {
-  opacity: 0.35;
-  cursor: not-allowed;
+ opacity: 0.35;
+ cursor: not-allowed;
 }
 
 /* ==========================================
-   TOGGLE SWITCH
-   ========================================== */
+ TOGGLE SWITCH
+ ========================================== */
 
 .bcm-toggle-switch {
-  position: relative;
-  width: 52px;
-  height: 28px;
-  cursor: pointer;
-  flex-shrink: 0;
+ position: relative;
+ width: 52px;
+ height: 28px;
+ cursor: pointer;
+ flex-shrink: 0;
 }
 
 .bcm-toggle-slider {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #3a3a3a;
-  border-radius: 28px;
-  transition: 0.25s ease;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background-color: #3a3a3a;
+ border-radius: 28px;
+ transition: 0.25s ease;
+ box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .bcm-toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 4px;
-  bottom: 4px;
-  background-color: #bbb;
-  border-radius: 50%;
-  transition: 0.25s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+ position: absolute;
+ content: "";
+ height: 20px;
+ width: 20px;
+ left: 4px;
+ bottom: 4px;
+ background-color: #bbb;
+ border-radius: 50%;
+ transition: 0.25s ease;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .bcm-toggle-slider.active {
-  background-color: #ff2d78;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 45, 120, 0.35);
+ background-color: #ff2d78;
+ box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 45, 120, 0.35);
 }
 
 .bcm-toggle-slider.active:before {
-  transform: translateX(24px);
-  background-color: #fff;
+ transform: translateX(24px);
+ background-color: #fff;
 }
 
 /* ==========================================
-   SLIDER
-   ========================================== */
+ SLIDER
+ ========================================== */
 
 .bcm-slider-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-  min-width: 160px;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ flex-shrink: 0;
+ min-width: 160px;
 }
 
 .bcm-slider-group input[type="range"] {
-  flex: 1;
-  height: 4px;
-  accent-color: #4fc3f7;
-  cursor: pointer;
+ flex: 1;
+ height: 4px;
+ accent-color: #4fc3f7;
+ cursor: pointer;
 }
 
 .bcm-slider-value {
-  min-width: 36px;
-  text-align: right;
-  font-weight: bold;
-  color: #4fc3f7;
-  font-size: 0.9rem;
+ min-width: 36px;
+ text-align: right;
+ font-weight: bold;
+ color: #4fc3f7;
+ font-size: 0.9rem;
 }
 
 /* ==========================================
-   BACK BUTTON
-   ========================================== */
+ BACK BUTTON
+ ========================================== */
 
 .bcm-back-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.5rem;
-  padding-top: 1rem;
+ display: flex;
+ justify-content: center;
+ margin-top: 0.5rem;
+ padding-top: 1rem;
 }
 
 .bcm-btn-back {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ccc;
-  padding: 0.7rem 1.75rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-family: inherit;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+ background: rgba(255, 255, 255, 0.06);
+ border: 1px solid rgba(255, 255, 255, 0.15);
+ color: #ccc;
+ padding: 0.7rem 1.75rem;
+ font-size: 0.95rem;
+ font-weight: 500;
+ border-radius: 8px;
+ cursor: pointer;
+ transition: all 0.25s ease;
+ font-family: inherit;
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
 }
 
 .bcm-btn-back:hover {
-  background: rgba(255, 45, 120, 0.12);
-  border-color: rgba(255, 45, 120, 0.4);
-  color: #ff2d78;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 45, 120, 0.15);
+ background: rgba(255, 45, 120, 0.12);
+ border-color: rgba(255, 45, 120, 0.4);
+ color: #ff2d78;
+ transform: translateY(-1px);
+ box-shadow: 0 4px 12px rgba(255, 45, 120, 0.15);
 }
 
 .bcm-btn-back:active {
-  transform: translateY(0);
-  box-shadow: none;
+ transform: translateY(0);
+ box-shadow: none;
 }
 
 .bcm-back-arrow {
-  font-size: 1.1rem;
+ font-size: 1.1rem;
 }
 
 /* ==========================================
-   ACTION / CONFIRM BUTTONS
-   ========================================== */
+ ACTION / CONFIRM BUTTONS
+ ========================================== */
 
 .bcm-btn-action {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  color: #ccc;
-  padding: 6px 16px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s ease;
+ background: rgba(255, 255, 255, 0.08);
+ border: 1px solid rgba(255, 255, 255, 0.2);
+ border-radius: 6px;
+ color: #ccc;
+ padding: 6px 16px;
+ font-size: 0.82rem;
+ font-weight: 500;
+ cursor: pointer;
+ font-family: inherit;
+ transition: all 0.2s ease;
 }
 
 .bcm-btn-action:hover:not([disabled]) {
-  background: rgba(255, 45, 120, 0.15);
-  border-color: rgba(255, 45, 120, 0.4);
-  color: #ff2d78;
+ background: rgba(255, 45, 120, 0.15);
+ border-color: rgba(255, 45, 120, 0.4);
+ color: #ff2d78;
 }
 
 .bcm-btn-action[disabled] {
-  opacity: 0.35;
-  cursor: not-allowed;
+ opacity: 0.35;
+ cursor: not-allowed;
 }
 
 .bcm-confirm-inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ flex-wrap: wrap;
 }
 
 .bcm-confirm-text {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
+ font-size: 12px;
+ color: rgba(255, 255, 255, 0.7);
 }
 
 .bcm-btn-confirm {
-  background: linear-gradient(135deg, #e040fb 0%, #00e5ff 100%);
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  padding: 6px 14px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 12px;
-  font-family: inherit;
+ background: linear-gradient(135deg, #e040fb 0%, #00e5ff 100%);
+ border: none;
+ border-radius: 4px;
+ color: #fff;
+ padding: 6px 14px;
+ font-weight: bold;
+ cursor: pointer;
+ font-size: 12px;
+ font-family: inherit;
 }
 
 .bcm-btn-cancel {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 6px 14px;
-  cursor: pointer;
-  font-size: 12px;
-  font-family: inherit;
+ background: transparent;
+ border: 1px solid rgba(255, 255, 255, 0.2);
+ border-radius: 4px;
+ color: rgba(255, 255, 255, 0.6);
+ padding: 6px 14px;
+ cursor: pointer;
+ font-size: 12px;
+ font-family: inherit;
 }
 
 .bcm-btn-cancel:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  color: rgba(255, 255, 255, 0.9);
+ border-color: rgba(255, 255, 255, 0.4);
+ color: rgba(255, 255, 255, 0.9);
 }
 
 .bcm-setting-note {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  margin-top: 4px;
-  display: block;
+ font-size: 11px;
+ color: rgba(255, 255, 255, 0.4);
+ margin-top: 4px;
+ display: block;
 }
 
 /* ==========================================
-   RESPONSIVE
-   ========================================== */
+ RESPONSIVE
+ ========================================== */
 
 @media (max-width: 600px) {
-  .bcm-settings-container {
-    padding: 1rem 0.5rem 2rem;
-  }
+ .bcm-settings-container {
+ padding: 1rem 0.5rem 2rem;
+ }
 
-  .bcm-setting-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
+ .bcm-setting-item {
+ flex-direction: column;
+ align-items: flex-start;
+ gap: 0.75rem;
+ }
 
-  .bcm-preset-group {
-    flex-wrap: wrap;
-  }
+ .bcm-preset-group {
+ flex-wrap: wrap;
+ }
 
-  .bcm-settings-header h1 {
-    font-size: 1.5rem;
-  }
+ .bcm-settings-header h1 {
+ font-size: 1.5rem;
+ }
 }

@@ -1,141 +1,141 @@
 {
-  "name":"ui.career.logistics.delivery.name",
-  "description":"ui.career.logistics.delivery.description",
-  "order": 2100,
-  "isSkill":true,
-  "icon":"boxPickUp03",
-  "parentBranch":"labourer",
-  "levels":[
-    {
-      "requiredValue":0,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Cargo Delivery Introduction",
-        "description":"Complete your first delivery to get started."
-      },
-      "unlocks":[
-        { "type":"tasklist", "icon":"boxPickUp03", "tasklistId": "delivery-introduction" }
-      ]
-    },
-    {
-      "requiredValue":120,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Standard Cargo & Small Trailers",
-        "description":"Start delivering standard parcels and towing small trailers."
-      },
-      "unlockFlags":["smallPackagesDelivery", "smallTrailersDelivery"],
-      "unlocks":[
-        { "type":"unlockCard", "icon":"boxPickUp03", "heading":"Small Packages", "description":"Deliver small and light-weight packages." },
-        { "type":"unlockCard", "icon":"smallTrailer", "heading":"Small Trailers", "description":"Deliver small and medium-sized trailers." }
-      ]
-    },
-    {
-      "requiredValue":320,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Premium Cargo",
-        "description":"Transport larger, heavier packages for higher rewards."
-      },
-      "unlockFlags":["largePackagesDelivery"],
-      "unlocks":[
-        { "type":"unlockCard", "icon":"boxPickUp03", "heading":"Large Packages", "description":"Deliver larger and heavier packages." }
-      ]
-    },
-    {
-      "requiredValue":650,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Heavy-duty Trailers",
-        "description":"Take on the challenge of delivering large trailers."
-      },
-      "unlockFlags":["largeTrailersDelivery"],
-      "unlocks":[
-        { "type":"unlockCard", "icon":"semiTrailer", "heading":"Large Trailers", "description":"Deliver full-sized transport trailers." }
-      ]
-    },
-    {
-      "requiredValue":1100,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Logistics Expert",
-        "description":"All cargo types at your disposal. PlanEx Tier 2 packs unlocked."
-      },
-      "unlocks":[]
-    },
-    {
-      "requiredValue":1700
-    },
-    {
-      "requiredValue":2500
-    },
-    {
-      "requiredValue":3500
-    },
-    {
-      "requiredValue":4800,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Professional Courier",
-        "description":"PlanEx Tier 3 packs unlocked — premium cargo, higher risk, better pay."
-      }
-    },
-    {
-      "requiredValue":6400
-    },
-    {
-      "requiredValue":8300
-    },
-    {
-      "requiredValue":10700
-    },
-    {
-      "requiredValue":13700,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Expert Hauler",
-        "description":"PlanEx Tier 4 packs unlocked — expert routes with serious payloads."
-      }
-    },
-    {
-      "requiredValue":17200
-    },
-    {
-      "requiredValue":21500
-    },
-    {
-      "requiredValue":26800
-    },
-    {
-      "requiredValue":33000,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Elite Dispatcher",
-        "description":"PlanEx Tier 5 packs unlocked — the most demanding and lucrative deliveries."
-      }
-    },
-    {
-      "requiredValue":40500
-    },
-    {
-      "requiredValue":49500
-    },
-    {
-      "requiredValue":60000,
-      "description":{
-        "type":"unlockCard",
-        "icon":"info",
-        "heading":"Logistics Legend",
-        "description":"Maximum rank achieved. You are the ultimate delivery driver."
-      }
-    }
-  ]
+ "name":"ui.career.logistics.delivery.name",
+ "description":"ui.career.logistics.delivery.description",
+ "order": 2100,
+ "isSkill":true,
+ "icon":"boxPickUp03",
+ "parentBranch":"labourer",
+ "levels":[
+ {
+ "requiredValue":0,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Cargo Delivery Introduction",
+ "description":"Complete your first delivery to get started."
+ },
+ "unlocks":[
+ { "type":"tasklist", "icon":"boxPickUp03", "tasklistId": "delivery-introduction" }
+ ]
+ },
+ {
+ "requiredValue":120,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Standard Cargo & Small Trailers",
+ "description":"Start delivering standard parcels and towing small trailers."
+ },
+ "unlockFlags":["smallPackagesDelivery", "smallTrailersDelivery"],
+ "unlocks":[
+ { "type":"unlockCard", "icon":"boxPickUp03", "heading":"Small Packages", "description":"Deliver small and light-weight packages." },
+ { "type":"unlockCard", "icon":"smallTrailer", "heading":"Small Trailers", "description":"Deliver small and medium-sized trailers." }
+ ]
+ },
+ {
+ "requiredValue":320,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Premium Cargo",
+ "description":"Transport larger, heavier packages for higher rewards."
+ },
+ "unlockFlags":["largePackagesDelivery"],
+ "unlocks":[
+ { "type":"unlockCard", "icon":"boxPickUp03", "heading":"Large Packages", "description":"Deliver larger and heavier packages." }
+ ]
+ },
+ {
+ "requiredValue":650,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Heavy-duty Trailers",
+ "description":"Take on the challenge of delivering large trailers."
+ },
+ "unlockFlags":["largeTrailersDelivery"],
+ "unlocks":[
+ { "type":"unlockCard", "icon":"semiTrailer", "heading":"Large Trailers", "description":"Deliver full-sized transport trailers." }
+ ]
+ },
+ {
+ "requiredValue":1100,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Logistics Expert",
+ "description":"All cargo types at your disposal. PlanEx Tier 2 packs unlocked."
+ },
+ "unlocks":[]
+ },
+ {
+ "requiredValue":1700
+ },
+ {
+ "requiredValue":2500
+ },
+ {
+ "requiredValue":3500
+ },
+ {
+ "requiredValue":4800,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Professional Courier",
+ "description":"PlanEx Tier 3 packs unlocked — premium cargo, higher risk, better pay."
+ }
+ },
+ {
+ "requiredValue":6400
+ },
+ {
+ "requiredValue":8300
+ },
+ {
+ "requiredValue":10700
+ },
+ {
+ "requiredValue":13700,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Expert Hauler",
+ "description":"PlanEx Tier 4 packs unlocked — expert routes with serious payloads."
+ }
+ },
+ {
+ "requiredValue":17200
+ },
+ {
+ "requiredValue":21500
+ },
+ {
+ "requiredValue":26800
+ },
+ {
+ "requiredValue":33000,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Elite Dispatcher",
+ "description":"PlanEx Tier 5 packs unlocked — the most demanding and lucrative deliveries."
+ }
+ },
+ {
+ "requiredValue":40500
+ },
+ {
+ "requiredValue":49500
+ },
+ {
+ "requiredValue":60000,
+ "description":{
+ "type":"unlockCard",
+ "icon":"info",
+ "heading":"Logistics Legend",
+ "description":"Maximum rank achieved. You are the ultimate delivery driver."
+ }
+ }
+ ]
 }

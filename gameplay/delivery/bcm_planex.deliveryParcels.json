@@ -1,146 +1,146 @@
 {
-  "planex_envelope": {
-    "names": ["Envelope", "Sobre"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": 1, "weight": 0.5,
-    "basePriceCents": 850, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.8, "category": "office"
-  },
-  "planex_standard": {
-    "names": ["Standard Package", "Paquete Estandar"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": [1, 2], "weight": [7, 14],
-    "basePriceCents": 1530, "tier": 1, "fragile": false, "urgent": false, "genChance": 1.0, "category": "household"
-  },
-  "planex_grocery": {
-    "names": ["Grocery Bag", "Bolsa de Supermercado"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": [1, 2], "weight": [5, 11],
-    "basePriceCents": 1020, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.9, "category": "food"
-  },
-  "planex_clothing": {
-    "names": ["Clothing Box", "Caja de Ropa"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": [2, 3], "weight": [4, 8],
-    "basePriceCents": 1360, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.7, "category": "household"
-  },
-  "planex_food_hot": {
-    "names": ["Hot Food Order", "Pedido Comida Caliente"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": 1, "weight": [2, 5],
-    "basePriceCents": 2040, "tier": 1, "fragile": false, "urgent": true, "genChance": 0.5, "category": "food"
-  },
-  "planex_building_materials": {
-    "names": ["Building Materials", "Material de Construccion"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": [3, 4, 6], "weight": [12, 18, 25],
-    "basePriceCents": 1190, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.6, "category": "construction"
-  },
-  "planex_electronics": {
-    "names": ["Electronics Box", "Caja de Electronica"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
-    "slots": [2, 3], "weight": [4, 8],
-    "basePriceCents": 4080, "tier": 2, "fragile": true, "urgent": false, "genChance": 0.7, "category": "electronics"
-  },
-  "planex_furniture_part": {
-    "names": ["Furniture Part", "Pieza de Mueble"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": [3, 4], "weight": [10, 20],
-    "basePriceCents": 3060, "tier": 2, "fragile": false, "urgent": false, "genChance": 0.5, "category": "household"
-  },
-  "planex_wine_case": {
-    "names": ["Wine Case", "Caja de Vino"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
-    "slots": 2, "weight": [8, 12],
-    "basePriceCents": 4760, "tier": 2, "fragile": true, "urgent": false, "genChance": 0.4, "category": "luxury"
-  },
-  "planex_pharmacy": {
-    "names": ["Pharmacy Order", "Pedido Farmacia"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
-    "slots": 1, "weight": [1, 3],
-    "basePriceCents": 3400, "tier": 2, "fragile": false, "urgent": true, "genChance": 0.5, "category": "medical"
-  },
-  "planex_glassware": {
-    "names": ["Fragile Glassware", "Cristaleria Fragil"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
-    "slots": [2, 3], "weight": [4, 8],
-    "basePriceCents": 6120, "tier": 3, "fragile": true, "urgent": false, "genChance": 0.5, "category": "glassware"
-  },
-  "planex_medical": {
-    "names": ["Medical Supplies", "Suministros Medicos"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
-    "slots": [1, 2], "weight": [2, 5],
-    "basePriceCents": 8160, "tier": 3, "fragile": true, "urgent": true, "genChance": 0.3, "category": "medical"
-  },
-  "planex_auto_parts": {
-    "names": ["Auto Parts Crate", "Caja Repuestos Auto"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
-    "slots": [2, 3, 4], "weight": [7, 14, 20],
-    "basePriceCents": 5440, "tier": 3, "fragile": false, "urgent": false, "genChance": 0.5, "category": "auto"
-  },
-  "planex_catering": {
-    "names": ["Catering Order", "Pedido Catering"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
-    "slots": [2, 3], "weight": [5, 10],
-    "basePriceCents": 4760, "tier": 3, "fragile": true, "urgent": true, "genChance": 0.3, "category": "food"
-  },
-  "planex_fine_art": {
-    "names": ["Fine Art Piece", "Obra de Arte"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
-    "slots": [2, 3], "weight": [4, 8],
-    "basePriceCents": 11900, "tier": 4, "fragile": true, "urgent": false, "genChance": 0.3, "category": "luxury"
-  },
-  "planex_server_rack": {
-    "names": ["Server Equipment", "Equipo de Servidor"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
-    "slots": [4, 6], "weight": [16, 28],
-    "basePriceCents": 12750, "tier": 4, "fragile": true, "urgent": false, "genChance": 0.2, "category": "electronics"
-  },
-  "planex_urgent_legal": {
-    "names": ["Urgent Legal Documents", "Documentos Legales Urgentes"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
-    "slots": 1, "weight": [0.5, 1],
-    "basePriceCents": 10200, "tier": 4, "fragile": false, "urgent": true, "genChance": 0.4, "category": "legal"
-  },
-  "planex_luxury": {
-    "names": ["Luxury Goods", "Articulos de Lujo"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
-    "slots": [1, 2], "weight": [1, 3],
-    "basePriceCents": 18700, "tier": 5, "fragile": true, "urgent": false, "genChance": 0.25, "category": "luxury"
-  },
-  "planex_hazmat": {
-    "names": ["Hazardous Materials (Definitely Fine)", "Material Peligroso (Definitivamente OK)"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
-    "slots": [4, 6], "weight": [14, 25],
-    "basePriceCents": 20400, "tier": 5, "fragile": true, "urgent": false, "genChance": 0.15, "category": "hazmat"
-  },
-  "planex_time_critical": {
-    "names": ["Time-Critical Samples", "Muestras Urgentes"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
-    "slots": 1, "weight": [0.5, 2],
-    "basePriceCents": 17000, "tier": 5, "fragile": true, "urgent": true, "genChance": 0.25, "category": "medical"
-  },
-  "planex_return_package": {
-    "names": ["Return Package", "Paquete de Devolucion"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
-    "slots": [1, 2], "weight": [2, 8],
-    "basePriceCents": 500, "tier": 1, "fragile": false, "urgent": false, "genChance": 1.0, "category": "household", "isPickup": true
-  },
-  "planex_inpost_collection": {
-    "names": ["InPost Collection", "Recogida InPost"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
-    "slots": 1, "weight": [1, 5],
-    "basePriceCents": 350, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.8, "category": "office", "isPickup": true
-  },
-  "planex_outbound_parcel": {
-    "names": ["Outbound Parcel", "Paquete de Salida"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
-    "slots": [1, 2], "weight": [3, 10],
-    "basePriceCents": 600, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.7, "category": "household", "isPickup": true
-  },
-  "planex_depot_return": {
-    "names": ["Route Manifest", "Manifiesto de Ruta"],
-    "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
-    "slots": 1, "weight": 1,
-    "basePriceCents": 0, "tier": 1, "fragile": false, "urgent": false, "genChance": 0, "category": "office", "isPickup": true, "isDepotReturn": true
-  }
+ "planex_envelope": {
+ "names": ["Envelope", "Sobre"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": 1, "weight": 0.5,
+ "basePriceCents": 850, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.8, "category": "office"
+ },
+ "planex_standard": {
+ "names": ["Standard Package", "Paquete Estandar"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": [1, 2], "weight": [7, 14],
+ "basePriceCents": 1530, "tier": 1, "fragile": false, "urgent": false, "genChance": 1.0, "category": "household"
+ },
+ "planex_grocery": {
+ "names": ["Grocery Bag", "Bolsa de Supermercado"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": [1, 2], "weight": [5, 11],
+ "basePriceCents": 1020, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.9, "category": "food"
+ },
+ "planex_clothing": {
+ "names": ["Clothing Box", "Caja de Ropa"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": [2, 3], "weight": [4, 8],
+ "basePriceCents": 1360, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.7, "category": "household"
+ },
+ "planex_food_hot": {
+ "names": ["Hot Food Order", "Pedido Comida Caliente"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": 1, "weight": [2, 5],
+ "basePriceCents": 2040, "tier": 1, "fragile": false, "urgent": true, "genChance": 0.5, "category": "food"
+ },
+ "planex_building_materials": {
+ "names": ["Building Materials", "Material de Construccion"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": [3, 4, 6], "weight": [12, 18, 25],
+ "basePriceCents": 1190, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.6, "category": "construction"
+ },
+ "planex_electronics": {
+ "names": ["Electronics Box", "Caja de Electronica"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
+ "slots": [2, 3], "weight": [4, 8],
+ "basePriceCents": 4080, "tier": 2, "fragile": true, "urgent": false, "genChance": 0.7, "category": "electronics"
+ },
+ "planex_furniture_part": {
+ "names": ["Furniture Part", "Pieza de Mueble"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": [3, 4], "weight": [10, 20],
+ "basePriceCents": 3060, "tier": 2, "fragile": false, "urgent": false, "genChance": 0.5, "category": "household"
+ },
+ "planex_wine_case": {
+ "names": ["Wine Case", "Caja de Vino"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
+ "slots": 2, "weight": [8, 12],
+ "basePriceCents": 4760, "tier": 2, "fragile": true, "urgent": false, "genChance": 0.4, "category": "luxury"
+ },
+ "planex_pharmacy": {
+ "names": ["Pharmacy Order", "Pedido Farmacia"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
+ "slots": 1, "weight": [1, 3],
+ "basePriceCents": 3400, "tier": 2, "fragile": false, "urgent": true, "genChance": 0.5, "category": "medical"
+ },
+ "planex_glassware": {
+ "names": ["Fragile Glassware", "Cristaleria Fragil"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
+ "slots": [2, 3], "weight": [4, 8],
+ "basePriceCents": 6120, "tier": 3, "fragile": true, "urgent": false, "genChance": 0.5, "category": "glassware"
+ },
+ "planex_medical": {
+ "names": ["Medical Supplies", "Suministros Medicos"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
+ "slots": [1, 2], "weight": [2, 5],
+ "basePriceCents": 8160, "tier": 3, "fragile": true, "urgent": true, "genChance": 0.3, "category": "medical"
+ },
+ "planex_auto_parts": {
+ "names": ["Auto Parts Crate", "Caja Repuestos Auto"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.5,
+ "slots": [2, 3, 4], "weight": [7, 14, 20],
+ "basePriceCents": 5440, "tier": 3, "fragile": false, "urgent": false, "genChance": 0.5, "category": "auto"
+ },
+ "planex_catering": {
+ "names": ["Catering Order", "Pedido Catering"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.7,
+ "slots": [2, 3], "weight": [5, 10],
+ "basePriceCents": 4760, "tier": 3, "fragile": true, "urgent": true, "genChance": 0.3, "category": "food"
+ },
+ "planex_fine_art": {
+ "names": ["Fine Art Piece", "Obra de Arte"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
+ "slots": [2, 3], "weight": [4, 8],
+ "basePriceCents": 11900, "tier": 4, "fragile": true, "urgent": false, "genChance": 0.3, "category": "luxury"
+ },
+ "planex_server_rack": {
+ "names": ["Server Equipment", "Equipo de Servidor"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
+ "slots": [4, 6], "weight": [16, 28],
+ "basePriceCents": 12750, "tier": 4, "fragile": true, "urgent": false, "genChance": 0.2, "category": "electronics"
+ },
+ "planex_urgent_legal": {
+ "names": ["Urgent Legal Documents", "Documentos Legales Urgentes"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
+ "slots": 1, "weight": [0.5, 1],
+ "basePriceCents": 10200, "tier": 4, "fragile": false, "urgent": true, "genChance": 0.4, "category": "legal"
+ },
+ "planex_luxury": {
+ "names": ["Luxury Goods", "Articulos de Lujo"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
+ "slots": [1, 2], "weight": [1, 3],
+ "basePriceCents": 18700, "tier": 5, "fragile": true, "urgent": false, "genChance": 0.25, "category": "luxury"
+ },
+ "planex_hazmat": {
+ "names": ["Hazardous Materials (Definitely Fine)", "Material Peligroso (Definitivamente OK)"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.8,
+ "slots": [4, 6], "weight": [14, 25],
+ "basePriceCents": 20400, "tier": 5, "fragile": true, "urgent": false, "genChance": 0.15, "category": "hazmat"
+ },
+ "planex_time_critical": {
+ "names": ["Time-Critical Samples", "Muestras Urgentes"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0.9,
+ "slots": 1, "weight": [0.5, 2],
+ "basePriceCents": 17000, "tier": 5, "fragile": true, "urgent": true, "genChance": 0.25, "category": "medical"
+ },
+ "planex_return_package": {
+ "names": ["Return Package", "Paquete de Devolucion"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
+ "slots": [1, 2], "weight": [2, 8],
+ "basePriceCents": 500, "tier": 1, "fragile": false, "urgent": false, "genChance": 1.0, "category": "household", "isPickup": true
+ },
+ "planex_inpost_collection": {
+ "names": ["InPost Collection", "Recogida InPost"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
+ "slots": 1, "weight": [1, 5],
+ "basePriceCents": 350, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.8, "category": "office", "isPickup": true
+ },
+ "planex_outbound_parcel": {
+ "names": ["Outbound Parcel", "Paquete de Salida"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
+ "slots": [1, 2], "weight": [3, 10],
+ "basePriceCents": 600, "tier": 1, "fragile": false, "urgent": false, "genChance": 0.7, "category": "household", "isPickup": true
+ },
+ "planex_depot_return": {
+ "names": ["Route Manifest", "Manifiesto de Ruta"],
+ "logisticTypes": ["parcel"], "cargoType": "parcel", "offerDuration": 86400, "modChance": {}, "generationChance": 0, "duplicationChance": [1], "rarity": 1, "worth": 0,
+ "slots": 1, "weight": 1,
+ "basePriceCents": 0, "tier": 1, "fragile": false, "urgent": false, "genChance": 0, "category": "office", "isPickup": true, "isDepotReturn": true
+ }
 }

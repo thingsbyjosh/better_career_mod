@@ -1,2233 +1,2233 @@
 {
 
-  "deliveryProviders":[
+ "deliveryProviders":[
 
-    {
+ {
 
-      "id":"belascoGarage",
+ "id":"belascoGarage",
 
-      "alwaysVisible": true,
+ "alwaysVisible": true,
 
-      "name":"Belasco City Garage",
+ "name":"Belasco City Garage",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "facilityInformation":"Belasco Garage; Cheap prices, friendly staff, and the building has two entrances, so you can just drive through it.\n\nEstablished only a few years ago when the map of WCUSA first released, it was an instant success with players. This text is not auto generated, but written by a human. Thanks!",
+ "facilityInformation":"Belasco Garage; Cheap prices, friendly staff, and the building has two entrances, so you can just drive through it.\n\nEstablished only a few years ago when the map of WCUSA first released, it was an instant success with players. This text is not auto generated, but written by a human. Thanks!",
 
-      "associatedOrganization":"belascoCityGarage",
+ "associatedOrganization":"belascoCityGarage",
 
-      "isTutorialForCargoDelivery": true,
+ "isTutorialForCargoDelivery": true,
 
-      "isTutorialForVehicleDelivery": true,
+ "isTutorialForVehicleDelivery": true,
 
-      "preview":"facilities/garage_servicestation.jpg",
+ "preview":"facilities/garage_servicestation.jpg",
 
-      //"pickUpSpotNames":["belascoGarage_parking"],
+ //"pickUpSpotNames":["belascoGarage_parking"],
 
-      //"dropOffSpotNames":["belascoGarage_parking"],
+ //"dropOffSpotNames":["belascoGarage_parking"],
 
-      //"trailerSpotNames":["belascoGarage_trailer"],
+ //"trailerSpotNames":["belascoGarage_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"belascoGarage_parking",
+ "psName":"belascoGarage_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts","tutorialParcel"],
+ "logisticTypesProvided":["mechanicalParts","tutorialParcel"],
 
-          "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"belascoGarage_trailer",
+ "psName":"belascoGarage_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-          "logisticTypesReceived":["vehNeedsRepair", "tutorialVehicleDelivery"]
+ "logisticTypesReceived":["vehNeedsRepair", "tutorialVehicleDelivery"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished", "tutorialParcel"],
+ "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished", "tutorialParcel"],
 
-      "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair", "tutorialVehicleDelivery"],
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair", "tutorialVehicleDelivery"],
 
-      "logisticMaxItems":4,
+ "logisticMaxItems":4,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["tutorialParcel"],
+ "logisticTypes":["tutorialParcel"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "interval":100,
+ "interval":100,
 
-          "isTutorialGenerator":true
+ "isTutorialGenerator":true
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":250,
+ "interval":250,
 
-          "min":1,
+ "min":1,
 
-          "max": 4,
+ "max": 4,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"junkerVehFilter",
+ "filter":"junkerVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":280,
+ "interval":280,
 
-          "min":0,
+ "min":0,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"fastAutomotive",
+ "id":"fastAutomotive",
 
-      "name":"Fast Automotive",
+ "name":"Fast Automotive",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "associatedOrganization":"fastAutomotive",
+ "associatedOrganization":"fastAutomotive",
 
-      "preview":"previews/fastAutomotive.jpg",
+ "preview":"previews/fastAutomotive.jpg",
 
-      //"pickUpSpotNames":["fastAutomotive_parking"],
+ //"pickUpSpotNames":["fastAutomotive_parking"],
 
-      //"dropOffSpotNames":["fastAutomotive_parking"],
+ //"dropOffSpotNames":["fastAutomotive_parking"],
 
-      //"trailerSpotNames":["fastAutomotive_trailer"],
+ //"trailerSpotNames":["fastAutomotive_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"fastAutomotive_parking",
+ "psName":"fastAutomotive_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"fastAutomotive_trailer",
+ "psName":"fastAutomotive_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-          "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck"]
+ "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-      "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck"],
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck"],
 
-      "logisticMaxItems":3,
+ "logisticMaxItems":3,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":320,
+ "interval":320,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"customizedVehFilter",
+ "filter":"customizedVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":350,
+ "interval":350,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"exoticVehFilter",
+ "filter":"exoticVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
 
 
-      ],
+ ],
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"exhaustShop",
+ "id":"exhaustShop",
 
-      "name":"Exhaust Shop",
+ "name":"Exhaust Shop",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "associatedOrganization":"belascoCityExhaust",
+ "associatedOrganization":"belascoCityExhaust",
 
-      "preview":"previews/exhaustShop.jpg",
+ "preview":"previews/exhaustShop.jpg",
 
-      //"pickUpSpotNames":["exhaustShop_parking"],
+ //"pickUpSpotNames":["exhaustShop_parking"],
 
-      //"dropOffSpotNames":["exhaustShop_parking"],
+ //"dropOffSpotNames":["exhaustShop_parking"],
 
-      //"trailerSpotNames":["exhaustShop_trailer"],
+ //"trailerSpotNames":["exhaustShop_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"exhaustShop_parking",
+ "psName":"exhaustShop_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"exhaustShop_trailer",
+ "psName":"exhaustShop_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-          "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"]
+ "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-      "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-      "logisticMaxItems":3,
+ "logisticMaxItems":3,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":250,
+ "interval":250,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"junkerVehFilter",
+ "filter":"junkerVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":280,
+ "interval":280,
 
-          "min":0,
+ "min":0,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":320,
+ "interval":320,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"customizedVehFilter",
+ "filter":"customizedVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        }
+ }
 
-      ],
+ ],
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"torresTires",
+ "id":"torresTires",
 
-      "name":"Torres Tires",
+ "name":"Torres Tires",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "associatedOrganization":"torresTires",
+ "associatedOrganization":"torresTires",
 
-      "preview":"previews/torresTires.jpg",
+ "preview":"previews/torresTires.jpg",
 
-      //"pickUpSpotNames":["torresTires_parking"],
+ //"pickUpSpotNames":["torresTires_parking"],
 
-      //"dropOffSpotNames":["torresTires_parking"],
+ //"dropOffSpotNames":["torresTires_parking"],
 
-      //"trailerSpotNames":["torresTires_trailer"],
+ //"trailerSpotNames":["torresTires_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"torresTires_parking",
+ "psName":"torresTires_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"torresTires_trailer",
+ "psName":"torresTires_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-          "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"]
+ "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-      "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-      "logisticMaxItems":3,
+ "logisticMaxItems":3,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":250,
+ "interval":250,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"junkerVehFilter",
+ "filter":"junkerVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":280,
+ "interval":280,
 
-          "min":0,
+ "min":0,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":320,
+ "interval":320,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"customizedVehFilter",
+ "filter":"customizedVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-      ],
+ ],
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"smashAutoRepairs",
+ "id":"smashAutoRepairs",
 
-      "name":"Smash Auto Repairs",
+ "name":"Smash Auto Repairs",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "associatedOrganization":"smashAutoRepairs",
+ "associatedOrganization":"smashAutoRepairs",
 
-      "preview":"previews/smashAutoRepairs.jpg",
+ "preview":"previews/smashAutoRepairs.jpg",
 
-      //"pickUpSpotNames":["smashAutoRepairs_parking"],
+ //"pickUpSpotNames":["smashAutoRepairs_parking"],
 
-      //"dropOffSpotNames":["smashAutoRepairs_parking"],
+ //"dropOffSpotNames":["smashAutoRepairs_parking"],
 
-      //"trailerSpotNames":["smashAutoRepairs_trailer"],
+ //"trailerSpotNames":["smashAutoRepairs_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"smashAutoRepairs_parking",
+ "psName":"smashAutoRepairs_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"smashAutoRepairs_trailer",
+ "psName":"smashAutoRepairs_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-          "logisticTypesReceived":["vehNeedsRepair"]
+ "logisticTypesReceived":["vehNeedsRepair"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-      "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair"],
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair"],
 
-      "logisticMaxItems":3,
+ "logisticMaxItems":3,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":250,
+ "interval":250,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"junkerVehFilter",
+ "filter":"junkerVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":280,
+ "interval":280,
 
-          "min":0,
+ "min":0,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":320,
+ "interval":320,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"customizedVehFilter",
+ "filter":"customizedVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-      ],
+ ],
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"jerryRigs",
+ "id":"jerryRigs",
 
-      "name":"Jerry Riggs",
+ "name":"Jerry Riggs",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "associatedOrganization":"jerryRiggs",
+ "associatedOrganization":"jerryRiggs",
 
-      "preview":"previews/jerryRigs.jpg",
+ "preview":"previews/jerryRigs.jpg",
 
-      //"pickUpSpotNames":["jerryRigs_parking"],
+ //"pickUpSpotNames":["jerryRigs_parking"],
 
-      //"dropOffSpotNames":["jerryRigs_parking"],
+ //"dropOffSpotNames":["jerryRigs_parking"],
 
-      //"trailerSpotNames":["jerryRigs_trailer"],
+ //"trailerSpotNames":["jerryRigs_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"jerryRigs_parking",
+ "psName":"jerryRigs_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts", "parcel", "food", "tutorialParcel"]
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food", "tutorialParcel"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"jerryRigs_trailer",
+ "psName":"jerryRigs_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-          "logisticTypesReceived":["vehNeedsRepair"]
+ "logisticTypesReceived":["vehNeedsRepair"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-      "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","tutorialParcel"],
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","tutorialParcel"],
 
-      "logisticMaxItems":6,
+ "logisticMaxItems":6,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"junkerVehFilter",
+ "filter":"junkerVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":270,
+ "interval":270,
 
-          "min":1,
+ "min":1,
 
-          "max": 4,
+ "max": 4,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"customizedVehFilter",
+ "filter":"customizedVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-      ],
+ ],
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"shuffleboardLogistics",
+ "id":"shuffleboardLogistics",
 
-      "name":"Shuffleboard Logistics (Belasco City)",
+ "name":"Shuffleboard Logistics (Belasco City)",
 
-      "description":"Ships and receives a wide variety of cargo types.",
+ "description":"Ships and receives a wide variety of cargo types.",
 
-      "preview":"previews/shuffleboardLogistics.jpg",
+ "preview":"previews/shuffleboardLogistics.jpg",
 
-      "associatedOrganization":"shuffleboardLogistics",
+ "associatedOrganization":"shuffleboardLogistics",
 
-      //"pickUpSpotNames":["shuffleboardLogistics_parking"],
+ //"pickUpSpotNames":["shuffleboardLogistics_parking"],
 
-      //"dropOffSpotNames":["shuffleboardLogistics_parking"],
+ //"dropOffSpotNames":["shuffleboardLogistics_parking"],
 
-      //"trailerSpotNames":["shuffleboardLogistics_trailer"],
+ //"trailerSpotNames":["shuffleboardLogistics_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"shuffleboardLogistics_parkingA",
+ "psName":"shuffleboardLogistics_parkingA",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["parcel", "food"]
+ "logisticTypesReceived":["parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"shuffleboardLogistics_parkingB",
+ "psName":"shuffleboardLogistics_parkingB",
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["industrial"]
+ "logisticTypesReceived":["industrial"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"shuffleboardLogistics_trailer1",
+ "psName":"shuffleboardLogistics_trailer1",
 
-          "logisticTypesProvided":["trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"],
+ "logisticTypesProvided":["trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"shuffleboardLogistics_trailer3",
+ "psName":"shuffleboardLogistics_trailer3",
 
-          "logisticTypesProvided":["trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"],
+ "logisticTypesProvided":["trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"shuffleboardLogistics_trailer5",
+ "psName":"shuffleboardLogistics_trailer5",
 
-          "logisticTypesProvided":["trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"],
+ "logisticTypesProvided":["trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"shuffleboardLogistics_fluids",
+ "psName":"shuffleboardLogistics_fluids",
 
-          "logisticTypesProvided":["water"],
+ "logisticTypesProvided":["water"],
 
-          "logisticTypesReceived":[]
+ "logisticTypesReceived":[]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"commercialGarageParkingOutside4",
+ "psName":"commercialGarageParkingOutside4",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-          "loanerNonTrailerPriority": 4,
+ "loanerNonTrailerPriority": 4,
 
-          "loanerTrailerPriority": 3
+ "loanerTrailerPriority": 3
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"commercialGarageParkingOutside3",
+ "psName":"commercialGarageParkingOutside3",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-          "loanerNonTrailerPriority": 3,
+ "loanerNonTrailerPriority": 3,
 
-          "loanerTrailerPriority": 2
+ "loanerTrailerPriority": 2
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"commercialGarageParkingOutside2",
+ "psName":"commercialGarageParkingOutside2",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-          "loanerNonTrailerPriority": 2,
+ "loanerNonTrailerPriority": 2,
 
-          "loanerTrailerPriority": 1
+ "loanerTrailerPriority": 1
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"commercialGarageParkingOutside1",
+ "psName":"commercialGarageParkingOutside1",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-          "loanerNonTrailerPriority": 1,
+ "loanerNonTrailerPriority": 1,
 
-          "loanerTrailerPriority": 4
+ "loanerTrailerPriority": 4
 
-        }
+ }
 
-      ],
+ ],
 
-      "sitesFile":["mechanics.sites.json", "facilities.sites.json"],
+ "sitesFile":["mechanics.sites.json", "facilities.sites.json"],
 
-      "logisticTypesProvided":["industrial", "trailerDeliveryResidential","trailerDeliveryConstructionMaterials", "water"],
+ "logisticTypesProvided":["industrial", "trailerDeliveryResidential","trailerDeliveryConstructionMaterials", "water"],
 
-      "logisticTypesReceived":["parcel", "food", "trailerDeliveryConstructionMaterials"],
+ "logisticTypesReceived":["parcel", "food", "trailerDeliveryConstructionMaterials"],
 
-      "logisticMaxItems":3,
+ "logisticMaxItems":3,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }
+ }
 
 
 
 
 
-        //small trailers
+ //small trailers
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":210,
+ "interval":210,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallEmptyTrailers",
+ "filter":"smallEmptyTrailers",
 
-          "logisticTypes":["trailerDeliveryResidential"],
+ "logisticTypes":["trailerDeliveryResidential"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":180,
+ "interval":180,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallFurnitureTrailers",
+ "filter":"smallFurnitureTrailers",
 
-          "logisticTypes":["trailerDeliveryResidential"],
+ "logisticTypes":["trailerDeliveryResidential"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":210,
+ "interval":210,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallCratePlanksTrailers",
+ "filter":"smallCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials", "trailerDeliveryResidential"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials", "trailerDeliveryResidential"],
 
-        },
+ },
 
 
 
-        //medium trailers
+ //medium trailers
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":210,
+ "interval":210,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumEmptyTrailer",
+ "filter":"mediumEmptyTrailer",
 
-          "logisticTypes":["trailerDeliveryResidential"],
+ "logisticTypes":["trailerDeliveryResidential"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":210,
+ "interval":210,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumFurnitureTrailers",
+ "filter":"mediumFurnitureTrailers",
 
-          "logisticTypes":["trailerDeliveryResidential"],
+ "logisticTypes":["trailerDeliveryResidential"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":210,
+ "interval":210,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumCratePlanksTrailers",
+ "filter":"mediumCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials", "trailerDeliveryResidential"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials", "trailerDeliveryResidential"],
 
-        },
+ },
 
 
 
-        //large trailers
+ //large trailers
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":210,
+ "interval":210,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigConstructionMaterials",
+ "filter":"bigConstructionMaterials",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":210,
+ "interval":210,
 
-          "min": 0,
+ "min": 0,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigEmptyTrailers",
+ "filter":"bigEmptyTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["water"],
+ "logisticTypes":["water"],
 
-          "materialType":"water",
+ "materialType":"water",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":7500,
+ "target":7500,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":600,
+ "interval":600,
 
-          "rate":1000,
+ "rate":1000,
 
-          "pickUpSpotName":"refinery_terminal_3"
+ "pickUpSpotName":"refinery_terminal_3"
 
-        }
+ }
 
-      ]
+ ]
 
-    },
+ },
 
 
 
-    {
+ {
 
-      "id":"shuffleboardGarage",
+ "id":"shuffleboardGarage",
 
-      "name":"Shuffleboard Garage",
+ "name":"Shuffleboard Garage",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "preview":"previews/shuffleboardLogistics.jpg",
+ "preview":"previews/shuffleboardLogistics.jpg",
 
-      "associatedOrganization":"shuffleboardLogistics",
+ "associatedOrganization":"shuffleboardLogistics",
 
-      //"pickUpSpotNames":["shuffleboardLogistics_parking"],
+ //"pickUpSpotNames":["shuffleboardLogistics_parking"],
 
-      //"dropOffSpotNames":["shuffleboardLogistics_parking"],
+ //"dropOffSpotNames":["shuffleboardLogistics_parking"],
 
-      //"trailerSpotNames":["shuffleboardLogistics_trailer"],
+ //"trailerSpotNames":["shuffleboardLogistics_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"shuffleboardGarage_parking",
+ "psName":"shuffleboardGarage_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"shuffleboardGarage_vehicles",
+ "psName":"shuffleboardGarage_vehicles",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished", "vehDeliveryAmbulance","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished", "vehDeliveryAmbulance","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-          "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"]
+ "logisticTypesReceived":["vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":["mechanics.sites.json", "facilities.sites.json"],
+ "sitesFile":["mechanics.sites.json", "facilities.sites.json"],
 
-      "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished", "vehDeliveryAmbulance","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["mechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished", "vehDeliveryAmbulance","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-      "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesReceived":["mechanicalParts", "parcel", "food","vehNeedsRepair","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-      "logisticMaxItems":3,
+ "logisticMaxItems":3,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":400,
+ "interval":400,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"ambulanceFleetVehFilter",
+ "filter":"ambulanceFleetVehFilter",
 
-          "logisticTypes":["vehDeliveryAmbulance"],
+ "logisticTypes":["vehDeliveryAmbulance"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":400,
+ "interval":400,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"largeVehFilter",
+ "filter":"largeVehFilter",
 
-          "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":400,
+ "interval":400,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"fleetLargeVehFilter",
+ "filter":"fleetLargeVehFilter",
 
-          "logisticTypes":["vehLargeTruck"],
+ "logisticTypes":["vehLargeTruck"],
 
-        },
+ },
 
-      ]
+ ]
 
-    },
+ },
 
 
 
-    // Dealerships
+ // Dealerships
 
-    {
+ {
 
-      "id":"quarrysideAutoSales",
+ "id":"quarrysideAutoSales",
 
-      "name":"Quarryside Auto Sales",
+ "name":"Quarryside Auto Sales",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "preview":"facilities/quarryside_dealership.jpg",
+ "preview":"facilities/quarryside_dealership.jpg",
 
-      "associatedOrganization":"quarrysideAutoSales",
+ "associatedOrganization":"quarrysideAutoSales",
 
-      //"pickUpSpotNames":["quarrysideAutoSales_parking"],
+ //"pickUpSpotNames":["quarrysideAutoSales_parking"],
 
-      //"dropOffSpotNames":["quarrysideAutoSales_parking"],
+ //"dropOffSpotNames":["quarrysideAutoSales_parking"],
 
-      //"trailerSpotNames":["quarrysideAutoSales_trailer"],
+ //"trailerSpotNames":["quarrysideAutoSales_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"quarrysideAutoSales_parking",
+ "psName":"quarrysideAutoSales_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"quarrysideAutoSales_trailer",
+ "psName":"quarrysideAutoSales_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-          "logisticTypesReceived":["vehRepairFinished"]
+ "logisticTypesReceived":["vehRepairFinished"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-      "logisticTypesReceived":["mechanicalParts","rareMechanicalParts" "parcel", "food","vehRepairFinished"],
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts" "parcel", "food","vehRepairFinished"],
 
-      "logisticMaxItems":2,
+ "logisticMaxItems":2,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":250,
+ "interval":250,
 
-          "min":1,
+ "min":1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"junkerVehFilter",
+ "filter":"junkerVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate","vehRepairFinished"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":280,
+ "interval":280,
 
-          "min":0,
+ "min":0,
 
-          "max": 4,
+ "max": 4,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
 
 
-      ],
+ ],
 
 
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"belascoAuto",
+ "id":"belascoAuto",
 
-      "name":"Belasco Auto",
+ "name":"Belasco Auto",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "preview":"facilities/belasco_auto_dealership.jpg",
+ "preview":"facilities/belasco_auto_dealership.jpg",
 
-      "associatedOrganization":"belascoAuto",
+ "associatedOrganization":"belascoAuto",
 
-      "isTutorialForVehicleDelivery": true,
+ "isTutorialForVehicleDelivery": true,
 
-      //"pickUpSpotNames":["belascoAuto_parking"],
+ //"pickUpSpotNames":["belascoAuto_parking"],
 
-      //"dropOffSpotNames":["belascoAuto_parking"],
+ //"dropOffSpotNames":["belascoAuto_parking"],
 
-      //"trailerSpotNames":["belascoAuto_trailer"],
+ //"trailerSpotNames":["belascoAuto_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"belascoAuto_parking",
+ "psName":"belascoAuto_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"belascoAuto_trailer",
+ "psName":"belascoAuto_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate", "tutorialVehicleDelivery"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate", "tutorialVehicleDelivery"],
 
-          "logisticTypesReceived":["vehRepairFinished"]
+ "logisticTypesReceived":["vehRepairFinished"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate", "tutorialVehicleDelivery" ],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate", "tutorialVehicleDelivery" ],
 
-      "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food", "vehRepairFinished"],
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food", "vehRepairFinished"],
 
-      "logisticMaxItems":2,
+ "logisticMaxItems":2,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "isTutorialGenerator": true,
+ "isTutorialGenerator": true,
 
-          "filter":"tutorialVehicleDelivery",
+ "filter":"tutorialVehicleDelivery",
 
-          "logisticTypes":["tutorialVehicleDelivery"],
+ "logisticTypes":["tutorialVehicleDelivery"],
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":280,
+ "interval":280,
 
-          "min":1,
+ "min":1,
 
-          "max": 4,
+ "max": 4,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"fleetVehFilter",
+ "filter":"fleetVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
 
 
-      ],
+ ],
 
 
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"jeffersonMotors",
+ "id":"jeffersonMotors",
 
-      "name":"Jefferson Motors",
+ "name":"Jefferson Motors",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "preview":"facilities/jefferson_dealership.jpg",
+ "preview":"facilities/jefferson_dealership.jpg",
 
-      "associatedOrganization":"jeffersonMotors",
+ "associatedOrganization":"jeffersonMotors",
 
-      //"pickUpSpotNames":["jeffersonMotors_parking"],
+ //"pickUpSpotNames":["jeffersonMotors_parking"],
 
-      //"dropOffSpotNames":["jeffersonMotors_parking"],
+ //"dropOffSpotNames":["jeffersonMotors_parking"],
 
-      //"trailerSpotNames":["jeffersonMotors_trailer"],
+ //"trailerSpotNames":["jeffersonMotors_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"jeffersonMotors_parking",
+ "psName":"jeffersonMotors_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"jeffersonMotors_trailer",
+ "psName":"jeffersonMotors_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate", "vehDeliveryPolice"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate", "vehDeliveryPolice"],
 
-          "logisticTypesReceived":["vehRepairFinished"]
+ "logisticTypesReceived":["vehRepairFinished"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate","vehDeliveryPolice"],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate","vehDeliveryPolice"],
 
-      "logisticTypesReceived":["mechanicalParts","rareMechanicalParts" "parcel", "food","vehRepairFinished"],
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts" "parcel", "food","vehRepairFinished"],
 
-      "logisticMaxItems":2,
+ "logisticMaxItems":2,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":290,
+ "interval":290,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"fleetVehFilter",
+ "filter":"fleetVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"smallVehFilter",
+ "filter":"smallVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"policeFleetVehFilter",
+ "filter":"policeFleetVehFilter",
 
-          "logisticTypes":["vehDeliveryPolice"],
+ "logisticTypes":["vehDeliveryPolice"],
 
-        },
+ },
 
 
 
-      ],
+ ],
 
 
 
-    },
+ },
 
-    {
+ {
 
-      "id":"richsMotorCompany",
+ "id":"richsMotorCompany",
 
-      "name":"Rich's Motor Company",
+ "name":"Rich's Motor Company",
 
-      "description":"Ships and receives car parts and accessories.",
+ "description":"Ships and receives car parts and accessories.",
 
-      "preview":"facilities/richsmotorcompany_dealership.jpg",
+ "preview":"facilities/richsmotorcompany_dealership.jpg",
 
-      "associatedOrganization":"richsMotorCompany",
+ "associatedOrganization":"richsMotorCompany",
 
-      //"pickUpSpotNames":["richsMotorCompany_parking"],
+ //"pickUpSpotNames":["richsMotorCompany_parking"],
 
-      //"dropOffSpotNames":["richsMotorCompany_parking"],
+ //"dropOffSpotNames":["richsMotorCompany_parking"],
 
-      //"trailerSpotNames":["richsMotorCompany_trailer"],
+ //"trailerSpotNames":["richsMotorCompany_trailer"],
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"richsMotorCompany_parking",
+ "psName":"richsMotorCompany_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts"],
 
-          "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts", "parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"richsMotorCompany_trailer",
+ "psName":"richsMotorCompany_trailer",
 
-          "logisticTypesProvided":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypesProvided":["vehNeedsRepair","vehForPrivate"],
 
-          "logisticTypesReceived":["vehRepairFinished"]
+ "logisticTypesReceived":["vehRepairFinished"]
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mechanics.sites.json",
+ "sitesFile":"mechanics.sites.json",
 
-      "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate"],
+ "logisticTypesProvided":["mechanicalParts","rareMechanicalParts","vehNeedsRepair","vehForPrivate"],
 
-      "logisticTypesReceived":["mechanicalParts","rareMechanicalParts" "parcel", "food","vehRepairFinished"],
+ "logisticTypesReceived":["mechanicalParts","rareMechanicalParts" "parcel", "food","vehRepairFinished"],
 
-      "logisticMaxItems":2,
+ "logisticMaxItems":2,
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":2,
+ "max":2,
 
-          "slotsMax":8,
+ "slotsMax":8,
 
-          "interval":100
+ "interval":100
 
-        }, {
+ }, {
 
-          "type":"parcelProvider",
+ "type":"parcelProvider",
 
-          "logisticTypes":["mechanicalParts"],
+ "logisticTypes":["mechanicalParts"],
 
-          "min":1,
+ "min":1,
 
-          "max":1,
+ "max":1,
 
-          "slotsMin":8,
+ "slotsMin":8,
 
-          "interval":180
+ "interval":180
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"customizedVehFilter",
+ "filter":"customizedVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":340,
+ "interval":340,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"exoticVehFilter",
+ "filter":"exoticVehFilter",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-        {
+ {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":400,
+ "interval":400,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 1,
+ "max": 1,
 
-          "offerDuration":{"min":300,"max":900},
+ "offerDuration":{"min":300,"max":900},
 
-          "filter":"oldTimerVeh",
+ "filter":"oldTimerVeh",
 
-          "logisticTypes":["vehNeedsRepair","vehForPrivate"],
+ "logisticTypes":["vehNeedsRepair","vehForPrivate"],
 
-        },
+ },
 
-      ],
+ ],
 
 
 
-    }
+ }
 
-  ]
+ ]
 
 }

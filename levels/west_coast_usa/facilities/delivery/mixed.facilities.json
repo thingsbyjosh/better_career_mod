@@ -1,2549 +1,2549 @@
 {
 
-  "deliveryProviders":[
+ "deliveryProviders":[
 
-    {
+ {
 
-      "id":"hospital",
+ "id":"hospital",
 
-      "name":"Hospital",
+ "name":"Hospital",
 
-      "description":"Receives various cargo.",
+ "description":"Receives various cargo.",
 
-      //"associatedOrganization":"belascoCityHospital",
+ //"associatedOrganization":"belascoCityHospital",
 
-      "preview":"previews/hospital.jpg",
+ "preview":"previews/hospital.jpg",
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"hospital_main"}
+ {"psName":"hospital_main"}
 
-      ],
+ ],
 
-      //"dropOffSpotNames":["hospital_main"],
+ //"dropOffSpotNames":["hospital_main"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-      "logisticTypesReceived":["parcel", "food", "vehDeliveryAmbulance"],
+ "logisticTypesReceived":["parcel", "food", "vehDeliveryAmbulance"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"policeStation",
+ "id":"policeStation",
 
-      "name":"Police Station",
+ "name":"Police Station",
 
-      "description":"Receives various cargo.",
+ "description":"Receives various cargo.",
 
-      //"associatedOrganization":"belascoCityPoliceDepartment",
+ //"associatedOrganization":"belascoCityPoliceDepartment",
 
-      "preview":"previews/hospital.jpg",
+ "preview":"previews/hospital.jpg",
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"police1"},
+ {"psName":"police1"},
 
-        {"psName":"police2"},
+ {"psName":"police2"},
 
-        {"psName":"police3"},
+ {"psName":"police3"},
 
-      ],
+ ],
 
-      //"dropOffSpotNames":["police1","police2","police3"],
+ //"dropOffSpotNames":["police1","police2","police3"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-      "logisticTypesReceived":["vehDeliveryPolice", "parcel"],
+ "logisticTypesReceived":["vehDeliveryPolice", "parcel"],
 
-      "logisticGenerators":[],
+ "logisticGenerators":[],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"snoozeNews",
+ "id":"snoozeNews",
 
-      "name":"Snooze News",
+ "name":"Snooze News",
 
-      "description":"Receives various cargo.",
+ "description":"Receives various cargo.",
 
-      //"associatedOrganization":"snoozeNews",
+ //"associatedOrganization":"snoozeNews",
 
-      "preview":"previews/snoozeNews.jpg",
+ "preview":"previews/snoozeNews.jpg",
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"snoozeNews_main"},
+ {"psName":"snoozeNews_main"},
 
-      ],
+ ],
 
-      //"dropOffSpotNames":["snoozeNews_main"],
+ //"dropOffSpotNames":["snoozeNews_main"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-      "logisticTypesReceived":["parcel", "food"],
+ "logisticTypesReceived":["parcel", "food"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"constructionCity",
+ "id":"constructionCity",
 
-      "name":"City Construction Site",
+ "name":"City Construction Site",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"belascoCityConstruction",
+ "associatedOrganization":"belascoCityConstruction",
 
-      "preview":"previews/constructionCity.jpg",
+ "preview":"previews/constructionCity.jpg",
 
-      //"pickUpSpotNames":["construction_city"],
+ //"pickUpSpotNames":["construction_city"],
 
-      //"dropOffSpotNames":["construction_city"],
+ //"dropOffSpotNames":["construction_city"],
 
-      //"trailerSpotNames":["construction_city_trailer"],
+ //"trailerSpotNames":["construction_city_trailer"],
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {
+ {
 
-          "psName":"construction_city",
+ "psName":"construction_city",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["soil"],
+ "logisticTypesProvided":["soil"],
 
-          "logisticTypesReceived":["industrial","parcel"],
+ "logisticTypesReceived":["industrial","parcel"],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"construction_city_trailer",
+ "psName":"construction_city_trailer",
 
-          "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck","sand","gravel","water"],
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck","sand","gravel","water"],
 
-        },
+ },
 
-      ],
+ ],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","soil"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","soil"],
 
-      "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","sand","gravel","water"],
+ "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","sand","gravel","water"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },{
+ },{
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":2,
+ "min":2,
 
-          "max": 4,
+ "max": 4,
 
-          "offerDuration":{"min":300,"max":400},
+ "offerDuration":{"min":300,"max":400},
 
-          "filter":"largeVehFilter",
+ "filter":"largeVehFilter",
 
-          "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        }, {
+ }, {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"fleetLargeVehFilter",
+ "filter":"fleetLargeVehFilter",
 
-          "logisticTypes":["vehLargeTruck"],
+ "logisticTypes":["vehLargeTruck"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallCratePlanksTrailers",
+ "filter":"smallCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumCratePlanksTrailers",
+ "filter":"mediumCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigConstructionMaterials",
+ "filter":"bigConstructionMaterials",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["sand"],
+ "logisticTypes":["sand"],
 
-          "materialType":"sand",
+ "materialType":"sand",
 
-          "capacity":3000,
+ "capacity":3000,
 
-          "target":1500,
+ "target":1500,
 
-          "variance":1000,
+ "variance":1000,
 
-          "interval":270,
+ "interval":270,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["gravel"],
+ "logisticTypes":["gravel"],
 
-          "materialType":"gravel",
+ "materialType":"gravel",
 
-          "capacity":2000,
+ "capacity":2000,
 
-          "target":300,
+ "target":300,
 
-          "variance":500,
+ "variance":500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["water"],
+ "logisticTypes":["water"],
 
-          "materialType":"water",
+ "materialType":"water",
 
-          "capacity":6000,
+ "capacity":6000,
 
-          "target":1000,
+ "target":1000,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":300,
+ "rate":300,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["soil"],
+ "logisticTypes":["soil"],
 
-          "materialType":"soil",
+ "materialType":"soil",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":7500,
+ "target":7500,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":180,
+ "interval":180,
 
-          "rate":700,
+ "rate":700,
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
 
 
-    {
+ {
 
-      "id":"construction_toll",
+ "id":"construction_toll",
 
-      "name":"Toll Construction Site",
+ "name":"Toll Construction Site",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"belascoCityConstruction",
+ "associatedOrganization":"belascoCityConstruction",
 
-      "preview":"previews/constructionToll.jpg",
+ "preview":"previews/constructionToll.jpg",
 
-      //"dropOffSpotNames":["construction_toll"],
+ //"dropOffSpotNames":["construction_toll"],
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"construction_toll"},
+ {"psName":"construction_toll"},
 
-      ],
+ ],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-      "logisticTypesReceived":["industrial","parcel","sand","gravel","water"],
+ "logisticTypesReceived":["industrial","parcel","sand","gravel","water"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["sand"],
+ "logisticTypes":["sand"],
 
-          "materialType":"sand",
+ "materialType":"sand",
 
-          "capacity":3000,
+ "capacity":3000,
 
-          "target":1500,
+ "target":1500,
 
-          "variance":1000,
+ "variance":1000,
 
-          "interval":270,
+ "interval":270,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["gravel"],
+ "logisticTypes":["gravel"],
 
-          "materialType":"gravel",
+ "materialType":"gravel",
 
-          "capacity":2000,
+ "capacity":2000,
 
-          "target":300,
+ "target":300,
 
-          "variance":500,
+ "variance":500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["water"],
+ "logisticTypes":["water"],
 
-          "materialType":"water",
+ "materialType":"water",
 
-          "capacity":6000,
+ "capacity":6000,
 
-          "target":1000,
+ "target":1000,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":300,
+ "rate":300,
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
 
 
-    {
+ {
 
-      "id":"construction_overpass",
+ "id":"construction_overpass",
 
-      "name":"Overpass Construction Site",
+ "name":"Overpass Construction Site",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"belascoCityConstruction",
+ "associatedOrganization":"belascoCityConstruction",
 
-      "preview":"previews/constructionOverpass.jpg",
+ "preview":"previews/constructionOverpass.jpg",
 
-      //"dropOffSpotNames":["construction_overpass"],
+ //"dropOffSpotNames":["construction_overpass"],
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"construction_overpass"},
+ {"psName":"construction_overpass"},
 
-      ],
+ ],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-      "logisticTypesReceived":["industrial","parcel","sand","gravel","water"],
+ "logisticTypesReceived":["industrial","parcel","sand","gravel","water"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["sand"],
+ "logisticTypes":["sand"],
 
-          "materialType":"sand",
+ "materialType":"sand",
 
-          "capacity":3000,
+ "capacity":3000,
 
-          "target":1500,
+ "target":1500,
 
-          "variance":1000,
+ "variance":1000,
 
-          "interval":270,
+ "interval":270,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["gravel"],
+ "logisticTypes":["gravel"],
 
-          "materialType":"gravel",
+ "materialType":"gravel",
 
-          "capacity":2000,
+ "capacity":2000,
 
-          "target":300,
+ "target":300,
 
-          "variance":500,
+ "variance":500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["water"],
+ "logisticTypes":["water"],
 
-          "materialType":"water",
+ "materialType":"water",
 
-          "capacity":6000,
+ "capacity":6000,
 
-          "target":1000,
+ "target":1000,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":300,
+ "rate":300,
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
 
 
 
 
-    {
+ {
 
-      "id":"steelFactory",
+ "id":"steelFactory",
 
-      "name":"Hot Rolled Inc.",
+ "name":"Hot Rolled Inc.",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"hotRolled",
+ "associatedOrganization":"hotRolled",
 
-      "preview":"previews/steelFactory.jpg",
+ "preview":"previews/steelFactory.jpg",
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"hotrolled_parking",
+ "psName":"hotrolled_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["parcel"]
+ "logisticTypesReceived":["parcel"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"hotrolled_trailer",
+ "psName":"hotrolled_trailer",
 
-          "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-          "logisticTypesReceived":["vehLargeTruck"]
+ "logisticTypesReceived":["vehLargeTruck"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"hotrolled_fluids",
+ "psName":"hotrolled_fluids",
 
-          "logisticTypesProvided":["hazardousFluid"],
+ "logisticTypesProvided":["hazardousFluid"],
 
-          "logisticTypesReceived":[]
+ "logisticTypesReceived":[]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"hotrolled_yard1",
+ "psName":"hotrolled_yard1",
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["industrial","trailerDeliveryConstructionMaterials"]
+ "logisticTypesReceived":["industrial","trailerDeliveryConstructionMaterials"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"hotrolled_yard2",
+ "psName":"hotrolled_yard2",
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["industrial","trailerDeliveryConstructionMaterials"]
+ "logisticTypesReceived":["industrial","trailerDeliveryConstructionMaterials"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"hotrolled_yard3",
+ "psName":"hotrolled_yard3",
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["industrial","trailerDeliveryConstructionMaterials"]
+ "logisticTypesReceived":["industrial","trailerDeliveryConstructionMaterials"]
 
-        },
+ },
 
-      ],
+ ],
 
-      //"pickUpSpotNames":["hotrolled_parking"],
+ //"pickUpSpotNames":["hotrolled_parking"],
 
-      //"dropOffSpotNames":["hotrolled_parking"],
+ //"dropOffSpotNames":["hotrolled_parking"],
 
-      //"trailerSpotNames":["hotrolled_trailer"],
+ //"trailerSpotNames":["hotrolled_trailer"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","hazardousFluid"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","hazardousFluid"],
 
-      "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck"],
+ "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":90
+ "interval":90
 
-        },{
+ },{
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"largeVehFilter",
+ "filter":"largeVehFilter",
 
-          "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        }, {
+ }, {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"fleetLargeVehFilter",
+ "filter":"fleetLargeVehFilter",
 
-          "logisticTypes":["vehLargeTruck"],
+ "logisticTypes":["vehLargeTruck"],
 
-        },{
+ },{
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallCratePlanksTrailers",
+ "filter":"smallCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumCratePlanksTrailers",
+ "filter":"mediumCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigConstructionMaterials",
+ "filter":"bigConstructionMaterials",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["hazardousFluid"],
+ "logisticTypes":["hazardousFluid"],
 
-          "materialType":"hazardousFluid",
+ "materialType":"hazardousFluid",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":7500,
+ "target":7500,
 
-          "variance":2500,
+ "variance":2500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":750,
+ "rate":750,
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"quarry",
+ "id":"quarry",
 
-      "name":"Quarry",
+ "name":"Quarry",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"sealbrik",
+ "associatedOrganization":"sealbrik",
 
-      "preview":"previews/quarry.jpg",
+ "preview":"previews/quarry.jpg",
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"quarry_parking",
+ "psName":"quarry_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["industrial","parcel"]
+ "logisticTypesReceived":["industrial","parcel"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"quarry_trailer",
+ "psName":"quarry_trailer",
 
-          "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"quarry_water",
+ "psName":"quarry_water",
 
-          "logisticTypesProvided":["hazardousFluid"],
+ "logisticTypesProvided":["hazardousFluid"],
 
-          "logisticTypesReceived":["water"]
+ "logisticTypesReceived":["water"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"quarry_loadMaterial",
+ "psName":"quarry_loadMaterial",
 
-          "logisticTypesProvided":["sand","gravel"],
+ "logisticTypesProvided":["sand","gravel"],
 
-          "logisticTypesReceived":[]
+ "logisticTypesReceived":[]
 
-        },
+ },
 
-      ],
+ ],
 
-      //"pickUpSpotNames":["quarry_parking"],
+ //"pickUpSpotNames":["quarry_parking"],
 
-      //"dropOffSpotNames":["quarry_parking"],
+ //"dropOffSpotNames":["quarry_parking"],
 
-      //"trailerSpotNames":["quarry_trailer"],
+ //"trailerSpotNames":["quarry_trailer"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","sand","hazardousFluid","gravel"],
+ "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","sand","hazardousFluid","gravel"],
 
-      "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","water"],
+ "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","water"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":90
+ "interval":90
 
-        },{
+ },{
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":2,
+ "min":2,
 
-          "max": 4,
+ "max": 4,
 
-          "offerDuration":{"min":300,"max":400},
+ "offerDuration":{"min":300,"max":400},
 
-          "filter":"largeVehFilter",
+ "filter":"largeVehFilter",
 
-          "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        }, {
+ }, {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"fleetLargeVehFilter",
+ "filter":"fleetLargeVehFilter",
 
-          "logisticTypes":["vehLargeTruck"],
+ "logisticTypes":["vehLargeTruck"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallCratePlanksTrailers",
+ "filter":"smallCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumCratePlanksTrailers",
+ "filter":"mediumCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigConstructionMaterials",
+ "filter":"bigConstructionMaterials",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["sand"],
+ "logisticTypes":["sand"],
 
-          "materialType":"sand",
+ "materialType":"sand",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":7500,
+ "target":7500,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":270,
+ "interval":270,
 
-          "rate":750,
+ "rate":750,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["gravel"],
+ "logisticTypes":["gravel"],
 
-          "materialType":"gravel",
+ "materialType":"gravel",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":9000,
+ "target":9000,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":180,
+ "interval":180,
 
-          "rate":900,
+ "rate":900,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["water"],
+ "logisticTypes":["water"],
 
-          "materialType":"water",
+ "materialType":"water",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":2500,
+ "target":2500,
 
-          "variance":2500,
+ "variance":2500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":750,
+ "rate":750,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["hazardousFluid"],
+ "logisticTypes":["hazardousFluid"],
 
-          "materialType":"hazardousFluid",
+ "materialType":"hazardousFluid",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":7500,
+ "target":7500,
 
-          "variance":2500,
+ "variance":2500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":750,
+ "rate":750,
 
-        },
+ },
 
-      ],
+ ],
 
 
 
-    },
+ },
 
 
 
-    {
+ {
 
-      "id":"sealbrik",
+ "id":"sealbrik",
 
-      "name":"Sealbrik",
+ "name":"Sealbrik",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"sealbrik",
+ "associatedOrganization":"sealbrik",
 
-      "preview":"previews/sealbrik.jpg",
+ "preview":"previews/sealbrik.jpg",
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"sealbrik_parkingA",
+ "psName":"sealbrik_parkingA",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["parcel"]
+ "logisticTypesReceived":["parcel"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"sealbrik_trailer",
+ "psName":"sealbrik_trailer",
 
-          "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"sealbrik_materialLoading",
+ "psName":"sealbrik_materialLoading",
 
-          "logisticTypesProvided":["sand", "hazardousFluid"],
+ "logisticTypesProvided":["sand", "hazardousFluid"],
 
-          "logisticTypesReceived":[]
+ "logisticTypesReceived":[]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"sealbrik_pitA",
+ "psName":"sealbrik_pitA",
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["gravel"]
+ "logisticTypesReceived":["gravel"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"sealbrik_pitB",
+ "psName":"sealbrik_pitB",
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["soil"]
+ "logisticTypesReceived":["soil"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"sealbrik_pitC",
+ "psName":"sealbrik_pitC",
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["water"]
+ "logisticTypesReceived":["water"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"sealbrik_industrialStorage",
+ "psName":"sealbrik_industrialStorage",
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["industrial"]
+ "logisticTypesReceived":["industrial"]
 
-        },
+ },
 
-      ],
+ ],
 
-      //"pickUpSpotNames":["sealbrik_parking"],
+ //"pickUpSpotNames":["sealbrik_parking"],
 
-      //"dropOffSpotNames":["sealbrik_parking"],
+ //"dropOffSpotNames":["sealbrik_parking"],
 
-      //"trailerSpotNames":["sealbrik_trailer"],
+ //"trailerSpotNames":["sealbrik_trailer"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","hazardousFluid","sand"],
+ "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","hazardousFluid","sand"],
 
-      "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","water","gravel","soil"],
+ "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","water","gravel","soil"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":90
+ "interval":90
 
-        },{
+ },{
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"largeVehFilter",
+ "filter":"largeVehFilter",
 
-          "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        }, {
+ }, {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"fleetLargeVehFilter",
+ "filter":"fleetLargeVehFilter",
 
-          "logisticTypes":["vehLargeTruck"],
+ "logisticTypes":["vehLargeTruck"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallCratePlanksTrailers",
+ "filter":"smallCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumCratePlanksTrailers",
+ "filter":"mediumCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigConstructionMaterials",
+ "filter":"bigConstructionMaterials",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["soil"],
+ "logisticTypes":["soil"],
 
-          "materialType":"soil",
+ "materialType":"soil",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":1000,
+ "target":1000,
 
-          "variance":1000,
+ "variance":1000,
 
-          "interval":180,
+ "interval":180,
 
-          "rate":1000,
+ "rate":1000,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["gravel"],
+ "logisticTypes":["gravel"],
 
-          "materialType":"gravel",
+ "materialType":"gravel",
 
-          "capacity":5000,
+ "capacity":5000,
 
-          "target":1000,
+ "target":1000,
 
-          "variance":1000,
+ "variance":1000,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":400,
+ "rate":400,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["water"],
+ "logisticTypes":["water"],
 
-          "materialType":"water",
+ "materialType":"water",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":2500,
+ "target":2500,
 
-          "variance":2500,
+ "variance":2500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":750,
+ "rate":750,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["sand"],
+ "logisticTypes":["sand"],
 
-          "materialType":"sand",
+ "materialType":"sand",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":7500,
+ "target":7500,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":270,
+ "interval":270,
 
-          "rate":750,
+ "rate":750,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["hazardousFluid"],
+ "logisticTypes":["hazardousFluid"],
 
-          "materialType":"hazardousFluid",
+ "materialType":"hazardousFluid",
 
-          "capacity":10000,
+ "capacity":10000,
 
-          "target":7500,
+ "target":7500,
 
-          "variance":2500,
+ "variance":2500,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":750,
+ "rate":750,
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
 
 
 
 
-    {
+ {
 
-      "id":"lensflareStudios",
+ "id":"lensflareStudios",
 
-      "name":"Lensflare Studios",
+ "name":"Lensflare Studios",
 
-      "description":"Receives various cargo.",
+ "description":"Receives various cargo.",
 
-      "associatedOrganization":"lensflareStudios",
+ "associatedOrganization":"lensflareStudios",
 
-      "preview":"previews/lensflareStudios.jpg",
+ "preview":"previews/lensflareStudios.jpg",
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"lensflareStudios_parking",
+ "psName":"lensflareStudios_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["parcel", "food"]
+ "logisticTypesReceived":["parcel", "food"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"lensflareLogistics_terminalA",
+ "psName":"lensflareLogistics_terminalA",
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"lensflareLogistics_terminalB",
+ "psName":"lensflareLogistics_terminalB",
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"lensflareLogistics_terminalC",
+ "psName":"lensflareLogistics_terminalC",
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"lensflareLogistics_terminalD",
+ "psName":"lensflareLogistics_terminalD",
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck", "industrial"]
 
-        },
+ },
 
-      ],
+ ],
 
-      //"dropOffSpotNames":["lensflareStudios_parking"],
+ //"dropOffSpotNames":["lensflareStudios_parking"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-      "logisticTypesReceived":["parcel", "food", "industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck"],
+ "logisticTypesReceived":["parcel", "food", "industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":0,
+ "min":0,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":90
+ "interval":90
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
-    /**
+ /**
 
-    {
+ {
 
-      "id":"lensflareLogistics",
+ "id":"lensflareLogistics",
 
-      "name":"Lensflare Studios Warehouse",
+ "name":"Lensflare Studios Warehouse",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "preview":"previews/lensflareLogistics.jpg",
+ "preview":"previews/lensflareLogistics.jpg",
 
-      "pickUpSpotNames":["lensflareLogistics_parking"],
+ "pickUpSpotNames":["lensflareLogistics_parking"],
 
-      "dropOffSpotNames":["lensflareLogistics_parking"],
+ "dropOffSpotNames":["lensflareLogistics_parking"],
 
-      "trailerSpotNames":["lensflareLogistics_trailer"],
+ "trailerSpotNames":["lensflareLogistics_trailer"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-      "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck"],
+ "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":90
+ "interval":90
 
-        }
+ }
 
-      ],
+ ],
 
-    },**/
+ },**/
 
 
 
-    {
+ {
 
-      "id":"refinery_logistics",
+ "id":"refinery_logistics",
 
-      "name":"Shuffleboard Logistics (Spearleaf Island)",
+ "name":"Shuffleboard Logistics (Spearleaf Island)",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"shuffleboardLogistics",
+ "associatedOrganization":"shuffleboardLogistics",
 
-      "preview":"previews/refinery_logistics.jpg",
+ "preview":"previews/refinery_logistics.jpg",
 
-      //"pickUpSpotNames":["refinery_logistics_parking"],
+ //"pickUpSpotNames":["refinery_logistics_parking"],
 
-      //"dropOffSpotNames":["refinery_logistics_parking"],
+ //"dropOffSpotNames":["refinery_logistics_parking"],
 
-      //"trailerSpotNames":["refinery_logistics_trailer"],
+ //"trailerSpotNames":["refinery_logistics_trailer"],
 
 
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"refinery_logistics_parking",
+ "psName":"refinery_logistics_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["food","parcel","industrial"],
+ "logisticTypesReceived":["food","parcel","industrial"],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"refinery_logistics_trailer",
+ "psName":"refinery_logistics_trailer",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials", "vehLargeTruck"],
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials", "vehLargeTruck"],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"refinery_logistics_loaner1",
+ "psName":"refinery_logistics_loaner1",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-          "loanerTrailerPriority": 1,
+ "loanerTrailerPriority": 1,
 
-          "loanerNonTrailerPriority": 1
+ "loanerNonTrailerPriority": 1
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"refinery_logistics_loaner2",
+ "psName":"refinery_logistics_loaner2",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-          "loanerTrailerPriority": 2,
+ "loanerTrailerPriority": 2,
 
-          "loanerNonTrailerPriority": 2
+ "loanerNonTrailerPriority": 2
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"refinery_logistics_loaner3",
+ "psName":"refinery_logistics_loaner3",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-          "loanerTrailerPriority": 3,
+ "loanerTrailerPriority": 3,
 
-          "loanerNonTrailerPriority": 3
+ "loanerNonTrailerPriority": 3
 
-        }
+ }
 
-      ],
+ ],
 
 
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-      "logisticTypesReceived":["industrial", "food", "parcel","trailerDeliveryConstructionMaterials","vehLargeTruck"],
+ "logisticTypesReceived":["industrial", "food", "parcel","trailerDeliveryConstructionMaterials","vehLargeTruck"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":90
+ "interval":90
 
-        },{
+ },{
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":1,
+ "min":1,
 
-          "max": 3,
+ "max": 3,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"largeVehFilter",
+ "filter":"largeVehFilter",
 
-          "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        }, {
+ }, {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"fleetLargeVehFilter",
+ "filter":"fleetLargeVehFilter",
 
-          "logisticTypes":["vehLargeTruck"],
+ "logisticTypes":["vehLargeTruck"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallCratePlanksTrailers",
+ "filter":"smallCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumCratePlanksTrailers",
+ "filter":"mediumCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigConstructionMaterials",
+ "filter":"bigConstructionMaterials",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
 
 
-    {
+ {
 
-      "id":"spearleaf_refinery",
+ "id":"spearleaf_refinery",
 
-      "name":"Spearleaf Refinery",
+ "name":"Spearleaf Refinery",
 
-      "description":"Provides industrial fluids.",
+ "description":"Provides industrial fluids.",
 
-      "associatedOrganization":"spearleafRefinery",
+ "associatedOrganization":"spearleafRefinery",
 
-      "preview":"previews/refinery.jpg",
+ "preview":"previews/refinery.jpg",
 
-      //"pickUpSpotNames":["refinery_logistics_parking"],
+ //"pickUpSpotNames":["refinery_logistics_parking"],
 
-      //"dropOffSpotNames":["refinery_logistics_parking"],
+ //"dropOffSpotNames":["refinery_logistics_parking"],
 
-      //"trailerSpotNames":["refinery_logistics_trailer"],
+ //"trailerSpotNames":["refinery_logistics_trailer"],
 
 
 
-      "manualAccessPoints": [
+ "manualAccessPoints": [
 
-        {
+ {
 
-          "psName":"refinery_parking",
+ "psName":"refinery_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["food","parcel"],
+ "logisticTypesReceived":["food","parcel"],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"refinery_terminal_1",
+ "psName":"refinery_terminal_1",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":["gasoline"],
+ "logisticTypesProvided":["gasoline"],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"refinery_terminal_2",
+ "psName":"refinery_terminal_2",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":["diesel"],
+ "logisticTypesProvided":["diesel"],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"refinery_terminal_3",
+ "psName":"refinery_terminal_3",
 
-          "isInspectSpot":false,
+ "isInspectSpot":false,
 
-          "logisticTypesProvided":["water"],
+ "logisticTypesProvided":["water"],
 
-          "logisticTypesReceived":[],
+ "logisticTypesReceived":[],
 
-        }
+ }
 
-      ],
+ ],
 
 
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["gasoline", "diesel","water"],
+ "logisticTypesProvided":["gasoline", "diesel","water"],
 
-      "logisticTypesReceived":["parcel","food"],
+ "logisticTypesReceived":["parcel","food"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["food"],
+ "logisticTypes":["food"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["gasoline"],
+ "logisticTypes":["gasoline"],
 
-          "materialType":"gasoline",
+ "materialType":"gasoline",
 
-          "capacity":40000,
+ "capacity":40000,
 
-          "target":35000,
+ "target":35000,
 
-          "variance":5000,
+ "variance":5000,
 
-          "interval":600,
+ "interval":600,
 
-          "rate":4500,
+ "rate":4500,
 
-          "pickUpSpotName":"refinery_terminal_1"
+ "pickUpSpotName":"refinery_terminal_1"
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["diesel"],
+ "logisticTypes":["diesel"],
 
-          "materialType":"diesel",
+ "materialType":"diesel",
 
-          "capacity":40000,
+ "capacity":40000,
 
-          "target":35000,
+ "target":35000,
 
-          "variance":5000,
+ "variance":5000,
 
-          "interval":600,
+ "interval":600,
 
-          "rate":4500,
+ "rate":4500,
 
-          "pickUpSpotName":"refinery_terminal_2"
+ "pickUpSpotName":"refinery_terminal_2"
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialProvider",
+ "type":"materialProvider",
 
-          "logisticTypes":["water"],
+ "logisticTypes":["water"],
 
-          "materialType":"water",
+ "materialType":"water",
 
-          "capacity":25000,
+ "capacity":25000,
 
-          "target":20000,
+ "target":20000,
 
-          "variance":2500,
+ "variance":2500,
 
-          "interval":600,
+ "interval":600,
 
-          "rate":3000,
+ "rate":3000,
 
-          "pickUpSpotName":"refinery_terminal_3"
+ "pickUpSpotName":"refinery_terminal_3"
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
 
 
 
 
-    {
+ {
 
-      "id":"pier",
+ "id":"pier",
 
-      "name":"Spearleaf Refinery (Pier)",
+ "name":"Spearleaf Refinery (Pier)",
 
-      "description":"Receives industrial goods.",
+ "description":"Receives industrial goods.",
 
-      "associatedOrganization":"spearleafRefinery",
+ "associatedOrganization":"spearleafRefinery",
 
-      "preview":"previews/pier.jpg",
+ "preview":"previews/pier.jpg",
 
-      //"pickUpSpotNames":["pier_parking"],
+ //"pickUpSpotNames":["pier_parking"],
 
-      //"dropOffSpotNames":["pier_parking"],
+ //"dropOffSpotNames":["pier_parking"],
 
-      //"trailerSpotNames":["pier_trailer"],
+ //"trailerSpotNames":["pier_trailer"],
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {
+ {
 
-          "psName":"pier_parking",
+ "psName":"pier_parking",
 
-          "isInspectSpot":true,
+ "isInspectSpot":true,
 
-          "logisticTypesProvided":["industrial"],
+ "logisticTypesProvided":["industrial"],
 
-          "logisticTypesReceived":["industrial","parcel"],
+ "logisticTypesReceived":["industrial","parcel"],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"pier_trailer",
+ "psName":"pier_trailer",
 
-          "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-          "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesReceived":["trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        },
+ },
 
-        {
+ {
 
-          "psName":"pier_fluids",
+ "psName":"pier_fluids",
 
-          "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-          "logisticTypesReceived":["hazardousFluid"],
+ "logisticTypesReceived":["hazardousFluid"],
 
-        }
+ }
 
-      ],
+ ],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypesProvided":["industrial", "trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-      "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","hazardousFluid"],
+ "logisticTypesReceived":["industrial","parcel","trailerDeliveryConstructionMaterials","vehLargeTruck","vehLargeTruckNeedsRepair","hazardousFluid"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["parcel"],
+ "logisticTypes":["parcel"],
 
-          "min":-3,
+ "min":-3,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }, {
+ }, {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["industrial"],
+ "logisticTypes":["industrial"],
 
-          "min":-0.5,
+ "min":-0.5,
 
-          "max":1,
+ "max":1,
 
-          "interval":90
+ "interval":90
 
-        },{
+ },{
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":2,
+ "min":2,
 
-          "max": 4,
+ "max": 4,
 
-          "offerDuration":{"min":300,"max":400},
+ "offerDuration":{"min":300,"max":400},
 
-          "filter":"largeVehFilter",
+ "filter":"largeVehFilter",
 
-          "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
+ "logisticTypes":["vehLargeTruck","vehLargeTruckNeedsRepair"],
 
-        }, {
+ }, {
 
-          "type":"vehOfferProvider",
+ "type":"vehOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":0,
+ "min":0,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":300},
+ "offerDuration":{"min":300,"max":300},
 
-          "filter":"fleetLargeVehFilter",
+ "filter":"fleetLargeVehFilter",
 
-          "logisticTypes":["vehLargeTruck"],
+ "logisticTypes":["vehLargeTruck"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"smallCratePlanksTrailers",
+ "filter":"smallCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"mediumCratePlanksTrailers",
+ "filter":"mediumCratePlanksTrailers",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        }, {
+ }, {
 
-          "type":"trailerOfferProvider",
+ "type":"trailerOfferProvider",
 
-          "interval":300,
+ "interval":300,
 
-          "min":-1,
+ "min":-1,
 
-          "max": 2,
+ "max": 2,
 
-          "offerDuration":{"min":300,"max":600},
+ "offerDuration":{"min":300,"max":600},
 
-          "filter":"bigConstructionMaterials",
+ "filter":"bigConstructionMaterials",
 
-          "logisticTypes":["trailerDeliveryConstructionMaterials"],
+ "logisticTypes":["trailerDeliveryConstructionMaterials"],
 
-        },
+ },
 
 
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["hazardousFluid"],
+ "logisticTypes":["hazardousFluid"],
 
-          "materialType":"hazardousFluid",
+ "materialType":"hazardousFluid",
 
-          "capacity":50000,
+ "capacity":50000,
 
-          "target":5000,
+ "target":5000,
 
-          "variance":2000,
+ "variance":2000,
 
-          "interval":100,
+ "interval":100,
 
-          "rate":900,
+ "rate":900,
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
 
 
-    {
+ {
 
-      "id":"dirt_track_a",
+ "id":"dirt_track_a",
 
-      "name":"Derby Track A",
+ "name":"Derby Track A",
 
-      "description":"Receives Sand and Gravel.",
+ "description":"Receives Sand and Gravel.",
 
-      "preview":"previews/dirt_track_a.jpg",
+ "preview":"previews/dirt_track_a.jpg",
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"dirt_tracks_offroad_parking"}
+ {"psName":"dirt_tracks_offroad_parking"}
 
-      ],
+ ],
 
-      //"dropOffSpotNames":["dirt_tracks_offroad_parking"],
+ //"dropOffSpotNames":["dirt_tracks_offroad_parking"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesProvided":[],
+ "logisticTypesProvided":[],
 
-      "logisticTypesReceived":["sand", "gravel"],
+ "logisticTypesReceived":["sand", "gravel"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["sand"],
+ "logisticTypes":["sand"],
 
-          "materialType":"sand",
+ "materialType":"sand",
 
-          "capacity":3000,
+ "capacity":3000,
 
-          "target":1500,
+ "target":1500,
 
-          "variance":1000,
+ "variance":1000,
 
-          "interval":270,
+ "interval":270,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["gravel"],
+ "logisticTypes":["gravel"],
 
-          "materialType":"gravel",
+ "materialType":"gravel",
 
-          "capacity":1000,
+ "capacity":1000,
 
-          "target":200,
+ "target":200,
 
-          "variance":400,
+ "variance":400,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":100,
+ "rate":100,
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"dirt_track_b",
+ "id":"dirt_track_b",
 
-      "name":"Derby Track B",
+ "name":"Derby Track B",
 
-      "description":"Receives Sand and Gravel.",
+ "description":"Receives Sand and Gravel.",
 
-      "preview":"previews/dirt_track_b.jpg",
+ "preview":"previews/dirt_track_b.jpg",
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"dirt_tracks_round_parking"}
+ {"psName":"dirt_tracks_round_parking"}
 
-      ],
+ ],
 
-      //"dropOffSpotNames":["dirt_tracks_round_parking"],
+ //"dropOffSpotNames":["dirt_tracks_round_parking"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesReceived":["sand", "gravel"],
+ "logisticTypesReceived":["sand", "gravel"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["sand"],
+ "logisticTypes":["sand"],
 
-          "materialType":"sand",
+ "materialType":"sand",
 
-          "capacity":3000,
+ "capacity":3000,
 
-          "target":1500,
+ "target":1500,
 
-          "variance":1000,
+ "variance":1000,
 
-          "interval":270,
+ "interval":270,
 
-          "rate":200,
+ "rate":200,
 
-        },
+ },
 
-        {
+ {
 
-          "type":"materialReceiver",
+ "type":"materialReceiver",
 
-          "logisticTypes":["gravel"],
+ "logisticTypes":["gravel"],
 
-          "materialType":"gravel",
+ "materialType":"gravel",
 
-          "capacity":1000,
+ "capacity":1000,
 
-          "target":200,
+ "target":200,
 
-          "variance":400,
+ "variance":400,
 
-          "interval":360,
+ "interval":360,
 
-          "rate":100,
+ "rate":100,
 
-        },
+ },
 
-      ],
+ ],
 
-    },
+ },
 
 
 
-    {
+ {
 
-      "id":"city_garden",
+ "id":"city_garden",
 
-      "name":"City Gardens",
+ "name":"City Gardens",
 
-      "description":"Receives Soil.",
+ "description":"Receives Soil.",
 
-      "preview":"previews/city_garden.jpg",
+ "preview":"previews/city_garden.jpg",
 
-      //"dropOffSpotNames":["city_garden"],
+ //"dropOffSpotNames":["city_garden"],
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"city_garden"}
+ {"psName":"city_garden"}
 
-      ],
+ ],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesReceived":["soil"],
+ "logisticTypesReceived":["soil"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["soil"],
+ "logisticTypes":["soil"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"office_garden",
+ "id":"office_garden",
 
-      "name":"Office Gardens",
+ "name":"Office Gardens",
 
-      "description":"Receives Sand and Gravel.",
+ "description":"Receives Sand and Gravel.",
 
-      "preview":"previews/office_garden.jpg",
+ "preview":"previews/office_garden.jpg",
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"office_garden"}
+ {"psName":"office_garden"}
 
-      ],
+ ],
 
-      //"dropOffSpotNames":["office_garden"],
+ //"dropOffSpotNames":["office_garden"],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesReceived":["soil"],
+ "logisticTypesReceived":["soil"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["soil"],
+ "logisticTypes":["soil"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"forest_house_a",
+ "id":"forest_house_a",
 
-      "name":"Forest House A",
+ "name":"Forest House A",
 
-      "description":"Receives Soil.",
+ "description":"Receives Soil.",
 
-      "preview":"previews/forest_house_a.jpg",
+ "preview":"previews/forest_house_a.jpg",
 
-      //"dropOffSpotNames":["forest_house_a"],
+ //"dropOffSpotNames":["forest_house_a"],
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"forest_house_a"}
+ {"psName":"forest_house_a"}
 
-      ],
+ ],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesReceived":["soil"],
+ "logisticTypesReceived":["soil"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["soil"],
+ "logisticTypes":["soil"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
-    {
+ {
 
-      "id":"forest_house_b",
+ "id":"forest_house_b",
 
-      "name":"Forest House B",
+ "name":"Forest House B",
 
-      "description":"Receives Soil.",
+ "description":"Receives Soil.",
 
-      "preview":"previews/forest_house_b.jpg",
+ "preview":"previews/forest_house_b.jpg",
 
-      //"dropOffSpotNames":["forest_house_b"],
+ //"dropOffSpotNames":["forest_house_b"],
 
-      "manualAccessPoints":[
+ "manualAccessPoints":[
 
-        {"psName":"forest_house_b"}
+ {"psName":"forest_house_b"}
 
-      ],
+ ],
 
-      "sitesFile":"mixed.sites.json",
+ "sitesFile":"mixed.sites.json",
 
-      "logisticTypesReceived":["soil"],
+ "logisticTypesReceived":["soil"],
 
-      "logisticGenerators":[
+ "logisticGenerators":[
 
-        {
+ {
 
-          "type":"parcelReceiver",
+ "type":"parcelReceiver",
 
-          "logisticTypes":["soil"],
+ "logisticTypes":["soil"],
 
-          "min":-1,
+ "min":-1,
 
-          "max":1,
+ "max":1,
 
-          "interval":120
+ "interval":120
 
-        }
+ }
 
-      ],
+ ],
 
-    },
+ },
 
-  ]
+ ]
 
 }

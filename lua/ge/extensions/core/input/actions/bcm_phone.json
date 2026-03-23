@@ -1,10 +1,10 @@
 {
-  "bcm_togglePhone": {
-    "cat": "gameplay",
-    "order": 258,
-    "ctx": "tlua",
-    "onDown": "if not bcm_phone then extensions.load('bcm_phone') end if bcm_phone then bcm_phone.togglePhone() end",
-    "title": "Toggle Phone (BCM)",
-    "desc": "Open or close the BCM phone overlay"
-  }
+ "bcm_togglePhone": {
+ "cat": "gameplay",
+ "order": 258,
+ "ctx": "tlua",
+ "onDown": "if not bcm_phone then extensions.load('bcm_phone') end if bcm_phone then bcm_phone.togglePhone() end",
+ "title": "Toggle Phone (BCM)",
+ "desc": "Open or close the BCM phone overlay"
+ }
 }

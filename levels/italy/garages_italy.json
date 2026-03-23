@@ -1,68 +1,68 @@
 [
-  {
-    "baseCapacity":2,
-    "basePrice":250000,
-    "description":"",
-    "flavorText":{
-      "en":"In the Italian countryside, where the wine is good and the roads are even better, sits this old villa turned sanctuary for cars and overly optimistic mechanics.\n\nFrom the outside it looks like a peaceful rural home. Inside, it’s a haven for engines that are far too loud for such a small village.\n\nThe coffee is strong, the tools are old… and the cars have character.",
-      "es":"En medio del campo italiano, donde el vino es bueno y las carreteras son aún mejores, se encuentra esta antigua villa convertida en refugio para coches y mecánicos optimistas.\n\nDesde fuera es una tranquila casa rural. Dentro, es un santuario para motores que suenan demasiado fuerte para un pueblo tan pequeño.\n\nAquí el café es fuerte, las herramientas son viejas… y los coches tienen carácter."
-    },
-    "id":"bcm_it_villa",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"italy",
-    "maxCapacity":7,
-    "name":"Villa Officina",
-    "slotUpgradeBasePrice":25000,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":75000,
-      "t2":175000
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":2,
-    "basePrice":150000,
-    "description":"",
-    "flavorText":{
-      "en":"Portino is one of those garages that looks small… until you realize how many cars have passed through it. Everything gets fixed here — from tired daily drivers to sports cars that “just came in for a quick check.”\n\nIt may not be the most modern place around, but the engine always leaves working. Or at least sounding different.",
-      "es":"Portino es uno de esos talleres que parecen pequeños… hasta que ves cuántos coches han pasado por él. Aquí se arregla de todo: desde utilitarios cansados hasta deportivos que “solo venían a revisar un ruido”.\n\nNo es el lugar más moderno del mundo, pero el motor siempre acaba funcionando. O al menos sonando diferente."
-    },
-    "id":"bcm_it_portino",
-    "images":{},
-    "isStarterGarage":false,
-    "mapName":"italy",
-    "maxCapacity":8,
-    "name":"Portino Auto Service",
-    "slotUpgradeBasePrice":15000,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":45000,
-      "t2":105000
-    },
-    "type":"garage"
-  },
-  {
-    "baseCapacity":2,
-    "basePrice":100000,
-    "description":"",
-    "flavorText":{
-      "en":"Si tu coche necesita algo más que un martillo y optimismo, probablemente acabará aquí. FBX Garage es un taller moderno donde los problemas se diagnostican con ordenadores, herramientas caras y mecánicos que saben exactamente cuánto te va a costar arreglarlo.\n\nRápido, profesional y sorprendentemente limpio para un sitio lleno de motores abiertos.",
-      "es":"If your car needs more than a hammer and optimism, it will probably end up here. FBX Garage is a modern workshop where problems are diagnosed with computers, expensive tools and mechanics who know exactly how much it will cost to fix.\n\nFast, professional and surprisingly clean for a place full of open engines."
-    },
-    "id":"bcm_it_fbx",
-    "images":{},
-    "isStarterGarage":true,
-    "mapName":"italy",
-    "maxCapacity":6,
-    "name":"FBX Garage",
-    "slotUpgradeBasePrice":10000,
-    "slotUpgradeMultiplier":1.5,
-    "tierUpgradeCosts":{
-      "t1":30000,
-      "t2":70000
-    },
-    "type":"garage"
-  }
+ {
+ "baseCapacity":2,
+ "basePrice":250000,
+ "description":"",
+ "flavorText":{
+ "en":"In the Italian countryside, where the wine is good and the roads are even better, sits this old villa turned sanctuary for cars and overly optimistic mechanics.\n\nFrom the outside it looks like a peaceful rural home. Inside, it’s a haven for engines that are far too loud for such a small village.\n\nThe coffee is strong, the tools are old… and the cars have character.",
+ "es":"En medio del campo italiano, donde el vino es bueno y las carreteras son aún mejores, se encuentra esta antigua villa convertida en refugio para coches y mecánicos optimistas.\n\nDesde fuera es una tranquila casa rural. Dentro, es un santuario para motores que suenan demasiado fuerte para un pueblo tan pequeño.\n\nAquí el café es fuerte, las herramientas son viejas… y los coches tienen carácter."
+ },
+ "id":"bcm_it_villa",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"italy",
+ "maxCapacity":7,
+ "name":"Villa Officina",
+ "slotUpgradeBasePrice":25000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":75000,
+ "t2":175000
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":150000,
+ "description":"",
+ "flavorText":{
+ "en":"Portino is one of those garages that looks small… until you realize how many cars have passed through it. Everything gets fixed here — from tired daily drivers to sports cars that “just came in for a quick check.”\n\nIt may not be the most modern place around, but the engine always leaves working. Or at least sounding different.",
+ "es":"Portino es uno de esos talleres que parecen pequeños… hasta que ves cuántos coches han pasado por él. Aquí se arregla de todo: desde utilitarios cansados hasta deportivos que “solo venían a revisar un ruido”.\n\nNo es el lugar más moderno del mundo, pero el motor siempre acaba funcionando. O al menos sonando diferente."
+ },
+ "id":"bcm_it_portino",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"italy",
+ "maxCapacity":8,
+ "name":"Portino Auto Service",
+ "slotUpgradeBasePrice":15000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":45000,
+ "t2":105000
+ },
+ "type":"garage"
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":100000,
+ "description":"",
+ "flavorText":{
+ "en":"Si tu coche necesita algo más que un martillo y optimismo, probablemente acabará aquí. FBX Garage es un taller moderno donde los problemas se diagnostican con ordenadores, herramientas caras y mecánicos que saben exactamente cuánto te va a costar arreglarlo.\n\nRápido, profesional y sorprendentemente limpio para un sitio lleno de motores abiertos.",
+ "es":"If your car needs more than a hammer and optimism, it will probably end up here. FBX Garage is a modern workshop where problems are diagnosed with computers, expensive tools and mechanics who know exactly how much it will cost to fix.\n\nFast, professional and surprisingly clean for a place full of open engines."
+ },
+ "id":"bcm_it_fbx",
+ "images":{},
+ "isStarterGarage":true,
+ "mapName":"italy",
+ "maxCapacity":6,
+ "name":"FBX Garage",
+ "slotUpgradeBasePrice":10000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":30000,
+ "t2":70000
+ },
+ "type":"garage"
+ }
 ]
