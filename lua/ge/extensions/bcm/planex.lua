@@ -4371,9 +4371,21 @@ initModule = function()
  loadPlanexData()
  refreshDriverLevel()
 
- -- Ensure vanilla delivery progress has cargoDeliveredByType (milestones depend on it).
- -- BCM career saves may lack this field since PlanEx bypasses vanilla's delivery tracking.
- if career_modules_delivery_progress and career_modules_delivery_progress.getProgress then
+ -- Monkey-patch vanilla setProgress so cargoDeliveredByType always exists.
+ -- Vanilla calls setProgress(data) every time a save is loaded — old BCM saves lack this field,
+ -- which crashes milestones. Patching setProgress guarantees the field survives any reload.
+ if career_modules_delivery_progress and career_modules_delivery_progress.setProgress and not planexState._progressPatched then
+ local originalSetProgress = career_modules_delivery_progress.setProgress
+ career_modules_delivery_progress.setProgress = function(data)
+ originalSetProgress(data)
+ local progress = career_modules_delivery_progress.getProgress()
+ if progress and not progress.cargoDeliveredByType then
+ progress.cargoDeliveredByType = { parcel = 0, vehicle = 0, trailer = 0, fluid = 0, dryBulk = 0 }
+ log('I', logTag, 'Patched cargoDeliveredByType after setProgress reload')
+ end
+ end
+ planexState._progressPatched = true
+ -- Also patch the current state right now
  local progress = career_modules_delivery_progress.getProgress()
  if progress and not progress.cargoDeliveredByType then
  progress.cargoDeliveredByType = { parcel = 0, vehicle = 0, trailer = 0, fluid = 0, dryBulk = 0 }
