@@ -3139,6 +3139,117 @@ M.debugStopFastForward = function()
  timeSystem.debugStopFastForward()
 end
 
+-- Midday rotation: run a lighter rotation pass at noon for 12h listing turnover.
+-- This doesn't run the full processNewDay pipeline (no Poisson arrivals, no buyer
+-- interest, no fatigue drops) — just rotates expired listings and replenishes.
+M.onBCMMidday = function(data)
+ local mp = getMarketplace()
+ if not mp then return end
+
+ local gameDay = data and data.gameDay or getCurrentGameDay()
+
+ -- Guard: don't re-run if we already processed this half-day
+ local state = mp.getMarketplaceState()
+ local lastMidday = state._lastMiddayProcessed or 0
+ if gameDay <= lastMidday then return end
+ state._lastMiddayProcessed = gameDay
+
+ -- Run rotation only (some listings "sell" or expire at noon too)
+ local pricingEngine = getPricingEngine()
+ local listings = state.listings or {}
+ local rotated = 0
+
+ -- Build set of listings with active negotiations (immune to rotation).
+ -- Stale negotiations (5+ days no player activity) don't protect listings.
+ local negotiations = state.negotiations or {}
+ local hasActiveNego = {}
+ local NEGO_STALE_DAYS = 5
+ for listingId, session in pairs(negotiations) do
+ if session and not session.isBlocked and not session.isGhosting and not session.dealReached then
+ local lastPlayerDay = session.createdGameDay or 0
+ if session.messages then
+ for _, msg in ipairs(session.messages) do
+ if msg.direction == "player" and (msg.gameDay or 0) > lastPlayerDay then
+ lastPlayerDay = msg.gameDay
+ end
+ end
+ end
+ if (gameDay - lastPlayerDay) < NEGO_STALE_DAYS then
+ hasActiveNego[listingId] = true
+ end
+ end
+ end
+
+ for i = #listings, 1, -1 do
+ local listing = listings[i]
+ if not listing.isSold and not hasActiveNego[listing.id] then
+ -- Check expiry
+ if listing.expiresGameDay and gameDay >= listing.expiresGameDay then
+ listing.isSold = true
+ listing.soldGameDay = gameDay
+ rotated = rotated + 1
+ else
+ -- Midday survival roll: ~15% chance of being "sold" (half the daily 30%)
+ local survivalRoll = pricingEngine.lcgFloat(listing.seed + gameDay * 100 + 50000)
+ local threshold = 0.15
+
+ if listing.isGem then
+ threshold = 0.40 -- gems move fast
+ elseif listing.priceCents and listing.marketValueCents and listing.priceCents > listing.marketValueCents * 1.15 then
+ threshold = 0.08 -- overpriced stick around
+ end
+
+ if survivalRoll < threshold then
+ listing.isSold = true
+ listing.soldGameDay = gameDay
+ rotated = rotated + 1
+ end
+ end
+ end
+ end
+
+ -- Replenish if below target
+ local currentCount = 0
+ for _, listing in ipairs(listings) do
+ if not listing.isSold then currentCount = currentCount + 1 end
+ end
+
+ local vehiclePool = {}
+ if util_configListGenerator and util_configListGenerator.getEligibleVehicles then
+ vehiclePool = util_configListGenerator.getEligibleVehicles() or {}
+ end
+ vehiclePool = getListingGenerator().injectFixedValueVehicles(vehiclePool)
+ local dynamicTarget = math.max(150, math.floor(#vehiclePool / 4))
+ local deficit = dynamicTarget - currentCount
+
+ if deficit > 0 and #vehiclePool > 0 then
+ local listingGen = getListingGenerator()
+ local dateInfo = extensions.bcm_timeSystem and extensions.bcm_timeSystem.getDateInfo and extensions.bcm_timeSystem.getDateInfo() or {}
+
+ local newListings = listingGen.generateMarketplace({
+ dailySeed = pricingEngine.lcg((state.dailySeed or 1) + 50000), -- different seed from morning batch
+ gameDay = gameDay,
+ language = getLanguage(),
+ targetCount = deficit,
+ vehiclePool = vehiclePool,
+ season = dateInfo.season or "summer",
+ postedDayOfWeek = dateInfo.dayOfWeek or 3,
+ })
+
+ for _, listing in ipairs(newListings) do
+ mp.addListing(listing)
+ end
+
+ if #newListings > 0 then
+ log('I', logTag, 'Midday replenish: added ' .. #newListings .. ' listings (rotated ' .. rotated .. ')')
+ end
+ elseif rotated > 0 then
+ log('I', logTag, 'Midday rotation: ' .. rotated .. ' listings sold/expired')
+ end
+
+ requestListings(nil)
+end
+
 -- Lifecycle hooks
 M.onAddedVehiclePartsToInventory = onAddedVehiclePartsToInventory
 M.onCareerModulesActivated = onCareerModulesActivated

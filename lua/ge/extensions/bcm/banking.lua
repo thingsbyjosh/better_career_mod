@@ -543,7 +543,7 @@ getDescriptionFromReason = function(change, reason)
  end
 
  -- Insurance changes
- if reason.reason == "insuranceChange" or (reason.label and reason.label:find("Insurance")) then
+ if reason.reason == "insuranceChange" or (type(reason.label) == 'string' and reason.label:find("Insurance")) then
  return reason.label or "Insurance"
  end
 

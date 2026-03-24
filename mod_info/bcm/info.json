@@ -1,9 +1,10 @@
 {
- "tagid": "bcm",
+ "tagid": "BCM",
  "title": "Better Career Mod",
  "tag_line": "Open-world career without tutorials or restrictions - start in an empty garage and progress realistically",
- "path": "bcm",
+ "path": "BCM",
  "filename": "better_career_mod.zip",
- "version_string": "0.2.0",
- "username": "Joshb"
+ "version_string": "0.3.0",
+ "username": "Joshb",
+ "message": "[CENTER][SIZE=5][B]Better Career Mod v0.3.0[\/B][\/SIZE]\n[I]A realistic open-world career experience[\/I][\/CENTER]\n\n[CENTER][SIZE=4][B]CORE FEATURES[\/B][\/SIZE][\/CENTER]\n[LIST]\n[*][B]Banking & Credit[\/B] - Multi-account system with FICO-inspired credit scoring (300-850)\n[*][B]Vehicle Marketplace[\/B] - 50+ curated listings with 9 seller archetypes and realistic negotiation\n[*][B]10 Brand Dealerships[\/B] - Each with their own website, catalog, and purchase flow\n[*][B]PlanEx Courier[\/B] - 20-level delivery dispatch with loaner vehicles, route optimization, and special routes\n[*][B]Police & Pursuits[\/B] - 3-level escalation with interceptors, spike strips, and persistent heat\n[*][B]O'Really Auto Parts[\/B] - Browse, preview, and purchase parts with 3 delivery options\n[*][B]Paint Shop[\/B] - 3-tier garage system: curated palette, per-part painting, full RGB + finishes\n[*][B]Dynamic Weather[\/B] - Seasonal weather with road surface effects and traffic impact\n[*][B]Time System[\/B] - Full 365-day calendar with day\/night cycle and configurable speed\n[*][B]Loans & Mortgages[\/B] - 4 lenders, auto-payments, repossession system\n[*][B]Real Estate[\/B] - Property purchasing with taxes and garage tiers\n[*][B]7-Step Tutorial[\/B] - Guided introduction for new players\n[\/LIST]\n\n[CENTER][SIZE=4][B]THE EXPERIENCE[\/B][\/SIZE][\/CENTER]\n[LIST]\n[*][B]Windows XP Desktop[\/B] - IE6 browser with 14+ themed websites\n[*][B]iPhone-style Phone[\/B] - 15+ apps for banking, delivery, marketplace, and more\n[*][B]Outlook Express Email[\/B] - System notifications, spam engine, event-driven messages\n[*][B]iMessage Chat[\/B] - NPC conversations for negotiation and police alerts\n[*][B]Clippy Assistant[\/B] - FAQ and contextual tips\n[*][B]Bilingual[\/B] - Full English and Spanish support\n[\/LIST]\n\n[CENTER][SIZE=3][B]REQUIREMENTS[\/B][\/SIZE][\/CENTER]\n[LIST]\n[*]BeamNG.drive 0.38+\n[*]West Coast USA map (primary), Italy (in development)\n[*]Not compatible with other career overhaul mods\n[\/LIST]\n\n[CENTER][SIZE=3][B]LINKS[\/B][\/SIZE]\n[URL=https:\/\/github.com\/thingsbyjosh\/better_career_mod\/wiki]Wiki Documentation[\/URL]\n[URL=https:\/\/github.com\/thingsbyjosh\/better_career_mod]GitHub Repository[\/URL][\/CENTER]"
 }

@@ -419,9 +419,37 @@ rotateDailyListings = function(gameDay)
  local pricingEngine = require('lua/ge/extensions/bcm/pricingEngine')
  local listings = marketplaceState.listings or {}
 
+ -- Build set of listings with active negotiations (immune to rotation).
+ -- Negotiations abandoned for 5+ days (no player message) are considered stale
+ -- and no longer protect the listing from rotation.
+ local negotiations = marketplaceState.negotiations or {}
+ local hasActiveNego = {}
+ local NEGO_STALE_DAYS = 5
+ for listingId, session in pairs(negotiations) do
+ if session and not session.isBlocked and not session.isGhosting and not session.dealReached then
+ -- Find last player activity
+ local lastPlayerDay = session.createdGameDay or 0
+ if session.messages then
+ for _, msg in ipairs(session.messages) do
+ if msg.direction == "player" and (msg.gameDay or 0) > lastPlayerDay then
+ lastPlayerDay = msg.gameDay
+ end
+ end
+ end
+ local daysSinceActivity = gameDay - lastPlayerDay
+ if daysSinceActivity < NEGO_STALE_DAYS then
+ hasActiveNego[listingId] = true
+ end
+ end
+ end
+
  for i = #listings, 1, -1 do
  local listing = listings[i]
  if not listing.isSold then
+ -- Guard: don't rotate listings with active player negotiations
+ if hasActiveNego[listing.id] then
+ -- skip — player is negotiating this one
+ else
  local age = gameDay - (listing.postedGameDay or 0)
  local survivalRoll = pricingEngine.lcgFloat(listing.seed + gameDay * 100)
  local threshold = 0.30 -- normal: 70% survive
@@ -441,6 +469,7 @@ rotateDailyListings = function(gameDay)
  listing.soldGameDay = gameDay
  if listing.isGem then
  listing.revealData = { trueValueCents = listing.marketValueCents }
+ end
  end
  end
  end

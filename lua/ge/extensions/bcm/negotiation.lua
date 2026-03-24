@@ -548,6 +548,27 @@ processOffer = function(listingId, offerCents, metadata)
 
  -- Re-bid detection (lower than previous offer)
  if prevPlayerOffer and offerCents < prevPlayerOffer then
+ -- Severity check on re-bids too: offering $1 after $7k is an insult, not just a mood degrade
+ local rebidSeverity = negotiationEngine.classifyOffer(session.archetype, offerCents, session.baselinePriceCents)
+ if rebidSeverity == "insulting" then
+ if session.archetype == "scammer" then
+ session.isGhosting = true
+ local ghostText = negotiationEngine.pickMessage(session, "ghost_message", gameDay)
+ if ghostText and ghostText ~= "" then
+ scheduleSellerResponse(session, ghostText, gameDay)
+ end
+ else
+ session.mood = "blocked"
+ session.isBlocked = true
+ local blockText = negotiationEngine.pickMessage(session, "block_message", gameDay)
+ blockText = formatAndSubstitute(session, blockText, nil)
+ appendMessage(session, "seller", blockText, gameDay)
+ end
+ session.lastPlayerOfferCents = offerCents
+ fireSessionUpdate(session)
+ return session
+ end
+
  session.mood = negotiationEngine.transitionMood(session.mood, -0.01, session)
  log('W', logTag, 'Re-bid lower detected: ' .. offerCents .. ' < previous ' .. prevPlayerOffer .. ' — mood crash')
 
@@ -570,6 +591,10 @@ processOffer = function(listingId, offerCents, metadata)
  fireSessionUpdate(session)
  return session
  end
+
+ -- Player is active: reset abandonment flags so timeout cycle restarts if they go silent again
+ session._proactivePingSent = nil
+ session._soldElsewhere = nil
 
  -- Increment round
  session.roundCount = (session.roundCount or 0) + 1
@@ -612,10 +637,18 @@ processOffer = function(listingId, offerCents, metadata)
  -- === R1: Opening concession (independent of player offer) ===
  if session.roundCount == 1 then
  local margin = session.baselinePriceCents - (session.floorCents or session.thresholdModeCents or 0)
+ -- Guard: if floor > asking (negative-markup archetype where marketValue > asking),
+ -- margin is negative → opening concession would be negative → counter ABOVE asking.
+ -- Clamp margin to 0 minimum so the seller never raises their own price.
+ if margin < 0 then margin = 0 end
  local openingAmount, openPct = negotiationEngine.computeOpeningConcession(
  session.archetype, margin, session.listingSeed or 0
  )
  local r1Counter = negotiationEngine.roundToNicePrice(session.baselinePriceCents - openingAmount)
+ -- Safety: counter must never exceed asking price
+ if r1Counter > session.baselinePriceCents then
+ r1Counter = session.baselinePriceCents
+ end
 
  -- R1 mood from offer ratio (severity only matters for instant-block above)
  session.mood = negotiationEngine.computeR1Mood(offerCents, session.baselinePriceCents)
@@ -1325,18 +1358,55 @@ M.onBCMNewGameDay = function(data)
  fireSessionUpdate(session)
  end
 
- -- 3. Proactive pings
+ -- 3. Proactive pings + abandonment timeout
  if not session.isBlocked and not session.isGhosting and not session.dealReached and session.messages and #session.messages > 0 then
- -- Find last player message game day
- local lastPlayerDay = 0
+ -- Find last player message game day (baseline: session creation day)
+ local lastPlayerDay = session.createdGameDay or 0
  for _, msg in ipairs(session.messages) do
  if msg.direction == "player" and (msg.gameDay or 0) > lastPlayerDay then
  lastPlayerDay = msg.gameDay
  end
  end
 
- if lastPlayerDay > 0 and (gameDay - lastPlayerDay) >= PROACTIVE_PING_THRESHOLD then
- -- Check if archetype has proactive_ping messages
+ local daysSincePlayer = (gameDay - lastPlayerDay)
+
+ -- 3b. Abandonment timeout: seller sells to someone else after 5+ days of silence.
+ -- This fires AFTER the proactive ping (which fires at 3 days), giving the player
+ -- 2 more days to respond before losing the car.
+ if daysSincePlayer >= 5 and not session._soldElsewhere then
+ session._soldElsewhere = true
+
+ local expiredText = negotiationEngine.pickMessage(session, "deal_expired", gameDay)
+ expiredText = formatAndSubstitute(session, expiredText, nil)
+ appendMessage(session, "seller", expiredText, gameDay)
+
+ -- Mark listing as sold by someone else (not the player — allow relist)
+ local listing = mp.getListingById(listingId)
+ if listing and not listing.isSold then
+ listing.isSold = true
+ listing.soldGameDay = gameDay
+ -- NOT purchasedByPlayer: this was sold to a third party, can be relisted
+ end
+
+ -- Close negotiation
+ session.isBlocked = true
+
+ if bcm_notifications and bcm_notifications.send then
+ bcm_notifications.send({
+ titleKey = "notif.dealExpired",
+ bodyKey = "notif.dealExpiredBody",
+ type = "warning",
+ duration = 5000,
+ })
+ end
+
+ guihooks.trigger('BCMNegotiationNewMessage', { listingId = listingId, unread = true })
+ fireSessionUpdate(session)
+
+ -- 3a. Proactive ping at 3 days of silence (only once — don't re-ping after sold elsewhere)
+ elseif daysSincePlayer >= PROACTIVE_PING_THRESHOLD and not session._proactivePingSent then
+ session._proactivePingSent = true
+
  local pingText = negotiationEngine.pickMessage(session, "proactive_ping", gameDay)
  if pingText and pingText ~= "" then
  pingText = formatAndSubstitute(session, pingText, nil)
@@ -1348,9 +1418,9 @@ M.onBCMNewGameDay = function(data)
  local listingAge = gameDay - (listing.postedGameDay or 0)
  local moodShift = negotiationEngine.computeTimeSoftening(listingAge, session.archetype)
  if moodShift < 0 then
- -- Time softening uses a gentle mood improve (legacy behavior preserved)
  local currentIdx = negotiationEngine.MOOD_INDEX[session.mood] or 2
- local newIdx = math.max(2, currentIdx - 1)
+ -- Allow improvement up to eager (index 1) — time softens all moods
+ local newIdx = math.max(1, currentIdx - 1)
  session.mood = negotiationEngine.MOOD_LEVELS[newIdx]
  end
  end
@@ -1389,8 +1459,8 @@ pickNonRepeatingMsgIdx = function(pool, session, pricingEng)
  if poolSize <= 1 then return 1 end
  local round = session.roundCount or 0
  local seed = session.seed or 0
- -- Use more entropy sources to spread across the pool
- local raw = pricingEng.lcg(seed + round * 444 + round * round * 13 + os.time() % 10000)
+ -- Deterministic entropy — no os.time() to preserve save-scum prevention
+ local raw = pricingEng.lcg(seed * 104729 + round * 7919 + round * round * 13)
  local idx = raw % poolSize + 1
  -- If same as last used, rotate forward
  if session._lastMsgIdx and idx == session._lastMsgIdx and poolSize > 1 then
@@ -1472,7 +1542,31 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
 
  local sessions = mp.getBuyerSessionsForListing(listingId)
  local session = sessions[buyerId]
- if not session or session.isGhosting or session.isCompleted or session.isBuyerFinalOffer then return end
+ if not session or session.isGhosting or session.isCompleted then return end
+
+ -- Buyer final offer timeout: if buyer declared final offer 2+ days ago, they ghost
+ if session.isBuyerFinalOffer then
+ local currentDay = getCurrentGameDay()
+ local finalDay = session.buyerFinalOfferGameDay or 0
+ if (currentDay - finalDay) >= 2 then
+ session.isGhosting = true
+ session.ghostReason = "final_offer_expired"
+ local negotiationTemplates = require('lua/ge/extensions/bcm/negotiationTemplates')
+ local lang = getLanguage()
+ local pool = negotiationTemplates.getBuyerMessagePool(session.archetype, lang, "buyer_ghost")
+ if pool and #pool > 0 then
+ local pricingEng = require('lua/ge/extensions/bcm/pricingEngine')
+ local msgIdx = pricingEng.lcg(session.seed + 88888) % #pool + 1
+ -- Queue ghost message via timer (not instant)
+ table.insert(pendingBuyerTimers, {
+ listingId = listingId, buyerId = buyerId,
+ phase = "reading", readRemaining = 1, typingRemaining = 1,
+ responseText = pool[msgIdx] or "nvm", isGhosting = true,
+ })
+ end
+ end
+ return
+ end
 
  local negotiationEngine = require('lua/ge/extensions/bcm/negotiationEngine')
  local negotiationTemplates = require('lua/ge/extensions/bcm/negotiationTemplates')
@@ -1598,6 +1692,7 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
  -- v4: Stagnation final offer for buyer side
  if (session.stagnationCounter or 0) >= 3 then
  session.isBuyerFinalOffer = true
+ session.buyerFinalOfferGameDay = getCurrentGameDay()
  session.lastOfferCents = prevOffer
  session.lastPlayerCounter = counterCents
 
@@ -1647,6 +1742,7 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
  -- Buyer stuck check
  if newOffer <= prevOffer then
  session.isBuyerFinalOffer = true
+ session.buyerFinalOfferGameDay = getCurrentGameDay()
  session.lastOfferCents = prevOffer
 
  local pool = negotiationTemplates.getBuyerMessagePool(session.archetype, lang, "buyer_final_offer")

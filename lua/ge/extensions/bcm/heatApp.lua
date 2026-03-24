@@ -65,7 +65,7 @@ onCareerModulesActivated = function()
  if bcm_appRegistry then
  bcm_appRegistry.register({
  id = "heat",
- name = "Infracciones",
+ name = "Fines",
  component = "PhoneHeatApp",
  iconName = "shield-alert",
  color = "#FF3B30",

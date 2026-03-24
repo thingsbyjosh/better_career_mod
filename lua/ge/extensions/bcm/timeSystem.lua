@@ -52,8 +52,31 @@ local function isLeapYear(y)
 end
 
 -- Calculate game days offset for a real-world date (days since Jan 1 of START_EPOCH.year)
+-- Returns nil on failure (os.date may not be available in all contexts)
 calcRealDateGameDays = function()
- local now = os.date("*t")
+ local ok, now = pcall(os.date, "*t")
+ if not ok or type(now) ~= "table" then
+ log('W', logTag, 'os.date("*t") failed: ' .. tostring(now))
+ -- Fallback: try os.time() to build date manually
+ local ok2, epoch = pcall(os.time)
+ if ok2 and epoch then
+ local ok3, dateStr = pcall(os.date, "%Y-%m-%d", epoch)
+ if ok3 and dateStr then
+ local y, m, d = dateStr:match("(%d+)-(%d+)-(%d+)")
+ if y then
+ now = {year = tonumber(y), month = tonumber(m), day = tonumber(d)}
+ log('I', logTag, 'Used os.date fallback: ' .. dateStr)
+ end
+ end
+ end
+ if type(now) ~= "table" then
+ log('W', logTag, 'All date methods failed, cannot determine real date')
+ return nil
+ end
+ end
+
+ log('I', logTag, string.format('Real OS date detected: %04d-%02d-%02d', now.year, now.month, now.day))
+
  local epochYear = START_EPOCH.year
  local totalDays = 0
  -- Add full years from epochYear to now.year
@@ -303,6 +326,14 @@ onUpdate = function(dtReal, dtSim, dtRaw)
  end
  end
 
+ -- Midday boundary detection: tod crosses 0.5 (noon)
+ -- Used by marketplace for 12h listing rotation
+ if timeState.lastTodTime ~= nil then
+ if timeState.lastTodTime < 0.5 and currentTod >= 0.5 then
+ extensions.hook('onBCMMidday', { gameDay = math.floor(timeState.gameTimeDays) })
+ end
+ end
+
  -- Update last known tod
  timeState.lastTodTime = currentTod
 
@@ -368,7 +399,7 @@ saveTimeData = function(currentSavePath)
 end
 
 -- Load time state from disk
-loadTimeData = function()
+loadTimeData = function(newSave)
  if not career_career or not career_career.isActive() then
  return
  end
@@ -378,41 +409,9 @@ loadTimeData = function()
  return
  end
 
- local currentSaveSlot = career_saveSystem.getCurrentSaveSlot()
- if not currentSaveSlot then
- log('W', logTag, 'No save slot active, cannot load time data')
- return
- end
-
- local autosavePath = career_saveSystem.getAutosave(currentSaveSlot)
- if not autosavePath then
- log('W', logTag, 'No autosave found for slot: ' .. tostring(currentSaveSlot))
- return
- end
-
- local dataPath = autosavePath .. "/career/bcm/timeSystem.json"
- local data = jsonReadFile(dataPath)
-
- if data then
- -- Restore time state from save
- timeState.gameTimeDays = data.gameTimeDays or 0
- timeState.realTimeAccumSecs = data.realTimeAccumSecs or 0
- timeState.speedMultiplier = data.speedMultiplier or 1.0
- timeState.nightRatio = data.nightRatio or (1/3)
- timeState.skipNights = data.skipNights or false
- timeState.timeFormat24h = (data.timeFormat24h ~= false) -- default true
- timeState.lastTodTime = nil -- Reset boundary detection on load
- timeState.isNightSkipping = false
-
- -- Restore tod position (play is always forced true by initModule)
- if scenetree.tod and data.todTime ~= nil then
- scenetree.tod.time = data.todTime
- end
-
- log('I', logTag, 'Time data loaded. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
- else
  -- New career: start on today's real-world date
- local startDays = calcRealDateGameDays()
+ if newSave then
+ local startDays = calcRealDateGameDays() or 0
  timeState.gameTimeDays = startDays
  timeState.realTimeAccumSecs = 0
  timeState.speedMultiplier = 1.0
@@ -431,6 +430,58 @@ loadTimeData = function()
  local startDate = gameTimeToDate(startDays)
  log('I', logTag, string.format('New career started on real date: %04d-%02d-%02d (gameDay=%d)',
  startDate.year, startDate.month, startDate.day, startDays))
+ return
+ end
+
+ -- Existing career: restore from save
+ local currentSaveSlot = career_saveSystem.getCurrentSaveSlot()
+ if not currentSaveSlot then
+ log('W', logTag, 'No save slot active, cannot load time data')
+ return
+ end
+
+ local autosavePath = career_saveSystem.getAutosave(currentSaveSlot)
+ if not autosavePath then
+ log('W', logTag, 'No autosave found for slot: ' .. tostring(currentSaveSlot))
+ return
+ end
+
+ local dataPath = autosavePath .. "/career/bcm/timeSystem.json"
+ local data = jsonReadFile(dataPath)
+
+ if data then
+ timeState.gameTimeDays = data.gameTimeDays or 0
+ timeState.realTimeAccumSecs = data.realTimeAccumSecs or 0
+ timeState.speedMultiplier = data.speedMultiplier or 1.0
+ timeState.nightRatio = data.nightRatio or (1/3)
+ timeState.skipNights = data.skipNights or false
+ timeState.timeFormat24h = (data.timeFormat24h ~= false) -- default true
+ timeState.lastTodTime = nil -- Reset boundary detection on load
+ timeState.isNightSkipping = false
+
+ -- Restore tod position (play is always forced true by initModule)
+ if scenetree.tod and data.todTime ~= nil then
+ scenetree.tod.time = data.todTime
+ end
+
+ log('I', logTag, 'Time data loaded. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
+ else
+ -- Fallback: no save file but not flagged as new (shouldn't happen)
+ timeState.gameTimeDays = 0
+ timeState.realTimeAccumSecs = 0
+ timeState.speedMultiplier = 1.0
+ timeState.nightRatio = 10/48
+ timeState.skipNights = false
+ timeState.timeFormat24h = true
+ timeState.lastTodTime = nil
+ timeState.isNightSkipping = false
+
+ if scenetree.tod then
+ scenetree.tod.time = START_TOD
+ scenetree.tod.play = true
+ end
+
+ log('W', logTag, 'No save file and not newSave — initialized defaults')
  end
 
  -- Apply speed settings after load
@@ -446,8 +497,8 @@ end
 -- ============================================================================
 
 -- Initialize module state
-initModule = function()
- loadTimeData()
+initModule = function(newSave)
+ loadTimeData(newSave)
  isInitialized = true
  activated = true
 
@@ -609,9 +660,9 @@ end
 -- Called when career becomes active/inactive
 -- NOTE: BCM extensions receive onCareerActive (global hook), NOT onCareerActivated
 -- (which only fires for career/modules/ registered modules).
-M.onCareerActive = function(active)
+M.onCareerActive = function(active, newSave)
  if active then
- initModule()
+ initModule(newSave)
  installQuickAccessFilter()
  else
  uninstallQuickAccessFilter()

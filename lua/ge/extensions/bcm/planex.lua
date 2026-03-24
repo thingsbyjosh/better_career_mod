@@ -2402,6 +2402,10 @@ onCargoDelivered = function(cargoItems)
  completeStop(stopIndex)
  end
  end
+
+ -- Note: vanilla's confirmDropOffData() already calls delivery_progress.onCargoDelivered()
+ -- which increments cargoDeliveredByType for milestones. No need to call it again here.
+ -- The field is ensured to exist by the initModule patch.
 end
 
 -- ============================================================================
@@ -4366,6 +4370,16 @@ initModule = function()
 
  loadPlanexData()
  refreshDriverLevel()
+
+ -- Ensure vanilla delivery progress has cargoDeliveredByType (milestones depend on it).
+ -- BCM career saves may lack this field since PlanEx bypasses vanilla's delivery tracking.
+ if career_modules_delivery_progress and career_modules_delivery_progress.getProgress then
+ local progress = career_modules_delivery_progress.getProgress()
+ if progress and not progress.cargoDeliveredByType then
+ progress.cargoDeliveredByType = { parcel = 0, vehicle = 0, trailer = 0, fluid = 0, dryBulk = 0 }
+ log('I', logTag, 'Patched vanilla delivery progress: added missing cargoDeliveredByType')
+ end
+ end
 
  -- Clean up orphaned loaner vehicles from previous sessions.
  -- If the player saved and quit while a loaner was active, the vehicle object is gone

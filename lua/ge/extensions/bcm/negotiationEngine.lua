@@ -280,6 +280,15 @@ computeThreshold = function(listingSeed, archetypeKey, askingPriceCents, marketV
  local modeCents = math.floor(anchorCents * (1 - modePercent))
  local sigmaCents = math.floor(anchorCents * sigma)
 
+ -- When marketValue > askingPrice (negative-markup archetypes), the floor
+ -- computed from marketValue can exceed the asking price. In that case,
+ -- guarantee a minimum negotiation margin of 5% below asking so the
+ -- buyer can still haggle — the seller listed cheap but isn't immovable.
+ local maxFloor = math.floor(askingPriceCents * 0.95)
+ if modeCents > maxFloor then
+ modeCents = maxFloor
+ end
+
  return {
  modeCents = modeCents,
  sigmaCents = sigmaCents,
@@ -664,6 +673,7 @@ end
 -- ============================================================================
 
 formatPrice = function(priceCents, archetypeKey, language)
+ if not priceCents or priceCents <= 0 then return "$0" end
  local dollars = math.floor(priceCents / 100)
  local cents = priceCents % 100
 
@@ -1223,7 +1233,8 @@ local function computeOpeningConcession(archetypeKey, margin, listingSeed)
 end
 
 local function computeReactiveConcession(session, playerOfferCents)
- local lastNPC = session.lastSellerCounterCents or session.baselinePriceCents
+ -- Use three-way fallback matching negotiation.lua's R2+ path
+ local lastNPC = session.lastSellerCounterCents or session._lastCounterCents or session.baselinePriceCents
  local lastPlayer = session.lastPlayerOfferCents or 0
  local floor = getEffectiveFloor(session)
  local archetypeKey = session.archetype
@@ -1234,7 +1245,9 @@ local function computeReactiveConcession(session, playerOfferCents)
  if negotiationGap > 0 then
  movement = playerDelta / negotiationGap
  else
- movement = 1.0
+ -- Gap collapsed or inverted: seller holds position. The autoAccept check
+ -- below handles the case where NPC counter <= player offer.
+ movement = 0
  end
 
  local willingness, band = movementToWillingness(movement)
@@ -1304,7 +1317,11 @@ local SPLIT_MOOD_ALLOWED = {
 local function checkSplitTheDifference(npcPriceCents, playerOfferCents, floorCents, session)
  local gap = npcPriceCents - playerOfferCents
  if gap <= 0 then return nil end
- local ratio = gap / npcPriceCents
+ -- Normalize gap against baseline (asking price), not current NPC counter.
+ -- This ensures consistent 5% threshold regardless of absolute price level.
+ local baseline = (session and session.baselinePriceCents and session.baselinePriceCents > 0)
+ and session.baselinePriceCents or npcPriceCents
+ local ratio = gap / baseline
  if ratio >= 0.05 then return nil end
 
  -- Gate: need at least 3 rounds of negotiation
