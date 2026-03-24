@@ -76,23 +76,30 @@ requestPackDetail = function(packId)
  guihooks.trigger('BCMPlanexPackDetail', { pack = pack })
 end
 
-acceptPack = function(packId, vehicleCapacity, inventoryId, customOrderJson)
+acceptPack = function(packId, vehicleCapacity, inventoryId, pinsJson)
  if not bcm_planex then return end
  -- Set vehicle capacity on the pack so cargo generation uses it
  local pack = bcm_planex.getPackById(packId)
  if pack then
  pack.vehicleCapacity = tonumber(vehicleCapacity) or 0
- -- Apply custom stop order from player's pre-accept drag reorder
- if customOrderJson and customOrderJson ~= '' then
- local customOrder = jsonDecode(customOrderJson)
- if customOrder and type(customOrder) == 'table' and #customOrder > 0 then
- local intOrder = {}
- for _, v in ipairs(customOrder) do
- table.insert(intOrder, math.floor(tonumber(v) or 0))
+ -- Apply pinned positions from player's pre-accept drag reorder
+ -- pinsJson is { "2": 7, "5": 3 } = position 2 → stop 7, position 5 → stop 3
+ if pinsJson and pinsJson ~= '' then
+ local pins = jsonDecode(pinsJson)
+ if pins and type(pins) == 'table' then
+ if not pack.pinnedPositions then pack.pinnedPositions = {} end
+ local pinLog = {}
+ for posStr, stopIdx in pairs(pins) do
+ local pos = math.floor(tonumber(posStr) or 0)
+ local idx = math.floor(tonumber(stopIdx) or 0)
+ if pos > 0 and idx > 0 then
+ pack.pinnedPositions[pos] = idx
+ table.insert(pinLog, string.format('pos %d→stop %d', pos, idx))
  end
- pack.stopOrder = intOrder
- pack.hasCustomOrder = true
- log('I', logTag, 'acceptPack: custom stopOrder applied from preview: ' .. table.concat(intOrder, ','))
+ end
+ if #pinLog > 0 then
+ log('I', logTag, 'acceptPack: player pins applied: ' .. table.concat(pinLog, ', '))
+ end
  end
  end
  end

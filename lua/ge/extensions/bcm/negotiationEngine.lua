@@ -1013,8 +1013,15 @@ computeBuyerInitialOffer = function(session, seed)
  offerCents = math.floor((target + anchor) / 2)
  end
 
- -- Clamp: never exceed buyerMax, minimum $500
- offerCents = math.min(offerCents, buyerMax)
+ -- Clamp: never exceed buyerMax, and limit how far above asking price
+ -- Most buyers never open above asking. Premium/desperate buyers may go up to 5% over.
+ local askPrice = session.listingPriceCents or buyerMax
+ local maxAboveAsk = askPrice -- default: capped at asking price
+ if strategy == "CLOSE_FAST" or strategy == "MARKET_ONLY" then
+ -- These strategies can offer slightly above asking for motivated buyers
+ maxAboveAsk = math.floor(askPrice * 1.03) -- max 3% above YOUR asking price
+ end
+ offerCents = math.min(offerCents, buyerMax, maxAboveAsk)
  offerCents = math.max(offerCents, 50000)
 
  return roundUp(offerCents)
@@ -1255,7 +1262,7 @@ local function computeReactiveConcession(session, playerOfferCents)
  local moodMult = MOOD_CONCESSION_MULT[session.mood] or 1.0
 
  local npcMargin = lastNPC - floor
- if npcMargin < 0 then npcMargin = 0 end
+ if npcMargin < 0 then npcMargin = 0 end -- guard: floor > lastNPC (marketValue > asking)
 
  local concession = math.floor(npcMargin * willingness * moodMult * archetypeMult)
 
@@ -1277,6 +1284,8 @@ local function computeReactiveConcession(session, playerOfferCents)
 
  local newNPC = roundToNicePrice(lastNPC - concession)
  if newNPC < floor then newNPC = floor end
+ -- Seller's counter must NEVER go up between rounds
+ if newNPC > lastNPC then newNPC = lastNPC end
  local autoAccept = newNPC <= playerOfferCents
 
  return newNPC, {

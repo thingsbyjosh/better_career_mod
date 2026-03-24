@@ -1374,6 +1374,67 @@ M.setSeasonLock = setSeasonLock
 M.getWeatherEnabled = function() return weatherState.weatherEnabled end
 M.getSeasonLock = function() return weatherState.seasonLock end
 
+-- After sleep: simulate weather progression for the hours that passed.
+-- Without this, player wakes up to the same blizzard they went to sleep in.
+M.onBCMSleepComplete = function(data)
+ if not weatherState.weatherEnabled then return end
+ if not data then return end
+
+ local hoursSlept = data.hoursSlept or data.gameHours or 8
+ local secondsElapsed = hoursSlept * 3600 -- convert game hours to seconds
+
+ -- Walk through weather states: consume time, trigger transitions as needed
+ local remaining = secondsElapsed
+ local maxSteps = 20 -- safety: max weather changes during sleep
+ local steps = 0
+
+ while remaining > 0 and steps < maxSteps do
+ local timeLeft = weatherState.scheduledDuration - weatherState.timeInCurrentState
+ if remaining >= timeLeft then
+ -- This state expires during sleep — advance to next
+ remaining = remaining - timeLeft
+
+ -- Update season info
+ local dateInfo = extensions.bcm_timeSystem and extensions.bcm_timeSystem.getDateInfo()
+ if dateInfo then
+ weatherState.month = dateInfo.month
+ weatherState.season = dateInfo.season
+ end
+ if weatherState.seasonLock ~= "auto" then
+ local lockMonth = SEASON_LOCK_MONTH and SEASON_LOCK_MONTH[weatherState.seasonLock]
+ if lockMonth then weatherState.month = lockMonth end
+ end
+
+ local newState = selectNextWeather(weatherState.currentState, weatherState.month)
+ -- Snap directly (no smooth transition — player was asleep)
+ weatherState.previousState = weatherState.currentState
+ weatherState.currentState = newState
+ weatherState.transitioning = false
+ weatherState.transitionProgress = 0
+ scheduleNextWeatherChange()
+ steps = steps + 1
+ else
+ -- Sleep ends mid-state — advance the clock
+ weatherState.timeInCurrentState = weatherState.timeInCurrentState + remaining
+ remaining = 0
+ end
+ end
+
+ -- Apply the final weather state to scenetree (snap, no transition)
+ if steps > 0 then
+ startTransition(weatherState.currentState)
+ -- Snap transition to 100% immediately
+ weatherState.transitioning = false
+ weatherState.transitionProgress = 0
+ if weatherState.goalValues then
+ applyScenetreeValues(weatherState.goalValues, true)
+ end
+ broadcastWeatherUpdate()
+ updateTrafficSpeed()
+ log('I', logTag, 'Post-sleep weather: ' .. weatherState.currentState .. ' (simulated ' .. steps .. ' transitions over ' .. tostring(hoursSlept) .. 'h)')
+ end
+end
+
 -- Lifecycle hooks
 M.onCareerActive = onCareerActive
 M.onUpdate = onUpdate

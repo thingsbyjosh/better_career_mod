@@ -720,7 +720,10 @@ requestAllNegotiations = function()
  local negotiations = mp.getNegotiations()
  if not negotiations then return end
  for listingId, session in pairs(negotiations) do
+ -- Don't push dismissed sessions to Vue — they should stay hidden
+ if not session.dismissed then
  guihooks.trigger('BCMNegotiationUpdate', sanitizeSession(session))
+ end
  end
 end
 
@@ -2321,7 +2324,7 @@ createPlayerListing = function(inventoryId, priceCents, description)
  description = niceName .. " — Well maintained."
  end
 
- local seed = pe.lcg(inventoryId * 7777 + gameDay)
+ local seed = pe.lcg(inventoryId * 7777 + os.time())
  local listingId = "player_listing_" .. tostring(seed)
 
  -- Compute market variables for living market
@@ -2521,7 +2524,12 @@ requestPlayerListings = function()
  local invId = tonumber(listing.inventoryId)
  if invId and not vehicles[invId] then
  -- Vehicle no longer in inventory — sold through other means (garage, instant sell, etc.)
- log('I', logTag, 'Auto-cleaning stale listing ' .. tostring(listing.id) .. ' (vehicle ' .. tostring(listing.inventoryId) .. ' no longer in inventory)')
+ local activeSessions = 0
+ local buyerSessions = mp.getBuyerSessionsForListing(listing.id) or {}
+ for _, s in pairs(buyerSessions) do
+ if not s.isGhosting and not s.isCompleted and not s.dismissed then activeSessions = activeSessions + 1 end
+ end
+ log('W', logTag, 'Auto-cleaning stale listing ' .. tostring(listing.id) .. ' (vehicle ' .. tostring(listing.inventoryId) .. ' inv=' .. tostring(invId) .. ' not in inventory, activeBuyerSessions=' .. tostring(activeSessions) .. ')')
  table.insert(toRemove, listing.id)
  end
  end
@@ -2533,36 +2541,114 @@ requestPlayerListings = function()
  end
  end
 
+ -- Clean up old sold listings (keep only last 7 days for history, remove the rest)
+ local currentGameDay = getCurrentGameDay()
+ local soldToRemove = {}
+ for _, listing in ipairs(listings) do
+ if listing.isSold and listing.soldGameDay and (currentGameDay - listing.soldGameDay) > 7 then
+ table.insert(soldToRemove, listing.id)
+ end
+ end
+ for _, listingId in ipairs(soldToRemove) do
+ mp.removePlayerListing(listingId)
+ end
+
  -- Re-fetch after cleanup
  listings = mp.getPlayerListings()
- log('I', logTag, 'requestPlayerListings: sending ' .. tostring(#listings) .. ' player listings to Vue (inventory vehicles=' .. tostring(vehicleCount) .. ')')
+ log('I', logTag, 'requestPlayerListings: sending ' .. tostring(#listings) .. ' player listings to Vue (inventory vehicles=' .. tostring(vehicleCount) .. ', cleaned ' .. #soldToRemove .. ' old sold)')
  guihooks.trigger('BCMPlayerListings', { listings = listings })
- -- Also send all buyer sessions so Vue has them on load
- local sessions = mp.getBuyerSessions()
- guihooks.trigger('BCMBuyerSessions', { sessions = sessions })
+ -- Send buyer sessions to Vue — filter out sessions that shouldn't be visible yet
+ local rawSessions = mp.getBuyerSessions() or {}
+ local filteredSessions = {}
+ for listingId, buyerMap in pairs(rawSessions) do
+ local filtered = {}
+ local hasAny = false
+ for buyerId, session in pairs(buyerMap or {}) do
+ -- Only show sessions that have messages and aren't dismissed
+ if not session.dismissed
+ and session.messages and #session.messages > 0 then
+ filtered[buyerId] = session
+ hasAny = true
+ end
+ end
+ if hasAny then filteredSessions[listingId] = filtered end
+ end
+ guihooks.trigger('BCMBuyerSessions', { sessions = filteredSessions })
 end
 
 -- NPC buyer interaction stubs (full implementation in Plan 50-03)
 respondToBuyer = function(listingId, buyerId, counterCents)
+ log('I', logTag, 'respondToBuyer called: listing=' .. tostring(listingId) .. ' buyer=' .. tostring(buyerId) .. ' counter=' .. tostring(counterCents))
  local nego = extensions.bcm_negotiation
- if nego and nego.processPlayerCounterToNPCBuyer then
- nego.processPlayerCounterToNPCBuyer(listingId, buyerId, counterCents)
+ if not nego then
+ log('W', logTag, 'respondToBuyer: bcm_negotiation not available!')
+ return
  end
+ if not nego.processPlayerCounterToNPCBuyer then
+ log('W', logTag, 'respondToBuyer: processPlayerCounterToNPCBuyer not found on extension!')
+ return
+ end
+ nego.processPlayerCounterToNPCBuyer(listingId, buyerId, counterCents)
 end
 
 acceptBuyerOffer = function(listingId, buyerId)
- local nego = extensions.bcm_negotiation
- if nego and nego.processPlayerCounterToNPCBuyer then
- -- Accept = counter with buyer's last offer price
+ -- Direct deal acceptance — bypass counter-offer flow entirely.
+ -- Sets dealReached + dealPriceCents so the player can confirm the sale.
  local mp = getMarketplace()
- if mp then
+ if not mp then return end
  local sessions = mp.getBuyerSessionsForListing(listingId)
- local session = sessions[buyerId]
- if session and session.lastOfferCents then
- nego.processPlayerCounterToNPCBuyer(listingId, buyerId, session.lastOfferCents)
+ local session = sessions and sessions[buyerId]
+ if not session or not session.lastOfferCents then return end
+ if session.isGhosting or session.isCompleted or session.dealReached then return end
+
+ local negotiationEngine = require('lua/ge/extensions/bcm/negotiationEngine')
+ local negotiationTemplates = require('lua/ge/extensions/bcm/negotiationTemplates')
+ local pricingEng = require('lua/ge/extensions/bcm/pricingEngine')
+ local lang = getLanguage()
+ local gameDay = getCurrentGameDay()
+
+ session.dealReached = true
+ session.dealPriceCents = session.lastOfferCents
+ session.roundCount = (session.roundCount or 0) + 1
+
+ -- Buyer accept message
+ local pool = negotiationTemplates.getBuyerMessagePool(session.archetype, lang, "buyer_accept")
+ local msgIdx = pool and #pool > 0 and (pricingEng.lcg(session.seed + session.roundCount * 555) % #pool + 1) or 1
+ local acceptText = (pool and pool[msgIdx]) or "Deal!"
+ acceptText = acceptText:gsub("{price}", negotiationEngine.formatPrice(session.lastOfferCents))
+
+ table.insert(session.messages, {
+ direction = "buyer",
+ text = acceptText,
+ gameDay = gameDay,
+ gameTimePrecise = os.time(),
+ })
+ session.lastActivityTime = os.time()
+ session.hasUnread = true
+
+ -- Notify Vue
+ guihooks.trigger('BCMBuyerDealReached', {
+ listingId = listingId,
+ buyerId = buyerId,
+ dealPriceCents = session.dealPriceCents,
+ buyerName = session.buyerName,
+ })
+
+ if bcm_notifications and bcm_notifications.send then
+ bcm_notifications.send({
+ titleKey = "notif.buyerAccepted",
+ bodyKey = "notif.buyerAcceptedBody",
+ type = "success",
+ duration = 5000,
+ })
  end
+
+ local nego = extensions.bcm_negotiation
+ if nego and nego.fireBuyerSessionUpdate then
+ nego.fireBuyerSessionUpdate(listingId, buyerId, session)
  end
- end
+
+ log('I', logTag, 'Player accepted buyer offer: ' .. tostring(buyerId) .. ' at ' .. tostring(session.lastOfferCents) .. ' for ' .. tostring(listingId))
 end
 
 confirmBuyerSale = function(listingId, buyerId)
@@ -2616,6 +2702,7 @@ dismissBuyerChat = function(listingId, buyerId)
  local session = sessions[buyerId]
  if not session then return end
  session.dismissed = true
+ session.isGhosting = true -- free up the active buyer slot for new buyers
  guihooks.trigger('BCMBuyerSessionUpdate', {
  listingId = listingId,
  buyerId = buyerId,
@@ -2899,6 +2986,33 @@ M.confirmBuyerSale = confirmBuyerSale
 M.rejectBuyer = rejectBuyer
 M.markBuyerSessionRead = markBuyerSessionRead
 M.dismissBuyerChat = dismissBuyerChat
+M.dismissNegotiation = function(listingId)
+ -- Dismiss a buy-side negotiation: mark as blocked (closes it) + set dismissed flag.
+ -- If there's an active test drive for this listing, cancel it too.
+ local mp = getMarketplace()
+ if not mp then return end
+ local state = mp.getMarketplaceState()
+ if not state or not state.negotiations then return end
+ local session = state.negotiations[listingId]
+ if not session then return end
+
+ -- Close the negotiation
+ if not session.isBlocked and not session.isGhosting and not session.dealReached then
+ session.isBlocked = true
+ end
+ session.dismissed = true
+
+ -- Cancel any active test drive
+ if extensions.bcm_defects and extensions.bcm_defects.getActiveTestDrive then
+ local td = extensions.bcm_defects.getActiveTestDrive()
+ if td and td.listingId == listingId then
+ extensions.bcm_defects.stopTestDrive()
+ end
+ end
+
+ guihooks.trigger('BCMNegotiationUpdate', nil)
+ log('I', logTag, 'Negotiation dismissed: ' .. tostring(listingId))
+end
 M.openSellPage = openSellPage
 M.openMyListingsPage = openMyListingsPage
 
@@ -2906,6 +3020,12 @@ M.openMyListingsPage = openMyListingsPage
 M.requestTestDrive = requestTestDrive
 M.navigateToTestDrive = function()
  if bcm_defects then bcm_defects.navigateToTestDrive() end
+end
+M.cancelTestDrive = function()
+ if bcm_defects and bcm_defects.cancelTestDrive then
+ return bcm_defects.cancelTestDrive()
+ end
+ return false
 end
 M.debugSpawnScammer = debugSpawnScammer
 M.debugClearScammers = debugClearScammers
@@ -3044,27 +3164,23 @@ M.debugForceBuyerOffer = function()
  log('I', logTag, 'debugForceBuyerOffer: spawned 6 archetype buyers on listing ' .. tostring(listing.id))
 end
 
--- Helper: flush all pending buyer arrivals and timers instantly (for debug commands)
+-- Helper: flush all pending buyer inits and timers instantly (for debug commands)
 local function flushAllBuyerDeliveries()
  local nego = extensions.bcm_negotiation
  if not nego then return end
- -- Deliver all scheduled arrivals regardless of game hour
- if nego.tickPendingBuyerArrivals then
- -- Temporarily force all arrivals by setting scheduledGameHour to 0
+ -- Deliver all pending buyer inits instantly
  local mp = getMarketplace()
  if mp then
  local allSessions = mp.getBuyerSessions()
  if allSessions then
- for _, listingSessions in pairs(allSessions) do
- for _, session in pairs(listingSessions) do
- if session.awaitingDelivery then
- session.scheduledGameHour = 0
+ for listingId, listingSessions in pairs(allSessions) do
+ for buyerId, session in pairs(listingSessions) do
+ if session.awaitingInit then
+ nego.processBuyerInit(listingId, buyerId, true)
  end
  end
  end
  end
- end
- nego.tickPendingBuyerArrivals()
  end
  -- Flush reading/typing timers
  if nego.tickBuyerTimers then
@@ -3257,14 +3373,15 @@ M.onBCMLanguageChanged = onBCMLanguageChanged
 M.onBCMNewGameDay = onBCMNewGameDay
 M.onCareerActive = onCareerActive
 
--- Belt-and-suspenders: tick negotiation timers from here too,
--- in case bcm_negotiation.onUpdate isn't being called by the engine
-M.onUpdate = function(dtReal, dtSim, dtRaw)
- local nego = extensions.bcm_negotiation
- if nego then
- if nego.tickPendingTimers then nego.tickPendingTimers(dtReal) end
- if nego.tickBuyerTimers then nego.tickBuyerTimers(dtReal) end
- end
-end
+-- NOTE: negotiation.onUpdate already ticks both pendingTimers and buyerTimers.
+-- A duplicate call here caused timers to advance at 2x speed. Removed.
+-- If negotiation.onUpdate ever stops being called, re-enable ONE of these.
+-- M.onUpdate = function(dtReal, dtSim, dtRaw)
+-- local nego = extensions.bcm_negotiation
+-- if nego then
+-- if nego.tickPendingTimers then nego.tickPendingTimers(dtReal) end
+-- if nego.tickBuyerTimers then nego.tickBuyerTimers(dtReal) end
+-- end
+-- end
 
 return M

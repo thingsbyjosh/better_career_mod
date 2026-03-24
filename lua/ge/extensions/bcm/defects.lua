@@ -227,6 +227,12 @@ startTestDrive = function(listingId, listing)
  if activeTestDrive then return { success = false, error = "test_drive_active" } end
  if not listing then return { success = false, error = "no_listing" } end
 
+ -- Guard: don't start test drive if negotiation is dead (sold elsewhere, blocked, ghosted)
+ local session = bcm_negotiation and bcm_negotiation.getSession and bcm_negotiation.getSession(listingId)
+ if session and (session.isBlocked or session.isGhosting or session._soldElsewhere) then
+ return { success = false, error = "negotiation_closed" }
+ end
+
  -- Check if already used
  if listing.defects and #listing.defects > 0 then
  defectState.discoveryMap = defectState.discoveryMap or {}
@@ -998,6 +1004,13 @@ end
 M.startTestDrive = startTestDrive
 M.stopTestDrive = stopTestDrive
 M.navigateToTestDrive = navigateToTestDrive
+M.getActiveTestDrive = function() return activeTestDrive end
+M.cancelTestDrive = function()
+ -- Player-initiated cancel (e.g., from phone UI). Works in any phase.
+ if not activeTestDrive then return false end
+ stopTestDrive()
+ return true
+end
 M.requestInspector = requestInspector
 M.revealPostPurchase = revealPostPurchase
 M.getDiscoveredDefects = getDiscoveredDefects

@@ -99,8 +99,34 @@ unloadAllExtensions = function()
  extensions.unload("bcm_partsOrders")
 end
 
+-- Remove stale user-space level overrides that persist from World Editor saves.
+-- When a player (or another mod like RLS) saves the map via World Editor, BeamNG writes
+-- items.level.json to the user directory. This overrides mod files in the VFS because
+-- user-space files take priority. Clearing these ensures BCM's prefabs/facilities load.
+local function cleanUserLevelOverrides()
+ local levelPaths = {
+ '/levels/west_coast_usa/main/MissionGroup/items.level.json',
+ '/levels/italy/main/MissionGroup/items.level.json',
+ }
+ local userPath = FS:getUserPath()
+ if not userPath or userPath == '' then return end
+
+ for _, vpath in ipairs(levelPaths) do
+ if FS:fileExists(vpath) then
+ local realPath = FS:getFileRealPath(vpath)
+ if realPath and realPath ~= '' and string.startswith(realPath, userPath) then
+ local backupPath = vpath .. '.bcm_backup'
+ FS:renameFile(vpath, backupPath)
+ log('W', 'bcm_extensionManager', 'Renamed stale user-space level override: ' .. vpath .. ' -> ' .. backupPath)
+ end
+ end
+ end
+end
+
 -- Mod startup sequence
 startup = function()
+ cleanUserLevelOverrides()
+
  -- Load override manager first (installs package.preload hooks)
  setExtensionUnloadMode("bcm_overrideManager", "manual")
  extensions.load("bcm_overrideManager")

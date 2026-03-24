@@ -1738,6 +1738,10 @@ checkDepotReturn = function()
  if dist > 50 then return end
 
  log('I', logTag, 'Depot return detected (no pickups) — completing route')
+ -- Mark depot stop as delivered for UI consistency
+ for _, s in ipairs(pack.stops) do
+ if s.isDepotStop then s.status = 'delivered' end
+ end
  planexState.routeState = 'completing'
  log('I', logTag, 'FSM: returning -> completing')
  broadcastState()
@@ -2060,12 +2064,16 @@ spawnPlanexCargoAtDepot = function(pack)
  local createdCargoIds = {}
 
  for i, stop in ipairs(pack.stops) do
+ -- Skip depot stop — no parcel needed upfront. Pickups already target the depot;
+ -- routes without pickups complete via proximity (checkDepotReturn).
+ if stop.isDepotStop then goto continueStop end
+
  if stop.status == 'pending' then
  planexCargoIdCounter = planexCargoIdCounter + 1
  local cargoId = planexCargoIdCounter
 
- log('I', logTag, string.format(' Spawning parcel %d for stop %d/%d: %s (facId=%s, isDepot=%s)',
- cargoId, i, #pack.stops, stop.displayName or stop.facId, tostring(stop.facId), tostring(stop.isDepotStop or false)))
+ log('I', logTag, string.format(' Spawning parcel %d for stop %d/%d: %s (facId=%s, isDepot=%s, mechanic=%s)',
+ cargoId, i, #pack.stops, stop.displayName or stop.facId, tostring(stop.facId), tostring(stop.isDepotStop or false), tostring(stop.mechanic or 'none')))
 
  -- Resolve destination psPath from scene tree (required for bigmap POI + drop-off matching)
  local destPsPath = nil
@@ -2103,26 +2111,38 @@ spawnPlanexCargoAtDepot = function(pack)
  destPsPath = ""
  end
 
- -- Build modifiers from pack mechanics (75.1 Plan 02)
+ -- Build modifiers from per-stop mechanic (not pack-level — each stop has its own)
  -- Only set in cargo table — do NOT call parcelMods.addModifier() to avoid double-registration
  local cargoMods = {}
- if packHasMechanic(pack, 'urgent') then
+ if stop.mechanic == 'urgent' then
  local driveSecs = estimateDriveSeconds(pack)
  local tierFactor = URGENT_TIER_FACTORS[pack.tier] or 1.5
  local timeMult = (bcm_settings and bcm_settings.getSetting('planexTimeMultiplier')) or 1.0
  local timeLimit = driveSecs * tierFactor * timeMult
  table.insert(cargoMods, {
  type = "timed",
+ icon = "stopwatchSectionSolidEnd",
+ important = true,
  timeUntilDelayed = timeLimit,
  timeUntilLate = timeLimit * 1.25 + 15,
  moneyMultipler = 1.5, -- NOTE: vanilla spelling (single 'i') — do not fix
  })
  end
- if packHasMechanic(pack, 'fragile') then
+ if stop.mechanic == 'fragile' then
  table.insert(cargoMods, {
  type = "precious",
+ icon = "fragile",
+ important = true,
  moneyMultipler = 2.5, -- NOTE: vanilla spelling (single 'i') — do not fix
  abandonMultiplier = 1.0,
+ })
+ end
+ if stop.mechanic == 'hazardous' then
+ table.insert(cargoMods, {
+ type = "hazardous",
+ icon = "roadblockL",
+ important = true,
+ penalty = 3,
  })
  end
 
@@ -2172,6 +2192,7 @@ spawnPlanexCargoAtDepot = function(pack)
  stop.parcelId = cargoId
  table.insert(createdCargoIds, cargoId)
  end
+ ::continueStop::
  end
 
  pack.cargoIds = createdCargoIds
@@ -2241,8 +2262,9 @@ assessDamageAtStop = function(pack, stopIndex, callback)
  local brokenThreshold = career_modules_valueCalculator.getBrokenPartsThreshold()
  local brokenRelative = totalParts > 0 and (brokenParts / totalParts) or 0
 
- -- Dynamic damage threshold: fragile packs use stricter 0.15, standard packs use 0.25
- local fragileThreshold = packHasMechanic(planexState.activePack, 'fragile')
+ -- Dynamic damage threshold: fragile stops use stricter 0.15, standard stops use 0.25
+ local thisStop = pack.stops[stopIndex]
+ local fragileThreshold = (thisStop and thisStop.mechanic == 'fragile')
  and FRAGILE_DAMAGE_THRESHOLD or STANDARD_DAMAGE_THRESHOLD
 
  local damageLevel = "none"
@@ -2330,7 +2352,8 @@ end
 -- Called by onDeliveryFacilityProgressStatsChanged hook when vanilla confirms a drop-off.
 -- Matches parcel IDs against active pack stops to detect which stop was just completed.
 onVanillaDropOff = function()
- if not planexState.activePack or planexState.routeState ~= 'en_route' then return end
+ if not planexState.activePack then return end
+ if planexState.routeState ~= 'en_route' and planexState.routeState ~= 'returning' then return end
 
  local pack = planexState.activePack
  local completedAny = false
@@ -2371,6 +2394,10 @@ onVanillaDropOff = function()
  end
  if allPickupsDelivered then
  log('I', logTag, 'All pickup cargo delivered at depot — completing route')
+ -- Mark depot stop as delivered for UI consistency
+ for _, s in ipairs(pack.stops) do
+ if s.isDepotStop then s.status = 'delivered' end
+ end
  planexState.routeState = 'completing'
  log('I', logTag, 'FSM: returning -> completing')
  broadcastState()
@@ -2497,11 +2524,22 @@ buildStopsForPack = function(candidates, density, packTypeDef)
  stop.senderName = 'PlanEx Consolidated'
  stop.receiverTag = facTag or 'unknown'
  end
- -- Per-stop mechanic from packType mechanics — distribute round-robin among stops
+ -- Per-stop mechanic: pack-level mechanics apply to ALL stops (round-robin);
+ -- stops without a pack mechanic can randomly roll one (adds variety to normal routes)
  if packTypeDef and packTypeDef.mechanics and #packTypeDef.mechanics > 0 then
  stop.mechanic = packTypeDef.mechanics[((i - 1) % #packTypeDef.mechanics) + 1]
  else
+ -- Random per-stop modifier chance on packs without explicit mechanics
+ local roll = math.random()
+ if roll < 0.08 then
+ stop.mechanic = 'urgent'
+ elseif roll < 0.14 then
+ stop.mechanic = 'fragile'
+ elseif roll < 0.17 then
+ stop.mechanic = 'hazardous'
+ else
  stop.mechanic = nil
+ end
  end
  -- Pickup definitions
  local estDeliveryWeight = isCollectMode and 0 or 10 -- collect mode stops have no delivery, only pickups
@@ -2734,11 +2772,19 @@ buildRouteFromSpecial = function(sDef, sKey, candidates)
  stop.receiverTag = facTag or 'unknown'
  end
  end
- -- Distribute special route mechanics round-robin among stops
+ -- Distribute special route mechanics round-robin among stops;
+ -- stops without explicit mechanics can randomly roll one
  if sDef.mechanics and #sDef.mechanics > 0 then
  stop.mechanic = sDef.mechanics[((i - 1) % #sDef.mechanics) + 1]
  else
+ local roll = math.random()
+ if roll < 0.08 then
+ stop.mechanic = 'urgent'
+ elseif roll < 0.14 then
+ stop.mechanic = 'fragile'
+ else
  stop.mechanic = nil
+ end
  end
  local estDeliveryWeight = isCollectMode and 0 or 10
  stop.pickups = generatePickupsForStop(stop, estDeliveryWeight, isCollectMode and 1.0 or pickupVol)
@@ -2835,8 +2881,9 @@ buildRouteFromSpecial = function(sDef, sKey, candidates)
 end
 
 -- Append depot as the last stop in a pack (for hasDepotReturn routes).
--- Creates a depot "stop" so vanilla handles the return drop-off like any other stop.
--- The depot stop always has at least 1 parcel (route manifest) with automaticDropOff=false.
+-- Creates a depot "stop" pinned as the last position in the route.
+-- No parcel is created for this stop — pickups already target the depot.
+-- Routes without pickups complete via proximity (checkDepotReturn).
 appendDepotStop = function(pack, candidates)
  if pack.hasDepotReturn == false then return end -- special routes without depot return
 
@@ -3467,14 +3514,10 @@ onArriveAtDepot = function()
  career_modules_delivery_general.startDeliveryMode()
  end
  -- Parcels already in vehicle (vanilla "Pick Up" moved them)
- -- If player manually reordered in preview, respect that order; otherwise optimize
- if pack.hasCustomOrder then
- setGPSToRoute(pack)
- log('I', logTag, 'onArriveAtDepot: using player custom stop order: ' .. table.concat(pack.stopOrder or {}, ','))
- else
+ -- Always optimize — pinnedPositions (from player drag + depot pin) are respected by optimizeStopOrder
  optimizeStopOrder(pack)
- log('I', logTag, 'onArriveAtDepot: optimized order: ' .. table.concat(pack.stopOrder or {}, ','))
- end
+ log('I', logTag, 'onArriveAtDepot: optimized order: ' .. table.concat(pack.stopOrder or {}, ',')
+ .. (pack.pinnedPositions and ' (with player pins)' or ''))
  -- Log stop details for debugging
  for i, s in ipairs(pack.stops) do
  log('I', logTag, string.format(' Stop %d: %s (facId=%s, isDepot=%s, pickups=%d)',
@@ -3621,7 +3664,9 @@ completeStop = function(stopIndex)
  ))
 
  -- Show per-stop payment toast
- showStopToast(pack.stopsDelivered, #pack.stops, stopPay)
+ -- Exclude depot from total count shown to player (depot is not a "delivery")
+ local deliveryStopCount = #pack.stops - (pack.hasDepotReturn ~= false and 1 or 0)
+ showStopToast(pack.stopsDelivered, deliveryStopCount, stopPay)
 
  -- Show damage toast if damage detected
  if damageLevel ~= "none" then
@@ -3637,27 +3682,24 @@ completeStop = function(stopIndex)
  -- Update GPS/bigmap
  refreshStopWaypoints(pack)
 
- -- Check if all stops delivered
- local allDelivered = true
+ -- Check if all delivery stops (non-depot) are delivered
+ local allDeliveryDone = true
  for _, s in ipairs(pack.stops) do
- if s.status ~= 'delivered' then
- allDelivered = false
+ if not s.isDepotStop and s.status ~= 'delivered' then
+ allDeliveryDone = false
  break
  end
  end
 
- if allDelivered then
- planexState.routeState = 'completing'
- log('I', logTag, 'All stops delivered! FSM: en_route -> completing')
+ if allDeliveryDone then
+ -- All deliveries done — transition to returning for depot leg
+ planexState.routeState = 'returning'
+ log('I', logTag, 'All delivery stops done! FSM: en_route -> returning')
  broadcastState()
- completePack()
+ -- If no pickups, checkDepotReturn will complete by proximity on next tick
  else
- -- Navigate to next pending stop (pinning ensures depot is always last)
- if pack.hasCustomOrder then
- setGPSToRoute(pack)
- else
+ -- Re-optimize remaining stops (pins are preserved by optimizeStopOrder)
  optimizeStopOrder(pack)
- end
  broadcastState()
  end
  end)

@@ -889,6 +889,8 @@ M.advanceTime = function(gameDays)
  gameDays = tonumber(gameDays) or 0
  if gameDays <= 0 then return 0 end
 
+ local dayBefore = math.floor(timeState.gameTimeDays)
+
  -- Advance game day counter
  timeState.gameTimeDays = timeState.gameTimeDays + gameDays
  log('I', logTag, 'Advanced time by ' .. tostring(gameDays) .. ' days. New game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
@@ -907,6 +909,14 @@ M.advanceTime = function(gameDays)
  scenetree.tod.time = newTod
  -- Reset boundary detection to avoid false day increments
  timeState.lastTodTime = newTod
+ end
+
+ -- Fire onBCMNewGameDay for each full day crossed during the advance.
+ -- This ensures marketplace rotation, negotiation ticks, and buyer interest
+ -- are processed even when time jumps (sleep, fast-forward).
+ local dayAfter = math.floor(timeState.gameTimeDays)
+ for day = dayBefore + 1, dayAfter do
+ extensions.hook('onBCMNewGameDay', { gameDay = day })
  end
 
  -- Force immediate broadcast

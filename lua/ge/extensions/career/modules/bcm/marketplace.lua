@@ -68,6 +68,8 @@ local getBuyerSessions
 local getBuyerSessionsForListing
 local cancelBuyerSessionsForListing
 local generateBuyerInterest
+local generateTickBuyer
+local applyBuyerInterestDecay
 
 -- ============================================================================
 -- Seller fatigue profiles (archetype-specific price drop curves)
@@ -128,6 +130,8 @@ getDefaultState = function()
  -- Phase 50 player sell flow
  playerListings = {}, -- array of player listing tables
  buyerSessions = {}, -- { playerListingId -> { buyerId -> session } }
+ -- Distributed buyer tick system (replaces daily batch)
+ lastBuyerTickGameHours = 0, -- continuous game hours when last buyer tick ran
  }
 end
 
@@ -701,7 +705,7 @@ processNewDay = function(gameDay)
  applySellerFatigueDrop(gameDay) -- v2: replaces applyPriceDrops
  removeSoldListings(gameDay) -- includes relist logic
  addPoissonArrivals(gameDay) -- v2: Poisson daily arrivals
- generateBuyerInterest(gameDay) -- NPC buyer interest for player listings
+ applyBuyerInterestDecay(gameDay) -- daily decay only, generation via distributed ticks
  marketplaceState.lastProcessedDay = gameDay
 
  saveMarketplaceData()
@@ -944,55 +948,59 @@ local function generateBuyerName(seed)
  return BUYER_FIRST_NAMES[fi] .. " " .. BUYER_LAST_NAMES[li]
 end
 
-generateBuyerInterest = function(gameDay)
+-- Generate a single buyer for a listing in a given tick slot.
+-- Returns session table if generated, nil otherwise. Does NOT store the session.
+generateTickBuyer = function(listing, tickIndex)
  local pricingEngine = require('lua/ge/extensions/bcm/pricingEngine')
  local negotiationEngine = require('lua/ge/extensions/bcm/negotiationEngine')
- local playerListings = marketplaceState.playerListings or {}
  marketplaceState.buyerSessions = marketplaceState.buyerSessions or {}
 
- for _, listing in ipairs(playerListings) do
- if not listing.isSold then
+ if listing.isSold then return nil end
+
+ -- Check for already-completed sale (only block on confirmed sale, not pending deals)
+ local existingSessions = marketplaceState.buyerSessions[listing.id] or {}
+ for _, bs in pairs(existingSessions) do
+ if bs.isCompleted then return nil end
+ end
+
  local market = listing.marketValueCents or listing.priceCents
  local ask = listing.priceCents or market
  local r = (market > 0) and (ask / market) or 1.0
  local zone = negotiationEngine.classifyPricingZone(r)
  local liquidity = listing.liquidity or 0.50
 
- -- Zone-based lead generation parameters
- -- Target volumes: chollo ~10-15/day, reasonable ~4-6/day, overpriced ~0-1/day
- local baseChance, maxBuyers, rollCount
+ -- Per-tick probability (48 ticks/day) to match daily target volumes
+ -- chollo: ~10-15/day → ~0.21-0.31 per tick
+ -- reasonable: ~4-6/day → ~0.08-0.12 per tick
+ -- overpriced: ~0-1/day → ~0.005-0.02 per tick
+ local tickProb, maxBuyers
  if zone == "chollo" then
- baseChance = 0.60 + liquidity * 0.30 -- 0.62–0.90
+ tickProb = 0.21 + liquidity * 0.10
  maxBuyers = 25
- rollCount = 14
  elseif zone == "overpriced" then
- baseChance = 0.05 + liquidity * 0.10 -- 0.06–0.15
+ tickProb = 0.005 + liquidity * 0.015
  maxBuyers = 3
- rollCount = 2
  else -- reasonable
- baseChance = 0.55 + liquidity * 0.35 -- 0.57–0.90
+ tickProb = 0.08 + liquidity * 0.04
  maxBuyers = 10
- rollCount = 6
  end
 
- -- Count active buyers for this listing (exclude awaiting delivery — they haven't arrived yet)
- local sessions = marketplaceState.buyerSessions[listing.id] or {}
+ -- Count active buyers (exclude ghosted, completed, and dismissed)
  local activeBuyers = 0
- for _, session in pairs(sessions) do
- if not session.isGhosting and not session.isCompleted and not session.awaitingDelivery then
+ for _, session in pairs(existingSessions) do
+ if not session.isGhosting and not session.isCompleted and not session.dismissed then
  activeBuyers = activeBuyers + 1
  end
  end
- if activeBuyers >= maxBuyers then goto continue end
+ if activeBuyers >= maxBuyers then return nil end
 
- -- Roll for new buyers (rollCount times)
- for rollIdx = 1, rollCount do
- if activeBuyers >= maxBuyers then break end
+ -- Single Poisson roll per tick
+ local tickSeed = pricingEngine.lcg(listing.seed + tickIndex * 7919)
+ local roll = pricingEngine.lcgFloat(tickSeed)
+ if roll >= tickProb then return nil end
 
- local buyerSlot = activeBuyers + rollIdx
- local roll = pricingEngine.lcgFloat(listing.seed + gameDay * 8887 + buyerSlot * 31)
- if roll < baseChance then
- local buyerSeed = pricingEngine.lcg(listing.seed + gameDay * 12345 + buyerSlot * 67890)
+ -- Generate buyer
+ local buyerSeed = pricingEngine.lcg(tickSeed + 12345)
  local archetypeKey = negotiationEngine.pickBuyerArchetype(buyerSeed)
 
  -- Overpriced zone: re-roll non-premium archetypes
@@ -1012,8 +1020,8 @@ generateBuyerInterest = function(gameDay)
  end
 
  local buyerName = generateBuyerName(buyerSeed)
+ local gameDay = math.floor(extensions.bcm_timeSystem and extensions.bcm_timeSystem.getGameTimeDays() or 0)
 
- -- Generate latent attributes
  local listingData = {
  askPriceCents = ask,
  marketValueCents = market,
@@ -1023,7 +1031,6 @@ generateBuyerInterest = function(gameDay)
  }
  local latent = negotiationEngine.generateBuyerLatentAttributes(archetypeKey, listingData, buyerSeed)
 
- -- Compute initial offer using session-like data
  local sessionForOffer = {
  anchor = latent.anchor,
  buyerTarget = latent.buyerTarget,
@@ -1053,8 +1060,10 @@ generateBuyerInterest = function(gameDay)
  dealReached = false,
  dealPriceCents = nil,
  vehicleTitle = listing.title or "",
+ vehiclePreview = listing.preview or nil,
  hasUnread = true,
  messages = {},
+ awaitingInit = true,
  -- Living Market attributes
  buyerTarget = latent.buyerTarget,
  buyerMax = latent.buyerMax,
@@ -1069,43 +1078,29 @@ generateBuyerInterest = function(gameDay)
  isPremiumBuyer = latent.isPremiumBuyer,
  }
 
- -- Assign arrival time using Gaussian distribution centered on 14h (2 PM), sigma=3.5h, clamped [6,22]
- -- Box-Muller transform using LCG for deterministic Gaussian
- local u1 = math.max(1e-10, pricingEngine.lcgFloat(buyerSeed + 55555))
- local u2 = pricingEngine.lcgFloat(buyerSeed + 66666)
- local gaussian = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
- local scheduledHour = 14.0 + gaussian * 3.5
- -- Clamp to [6, 22] range
- scheduledHour = math.max(6.0, math.min(22.0, scheduledHour))
- session.scheduledGameHour = scheduledHour
- session.awaitingDelivery = true
-
+ -- Store the session
  if not marketplaceState.buyerSessions[listing.id] then
  marketplaceState.buyerSessions[listing.id] = {}
  end
  marketplaceState.buyerSessions[listing.id][buyerId] = session
 
- activeBuyers = activeBuyers + 1
- log('I', logTag, 'Buyer interest: ' .. buyerId .. ' (' .. archetypeKey .. '/' .. latent.strategy .. '/' .. zone .. ') listing=' .. tostring(listing.id) .. ' offer=' .. tostring(initialOfferCents) .. ' scheduled=' .. string.format("%.1fh", scheduledHour))
- end
- end
+ log('I', logTag, 'Tick buyer: ' .. buyerId .. ' (' .. archetypeKey .. '/' .. latent.strategy .. '/' .. zone .. ') listing=' .. tostring(listing.id) .. ' offer=' .. tostring(initialOfferCents) .. ' tick=' .. tostring(tickIndex))
 
- ::continue::
- end
- end
+ return session
+end
 
- -- Daily interest decay for existing active sessions
+-- Daily interest decay for existing buyer sessions (called from processNewDay)
+applyBuyerInterestDecay = function(gameDay)
+ local negotiationEngine = require('lua/ge/extensions/bcm/negotiationEngine')
  local allSessions = marketplaceState.buyerSessions or {}
  for listingId, listingSessions in pairs(allSessions) do
  for buyerId, session in pairs(listingSessions) do
  if not session.isGhosting and not session.isCompleted and session.buyerInterest then
  local daysSinceActivity = gameDay - (session.lastActivityGameDay or session.createdGameDay or gameDay)
  if daysSinceActivity > 0 then
- -- Apply daily decay
  local decay = negotiationEngine.computeBuyerInterestDecay(session, "no_response_multi_day", daysSinceActivity)
  session.buyerInterest = math.max(0, math.min(1.0, (session.buyerInterest or 0.5) + decay))
 
- -- Check if should ghost
  local shouldGhost, ghostReason = negotiationEngine.shouldBuyerGhost(session, session.seed + gameDay)
  if shouldGhost then
  session.isGhosting = true
@@ -1116,6 +1111,11 @@ generateBuyerInterest = function(gameDay)
  end
  end
  end
+end
+
+-- Legacy wrapper (kept for backward compatibility — now a no-op for generation, only does decay)
+generateBuyerInterest = function(gameDay)
+ applyBuyerInterestDecay(gameDay)
 end
 
 -- ============================================================================
@@ -1181,5 +1181,9 @@ M.getBuyerSessions = getBuyerSessions
 M.getBuyerSessionsForListing = getBuyerSessionsForListing
 M.cancelBuyerSessionsForListing = cancelBuyerSessionsForListing
 M.generateBuyerInterest = generateBuyerInterest
+M.generateTickBuyer = generateTickBuyer
+M.applyBuyerInterestDecay = applyBuyerInterestDecay
+M.getLastBuyerTickGameHours = function() return marketplaceState.lastBuyerTickGameHours or 0 end
+M.setLastBuyerTickGameHours = function(h) marketplaceState.lastBuyerTickGameHours = h end
 
 return M

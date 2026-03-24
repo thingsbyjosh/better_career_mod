@@ -42,10 +42,10 @@ local fireSessionUpdate
 local processBuyerInit
 local processPlayerCounterToNPCBuyer
 local confirmBuyerSale
-local deliverBuyerOffer
 local pendingBuyerTimers
 local tickBuyerTimers
-local tickPendingBuyerArrivals
+local tickDistributedBuyers
+local processRetroactiveBuyers
 local fireBuyerSessionUpdate
 local pickNonRepeatingMsgIdx
 
@@ -57,7 +57,6 @@ local activated = false
 local DEAL_EXPIRY_DAYS = 2
 local PROACTIVE_PING_THRESHOLD = 3
 local MIN_EXCHANGES_BEFORE_ACCEPT = 1 -- v2: seller never accepts first offer (round must be > 1)
-
 local logTag = 'bcm_negotiation'
 
 -- v3: Frame-based response timers (in-memory, not persisted)
@@ -67,6 +66,7 @@ local pendingTimers = {}
 
 -- Separate buyer timer array (avoids collision with seller timers)
 pendingBuyerTimers = {}
+
 
 -- Archetype typing speed multiplier (1.0 = normal, <1 = fast, >1 = slow)
 local ARCHETYPE_TYPING_SPEED = {
@@ -142,6 +142,10 @@ end
 appendMessage = function(session, direction, text, gameDay, extra)
  session.messages = session.messages or {}
  local preciseTime = getGameTimePrecise()
+ -- Use os.time() for chat ordering — real wall-clock seconds, always unique,
+ -- never affected by game time pauses/resets. Not used for gameplay decisions
+ -- (prices, rolls) so determinism is preserved.
+ local activityTime = os.time()
  local msg = {
  id = #session.messages + 1,
  direction = direction,
@@ -154,7 +158,7 @@ appendMessage = function(session, direction, text, gameDay, extra)
  mood = session.mood,
  }
  -- Track last activity for chat ordering
- session.lastActivityTime = preciseTime
+ session.lastActivityTime = activityTime
  table.insert(session.messages, msg)
  return msg
 end
@@ -278,6 +282,7 @@ fireSessionUpdate = function(session)
  sellerIsReading = session.sellerIsReading or false,
  sellerIsTyping = session.sellerIsTyping or false,
  isFinalOffer = session.isFinalOffer or false,
+ dismissed = session.dismissed or false,
  lastActivityTime = session.lastActivityTime or 0,
  _batchLeveragePushCount = session._batchLeveragePushCount or 0,
  -- NOTE: floorCents is intentionally EXCLUDED — it's secret from Vue
@@ -1274,7 +1279,7 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
  end
  tickTimers(dtReal)
  tickBuyerTimers(dtReal)
- tickPendingBuyerArrivals()
+ tickDistributedBuyers()
 end
 
 M.onCareerActivated = function()
@@ -1285,6 +1290,27 @@ end
 M.onCareerModulesActivated = function()
  activated = true
  log('I', logTag, 'Negotiation extension activated (onCareerModulesActivated)')
+
+ -- Recovery: deliver any buyer sessions stuck in awaitingInit (timers lost on save/load)
+ local mp = getMarketplace()
+ if mp then
+ local allSessions = mp.getBuyerSessions() or {}
+ local recovered = 0
+ for listingId, buyerMap in pairs(allSessions) do
+ for buyerId, session in pairs(buyerMap) do
+ if session.awaitingInit and not session.isGhosting and not session.isCompleted then
+ processBuyerInit(listingId, buyerId, true)
+ recovered = recovered + 1
+ end
+ end
+ end
+ if recovered > 0 then
+ log('I', logTag, 'Recovered ' .. recovered .. ' buyer sessions stuck in awaitingInit')
+ end
+ end
+
+ -- Process retroactive buyers (from sleep/time skips since last save)
+ processRetroactiveBuyers()
 end
 
 M.onBCMNewGameDay = function(data)
@@ -1391,6 +1417,14 @@ M.onBCMNewGameDay = function(data)
  -- Close negotiation
  session.isBlocked = true
 
+ -- Clean up any active test drive for this listing
+ if extensions.bcm_defects and extensions.bcm_defects.getActiveTestDrive then
+ local td = extensions.bcm_defects.getActiveTestDrive()
+ if td and td.listingId == listingId then
+ extensions.bcm_defects.stopTestDrive()
+ end
+ end
+
  if bcm_notifications and bcm_notifications.send then
  bcm_notifications.send({
  titleKey = "notif.dealExpired",
@@ -1486,6 +1520,7 @@ fireBuyerSessionUpdate = function(listingId, buyerId, session)
  hasUnread = session.hasUnread,
  messages = session.messages,
  vehicleTitle = session.vehicleTitle,
+ vehiclePreview = session.vehiclePreview,
  listingPriceCents = session.listingPriceCents,
  -- Living Market fields
  zone = session.zone,
@@ -1495,7 +1530,7 @@ fireBuyerSessionUpdate = function(listingId, buyerId, session)
  })
 end
 
-processBuyerInit = function(listingId, buyerId)
+processBuyerInit = function(listingId, buyerId, instant)
  local mp = getMarketplace()
  if not mp then return end
 
@@ -1519,6 +1554,38 @@ processBuyerInit = function(listingId, buyerId)
  rawText = rawText:gsub("{price}", priceStr)
  rawText = rawText:gsub("{vehicle}", session.vehicleTitle or "your vehicle")
 
+ session.awaitingInit = false
+
+ if instant then
+ -- Deliver immediately (recovery path — timer was lost)
+ table.insert(session.messages, {
+ direction = "buyer",
+ text = rawText,
+ gameDay = getCurrentGameDay(),
+ gameTimePrecise = session.createdGameDay or 0,
+ })
+ session.lastActivityTime = os.time()
+ session.hasUnread = true
+ fireBuyerSessionUpdate(listingId, buyerId, session)
+
+ -- Phone notification
+ if bcm_notifications and bcm_notifications.send then
+ bcm_notifications.send({
+ titleKey = "notif.buyerMessage",
+ bodyKey = "notif.buyerMessageBody",
+ type = "info",
+ duration = 5000,
+ })
+ end
+ guihooks.trigger('BCMBuyerMessage', {
+ listingId = listingId,
+ buyerId = buyerId,
+ buyerName = session.buyerName,
+ text = rawText,
+ })
+
+ log('I', logTag, 'Buyer init delivered instantly: ' .. buyerId)
+ else
  -- Schedule delayed delivery (reading + typing)
  local readDelay = 2 + (pricingEng.lcgFloat(session.seed + 111) * 3)
  local typingDelay = 1 + (pricingEng.lcgFloat(session.seed + 222) * 2)
@@ -1531,18 +1598,20 @@ processBuyerInit = function(listingId, buyerId)
  typingRemaining = typingDelay,
  responseText = rawText,
  })
-
- session.awaitingInit = false
  log('I', logTag, 'Buyer init scheduled: ' .. buyerId .. ' for listing ' .. tostring(listingId))
+ end
 end
 
 processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
+ log('I', logTag, 'processPlayerCounterToNPCBuyer: listing=' .. tostring(listingId) .. ' buyer=' .. tostring(buyerId) .. ' counter=' .. tostring(counterCents))
  local mp = getMarketplace()
- if not mp then return end
+ if not mp then log('W', logTag, 'processPlayerCounterToNPCBuyer: no marketplace!') return end
 
  local sessions = mp.getBuyerSessionsForListing(listingId)
  local session = sessions[buyerId]
- if not session or session.isGhosting or session.isCompleted then return end
+ if not session then log('W', logTag, 'processPlayerCounterToNPCBuyer: session not found for ' .. tostring(buyerId)) return end
+ if session.isGhosting then log('I', logTag, 'processPlayerCounterToNPCBuyer: session ghosted, ignoring') return end
+ if session.isCompleted then log('I', logTag, 'processPlayerCounterToNPCBuyer: session completed, ignoring') return end
 
  -- Buyer final offer timeout: if buyer declared final offer 2+ days ago, they ghost
  if session.isBuyerFinalOffer then
@@ -1564,6 +1633,7 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
  responseText = pool[msgIdx] or "nvm", isGhosting = true,
  })
  end
+ fireBuyerSessionUpdate(listingId, buyerId, session)
  end
  return
  end
@@ -1670,6 +1740,9 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
  responseText = acceptText,
  isDeal = true,
  })
+ session.lastPlayerCounter = counterCents
+ fireBuyerSessionUpdate(listingId, buyerId, session)
+ return
  else
  -- v4: Reactive buyer counter-offer
  local prevOffer = session.lastOfferCents or session.initialOfferCents or 0
@@ -1921,6 +1994,13 @@ confirmBuyerSale = function(listingId, buyerId)
  -- Mark this session completed
  session.isCompleted = true
 
+ -- Purge pending buyer timers for this listing (stop ghost notifications)
+ for i = #pendingBuyerTimers, 1, -1 do
+ if pendingBuyerTimers[i].listingId == listingId then
+ table.remove(pendingBuyerTimers, i)
+ end
+ end
+
  -- Send result to Vue
  guihooks.trigger('BCMSellResult', {
  success = true,
@@ -1951,20 +2031,73 @@ end
 tickBuyerTimers = function(dtReal)
  for i = #pendingBuyerTimers, 1, -1 do
  local timer = pendingBuyerTimers[i]
+
+ -- Safety: track total age and force delivery after 10 seconds
+ timer._age = (timer._age or 0) + dtReal
+ if timer._age > 10 then
+ log('W', logTag, 'Buyer timer stuck for ' .. string.format("%.1f", timer._age) .. 's — forcing delivery: ' .. tostring(timer.buyerId))
+ -- For init timers, use processBuyerInit. For counter-offer timers,
+ -- deliver the message directly since awaitingInit is already false.
+ local mp = getMarketplace()
+ if mp then
+ local sessions = mp.getBuyerSessionsForListing(timer.listingId)
+ local session = sessions and sessions[timer.buyerId]
+ if session and session.awaitingInit then
+ processBuyerInit(timer.listingId, timer.buyerId, true)
+ elseif session and not session.isGhosting and not session.isCompleted and timer.responseText then
+ table.insert(session.messages, {
+ direction = "buyer",
+ text = timer.responseText,
+ gameDay = getCurrentGameDay(),
+ timestamp = os.time(),
+ })
+ session.hasUnread = true
+ session.lastActivityTime = os.time()
+ if timer.isDeal then
+ guihooks.trigger('BCMBuyerDealReached', {
+ listingId = timer.listingId, buyerId = timer.buyerId,
+ dealPriceCents = session.dealPriceCents, buyerName = session.buyerName,
+ })
+ end
+ if timer.isGhosting then session.isGhosting = true end
+ fireBuyerSessionUpdate(timer.listingId, timer.buyerId, session)
+ log('I', logTag, 'Stuck timer force-delivered (non-init): ' .. tostring(timer.buyerId))
+ end
+ end
+ table.remove(pendingBuyerTimers, i)
+ goto continueBuyerTimer
+ end
+
  if timer.phase == "reading" then
  timer.readRemaining = timer.readRemaining - dtReal
  if timer.readRemaining <= 0 then
  timer.phase = "typing"
+ log('D', logTag, 'Buyer timer reading->typing: ' .. tostring(timer.buyerId))
  end
  elseif timer.phase == "typing" then
  timer.typingRemaining = timer.typingRemaining - dtReal
  if timer.typingRemaining <= 0 then
  -- Deliver buyer message
  local mp = getMarketplace()
+ if not mp then
+ log('W', logTag, 'Buyer timer delivery: no marketplace for ' .. tostring(timer.buyerId))
+ end
  if mp then
  local sessions = mp.getBuyerSessionsForListing(timer.listingId)
  local session = sessions and sessions[timer.buyerId]
+ -- Skip delivery if session is dead (ghosted/completed) or listing is sold
+ if not session then
+ log('W', logTag, 'Buyer timer delivery: session not found for ' .. tostring(timer.buyerId) .. ' listing=' .. tostring(timer.listingId))
+ end
+ if session and (session.isGhosting or session.isCompleted) then
+ log('D', logTag, 'Buyer timer delivery: session dead (ghost/complete), skipping ' .. tostring(timer.buyerId))
+ table.remove(pendingBuyerTimers, i)
+ goto continueBuyerTimer
+ end
  if session then
+ -- Note: listing sold check removed — session-level guards (ghosted/completed)
+ -- are sufficient, and getPlayerListingById can return a stale sold duplicate.
+ log('I', logTag, 'Buyer timer delivered: ' .. tostring(timer.buyerId) .. ' text=' .. tostring(timer.responseText):sub(1, 40) .. (timer.isDeal and ' [DEAL]' or ''))
  table.insert(session.messages, {
  direction = "buyer",
  text = timer.responseText,
@@ -1988,12 +2121,21 @@ tickBuyerTimers = function(dtReal)
 
  -- Phone notification
  if bcm_notifications and bcm_notifications.send then
+ if timer.isDeal then
+ bcm_notifications.send({
+ titleKey = "notif.buyerDealReached",
+ bodyKey = "notif.buyerDealReachedBody",
+ type = "success",
+ duration = 6000,
+ })
+ else
  bcm_notifications.send({
  titleKey = "notif.buyerMessage",
  bodyKey = "notif.buyerMessageBody",
  type = "info",
  duration = 5000,
  })
+ end
  end
 
  guihooks.trigger('BCMBuyerMessage', {
@@ -2009,42 +2151,142 @@ tickBuyerTimers = function(dtReal)
  table.remove(pendingBuyerTimers, i)
  end
  end
+ ::continueBuyerTimer::
  end
 end
 
 -- ============================================================================
--- Scheduled buyer arrival delivery (game-time based)
+-- Distributed buyer tick system (replaces scheduledGameHour arrivals)
 -- ============================================================================
 
--- Check current game hour and deliver any pending buyer arrivals whose
--- scheduledGameHour has passed. Called every frame from onUpdate.
-tickPendingBuyerArrivals = function()
- if not activated then return end
+local BUYER_TICK_INTERVAL_HOURS = 0.5 -- 30 game-minutes per tick
 
+-- Monotonic game hours — immune to day/tod desync spikes at day boundaries.
+-- gameDays (integer) and tod.time (0-1 fraction) can be out of sync for 1-2 frames
+-- at midnight, causing ±24h jumps. This wrapper only accepts forward movement < 2h.
+local _lastContinuousHours = nil -- nil = uninitialized
+
+local function getContinuousGameHours()
  local ts = extensions.bcm_timeSystem
- if not ts or not scenetree.tod then return end
+ if not ts then return _lastContinuousHours or 0 end
+ local gameDays = ts.getGameTimeDays and ts.getGameTimeDays() or 0
+ local dayFloor = math.floor(gameDays)
+ local currentTod = scenetree.tod and scenetree.tod.time or 0
+ local visualHours = ts.todToVisualHours and ts.todToVisualHours(currentTod) or 0
+ local raw = dayFloor * 24 + visualHours
 
- local currentGameHour = ts.todToVisualHours(scenetree.tod.time)
+ -- First call after load: accept raw value as baseline
+ if not _lastContinuousHours then
+ _lastContinuousHours = raw
+ return raw
+ end
+
+ if raw > _lastContinuousHours then
+ local delta = raw - _lastContinuousHours
+ -- Reject ONLY the day-boundary desync spike (~24h ± 2h).
+ -- Normal progression (small delta) AND legitimate large jumps (reload gap) are accepted.
+ if delta < 22 or delta > 26 then
+ _lastContinuousHours = raw
+ end
+ -- else: 22-26h = day boundary spike, ignore until tod settles
+ end
+ return _lastContinuousHours
+end
+
+tickDistributedBuyers = function()
+ if not activated then return end
 
  local mp = getMarketplace()
  if not mp then return end
 
- local allSessions = mp.getBuyerSessions()
- if not allSessions then return end
+ local currentHours = getContinuousGameHours()
+ local lastTickHours = mp.getLastBuyerTickGameHours and mp.getLastBuyerTickGameHours() or 0
 
- for listingId, listingSessions in pairs(allSessions) do
- for buyerId, session in pairs(listingSessions) do
- if session.awaitingDelivery and session.scheduledGameHour then
- if currentGameHour >= session.scheduledGameHour then
- -- Time has come — mark as awaitingInit and fire processBuyerInit
- session.awaitingDelivery = nil
- session.scheduledGameHour = nil
- session.awaitingInit = true
- processBuyerInit(listingId, buyerId)
- log('I', logTag, 'Buyer arrived (game hour ' .. string.format("%.1f", currentGameHour) .. '): ' .. buyerId)
+ -- First run after load: initialize
+ if lastTickHours <= 0 then
+ if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(currentHours) end
+ return
+ end
+
+ local hoursSinceLast = currentHours - lastTickHours
+ if hoursSinceLast < BUYER_TICK_INTERVAL_HOURS then return end
+
+ -- Live gameplay: process only 1 tick per call (buyers arrive one by one)
+ local newTickHours = lastTickHours + BUYER_TICK_INTERVAL_HOURS
+ if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(newTickHours) end
+
+ local tickIndex = math.floor(lastTickHours / BUYER_TICK_INTERVAL_HOURS) + 1
+ local playerListings = mp.getPlayerListings and mp.getPlayerListings() or {}
+ local newBuyerCount = 0
+
+ for _, listing in ipairs(playerListings) do
+ if not listing.isSold then
+ local session = mp.generateTickBuyer and mp.generateTickBuyer(listing, tickIndex)
+ if session then
+ newBuyerCount = newBuyerCount + 1
+ processBuyerInit(session.listingId, session.buyerId, false)
  end
  end
  end
+
+ if newBuyerCount > 0 then
+ log('I', logTag, 'Distributed buyer tick #' .. tickIndex .. ': generated ' .. newBuyerCount .. ' buyers')
+ end
+end
+
+-- Retroactive buyer generation (called on activation after sleep/reload)
+processRetroactiveBuyers = function()
+ local mp = getMarketplace()
+ if not mp then return end
+
+ local currentHours = getContinuousGameHours()
+ local lastTickHours = mp.getLastBuyerTickGameHours and mp.getLastBuyerTickGameHours() or 0
+
+ -- First run ever: initialize pointer
+ if lastTickHours <= 0 then
+ if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(currentHours) end
+ return
+ end
+
+ -- If game time went backwards (reloaded older save), reset pointer
+ if currentHours < lastTickHours - 24 then
+ log('W', logTag, 'lastBuyerTickGameHours (' .. string.format("%.0f", lastTickHours) .. ') ahead of current (' .. string.format("%.0f", currentHours) .. ') — resetting')
+ if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(currentHours) end
+ return
+ end
+
+ local hoursSinceLast = currentHours - lastTickHours
+ if hoursSinceLast < 1 then return end -- <1h gap: live ticks will handle it
+
+ local ticksDue = math.floor(hoursSinceLast / BUYER_TICK_INTERVAL_HOURS)
+ local MAX_CATCHUP_TICKS = 96 -- 2 days max
+ ticksDue = math.min(ticksDue, MAX_CATCHUP_TICKS)
+
+ local startTickIndex = math.floor(lastTickHours / BUYER_TICK_INTERVAL_HOURS) + 1
+ local playerListings = mp.getPlayerListings and mp.getPlayerListings() or {}
+ local newBuyerCount = 0
+
+ for t = 0, ticksDue - 1 do
+ local tickIndex = startTickIndex + t
+ for _, listing in ipairs(playerListings) do
+ if not listing.isSold then
+ local session = mp.generateTickBuyer and mp.generateTickBuyer(listing, tickIndex)
+ if session then
+ newBuyerCount = newBuyerCount + 1
+ processBuyerInit(session.listingId, session.buyerId, true)
+ end
+ end
+ end
+ end
+
+ -- Advance pointer
+ if mp.setLastBuyerTickGameHours then
+ mp.setLastBuyerTickGameHours(lastTickHours + ticksDue * BUYER_TICK_INTERVAL_HOURS)
+ end
+
+ if newBuyerCount > 0 then
+ log('I', logTag, 'Retroactive buyer ticks: processed ' .. ticksDue .. ' ticks, generated ' .. newBuyerCount .. ' buyers')
+ guihooks.trigger('BCMSleepBuyerOffers', { count = newBuyerCount })
  end
 end
 
@@ -2069,6 +2311,7 @@ M.processBuyerInit = processBuyerInit
 M.processPlayerCounterToNPCBuyer = processPlayerCounterToNPCBuyer
 M.confirmBuyerSale = confirmBuyerSale
 M.tickBuyerTimers = tickBuyerTimers
-M.tickPendingBuyerArrivals = tickPendingBuyerArrivals
+M.tickDistributedBuyers = tickDistributedBuyers
+M.fireBuyerSessionUpdate = fireBuyerSessionUpdate
 
 return M
