@@ -3692,6 +3692,13 @@ completeStop = function(stopIndex)
  end
 
  if allDeliveryDone then
+ -- Packs without depot return (tutorial, some special routes): complete immediately
+ if pack.hasDepotReturn == false or pack.isTutorialPack then
+ planexState.routeState = 'completing'
+ log('I', logTag, 'All delivery stops done! FSM: en_route -> completing (no depot return)')
+ completePack()
+ return
+ end
  -- All deliveries done — transition to returning for depot leg
  planexState.routeState = 'returning'
  log('I', logTag, 'All delivery stops done! FSM: en_route -> returning')

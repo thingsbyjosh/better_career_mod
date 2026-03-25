@@ -91,7 +91,7 @@ local STEPS = {
  [5] = {
  id = "step_radial",
  label = function() return t("Recover the Miramar", "Recupera el Miramar") end,
- subtext = function() return t("Press E to open the radial menu, then select 'Recover favorite vehicle'.", "Pulsa E para abrir el menú radial y selecciona 'Recuperar vehículo favorito'.") end,
+ subtext = function() return t("Hold the radial menu key (E) → Career Actions → Retrieve your favorite vehicle.", "Mantén pulsada la tecla del menú radial (E) → Career Actions → Recuperar tu vehículo favorito.") end,
  type = "goal",
  },
  [6] = {
@@ -397,7 +397,7 @@ getNudgeHintForStep = function(step)
  [2] = t("Follow the GPS route to reach the garage.", "Sigue la ruta GPS para llegar al garaje."),
  [3] = t("Enter the garage and interact with the computer terminal.", "Entra al garaje e interactúa con la terminal del ordenador."),
  [4] = t("Pick up your cargo at the depot, then deliver it to the marked location.", "Recoge tu carga en el depósito y llévala al punto marcado."),
- [5] = t("Hold the radial menu key and select 'Retrieve favorite vehicle'.", "Mantén pulsada la tecla del menú radial y selecciona 'Recuperar vehículo favorito'."),
+ [5] = t("Hold the radial menu key (E) → Career Actions → Retrieve your favorite vehicle.", "Mantén pulsada la tecla del menú radial (E) → Career Actions → Recuperar tu vehículo favorito."),
  [6] = t("Use the garage computer and select a sleep time.", "Usa el ordenador del garaje y selecciona una hora para dormir."),
  [7] = t("Check the dealerships once you have enough money.", "Revisa los concesionarios cuando tengas suficiente dinero."),
  }

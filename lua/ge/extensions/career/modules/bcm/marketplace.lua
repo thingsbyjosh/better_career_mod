@@ -447,12 +447,20 @@ rotateDailyListings = function(gameDay)
  end
  end
 
+ -- Also protect listings with active test drive
+ local testDriveListingId = nil
+ local defects = extensions.bcm_defects
+ if defects and defects.getActiveTestDrive then
+ local td = defects.getActiveTestDrive()
+ if td then testDriveListingId = td.listingId end
+ end
+
  for i = #listings, 1, -1 do
  local listing = listings[i]
  if not listing.isSold then
- -- Guard: don't rotate listings with active player negotiations
- if hasActiveNego[listing.id] then
- -- skip — player is negotiating this one
+ -- Guard: don't rotate listings with active player negotiations or test drive
+ if hasActiveNego[listing.id] or listing.id == testDriveListingId then
+ -- skip — player is negotiating or test-driving this one
  else
  local age = gameDay - (listing.postedGameDay or 0)
  local survivalRoll = pricingEngine.lcgFloat(listing.seed + gameDay * 100)

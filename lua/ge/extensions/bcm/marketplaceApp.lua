@@ -1084,6 +1084,15 @@ end
 -- ============================================================================
 
 confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
+ -- Cancel active test drive for this listing (prevents zombie spawned vehicle)
+ local defects = extensions.bcm_defects
+ if defects and defects.getActiveTestDrive then
+ local td = defects.getActiveTestDrive()
+ if td and td.listingId == listingId and defects.cancelTestDrive then
+ defects.cancelTestDrive()
+ end
+ end
+
  local mp = getMarketplace()
  if not mp then
  guihooks.trigger('BCMPurchaseResult', { success = false, error = "marketplace_unavailable" })
