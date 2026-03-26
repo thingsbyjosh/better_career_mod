@@ -3056,6 +3056,13 @@ generatePool = function(rotationId)
  pack.totalPickupCount = pack.totalPickupCount + #(stop.pickups or {})
  end
 
+ -- Only add depot return if there are actual pickups to bring back
+ -- Routes with no pickups end at the last delivery stop (no pointless drive-back)
+ if pack.totalPickupCount == 0 and pack.hasDepotReturn then
+ pack.hasDepotReturn = false
+ log('D', logTag, string.format('Pack %s: no pickups at any stop — depot return disabled', pack.id))
+ end
+
  -- Add depot as last stop (for depot-return routes)
  appendDepotStop(pack, candidates)
 
@@ -3080,6 +3087,11 @@ generatePool = function(rotationId)
  local sDef = specialDefs[sKey]
  local specialPack = buildRouteFromSpecial(sDef, sKey, candidates)
  if specialPack then
+ -- No depot return if no pickups to bring back
+ if (specialPack.totalPickupCount or 0) == 0 and specialPack.hasDepotReturn then
+ specialPack.hasDepotReturn = false
+ log('D', logTag, string.format('Special pack %s: no pickups — depot return disabled', specialPack.id))
+ end
  appendDepotStop(specialPack, candidates)
  table.insert(pool, specialPack)
  end
@@ -3702,6 +3714,10 @@ completeStop = function(stopIndex)
  -- All deliveries done — transition to returning for depot leg
  planexState.routeState = 'returning'
  log('I', logTag, 'All delivery stops done! FSM: en_route -> returning')
+ -- Explicitly route GPS to depot — vanilla's setBestRoute callback may not fire again
+ if career_modules_delivery_cargoScreen and career_modules_delivery_cargoScreen.setBestRoute then
+ career_modules_delivery_cargoScreen.setBestRoute(true)
+ end
  broadcastState()
  -- If no pickups, checkDepotReturn will complete by proximity on next tick
  else
@@ -3762,14 +3778,26 @@ completePack = function()
  local streakMultiplier = math.min(0.25, (planexState.currentStreak - 1) * 0.05)
  streakXPBonus = math.floor(starXP * streakMultiplier)
  end
- local totalXP = starXP + streakXPBonus
+ local completionXP = starXP + streakXPBonus
+ local totalXP = (planexState.accumulatedXP or 0) + completionXP -- per-stop XP + star/streak bonus
  local prevLevel = planexState.driverLevel
- if totalXP ~= 0 then
- grantXP(totalXP)
+ if completionXP ~= 0 then
+ grantXP(completionXP)
  end
 
- -- Note: PlanEx reputation is granted automatically by vanilla parcelManager
- -- (~5 + distanceKm per parcel delivered). No extra grant needed here.
+ -- Grant PlanEx organization reputation (BCM bypasses vanilla parcelManager so we grant manually).
+ -- Formula: base 5 per stop + bonus for stars.
+ local repGain = (pack.stopsDelivered or 0) * 5
+ if stars >= 4 then repGain = repGain + 10
+ elseif stars >= 3 then repGain = repGain + 5
+ end
+ if repGain > 0 and career_modules_playerAttributes and career_modules_playerAttributes.addAttributes then
+ career_modules_playerAttributes.addAttributes(
+ {planexReputation = repGain},
+ {label = "PlanEx delivery", tags = {"gameplay", "delivery"}}
+ )
+ log('I', logTag, string.format('Reputation granted: +%d planexReputation (%d stops, %d stars)', repGain, pack.stopsDelivered or 0, stars))
+ end
 
  -- Loaner usage tracking — daily fee charged at end of game day
  local loanerGrossPay = finalPay
@@ -3821,11 +3849,12 @@ completePack = function()
  packId = pack.id,
  packTypeId = pack.packTypeId or 'generic',
  tier = pack.tier,
- stopCount = pack.stopCount or #pack.stops,
+ stopCount = (pack.stopCount or #pack.stops) - (pack.hasDepotReturn ~= false and 1 or 0),
  stopsDelivered = pack.stopsDelivered or 0,
  totalEarned = finalPay,
  grossEarnings = preStarPay,
  xpGained = totalXP,
+ xpBonus = completionXP, -- star + streak adjustment (can be negative)
  starRating = stars,
  starScore = weightedScore,
  starMultiplier = starMultiplier,
@@ -3870,6 +3899,7 @@ completePack = function()
  totalEarned = finalPay,
  grossEarnings = planexState.grossPay or finalPay,
  xpGained = totalXP,
+ xpBonus = completionXP,
  fatigueApplied = fatApplied,
  fatigueMultiplier = fatApplied and fatigueMult or nil,
  starRating = stars,

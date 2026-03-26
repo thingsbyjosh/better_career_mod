@@ -363,28 +363,6 @@ applyPaint = function(inventoryId, paints, partPaints, totalCostCents)
  end
  end
 
- -- Apply visual paint to vehicle (vanilla pattern)
- local vehIdMap = career_modules_inventory.getMapInventoryIdToVehId()
- local vehObjId = vehIdMap and vehIdMap[inventoryId]
- if vehObjId then
- local cvc = extensions.core_vehicle_colors or core_vehicle_colors
- if cvc and cvc.setVehiclePaint then
- cvc.setVehiclePaint(1, paints[1], vehObjId)
- cvc.setVehiclePaint(2, paints[2], vehObjId)
- cvc.setVehiclePaint(3, paints[3], vehObjId)
- end
- local vehObj = be:getObjectByID(vehObjId)
- if vehObj then
- vehObj:queueLuaCommand(string.format("partCondition.setAllPartPaints(%s, 0)", serialize(paints)))
-
- -- Re-apply ALL per-part paints (existing + new)
- for partId, paintObj in pairs(allPartPaints) do
- local paintsArray = { paintObj, paintObj, paintObj }
- vehObj:queueLuaCommand(string.format("partCondition.setPartPaints(%q, %s, 0)", partId, serialize(paintsArray)))
- end
- end
- end
-
  -- Build a clean paint object (avoid any metatable/serialization artifacts from Vue)
  local cleanPaint = {
  baseColor = {paints[1].baseColor[1], paints[1].baseColor[2], paints[1].baseColor[3], paints[1].baseColor[4] or 1},
@@ -396,9 +374,9 @@ applyPaint = function(inventoryId, paints, partPaints, totalCostCents)
  local cleanPaints = {cleanPaint, cleanPaint, cleanPaint}
 
  -- Step 1: Update config.paints in memory
- vehicleInfo.config.paints = {cleanPaint, cleanPaint, cleanPaint}
+ vehicleInfo.config.paints = cleanPaints
 
- -- Step 2: Sync partConditions — exactly like the console command that worked
+ -- Step 2: Sync partConditions
  local updatedCount = 0
  for partPath, partCondition in pairs(vehicleInfo.partConditions) do
  if partCondition.visualState and partCondition.visualState.paint then
@@ -421,25 +399,23 @@ applyPaint = function(inventoryId, paints, partPaints, totalCostCents)
  end
  log('I', logTag, 'applyPaint: updated ' .. updatedCount .. ' partConditions with baseColor=' .. serialize(cleanPaint.baseColor))
 
- -- Step 3: Clear sessions BEFORE anything else
+ -- Step 3: Clear BCM sessions
  paintSessionActive = false
  paintSessionInventoryId = nil
 
- -- Step 4: Notify Vue IMMEDIATELY (sets paintApplied flag, prevents onUnmounted revert)
+ -- Step 4: Notify Vue (sets paintApplied flag so onUnmounted won't revert)
  guihooks.trigger('BCMPaintResult', { success = true })
 
- -- Step 5: Spawn vehicle (reads updated config.paints + partConditions from memory)
- -- This is safe now because Vue's paintApplied flag prevents closePaint from being called
- career_modules_inventory.spawnVehicle(inventoryId, 2)
-
- -- Step 6: Mark dirty + save AFTER spawn
+ -- Step 5: Save to disk (NO spawn — visual paint from preview is already correct)
  career_modules_inventory.setVehicleDirty(inventoryId)
  career_saveSystem.saveCurrent({inventoryId})
 
- -- Step 7: Reset camera
+ -- Step 6: Close computer entirely — this avoids the paint-mode→desktop CSS transition
+ -- which resets vehicle materials. Going straight to game world preserves the preview paint.
  core_camera.resetCamera(0)
+ career_career.closeAllMenus()
 
- log('I', logTag, 'applyPaint: paint[1]=' .. serialize(paints[1] and paints[1].baseColor or {}))
+ log('I', logTag, 'applyPaint: paint[1]=' .. serialize(cleanPaint.baseColor))
 
  local partCount = partPaints and tableSize(partPaints) or 0
  log('I', logTag, 'applyPaint: Applied paint for inventoryId=' .. tostring(inventoryId) .. ' cost=' .. tostring(totalCostCents) .. ' cents, partPaints=' .. tostring(partCount))

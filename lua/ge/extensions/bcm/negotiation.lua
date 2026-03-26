@@ -1358,8 +1358,12 @@ M.onBCMNewGameDay = function(data)
  fireSessionUpdate(session)
  end
 
- -- 2. Deal expiry
- if session.dealReached and session.dealExpiresGameDay and session.dealExpiresGameDay <= gameDay and not session.dealCompleted then
+ -- 2. Deal expiry (skip if buyer is currently test-driving this listing)
+ local testDriveListingId = nil
+ if extensions.bcm_defects and extensions.bcm_defects.getActiveTestDriveListingId then
+ testDriveListingId = extensions.bcm_defects.getActiveTestDriveListingId()
+ end
+ if session.dealReached and session.dealExpiresGameDay and session.dealExpiresGameDay <= gameDay and not session.dealCompleted and listingId ~= testDriveListingId then
  session.dealReached = false
  session.dealPriceCents = nil
  session.dealExpiresGameDay = nil

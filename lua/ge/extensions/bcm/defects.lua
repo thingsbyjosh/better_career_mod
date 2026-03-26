@@ -429,11 +429,17 @@ stopTestDrive = function()
 
  activeTestDrive = nil
 
- -- Seller sends "how was it?" message to negotiation chat
+ -- Extend deal expiry if it was frozen during test drive — give player 1 extra day
  local session = bcm_negotiation and bcm_negotiation.getSession and bcm_negotiation.getSession(listingId)
+ local gameDay = getCurrentGameDay()
+ if session and session.dealReached and session.dealExpiresGameDay and session.dealExpiresGameDay <= gameDay then
+ session.dealExpiresGameDay = gameDay + 1
+ log('I', logTag, 'Extended deal expiry to day ' .. tostring(session.dealExpiresGameDay) .. ' after test drive for listing ' .. tostring(listingId))
+ end
+
+ -- Seller sends "how was it?" message to negotiation chat
  if session then
  local lang = getLanguage()
- local gameDay = getCurrentGameDay()
  session.messages = session.messages or {}
  local sellerMsg = {
  id = #session.messages + 1,

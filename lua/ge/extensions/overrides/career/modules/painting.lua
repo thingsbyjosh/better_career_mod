@@ -322,10 +322,19 @@ local function clearPaintingSession()
  originComputerId = nil
 end
 
+-- BCM: prepare vanilla painting state so close() can do the spawn.
+-- Sets the minimum state needed for close(true) to work without side effects.
+local function preparePaintingSession(_inventoryId, _originComputerId)
+ paintingActive = true
+ inventoryId = _inventoryId
+ originComputerId = _originComputerId
+end
+
 M.start = start
 M.apply = apply
 M.close = close
 M.clearPaintingSession = clearPaintingSession
+M.preparePaintingSession = preparePaintingSession
 M.getPaintData = getPaintData
 M.setPaints = setPaints
 M.getFactoryPaint = getFactoryPaint
