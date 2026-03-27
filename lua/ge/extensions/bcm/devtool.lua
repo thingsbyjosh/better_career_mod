@@ -1470,6 +1470,10 @@ exportGaragesJson = function(levelName, garageList)
  es = (g.flavorText and g.flavorText.es ~= "") and g.flavorText.es or "Propiedad embargada por el Condado de Belasco."
  },
  isStarterGarage = g.isStarterGarage or false,
+ center = g.center or nil,
+ zoneVertices = g.zoneVertices or nil,
+ parkingSpots = g.parkingSpots or nil,
+ computerPoint = g.computerPoint or nil,
  dropOffZone = g.dropOffZone or nil
  }
 

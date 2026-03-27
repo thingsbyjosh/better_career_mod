@@ -1074,7 +1074,13 @@ checkCitizenReports = function(dtSim)
  end
  end
 
- -- Activate or refresh report timer
+ -- Activate or refresh report timer (30% chance citizens actually report)
+ if triggered and not reportActive then
+ if math.random() > 0.30 then
+ log('D', logTag, '[CITIZEN REPORT] Detected but not reported (70% ignore chance)')
+ return
+ end
+ end
  if triggered then
  local wasActive = reportActive
  reportActive = true

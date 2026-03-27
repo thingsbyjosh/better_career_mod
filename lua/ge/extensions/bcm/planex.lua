@@ -688,11 +688,12 @@ packHasMechanic = function(pack, mechName)
  return false
 end
 
--- Estimate drive time in seconds for urgent timer calculation
--- Uses 45 km/h average speed = 0.75 km/min (mix of city + highway)
+-- Estimate drive time in seconds for urgent timer (vanilla formula).
+-- Used as initial fallback in spawnPlanexCargoAtDepot; overridden per-stop in onArriveAtDepot.
+-- Vanilla: (distanceM / 13) + 30-60s buffer. We use totalDistanceKm (includes depot-to-first-stop).
 estimateDriveSeconds = function(pack)
  local totalKm = pack.totalDistanceKm or 10
- return (totalKm / 0.75) * 60 -- seconds
+ return (totalKm * 1000 / 13) + 60 -- seconds (vanilla formula with fixed 60s buffer)
 end
 
 -- Speed limit infraction check — called every 1s from onUpdate when en_route + speedlimit mechanic
@@ -1783,9 +1784,11 @@ setStopOrder = function(newOrder)
 end
 
 -- Recalculate total route distance from current stop order (pending stops only)
+-- Starts from depot position so distance includes depot-to-first-stop
 recalculateRouteDistance = function(pack)
  local totalDist = 0
- local prevPos = nil
+ -- Start from depot position (distance includes depot-to-first-stop)
+ local prevPos = getDepotPosition(pack.warehouseId)
  for _, orderIdx in ipairs(pack.stopOrder or {}) do
  local stop = pack.stops[orderIdx]
  if stop and stop.status == 'pending' and stop.pos then
@@ -1806,8 +1809,14 @@ end
 -- e.g. { [1] = 3, [4] = 7 } = stop 3 first, stop 7 fourth, rest optimized
 -- nil = use pack.pinnedPositions (set by appendDepotStop / player drag)
 -- If pack.pinnedPositions also nil, pure nearest-neighbor.
-optimizeStopOrder = function(pack, pinnedPositions)
+-- @param pack: the pack to optimize
+-- @param pinnedPositions: (optional) table { [position] = stopIndex } — see header comment
+-- @param opts: (optional) table { fromPlayer = true } to use player position as NN start
+-- Default (fromPlayer=false/nil): starts NN from depot (for pool generation / pre-accept)
+-- fromPlayer=true: starts NN from current player position (for mid-route "Optimise route")
+optimizeStopOrder = function(pack, pinnedPositions, opts)
  if not pack or not pack.stops then return end
+ opts = opts or {}
 
  local pins = pinnedPositions or pack.pinnedPositions or {}
 
@@ -1825,11 +1834,13 @@ optimizeStopOrder = function(pack, pinnedPositions)
  end
 
  -- Identify which pending stops are pinned and which are free
+ -- tonumber() keys: pinnedPositions may have string keys from JSON persistence
  local pinnedSet = {} -- stopIndex → true (pinned somewhere)
  local positionToPinned = {} -- position → stopIndex
  for pos, stopIdx in pairs(pins) do
+ local numPos = tonumber(pos) or pos
  if pack.stops[stopIdx] and pack.stops[stopIdx].status ~= 'delivered' then
- positionToPinned[pos] = stopIdx
+ positionToPinned[numPos] = stopIdx
  pinnedSet[stopIdx] = true
  end
  end
@@ -1843,16 +1854,30 @@ optimizeStopOrder = function(pack, pinnedPositions)
 
  -- Build pairwise distance matrix for ALL pending stops (cached road distances)
  local dists = {}
- local playerVeh = getPlayerVehicle(0)
- local playerPos = playerVeh and playerVeh:getPosition()
 
- local playerDists = {}
+ -- Starting point for nearest-neighbor:
+ -- fromPlayer=true → player position (mid-route reoptimize)
+ -- fromPlayer=false → depot position (pool generation / pre-accept)
+ local startPos = nil
+ if opts.fromPlayer then
+ local playerVeh = getPlayerVehicle(0)
+ startPos = playerVeh and playerVeh:getPosition()
+ end
+ if not startPos then
+ startPos = getDepotPosition(pack.warehouseId)
+ end
+ if not startPos then
+ local playerVeh = getPlayerVehicle(0)
+ startPos = playerVeh and playerVeh:getPosition()
+ end
+
+ local startDists = {}
  for _, idx in ipairs(pendingIndices) do
  local stop = pack.stops[idx]
- if stop.pos and playerPos then
- playerDists[idx] = distanceBetween(playerPos, stop.pos)
+ if stop.pos and startPos then
+ startDists[idx] = distanceBetween(startPos, stop.pos)
  else
- playerDists[idx] = math.huge
+ startDists[idx] = math.huge
  end
  end
 
@@ -1915,7 +1940,7 @@ optimizeStopOrder = function(pack, pinnedPositions)
  if currentIdx then
  d = dists[currentIdx .. "|" .. idx] or math.huge
  else
- d = playerDists[idx] or math.huge
+ d = startDists[idx] or math.huge
  end
  if d < bestDist then
  bestDist = d
@@ -1944,7 +1969,10 @@ optimizeStopOrder = function(pack, pinnedPositions)
 
  pack.stopOrder = fullOrder
  recalculateRouteDistance(pack)
+ -- Only update GPS if this is the active accepted pack (not during pool generation)
+ if pack.status == 'accepted' then
  setGPSToRoute(pack)
+ end
 
  -- Log summary
  local pinnedCount = 0
@@ -2819,6 +2847,8 @@ buildRouteFromSpecial = function(sDef, sKey, candidates)
  end
  end
  end
+ -- Include depot-to-first-stop in total route distance (timer + display)
+ totalDistanceM = totalDistanceM + depotDistanceM
 
  local requiredLevel = (sDef.tier - 1) * 4 + 1
  local basePay = computePackPay(sDef.tier, #stops, totalDistanceM, {payMultiplier = sDef.payMultiplier or 1.0})
@@ -2995,6 +3025,8 @@ generatePool = function(rotationId)
  end
  end
  end
+ -- Include depot-to-first-stop in total route distance (timer + display)
+ totalDistanceM = totalDistanceM + depotDistanceM
 
  -- Required level: based on tier (tier 1=1, tier 2=5, tier 3=9, tier 4=13, tier 5=17)
  local requiredLevel = (tier - 1) * 4 + 1
@@ -3066,6 +3098,10 @@ generatePool = function(rotationId)
  -- Add depot as last stop (for depot-return routes)
  appendDepotStop(pack, candidates)
 
+ -- Pre-optimize stop order so the UI shows an optimized route before the user accepts.
+ -- User can reorder manually before/after accepting; onArriveAtDepot respects current order.
+ optimizeStopOrder(pack)
+
  table.insert(pool, pack)
  tierCounts[tier] = (tierCounts[tier] or 0) + 1
  ::continue::
@@ -3093,6 +3129,7 @@ generatePool = function(rotationId)
  log('D', logTag, string.format('Special pack %s: no pickups — depot return disabled', specialPack.id))
  end
  appendDepotStop(specialPack, candidates)
+ optimizeStopOrder(specialPack)
  table.insert(pool, specialPack)
  end
  end
@@ -3526,10 +3563,11 @@ onArriveAtDepot = function()
  career_modules_delivery_general.startDeliveryMode()
  end
  -- Parcels already in vehicle (vanilla "Pick Up" moved them)
- -- Always optimize — pinnedPositions (from player drag + depot pin) are respected by optimizeStopOrder
+ -- Re-optimize free (non-pinned) stops from depot position; pinned stops stay fixed.
+ -- The user may have reordered pre-accept — pins preserve their choices, free stops get best route from depot.
  optimizeStopOrder(pack)
  log('I', logTag, 'onArriveAtDepot: optimized order: ' .. table.concat(pack.stopOrder or {}, ',')
- .. (pack.pinnedPositions and ' (with player pins)' or ''))
+ .. (pack.pinnedPositions and (' (with player pins)') or ''))
  -- Log stop details for debugging
  for i, s in ipairs(pack.stops) do
  log('I', logTag, string.format(' Stop %d: %s (facId=%s, isDepot=%s, pickups=%d)',
@@ -3543,14 +3581,61 @@ onArriveAtDepot = function()
  extensions.hook("onBCMTutorialDepotPickup")
  end
 
- -- Temperature mechanic: set per-stop countdown timers
- -- Timer uses distanceKm / 13 * 60 seconds (vanilla formula) scaled by planexTimeMultiplier
- if packHasMechanic(pack, 'temperature') then
+ -- Compute per-stop cumulative distance from depot (used by urgent + temperature timers)
+ -- This runs AFTER optimizeStopOrder so distances match the actual driving order.
+ local depotPos = getDepotPosition(pack.warehouseId)
  local timeMult = (bcm_settings and bcm_settings.getSetting('planexTimeMultiplier')) or 1.0
- for i, stop in ipairs(pack.stops) do
- if stop.status == 'pending' then
- local distKm = stop.distanceKm or 1
- local distSecs = (distKm / 13) * 60 -- vanilla formula
+ local cumulativeDistM = 0
+ local prevPos = depotPos
+ for _, orderIdx in ipairs(pack.stopOrder or {}) do
+ local stop = pack.stops[orderIdx]
+ if stop and stop.status == 'pending' and stop.pos then
+ if prevPos then
+ cumulativeDistM = cumulativeDistM + distanceBetween(prevPos, stop.pos)
+ end
+ stop.cumulativeDistM = cumulativeDistM
+ stop.cumulativeDistKm = math.floor((cumulativeDistM / 1000) * 10) / 10
+ prevPos = stop.pos
+ end
+ end
+
+ -- Urgent mechanic: recalculate per-stop timers using vanilla formula with cumulative distance from depot.
+ -- Each stop gets a timer proportional to how far it is along the route (depot → stop).
+ -- Vanilla formula: (distanceM / 13) + 30 + random(30). Scaled by tierFactor + planexTimeMultiplier.
+ if packHasMechanic(pack, 'urgent') then
+ local tierFactor = URGENT_TIER_FACTORS[pack.tier] or 1.3
+ for _, orderIdx in ipairs(pack.stopOrder or {}) do
+ local stop = pack.stops[orderIdx]
+ if stop and stop.status == 'pending' and stop.mechanic == 'urgent' and stop.parcelId then
+ local cargo = career_modules_delivery_parcelManager.getCargoById(stop.parcelId)
+ if cargo and cargo.modifiers then
+ local distM = stop.cumulativeDistM or 1000
+ local time = ((distM / 13) + 30 + 30 * math.random()) * tierFactor * timeMult
+ for _, mod in ipairs(cargo.modifiers) do
+ if mod.type == 'timed' then
+ mod.timeUntilDelayed = time
+ mod.timeUntilLate = time * 1.25 + 15
+ log('I', logTag, string.format(' Urgent timer updated: stop %s distM=%.0f time=%.0fs delayed=%.0fs late=%.0fs',
+ stop.displayName or stop.facId, distM, time, mod.timeUntilDelayed, mod.timeUntilLate))
+ end
+ end
+ -- Update originalDistance so vanilla displays correct distance
+ if cargo.data then
+ cargo.data.originalDistance = distM
+ end
+ end
+ end
+ end
+ end
+
+ -- Temperature mechanic: set per-stop countdown timers
+ -- Uses cumulative distance from depot (vanilla formula) scaled by planexTimeMultiplier
+ if packHasMechanic(pack, 'temperature') then
+ for _, orderIdx in ipairs(pack.stopOrder or {}) do
+ local stop = pack.stops[orderIdx]
+ if stop and stop.status == 'pending' then
+ local distM = stop.cumulativeDistM or 1000
+ local distSecs = (distM / 13) + 30 + 30 * math.random() -- vanilla formula
  local duration = distSecs * timeMult
  stop.tempTimerExpiry = os.clock() + duration
  stop.tempTimerDuration = duration -- store for UI display
@@ -3721,8 +3806,8 @@ completeStop = function(stopIndex)
  broadcastState()
  -- If no pickups, checkDepotReturn will complete by proximity on next tick
  else
- -- Re-optimize remaining stops (pins are preserved by optimizeStopOrder)
- optimizeStopOrder(pack)
+ -- Re-optimize free (non-pinned) stops from player position; pinned stops stay fixed
+ optimizeStopOrder(pack, nil, { fromPlayer = true })
  broadcastState()
  end
  end)
@@ -4540,6 +4625,14 @@ initModule = function()
  return
  end
 
+ -- While traveling to depot, GPS should point to depot — not delivery stops
+ if planexState.routeState == 'traveling_to_depot' then
+ if pack.warehouseId then
+ setGPSToDepot(pack.warehouseId)
+ end
+ return
+ end
+
  -- Pinned positions use ABSOLUTE route positions (1-based).
  -- -1 = sentinel for "last position" (depot).
  -- Example: pinnedPositions = { [5] = 3, [-1] = 8 }
@@ -4568,9 +4661,10 @@ initModule = function()
  end
 
  -- Resolve -1 sentinel to actual last position
+ -- tonumber() keys: pinnedPositions may have string keys from JSON persistence
  local resolvedPins = {}
  for pos, stopIdx in pairs(pins) do
- local resolved = pos
+ local resolved = tonumber(pos) or pos
  if resolved == -1 then resolved = totalStops end
  resolvedPins[resolved] = stopIdx
  end
@@ -5137,6 +5231,7 @@ injectTutorialPack = function()
  estimatedSlots = 0, -- updated by generateCargoForPool when vehicle selected
  -- Tutorial-specific
  isTutorialPack = true,
+ hasDepotReturn = false,
  }
 
  -- Inject into pool as available — player accepts through normal UI flow
@@ -5237,6 +5332,30 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
  loanerIdleWarningShown = false
  guihooks.trigger('BCMPlanexLoanerIdleTimer', { remaining = 0, total = LOANER_IDLE_TIMEOUT })
  broadcastState()
+ end
+ end
+
+ -- Loaner distance check: despawn if player is >200m away and NOT in the loaner
+ -- Only check during idle timer (post-route) — NOT during traveling_to_depot or en_route
+ if planexState.loanerVehId and planexState.loanerIdleTimer then
+ local playerVehId = be:getPlayerVehicleID(0) or -1
+ if playerVehId ~= planexState.loanerVehId then
+ local playerVeh = be:getObjectByID(playerVehId)
+ local loanerObj = be:getObjectByID(planexState.loanerVehId)
+ if playerVeh and loanerObj then
+ local pp = playerVeh:getPosition()
+ local lp = loanerObj:getPosition()
+ local dist = pp:distance(lp)
+ if dist > 200 then
+ log('I', logTag, string.format('Loaner too far from player (%.0fm) — despawning', dist))
+ ui_message("PlanEx loaner returned (too far).", 5, "planexLoanerFar")
+ despawnLoaner()
+ planexState.loanerIdleTimer = nil
+ planexState.loanerSelectedTier = nil
+ loanerIdleWarningShown = false
+ broadcastState()
+ end
+ end
  end
  end
 

@@ -4,16 +4,16 @@
  "deletedGarageIds":[
  "bcmGarage_rural",
  "bcmGarage_suburban",
- "bcmGarage_highway",
- "bcmGarage_starter",
- "bcmGarage_executive",
  "bcmGarage_estate",
- "bcmGarage_hillside",
+ "bcmGarage_industrial",
+ "bcmGarage_executive",
+ "bcmGarage_highway",
  "bcmGarage_downtown",
+ "bcmGarage_hillside",
  "bcmGarage_penthouse",
  "bcmGarage_commercial",
  "bcmGarage_beachfront",
- "bcmGarage_industrial"
+ "bcmGarage_starter"
  ],
  "deliveryFacilities":[
  {
@@ -186,7 +186,7 @@
  }
  ],
  "deliveryWizardStep":6,
- "devtoolMode":"garages",
+ "devtoolMode":"cameras",
  "garages":[
  {
  "baseCapacity":2,
@@ -3300,7 +3300,7 @@
  ]
  }
  ],
- "lastSaved":1774079422,
+ "lastSaved":1774631487,
  "levelName":"west_coast_usa",
  "radarSpots":[
  {
@@ -3390,6 +3390,6 @@
  ],
  "selectedDeliveryIdx":2,
  "selectedIdx":1,
- "selectedRadarSpotIdx":3,
+ "selectedRadarSpotIdx":1,
  "wizardStep":5
 }

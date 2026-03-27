@@ -76,12 +76,24 @@ requestPackDetail = function(packId)
  guihooks.trigger('BCMPlanexPackDetail', { pack = pack })
 end
 
-acceptPack = function(packId, vehicleCapacity, inventoryId, pinsJson)
+acceptPack = function(packId, vehicleCapacity, inventoryId, pinsJson, orderJson)
  if not bcm_planex then return end
  -- Set vehicle capacity on the pack so cargo generation uses it
  local pack = bcm_planex.getPackById(packId)
  if pack then
  pack.vehicleCapacity = tonumber(vehicleCapacity) or 0
+ -- Apply stopOrder from player's pre-accept reorder (overrides generation order)
+ if orderJson and orderJson ~= '' then
+ local order = jsonDecode(orderJson)
+ if order and type(order) == 'table' and #order > 0 then
+ local intOrder = {}
+ for _, v in ipairs(order) do
+ table.insert(intOrder, math.floor(tonumber(v) or 0))
+ end
+ pack.stopOrder = intOrder
+ log('I', logTag, 'acceptPack: player stopOrder applied: ' .. table.concat(intOrder, ','))
+ end
+ end
  -- Apply pinned positions from player's pre-accept drag reorder
  -- pinsJson is { "2": 7, "5": 3 } = position 2 → stop 7, position 5 → stop 3
  if pinsJson and pinsJson ~= '' then
@@ -92,7 +104,7 @@ acceptPack = function(packId, vehicleCapacity, inventoryId, pinsJson)
  for posStr, stopIdx in pairs(pins) do
  local pos = math.floor(tonumber(posStr) or 0)
  local idx = math.floor(tonumber(stopIdx) or 0)
- if pos > 0 and idx > 0 then
+ if pos ~= 0 and idx > 0 then -- pos can be -1 (depot sentinel)
  pack.pinnedPositions[pos] = idx
  table.insert(pinLog, string.format('pos %d→stop %d', pos, idx))
  end
@@ -168,9 +180,12 @@ optimizeRoute = function(pinnedJson)
  local pack = bcm_planex.getActivePack and bcm_planex.getActivePack()
  if pack then
  pack.hasCustomOrder = false -- clear manual override, let optimizer take over
- bcm_planex.optimizeStopOrder(pack, pinned)
+ -- Mid-route: optimize from player position. Pre-accept/traveling: optimize from depot.
+ local state = bcm_planex.getRouteState and bcm_planex.getRouteState() or 'idle'
+ local fromPlayer = (state == 'en_route' or state == 'returning')
+ bcm_planex.optimizeStopOrder(pack, pinned, { fromPlayer = fromPlayer })
  bcm_planex.broadcastState()
- log('I', logTag, 'optimizeRoute: route optimized' .. (pinned and (' with ' .. #pinned .. ' pinned') or ''))
+ log('I', logTag, 'optimizeRoute: route optimized (fromPlayer=' .. tostring(fromPlayer) .. ')' .. (pinned and (' with ' .. #pinned .. ' pinned') or ''))
  end
 end
 
@@ -313,11 +328,19 @@ requestGarageVehicles = function()
  local loanerInvId = bcm_planex and bcm_planex.getLoanerInventoryId and bcm_planex.getLoanerInventoryId()
 
  for invId, veh in pairs(allVehicles) do
- -- Only list vehicles that are spawned and NOT the PlanEx loaner
+ -- Only list owned vehicles that are spawned, NOT the PlanEx loaner, and in a garage area
  if invId == loanerInvId then goto continueVeh end
+ if veh.owned == false then goto continueVeh end
  local vehObjId = idMap[invId]
  local vehObj = vehObjId and be:getObjectByID(vehObjId)
  if vehObj then
+ -- Filter: vehicle must be physically inside an owned garage area
+ local vehPos = vehObj:getPosition()
+ if vehPos and bcm_garages and bcm_garages.isPositionInOwnedGarage then
+ local inGarage = bcm_garages.isPositionInOwnedGarage(vehPos)
+ if not inGarage then goto continueVeh end
+ end
+
  -- Build nice name from model info if niceName missing
  local niceName = veh.niceName
  if not niceName and veh.model then

@@ -25,6 +25,7 @@ local getGarageCount
 local grantStarterGarageIfNeeded
 local onCareerModulesActivated
 local discoverAllGarages
+local isPositionInOwnedGarage
 
 -- ============================================================================
 -- Private state
@@ -244,6 +245,52 @@ getFreeSlots = function(garageId)
  return capacity - #vehicles
 end
 
+-- Check if a world position is inside any owned garage area.
+-- Uses zoneVertices (2D point-in-polygon) if available, else center + 200m radius fallback.
+-- Returns garageId if inside, nil otherwise.
+isPositionInOwnedGarage = function(pos)
+ if not bcm_properties or not pos then return nil end
+ local ownedProperties = bcm_properties.getAllOwnedProperties() or {}
+ local px = pos.x or pos[1] or 0
+ local py = pos.y or pos[2] or 0
+
+ for _, property in ipairs(ownedProperties) do
+ if property.type == "garage" then
+ local def = bcmGarageConfig[property.id]
+ if def then
+ -- Try zone polygon (2D point-in-polygon, ignore Z)
+ local verts = def.zoneVertices
+ if verts and #verts >= 3 then
+ local inside = false
+ local n = #verts
+ local j = n
+ for i = 1, n do
+ local xi = verts[i][1] or 0
+ local yi = verts[i][2] or 0
+ local xj = verts[j][1] or 0
+ local yj = verts[j][2] or 0
+ if ((yi > py) ~= (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi) then
+ inside = not inside
+ end
+ j = i
+ end
+ if inside then return property.id end
+ elseif def.center then
+ -- Fallback: 200m radius from center
+ local cx = def.center[1] or 0
+ local cy = def.center[2] or 0
+ local dx = px - cx
+ local dy = py - cy
+ if (dx * dx + dy * dy) < (200 * 200) then
+ return property.id
+ end
+ end
+ end
+ end
+ end
+ return nil
+end
+
 -- Returns the count of BCM-owned garages (type == "garage").
 getGarageCount = function()
  if not bcm_properties then return 0 end
@@ -353,6 +400,7 @@ M.getGarageDisplayName = getGarageDisplayName
 M.getVehiclesInGarage = getVehiclesInGarage
 M.getFreeSlots = getFreeSlots
 M.getGarageCount = getGarageCount
+M.isPositionInOwnedGarage = isPositionInOwnedGarage
 
 -- Starter and dev
 M.grantStarterGarageIfNeeded = grantStarterGarageIfNeeded
