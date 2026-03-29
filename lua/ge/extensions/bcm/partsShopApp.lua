@@ -240,7 +240,7 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents)
  value = math.floor((item.price or 0) / 2),
  slot = item.slot or '',
  partCondition = {},
- description = { description = item.partLabel or item.partName or '' },
+ description = item.partLabel or item.partName or '',
  partPath = (item.slot or '') .. (item.partName or ''),
  },
  deliveryType or 'pickup',
@@ -302,7 +302,24 @@ end
 
 M.installPart = function(partShopId)
  if career_modules_partShopping then
- career_modules_partShopping.installPartByPartShopId(tonumber(partShopId))
+ local id = tonumber(partShopId)
+ -- Debug: log what we're about to install
+ local partsInShop = career_modules_partShopping.getPartsInShop()
+ if partsInShop then
+ for _, p in ipairs(partsInShop) do
+ if p.partShopId == id then
+ log('I', logTag, 'installPart: id=' .. tostring(id)
+ .. ' name=' .. tostring(p.name)
+ .. ' slot=' .. tostring(p.containingSlot)
+ .. ' desc=' .. tostring(type(p.description) == 'table' and p.description.description or p.description))
+ break
+ end
+ end
+ end
+ local ok, err = pcall(career_modules_partShopping.installPartByPartShopId, id)
+ if not ok then
+ log('E', logTag, 'installPart FAILED for id=' .. tostring(id) .. ': ' .. tostring(err))
+ end
  end
 end
 
@@ -312,7 +329,13 @@ end
 
 M.removePart = function(slot)
  if career_modules_partShopping then
- career_modules_partShopping.removePartBySlot(slot)
+ log('I', logTag, 'removePart: slot=' .. tostring(slot))
+ local ok, err = pcall(career_modules_partShopping.removePartBySlot, slot)
+ if not ok then
+ log('E', logTag, 'removePart FAILED for slot=' .. tostring(slot) .. ': ' .. tostring(err))
+ end
+ -- Refresh shop data after remove so next install gets fresh partShopIds
+ pcall(career_modules_partShopping.sendShoppingDataToUI)
  end
 end
 

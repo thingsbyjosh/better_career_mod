@@ -32,6 +32,7 @@ local onSaveCurrentSaveSlot
 local onPlayerAttributesChanged
 local onUpdate
 local flushPendingTransaction
+local resolveLabel
 local getDescriptionFromReason
 
 -- Private state
@@ -498,6 +499,15 @@ loadBankData = function()
  end
  end
 
+ -- Migrate corrupted descriptions (tables from vanilla i18n labels)
+ for accountId, txnList in pairs(transactions) do
+ for _, txn in ipairs(txnList) do
+ if type(txn.description) ~= 'string' then
+ txn.description = resolveLabel(txn.description) or ""
+ end
+ end
+ end
+
  -- Migrate legacy transactions without gameTime
  local BASE_DAY_LENGTH = 1800 -- From timeSystem (30 min real = 1 game day)
  for accountId, txnList in pairs(transactions) do
@@ -523,12 +533,54 @@ loadBankData = function()
  end
 end
 
--- Extract description from reason parameter (from phoneTransactions.lua)
+-- Resolve a vanilla i18n label (string or table) into a readable string.
+-- Vanilla sends labels as either plain strings or tables like:
+-- {txt = "ui.career.milestones.claimedRewardsFor", context = {milestoneName = "Moneymaker"}}
+-- {txt = "ui.career.milestones.claimedRewardsFor", context = {milestoneName = {txt = "ui.career.skillSemicolon", context = {branch = "ui.career.logistics.delivery.name"}}}}
+resolveLabel = function(label)
+ if type(label) == 'string' then
+ -- Translate known vanilla i18n keys to readable text
+ if label == "ui.career.milestones.claimedRewardsFor" then
+ return "Milestone Reward"
+ end
+ return label
+ end
+
+ if type(label) ~= 'table' then
+ return nil
+ end
+
+ -- Extract milestone name from context
+ local ctx = label.context
+ local milestoneName = ctx and ctx.milestoneName
+ local name = nil
+ if type(milestoneName) == 'string' then
+ name = milestoneName
+ elseif type(milestoneName) == 'table' then
+ -- Nested i18n: {txt = "ui.career.skillSemicolon", context = {branch = "ui.career.logistics.delivery.name"}}
+ -- Use the branch as display name, strip the "ui.career." prefix
+ local branch = milestoneName.context and milestoneName.context.branch
+ if type(branch) == 'string' then
+ name = branch:gsub("^ui%.career%.", "")
+ end
+ end
+
+ if name then
+ return "Milestone Reward: " .. name
+ end
+
+ return "Milestone Reward"
+end
+
+-- Extract description from reason parameter
 getDescriptionFromReason = function(change, reason)
  local amount = change.money or 0
  if not reason then
  return amount > 0 and "Income" or "Purchase"
  end
+
+ -- Resolve label (handles both strings and vanilla i18n tables)
+ local label = resolveLabel(reason.label)
 
  -- Convert tags array to lookup dict
  local tagsRaw = reason.tags or {}
@@ -539,32 +591,32 @@ getDescriptionFromReason = function(change, reason)
 
  -- Vehicle purchase
  if tags.vehicleBought then
- return reason.label or "Vehicle Purchase"
+ return label or "Vehicle Purchase"
  end
 
  -- Insurance changes
- if reason.reason == "insuranceChange" or (type(reason.label) == 'string' and reason.label:find("Insurance")) then
- return reason.label or "Insurance"
+ if reason.reason == "insuranceChange" or (type(label) == 'string' and label:find("Insurance")) then
+ return label or "Insurance"
  end
 
  -- Buying-related
  if tags.buying then
- return reason.label or "Purchase"
+ return label or "Purchase"
  end
 
  -- Mission/delivery rewards
  if tags.gameplay or tags.delivery or tags.mission then
- return reason.label or "Mission Reward"
+ return label or "Mission Reward"
  end
 
  -- Repair costs
  if tags.repair then
- return reason.label or "Repair"
+ return label or "Repair"
  end
 
  -- Fallback
- if reason.label and reason.label ~= "" then
- return reason.label
+ if label and label ~= "" then
+ return label
  end
 
  return amount > 0 and "Income" or "Purchase"
