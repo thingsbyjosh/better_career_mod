@@ -17,6 +17,7 @@ angular.module('beamng.stuff')
  policeSpawnMode: 'flexible',
  policeFlexMin: 1,
  policeFlexMax: 4,
+ policePresenceCycle: 45,
  pursuitHudEnabled: true,
  turboEncabulator: false,
  planexTimeMultiplier: 1.0,
@@ -43,6 +44,13 @@ angular.module('beamng.stuff')
  if ($scope.settings.policeSpawnMode === value) return;
  $scope.settings.policeSpawnMode = value;
  bngApi.engineLua("extensions.bcm_settings.setSetting('policeSpawnMode', '" + value + "')");
+ };
+
+ // Set presence cycle interval
+ $scope.setPresenceCycle = function(value) {
+ if ($scope.settings.policePresenceCycle === value) return;
+ $scope.settings.policePresenceCycle = value;
+ bngApi.engineLua("extensions.bcm_settings.setSetting('policePresenceCycle', " + value + ")");
  };
 
  // Set police flex min/max (integer sliders)
@@ -77,7 +85,7 @@ angular.module('beamng.stuff')
  }
  }
  // Clamp flex values to valid range (may be corrupted from old tutorial approach)
- if ($scope.settings.policeFlexMin < 1) $scope.settings.policeFlexMin = 1;
+ if ($scope.settings.policeFlexMin < 0) $scope.settings.policeFlexMin = 0;
  if ($scope.settings.policeFlexMax < 2) $scope.settings.policeFlexMax = 4;
  }
  $scope.loaded = true;
@@ -118,6 +126,23 @@ angular.module('beamng.stuff')
 
  $scope.cancelResetTutorials = function() {
  $scope.resetTutorialsConfirming = false;
+ };
+
+ // Full tutorial reset (linear tutorial) — two-step confirmation flow
+ $scope.resetFullTutorialConfirming = false;
+
+ $scope.resetFullTutorial = function() {
+ if (!$scope.hasActiveSave) return;
+ if ($scope.resetFullTutorialConfirming) {
+ $scope.resetFullTutorialConfirming = false;
+ bngApi.engineLua("extensions.bcm_tutorial.resetFullTutorial()");
+ } else {
+ $scope.resetFullTutorialConfirming = true;
+ }
+ };
+
+ $scope.cancelResetFullTutorial = function() {
+ $scope.resetFullTutorialConfirming = false;
  };
 
  // Set a preset-type setting (timeSpeed, nightDuration, seasonLock)

@@ -38,7 +38,7 @@ local calcRealDateGameDays
 -- ============================================================================
 local logTag = 'bcm_timeSystem'
 
-local START_EPOCH = {year = 2026, month = 3, day = 15} -- Epoch year for date calc (new saves start on real OS date)
+local START_EPOCH = {year = 2026, month = 5, day = 15} -- Fallback start date when OS date unavailable (May 15)
 local START_TOD = 0.2083 -- 17:00 (5 PM) as tod.time: ((17-12)%24)/24
 
 local DAYS_PER_SEASON = 14
@@ -98,12 +98,12 @@ end
 local BASE_DAY_LENGTH = 5760
 
 -- Night range in tod.time (0 = noon, 0.5 = midnight)
--- ~6 PM = tod 0.25, ~7 AM = tod 0.7917
+-- ~6 PM = tod 0.25, ~6 AM = tod 0.75
 local NIGHT_THRESHOLD_START = 0.25
-local NIGHT_THRESHOLD_END = 0.7917
+local NIGHT_THRESHOLD_END = 0.75
 
--- Night skip uses very high nightScale to fast-forward
-local NIGHT_SKIP_SCALE = 100
+-- Night skip: boost speedMultiplier to this value during night hours
+local NIGHT_SKIP_SPEED = 100
 
 -- Max broadcast rate (seconds between broadcasts at high speed)
 local MAX_BROADCAST_INTERVAL = 0.5
@@ -132,6 +132,9 @@ local isInitialized = false
 local todSnapshot = nil -- Captures TOD state before radial menu opens (Phase 31 — FIX-02)
 local lastBroadcastMinute = -1
 local lastBroadcastTime = 0 -- os.clock() of last broadcast (for high-speed throttle)
+
+-- Night skip: stores the user's speedMultiplier before skip engaged
+local nightSkipSavedSpeed = nil
 
 -- Debug fast-forward state
 local fastForward = nil -- { targetDays, daysRemaining, originalSpeed, originalNightRatio, originalSkipNights }
@@ -273,11 +276,7 @@ applyTodSettings = function()
  -- Set night scale for asymmetric day/night duration
  -- nightScale > 1 makes night pass faster (shorter duration)
  -- nightRatio = 1/3 means night is 1/3 of day, so nightScale = 3.0
- if timeState.isNightSkipping then
- scenetree.tod.nightScale = NIGHT_SKIP_SCALE
- else
  scenetree.tod.nightScale = 1 / timeState.nightRatio
- end
 
  -- dayScale stays at 1.0 (baseline)
  scenetree.tod.dayScale = 1.0
@@ -337,21 +336,27 @@ onUpdate = function(dtReal, dtSim, dtRaw)
  -- Update last known tod
  timeState.lastTodTime = currentTod
 
- -- Night skip logic
- if timeState.skipNights then
+ -- Night skip logic: boost speedMultiplier during night hours
+ if timeState.skipNights and not fastForward then
  local inNight = isInNightRange(currentTod)
  if inNight and not timeState.isNightSkipping then
- -- Entering night: enable night skip
+ -- Entering night: save current speed and boost to skip speed
+ nightSkipSavedSpeed = timeState.speedMultiplier
+ timeState.speedMultiplier = NIGHT_SKIP_SPEED
  timeState.isNightSkipping = true
- log('D', logTag, 'Night skip activated')
+ log('D', logTag, 'Night skip activated (x' .. tostring(NIGHT_SKIP_SPEED) .. ')')
  elseif not inNight and timeState.isNightSkipping then
- -- Exiting night: disable night skip
+ -- Exiting night: restore original speed
+ timeState.speedMultiplier = nightSkipSavedSpeed or 1.0
+ nightSkipSavedSpeed = nil
  timeState.isNightSkipping = false
- log('D', logTag, 'Night skip deactivated')
+ log('D', logTag, 'Night skip deactivated, speed restored to x' .. tostring(timeState.speedMultiplier))
  end
  else
- -- skipNights disabled, ensure we're not stuck in skip mode
+ -- skipNights disabled or fastForward active: ensure we're not stuck in skip mode
  if timeState.isNightSkipping then
+ timeState.speedMultiplier = nightSkipSavedSpeed or timeState.speedMultiplier
+ nightSkipSavedSpeed = nil
  timeState.isNightSkipping = false
  end
  end
@@ -411,7 +416,9 @@ loadTimeData = function(newSave)
 
  -- New career: start on today's real-world date
  if newSave then
- local startDays = calcRealDateGameDays() or 0
+ -- Fallback: May 15 = day 134 (31+28+31+30+14) if OS date detection fails
+ local FALLBACK_DAY = 134
+ local startDays = calcRealDateGameDays() or FALLBACK_DAY
  timeState.gameTimeDays = startDays
  timeState.realTimeAccumSecs = 0
  timeState.speedMultiplier = 1.0
@@ -466,8 +473,8 @@ loadTimeData = function(newSave)
 
  log('I', logTag, 'Time data loaded. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
  else
- -- Fallback: no save file but not flagged as new (shouldn't happen)
- timeState.gameTimeDays = 0
+ -- Fallback: no save file but not flagged as new (shouldn't happen) — use May 15
+ timeState.gameTimeDays = 134
  timeState.realTimeAccumSecs = 0
  timeState.speedMultiplier = 1.0
  timeState.nightRatio = 10/48
@@ -530,6 +537,7 @@ resetModule = function()
  isInitialized = false
  lastBroadcastMinute = -1
  lastBroadcastTime = 0
+ nightSkipSavedSpeed = nil
 
  log('I', logTag, 'Time system reset')
 end
@@ -769,9 +777,15 @@ end
 
 M.setSpeedMultiplier = function(mult)
  mult = tonumber(mult) or 1.0
- timeState.speedMultiplier = math.max(0.25, math.min(8.0, mult))
+ mult = math.max(0.25, math.min(8.0, mult))
+ if timeState.isNightSkipping then
+ -- Update the saved speed so it restores to the new value after skip ends
+ nightSkipSavedSpeed = mult
+ else
+ timeState.speedMultiplier = mult
+ end
  applyTodSettings()
- log('I', logTag, 'Speed multiplier set to: ' .. tostring(timeState.speedMultiplier))
+ log('I', logTag, 'Speed multiplier set to: ' .. tostring(mult))
 end
 
 -- Debug: fast-forward N days at turbo speed (x20), then restore original settings.
@@ -856,7 +870,10 @@ end
 
 M.setSkipNights = function(skip)
  timeState.skipNights = skip and true or false
- if not timeState.skipNights then
+ if not timeState.skipNights and timeState.isNightSkipping then
+ -- Restore speed if currently in skip mode
+ timeState.speedMultiplier = nightSkipSavedSpeed or timeState.speedMultiplier
+ nightSkipSavedSpeed = nil
  timeState.isNightSkipping = false
  end
  applyTodSettings()

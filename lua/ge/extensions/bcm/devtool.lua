@@ -26,14 +26,17 @@ local deleteMarker
 local moveMarkerToCurrentPos
 local deleteGarage
 local updateGarageField
+local updateParkingSpotTag
 local loadWip
 local saveWip
+-- discardWip removed (dangerous — WIP is single source of truth)
 local loadExistingGarages
 local exportAll
 local triggerUIUpdate
 local exportFacilitiesJson
 local exportSitesJson
 local exportGaragesJson
+local exportGarageDeliveryReceiversJson
 local exportItemsLevelJson
 local writeNdjson
 local readNdjsonFile
@@ -78,6 +81,7 @@ local adjustDeliveryMarkerZ
 local deleteDeliveryFacility
 local updateDeliveryField
 local updateDeliverySpotLogisticType
+local updateDeliverySpotInspect
 local updateDeliveryGenerator
 local addDeliveryGenerator
 local removeDeliveryGenerator
@@ -89,6 +93,10 @@ local validateDeliveryFacility
 local drawAllDeliveryMarkers
 local cloneDeliveryFacilityConfig
 local getCloneSourceList
+local saveDeliveryTemplate
+local deleteDeliveryTemplate
+local createFromTemplate
+local selectTemplate
 
 -- ============================================================================
 -- Camera placement mode forward declarations
@@ -212,6 +220,8 @@ local devtoolMode = "garages" -- "garages" | "delivery" | "cameras" | "radarSpot
 local deliveryFacilities = {} -- array of delivery facility WIP objects
 local selectedDeliveryIdx = nil -- 1-based index into deliveryFacilities
 local deliveryWizardStep = 0 -- current wizard step (1=name, 2=center, 3=parking, 4=config, 5=review)
+local deliveryTemplates = {} -- { name => { facilityType, logisticGenerators, logisticMaxItems, spotConfig } }
+local selectedTemplateName = nil -- currently selected template for quick-create
 
 -- ============================================================================
 -- Camera placement mode state
@@ -609,13 +619,13 @@ addNewGarage = function()
  baseCapacity = 2,
  maxCapacity = 6,
  description = "",
- flavorText = { en = "", es = "" },
  isStarterGarage = false,
  isExisting = false
  }
  table.insert(garages, newGarage)
  selectedGarageIdx = #garages
  wizardStep = 1
+ saveWip()
  triggerUIUpdate()
  log('I', logTag, 'Added new garage at index ' .. #garages)
 end
@@ -667,10 +677,14 @@ placeMarkerFromUI = function()
  table.insert(garage.zoneVertices, getPlacementPosition())
  log('I', logTag, 'Placed zone vertex #' .. #garage.zoneVertices .. ' for ' .. (garage.name or garage.id))
  elseif wizardStep == 4 then
- -- Parking spot
+ -- Parking spot — drop to terrain and capture surface normal for ground alignment
+ local rawPos = getPlacementPosition()
+ local droppedPos, surfaceNormal = dropToTerrain(rawPos)
  table.insert(garage.parkingSpots, {
- pos = getPlacementPosition(),
- dir = getPlacementDirection()
+ pos = droppedPos,
+ dir = getPlacementDirection(),
+ normal = surfaceNormal,
+ tags = { ignoreOthers = true, perfect = true, forwards = true }
  })
  log('I', logTag, 'Placed parking spot #' .. #garage.parkingSpots .. ' for ' .. (garage.name or garage.id))
  elseif wizardStep == 5 then
@@ -758,8 +772,11 @@ moveMarkerToCurrentPos = function(markerType, index)
  end
  elseif markerType == "parking" and index then
  if index >= 1 and index <= #(garage.parkingSpots or {}) then
- garage.parkingSpots[index].pos = getPlacementPosition()
+ local rawPos = getPlacementPosition()
+ local droppedPos, surfaceNormal = dropToTerrain(rawPos)
+ garage.parkingSpots[index].pos = droppedPos
  garage.parkingSpots[index].dir = getPlacementDirection()
+ garage.parkingSpots[index].normal = surfaceNormal
  end
  elseif markerType == "dropoff" then
  garage.dropOffZone = {
@@ -780,11 +797,12 @@ deleteGarage = function(idx)
  if not idx or idx < 1 or idx > #garages then return end
 
  local garage = garages[idx]
- local name = garage.name or garage.id
+ local garageId = garage.id
+ local name = garage.name or garageId
 
- -- Track deleted existing garages so loadExistingGarages won't re-add them
- if garage.isExisting and garage.id then
- deletedGarageIds[garage.id] = true
+ -- Always track deleted IDs so exports filter them out
+ if garageId then
+ deletedGarageIds[garageId] = true
  end
 
  table.remove(garages, idx)
@@ -800,6 +818,7 @@ deleteGarage = function(idx)
  end
 
  saveWip()
+ exportAll()
  triggerUIUpdate()
  log('I', logTag, 'Deleted garage: ' .. name)
 end
@@ -809,14 +828,7 @@ updateGarageField = function(field, value)
  local garage = garages[selectedGarageIdx]
  if not garage then return end
 
- -- Handle nested flavorText fields
- if field == "flavorText.en" then
- garage.flavorText = garage.flavorText or {}
- garage.flavorText.en = tostring(value)
- elseif field == "flavorText.es" then
- garage.flavorText = garage.flavorText or {}
- garage.flavorText.es = tostring(value)
- elseif field == "basePrice" or field == "baseCapacity" or field == "maxCapacity" then
+ if field == "basePrice" or field == "baseCapacity" or field == "maxCapacity" then
  garage[field] = tonumber(value) or garage[field]
  elseif field == "isStarterGarage" then
  garage[field] = (value == true or value == "true")
@@ -828,6 +840,18 @@ updateGarageField = function(field, value)
  garage[field] = value
  end
 
+ saveWip()
+ triggerUIUpdate()
+end
+
+updateParkingSpotTag = function(spotIdx, tagName, enabled)
+ if not selectedGarageIdx then return end
+ local garage = garages[selectedGarageIdx]
+ if not garage then return end
+ local spot = garage.parkingSpots and garage.parkingSpots[spotIdx]
+ if not spot then return end
+ if not spot.tags then spot.tags = {} end
+ spot.tags[tagName] = enabled or nil
  saveWip()
  triggerUIUpdate()
 end
@@ -863,6 +887,9 @@ loadWip = function()
  -- Restore radar spot state
  radarSpots = data.radarSpots or {}
  selectedRadarSpotIdx = data.selectedRadarSpotIdx or nil
+ -- Restore delivery templates
+ deliveryTemplates = data.deliveryTemplates or {}
+ selectedTemplateName = data.selectedTemplateName or nil
  log('I', logTag, 'Restored WIP: ' .. #garages .. ' garages, ' .. #deliveryFacilities .. ' delivery facilities, ' .. #cameras .. ' cameras, ' .. #radarSpots .. ' radar spots from ' .. wipFilePath)
  else
  garages = {}
@@ -905,12 +932,18 @@ saveWip = function()
  selectedCameraIdx = selectedCameraIdx,
  cameraWizardStep = cameraWizardStep,
  radarSpots = radarSpots,
- selectedRadarSpotIdx = selectedRadarSpotIdx
+ selectedRadarSpotIdx = selectedRadarSpotIdx,
+ deliveryTemplates = deliveryTemplates,
+ selectedTemplateName = selectedTemplateName
  }
 
  jsonWriteFile(wipFilePath, data, true)
  log('D', logTag, 'Saved WIP: ' .. #garages .. ' garages, ' .. #deliveryFacilities .. ' delivery, ' .. #cameras .. ' cameras, ' .. #radarSpots .. ' radar spots to ' .. wipFilePath)
 end
+
+-- ============================================================================
+-- discardWip removed — WIP is single source of truth, deleting it destroys data
+-- that only exists there (propsAnchor, propsAngle, images.preview, etc.)
 
 -- ============================================================================
 -- Load existing garages from facilities JSON
@@ -973,7 +1006,6 @@ loadExistingGarages = function()
  baseCapacity = facilityGarage.capacity or 2,
  maxCapacity = (facilityGarage.capacity or 2) * 3,
  description = facilityGarage.description or "",
- flavorText = { en = "", es = "" },
  isStarterGarage = false,
  isExisting = true
  }
@@ -1049,7 +1081,9 @@ triggerUIUpdate = function()
  selectedCameraIdx = selectedCameraIdx,
  cameraWizardStep = cameraWizardStep,
  radarSpots = radarSpots,
- selectedRadarSpotIdx = selectedRadarSpotIdx
+ selectedRadarSpotIdx = selectedRadarSpotIdx,
+ deliveryTemplates = deliveryTemplates,
+ selectedTemplateName = selectedTemplateName
  })
  end
 end
@@ -1272,7 +1306,7 @@ exportFacilitiesJson = function(levelName, garageList)
  { keyLabel = "Vehicle & Parts Management" },
  { keyLabel = "Vehicle & Parts Shopping" }
  },
- description = "ui.career.computer.bigmapLabel.garage",
+ description = (g.description and g.description ~= "") and g.description or "ui.career.computer.bigmapLabel.garage",
  doors = {{ g.id .. "_area", g.id .. "_icon" }},
  functions = {
  vehicleInventory = true,
@@ -1388,12 +1422,24 @@ exportSitesJson = function(levelName, garageList)
 
  -- Parking spots
  for j, spot in ipairs(g.parkingSpots) do
- local dir = vec3(spot.dir[1], spot.dir[2], spot.dir[3])
- local quat = quatFromDir(dir)
+ local dir3 = vec3(spot.dir[1], spot.dir[2], spot.dir[3]):normalized()
+ -- Build quaternion aligned to terrain normal if available (same method as delivery export)
+ local quat
+ if spot.normal then
+ local up = vec3(spot.normal[1], spot.normal[2], spot.normal[3]):normalized()
+ local projFwd = dir3:cross(up):cross(up)
+ if projFwd:length() > 0.001 then
+ quat = quatFromDir(projFwd, up)
+ else
+ quat = quatFromDir(dir3, up)
+ end
+ else
+ quat = quatFromDir(dir3)
+ end
 
  local spotEntry = {
  color = {1, 1, 1},
- customFields = { names = {}, tags = {}, types = {}, values = {} },
+ customFields = { names = {}, tags = spot.tags or { ignoreOthers = true, perfect = true, forwards = true }, types = {}, values = {} },
  isMultiSpot = false,
  name = g.id .. "_parking" .. j,
  oldId = nextOldId,
@@ -1415,6 +1461,49 @@ exportSitesJson = function(levelName, garageList)
 
  writeJsonToMod(writePath, existing)
  log('I', logTag, 'Exported sites to ' .. writePath)
+end
+
+-- ============================================================================
+-- Export: delivery/bcm_garages.facilities.json (residential pattern)
+-- Registers garages as delivery receivers for bcm_parts cargo type.
+-- Uses multiDropOffSpotFilter by zone so parking spots auto-register.
+-- ============================================================================
+
+exportGarageDeliveryReceiversJson = function(levelName, garageList)
+ local writePath = getModLevelsPath(levelName) .. "/facilities/delivery/bcm_garages.facilities.json"
+ local existing = jsonReadFile(writePath) or { deliveryProviders = {} }
+
+ -- Build set of IDs being exported
+ local exportIds = {}
+ for _, g in ipairs(garageList) do
+ exportIds[g.id] = true
+ end
+
+ -- Filter out old entries with same IDs or deleted
+ local filtered = {}
+ for _, ep in ipairs(existing.deliveryProviders or {}) do
+ if not exportIds[ep.id] and not deletedGarageIds[ep.id] then
+ table.insert(filtered, ep)
+ end
+ end
+
+ -- Add new entries (residential pattern: receiver-only, no generators)
+ for _, g in ipairs(garageList) do
+ local entry = {
+ id = g.id,
+ name = g.name,
+ description = "BCM Garage - Parts receiver",
+ multiDropOffSpotFilter = {{ type = "byZone", zoneName = g.id }},
+ logisticTypesProvided = setmetatable({}, {__jsontype = "array"}),
+ logisticTypesReceived = { "bcm_parts" },
+ logisticGenerators = setmetatable({}, {__jsontype = "array"}),
+ }
+ table.insert(filtered, entry)
+ end
+
+ existing.deliveryProviders = filtered
+ writeJsonToMod(writePath, existing)
+ log('I', logTag, 'Exported ' .. #garageList .. ' delivery receivers to ' .. writePath)
 end
 
 -- ============================================================================
@@ -1465,10 +1554,6 @@ exportGaragesJson = function(levelName, garageList)
  },
  description = g.description or "",
  images = {},
- flavorText = {
- en = (g.flavorText and g.flavorText.en ~= "") and g.flavorText.en or "Property seized by Belasco County.",
- es = (g.flavorText and g.flavorText.es ~= "") and g.flavorText.es or "Propiedad embargada por el Condado de Belasco."
- },
  isStarterGarage = g.isStarterGarage or false,
  center = g.center or nil,
  zoneVertices = g.zoneVertices or nil,
@@ -1644,6 +1729,8 @@ exportAll = function()
  exportFacilitiesJson(levelName, toExport)
  exportSitesJson(levelName, toExport)
  exportGaragesJson(levelName, toExport)
+ exportGarageDeliveryReceiversJson(levelName, toExport) -- bcm_garages.facilities.json (bcm_parts receivers)
+ -- NOTE: bcm_depots.facilities.json is written by exportAllDelivery(), not here
  exportItemsLevelJson(levelName, toExport)
 
  -- Clean stale userdata config files that could override mod versions
@@ -1681,6 +1768,7 @@ addNewDeliveryFacility = function()
  name = "",
  description = "",
  associatedOrganization = "",
+ facilityType = "custom",
  center = nil,
  parkingSpots = {},
  logisticMaxItems = 8,
@@ -1741,7 +1829,8 @@ placeDeliveryMarkerFromUI = function()
  dir = getPlacementDirection(),
  normal = sNormal,
  logisticTypesProvided = setmetatable({}, {__jsontype = "array"}),
- logisticTypesReceived = setmetatable({}, {__jsontype = "array"})
+ logisticTypesReceived = setmetatable({}, {__jsontype = "array"}),
+ isInspectSpot = true
  })
  log('I', logTag, 'Placed delivery parking spot #' .. #facility.parkingSpots .. ' for ' .. (facility.name ~= "" and facility.name or facility.id))
  else
@@ -1821,6 +1910,7 @@ deleteDeliveryFacility = function()
  deliveryWizardStep = 0
 
  saveWip()
+ exportAllDelivery()
  triggerUIUpdate()
  log('I', logTag, 'Deleted delivery facility: ' .. name)
 end
@@ -1871,6 +1961,19 @@ updateDeliverySpotLogisticType = function(spotIdx, direction, logisticType, enab
  end
  end
 
+ saveWip()
+ triggerUIUpdate()
+end
+
+updateDeliverySpotInspect = function(spotIdx, enabled)
+ if not selectedDeliveryIdx then return end
+ local facility = deliveryFacilities[selectedDeliveryIdx]
+ if not facility then return end
+
+ spotIdx = tonumber(spotIdx)
+ if not spotIdx or spotIdx < 1 or spotIdx > #(facility.parkingSpots or {}) then return end
+
+ facility.parkingSpots[spotIdx].isInspectSpot = enabled
  saveWip()
  triggerUIUpdate()
 end
@@ -2108,6 +2211,7 @@ cloneDeliveryFacilityConfig = function(sourceId, sourceMap)
  -- Copy config fields
  target.logisticMaxItems = source.logisticMaxItems or 8
  target.associatedOrganization = source.associatedOrganization or ""
+ target.facilityType = source.facilityType or "custom"
  target.preset = source.preset or "custom"
 
  -- Copy logistic types to existing spots (if target has spots)
@@ -2235,6 +2339,139 @@ drawAllDeliveryMarkers = function()
 end
 
 -- ============================================================================
+-- Delivery templates (quick-create from saved config)
+-- ============================================================================
+
+saveDeliveryTemplate = function(name)
+ if not name or name == "" then return end
+ if not selectedDeliveryIdx then return end
+ local fac = deliveryFacilities[selectedDeliveryIdx]
+ if not fac then return end
+
+ -- Deep-copy spot config from first spot (types + isInspectSpot)
+ local spotConfig = {}
+ local firstSpot = (fac.parkingSpots or {})[1]
+ if firstSpot then
+ local prov = {}
+ for _, t in ipairs(firstSpot.logisticTypesProvided or {}) do table.insert(prov, t) end
+ local recv = {}
+ for _, t in ipairs(firstSpot.logisticTypesReceived or {}) do table.insert(recv, t) end
+ spotConfig = {
+ logisticTypesProvided = prov,
+ logisticTypesReceived = recv,
+ isInspectSpot = firstSpot.isInspectSpot
+ }
+ end
+
+ -- Deep-copy generators
+ local gens = {}
+ for _, gen in ipairs(fac.logisticGenerators or {}) do
+ local g = {}
+ for k, v in pairs(gen) do
+ if type(v) == "table" then
+ g[k] = {}; for kk, vv in pairs(v) do g[k][kk] = vv end
+ else g[k] = v end
+ end
+ table.insert(gens, g)
+ end
+
+ deliveryTemplates[name] = {
+ facilityType = fac.facilityType or "custom",
+ logisticMaxItems = fac.logisticMaxItems or 8,
+ logisticGenerators = gens,
+ spotConfig = spotConfig,
+ preset = fac.preset
+ }
+ selectedTemplateName = name
+
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Saved delivery template: ' .. name)
+end
+
+deleteDeliveryTemplate = function(name)
+ if not name or not deliveryTemplates[name] then return end
+ deliveryTemplates[name] = nil
+ if selectedTemplateName == name then
+ selectedTemplateName = next(deliveryTemplates) or nil
+ end
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Deleted delivery template: ' .. name)
+end
+
+selectTemplate = function(name)
+ if name and deliveryTemplates[name] then
+ selectedTemplateName = name
+ else
+ selectedTemplateName = nil
+ end
+ saveWip()
+ triggerUIUpdate()
+end
+
+createFromTemplate = function(templateName)
+ templateName = templateName or selectedTemplateName
+ local tpl = deliveryTemplates[templateName]
+ if not tpl then
+ log('W', logTag, 'createFromTemplate: template "' .. tostring(templateName) .. '" not found')
+ addNewDeliveryFacility()
+ return
+ end
+
+ local pos = getPlacementPosition()
+ local dir = getPlacementDirection()
+ local droppedPos, surfaceNormal = dropToTerrain(pos)
+
+ -- Deep-copy generators from template
+ local gens = {}
+ for _, gen in ipairs(tpl.logisticGenerators or {}) do
+ local g = {}
+ for k, v in pairs(gen) do
+ if type(v) == "table" then
+ g[k] = {}; for kk, vv in pairs(v) do g[k][kk] = vv end
+ else g[k] = v end
+ end
+ table.insert(gens, g)
+ end
+
+ -- Build spot with template config
+ local spotProv = {}
+ local spotRecv = {}
+ if tpl.spotConfig then
+ for _, t in ipairs(tpl.spotConfig.logisticTypesProvided or {}) do table.insert(spotProv, t) end
+ for _, t in ipairs(tpl.spotConfig.logisticTypesReceived or {}) do table.insert(spotRecv, t) end
+ end
+
+ local newFacility = {
+ id = "bcmFacility_" .. tostring(#deliveryFacilities + 1),
+ name = "",
+ description = "",
+ associatedOrganization = "",
+ facilityType = tpl.facilityType or "custom",
+ center = droppedPos,
+ parkingSpots = {{
+ pos = droppedPos,
+ dir = dir,
+ normal = surfaceNormal,
+ logisticTypesProvided = spotProv,
+ logisticTypesReceived = spotRecv,
+ isInspectSpot = (tpl.spotConfig ~= nil) and (tpl.spotConfig.isInspectSpot == true) or false
+ }},
+ logisticMaxItems = tpl.logisticMaxItems or 8,
+ logisticGenerators = gens,
+ preset = tpl.preset
+ }
+
+ table.insert(deliveryFacilities, newFacility)
+ selectedDeliveryIdx = #deliveryFacilities
+ deliveryWizardStep = 1 -- go to Name so user types the name
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Created delivery facility from template "' .. templateName .. '": ' .. newFacility.id)
+end
+
+-- ============================================================================
 -- Delivery facility export functions
 -- ============================================================================
 
@@ -2256,7 +2493,7 @@ exportDeliveryFacilitiesJson = function(levelName, facilityList)
  and spot.logisticTypesReceived or setmetatable({}, {__jsontype = "array"})
  table.insert(accessPoints, {
  psName = psName,
- isInspectSpot = true,
+ isInspectSpot = spot.isInspectSpot ~= false,
  logisticTypesProvided = provided,
  logisticTypesReceived = received
  })
@@ -2293,6 +2530,7 @@ exportDeliveryFacilitiesJson = function(levelName, facilityList)
  name = f.name or f.id,
  description = f.description or "",
  associatedOrganization = org,
+ facilityType = f.facilityType or "custom",
  sitesFile = "bcm_depots.sites.json",
  manualAccessPoints = accessPoints,
  logisticTypesProvided = allProvided,
@@ -2381,7 +2619,20 @@ exportAllDelivery = function()
  end
 
  if #deliveryFacilities == 0 then
- log('W', logTag, 'exportAllDelivery: No delivery facilities to export')
+ -- No facilities: write empty files to clean up ghost data
+ log('I', logTag, 'exportAllDelivery: No facilities — writing empty export to clean up')
+ local facPath = getModLevelsPath(levelName) .. "/facilities/delivery/bcm_depots.facilities.json"
+ writeJsonToMod(facPath, {deliveryProviders = setmetatable({}, {__jsontype = "array"})})
+ local sitePath = getModLevelsPath(levelName) .. "/facilities/delivery/bcm_depots.sites.json"
+ writeJsonToMod(sitePath, {
+ description = "BCM delivery facility parking spots.",
+ dir = "/levels/" .. levelName .. "/facilities/delivery/",
+ filename = "bcm_depots.sites.json",
+ locations = setmetatable({}, {__jsontype = "object"}),
+ name = "bcm_depots.sites.json",
+ parkingSpots = setmetatable({}, {__jsontype = "array"}),
+ zones = setmetatable({}, {__jsontype = "object"})
+ })
  return
  end
 
@@ -2825,6 +3076,7 @@ deleteCameraItem = function()
  cameraWizardStep = 0
 
  saveWip()
+ exportAllCameras()
  triggerUIUpdate()
  log('I', logTag, 'Deleted camera: ' .. name)
 end
@@ -2973,11 +3225,6 @@ exportAllCameras = function()
  end
  end
 
- if #toExport == 0 then
- log('W', logTag, 'exportAllCameras: No valid cameras to export')
- return
- end
-
  -- Export as NDJSON BeamNGTrigger objects
  local writeBasePath = getModLevelsPath(levelName) .. "/main/MissionGroup/BCM_AREAS/"
 
@@ -2985,6 +3232,20 @@ exportAllCameras = function()
  local readBasePath = "/levels/" .. levelName .. "/main/MissionGroup/BCM_AREAS/"
  local parentPath = readBasePath .. "items.level.json"
  local parentObjects = readNdjsonFile(parentPath)
+
+ if #toExport == 0 then
+ -- No cameras: remove sub-file and SimGroup from parent
+ log('I', logTag, 'exportAllCameras: No valid cameras — cleaning up exported files')
+ FS:removeFile(writeBasePath .. "bcm_cameras/items.level.json")
+ local filtered = {}
+ for _, obj in ipairs(parentObjects) do
+ if obj.name ~= "bcm_cameras" then table.insert(filtered, obj) end
+ end
+ if #filtered < #parentObjects then
+ writeNdjsonToMod(writeBasePath .. "items.level.json", filtered)
+ end
+ return
+ end
 
  -- Add bcm_cameras SimGroup if not present
  local hasCameraGroup = false
@@ -3144,6 +3405,7 @@ deleteRadarSpot = function()
  selectedRadarSpotIdx = nil
 
  saveWip()
+ exportAllRadarSpots()
  triggerUIUpdate()
  log('I', logTag, 'Deleted radar spot: ' .. name)
 end
@@ -3272,7 +3534,21 @@ exportAllRadarSpots = function()
  end
 
  if #toExport == 0 then
- log('W', logTag, 'exportAllRadarSpots: No valid radar spots to export')
+ -- No radar spots: remove files and SimGroup from parent
+ log('I', logTag, 'exportAllRadarSpots: No valid spots — cleaning up exported files')
+ local basePath = getModLevelsPath(levelName)
+ FS:removeFile(basePath .. "/facilities/bcm_radarSpots.json")
+ FS:removeFile(basePath .. "/main/MissionGroup/BCM_AREAS/bcm_radarzones/items.level.json")
+ -- Remove SimGroup from parent
+ local readBasePath = "/levels/" .. levelName .. "/main/MissionGroup/BCM_AREAS/"
+ local parentObjects = readNdjsonFile(readBasePath .. "items.level.json")
+ local filtered = {}
+ for _, obj in ipairs(parentObjects) do
+ if obj.name ~= "bcm_radarzones" then table.insert(filtered, obj) end
+ end
+ if #filtered < #parentObjects then
+ writeNdjsonToMod(basePath .. "/main/MissionGroup/BCM_AREAS/items.level.json", filtered)
+ end
  return
  end
 
@@ -3378,7 +3654,9 @@ M.deleteMarker = deleteMarker
 M.moveMarkerToCurrentPos = moveMarkerToCurrentPos
 M.deleteGarage = deleteGarage
 M.updateGarageField = updateGarageField
+M.updateParkingSpotTag = updateParkingSpotTag
 M.saveWip = saveWip
+-- M.discardWip removed (dangerous — destroys WIP data that isn't in exports)
 M.exportAll = exportAll
 M.syncProps = syncPropsFromUserdata
 M.placeWallProps = placeWallProps
@@ -3573,6 +3851,7 @@ M.moveDeliveryMarkerToCurrentPos = moveDeliveryMarkerToCurrentPos
 M.deleteDeliveryFacility = deleteDeliveryFacility
 M.updateDeliveryField = updateDeliveryField
 M.updateDeliverySpotLogisticType = updateDeliverySpotLogisticType
+M.updateDeliverySpotInspect = updateDeliverySpotInspect
 M.updateDeliveryGenerator = updateDeliveryGenerator
 M.addDeliveryGenerator = addDeliveryGenerator
 M.removeDeliveryGenerator = removeDeliveryGenerator
@@ -3582,6 +3861,10 @@ M.validateDeliveryFacility = validateDeliveryFacility
 M.goToDeliveryStep = goToDeliveryStep
 M.adjustDeliveryMarkerZ = adjustDeliveryMarkerZ
 M.getCloneSourceList = getCloneSourceList
+M.saveDeliveryTemplate = saveDeliveryTemplate
+M.deleteDeliveryTemplate = deleteDeliveryTemplate
+M.createFromTemplate = createFromTemplate
+M.selectTemplate = selectTemplate
 M.cloneDeliveryFacilityConfig = cloneDeliveryFacilityConfig
 
 -- Camera mode exports

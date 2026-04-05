@@ -1,8 +1,9 @@
 -- BCM Tutorial Extension
--- 7-step linear tutorial FSM: step definitions, detection hooks, watchdog timers,
+-- 6-step linear tutorial FSM: step definitions, detection hooks, watchdog timers,
 -- save/restore resilience, phone blocking, Miramar sale block, pause menu skip injection.
 -- Locked save schema and FSM skeleton.
 -- Full step logic, detection hooks, watchdog, save/restore, monkey-patches.
+-- Restructured 7->6 steps, string sub-steps, v3->v4 migration, loaner removal.
 -- Extension name: bcm_tutorial
 
 local M = {}
@@ -40,11 +41,12 @@ local onUpdate
 local onVehicleSwitched
 local onComputerMenuOpened
 local onBCMTutorialPackComplete
-local onRecoveryPromptButtonPressed
 local onBCMSleepComplete
 local getGaragePosition
 local getNudgeHintForStep
 local broadcastStepState
+local resetFullTutorial
+local onBCMPartsShopCheckoutComplete
 
 -- ============================================================
 -- Step definitions
@@ -56,6 +58,45 @@ local function isEs()
 end
 local function t(en, es)
  return isEs() and es or en
+end
+
+-- Step 4 sub-step sequence: named string IDs for the desktop tour + delivery flow
+-- Each sub-step is referenced by string ID, not integer index
+local STEP4_SUBSTEPS = {
+ -- Desktop icon info spotlights
+ 'desktop_eboy', 'desktop_vpbeta', 'desktop_install_parts',
+ 'desktop_my_vehicles', 'desktop_garage_mgr', 'desktop_ie',
+ -- O'Really flow (per D-04)
+ 'click_vpbeta',
+ 'oreally_landing', 'oreally_enter_all', 'oreally_all_tour', 'oreally_all_back',
+ 'oreally_click_cargo', 'oreally_select_box',
+ 'oreally_delivery_explain', 'oreally_select_fs',
+ 'oreally_checkout', 'oreally_confirm',
+ 'oreally_close_window', 'back_to_desktop',
+ -- IE + PlanEx flow (unchanged)
+ 'click_ie', 'ie_tour_nav', 'ie_tour_favorites',
+ 'click_planex', 'planex_tour',
+ 'planex_vehicle_info', 'planex_open_dropdown', 'planex_loaner_info', 'planex_personal_info', 'planex_select_vehicle',
+ 'planex_click_pack', 'planex_accept_pack',
+ 'drive_to_depot', 'complete_delivery', 'toll_to_garage',
+}
+
+-- Lookup: subStepId -> index (for advancing)
+local STEP4_SUBSTEP_INDEX = {}
+for i, id in ipairs(STEP4_SUBSTEPS) do
+ STEP4_SUBSTEP_INDEX[id] = i
+end
+
+-- Dynamic retrieve branch: activated when Miramar not spawned before click_ie (D-08/D-09)
+-- These sub-steps are NOT in STEP4_SUBSTEPS — they run as a side branch
+local RETRIEVE_SUBSTEPS = {
+ 'retrieve_open_my_vehicles',
+ 'retrieve_click_retrieve',
+ 'retrieve_close_window',
+}
+local RETRIEVE_SUBSTEP_INDEX = {}
+for i, id in ipairs(RETRIEVE_SUBSTEPS) do
+ RETRIEVE_SUBSTEP_INDEX[id] = i
 end
 
 -- Each step: id, label(), subtext(), type, immediateCheck (optional fn -> bool)
@@ -79,22 +120,17 @@ local STEPS = {
  [3] = {
  id = "step_computer",
  label = function() return t("Use the garage computer", "Usa el ordenador del garaje") end,
+ -- Note: If player exits computer during step 4, objective reverts to step_computer tasklist text
  subtext = function() return t("Walk inside and interact with the computer terminal.", "Entra y usa la terminal del ordenador.") end,
  type = "goal",
  },
  [4] = {
- id = "step_delivery",
- label = function() return t("Complete your first PlanEx delivery", "Completa tu primera entrega PlanEx") end,
- subtext = function() return t("Open the computer and accept the PlanEx tutorial delivery.", "Abre el ordenador y acepta el envío tutorial de PlanEx.") end,
+ id = "step_desktop_tour",
+ label = function() return t("Complete the desktop tutorial", "Completa el tutorial del escritorio") end,
+ subtext = function() return t("Follow the on-screen guides to learn the garage computer tools.", "Sigue las guias en pantalla para aprender las herramientas del ordenador del garaje.") end,
  type = "goal",
  },
  [5] = {
- id = "step_radial",
- label = function() return t("Recover the Miramar", "Recupera el Miramar") end,
- subtext = function() return t("Hold the radial menu key (E) → Career Actions → Retrieve your favorite vehicle.", "Mantén pulsada la tecla del menú radial (E) → Career Actions → Recuperar tu vehículo favorito.") end,
- type = "goal",
- },
- [6] = {
  id = "step_sleep",
  label = function() return t("Set up your phone and sleep", "Configura tu móvil y duerme") end,
  subtext = function() return t(
@@ -103,12 +139,11 @@ local STEPS = {
  ) end,
  type = "goal",
  },
- [7] = {
- id = "step_advice",
- label = function() return t("Consider buying your own car", "Piensa en comprar tu propio coche") end,
- subtext = function() return t("The Miramar won't be yours forever. Check the dealerships.", "El Miramar no será tuyo para siempre. Echa un vistazo a los concesionarios.") end,
+ [6] = {
+ id = "step_complete",
+ label = function() return t("Tutorial complete", "Tutorial completado") end,
+ subtext = function() return "" end,
  type = "message",
- -- auto-complete after 4s delay via core_jobsystem
  },
 }
 
@@ -117,15 +152,14 @@ local STEPS = {
 -- ============================================================
 
 local DEFAULT_DATA = {
- version = 3,
+ version = 4,
  tutorialDone = false,
  tutorialSkipped = false,
- currentStep = 0, -- 0 = not started, 1-7 = active, 999 = done
- tutorialSubStep = 0, -- numeric sub-step within step 4 (0-15) and step 6 (0-1)
+ currentStep = 0, -- 0 = not started, 1-6 = active, 999 = done
+ tutorialSubStep = '', -- string sub-step ID within step 4 ('' = none)
  stepStartedAt = nil, -- os.time() when step began
  betaWelcomeShown = false,
  miramarInventoryId = nil, -- set after Miramar spawn
- loanerInventoryId = nil, -- set if fallback loaner used
  shownContextualTutorials = {}, -- { [tutorialId] = true }
  contextualTutorialsDisabled = false, -- player opted out of all contextual tutorials
 }
@@ -396,10 +430,9 @@ getNudgeHintForStep = function(step)
  [1] = t("Walk to the red car and press the enter-vehicle prompt.", "Acércate al coche rojo y pulsa el botón para subir."),
  [2] = t("Follow the GPS route to reach the garage.", "Sigue la ruta GPS para llegar al garaje."),
  [3] = t("Enter the garage and interact with the computer terminal.", "Entra al garaje e interactúa con la terminal del ordenador."),
- [4] = t("Pick up your cargo at the depot, then deliver it to the marked location.", "Recoge tu carga en el depósito y llévala al punto marcado."),
- [5] = t("Hold the radial menu key (E) → Career Actions → Retrieve your favorite vehicle.", "Mantén pulsada la tecla del menú radial (E) → Career Actions → Recuperar tu vehículo favorito."),
- [6] = t("Use the garage computer and select a sleep time.", "Usa el ordenador del garaje y selecciona una hora para dormir."),
- [7] = t("Check the dealerships once you have enough money.", "Revisa los concesionarios cuando tengas suficiente dinero."),
+ [4] = t("Follow the on-screen guides to complete the desktop tutorial.", "Sigue las guias en pantalla para completar el tutorial del escritorio."),
+ [5] = t("Open your phone and use the sleep feature.", "Abre tu movil y usa la funcion de dormir."),
+ [6] = t("The tutorial is complete! Enjoy Better Career Mod.", "El tutorial esta completo! Disfruta de Better Career Mod."),
  }
  return hints[step] or t("Check the tasklist for your current objective.", "Consulta la lista de tareas para ver tu objetivo actual.")
 end
@@ -409,11 +442,13 @@ end
 -- ============================================================
 
 setWaypointForStep = function(n)
- if n == 2 or (n == 5 and tutorialData and (tutorialData.tutorialSubStep or 0) == 1) then
+ local subStep = tutorialData and tutorialData.tutorialSubStep or ''
+ if n == 2 or (n == 4 and subStep == 'toll_to_garage') then
  local garagePos = getGaragePosition()
- if garagePos and freeroam_bigMapMode and freeroam_bigMapMode.setNavFocus then
- -- setNavFocus sets both ground markers AND bigmap navigation
+ if garagePos then
+ if freeroam_bigMapMode and freeroam_bigMapMode.setNavFocus then
  freeroam_bigMapMode.setNavFocus(garagePos)
+ end
  log('I', logTag, 'GPS waypoint set to garage for step ' .. tostring(n))
  end
  else
@@ -433,8 +468,8 @@ broadcastStepState = function()
  local stepDef = STEPS[tutorialData.currentStep]
  guihooks.trigger("BCMTutorialStepChanged", {
  step = tutorialData.currentStep,
- subStep = tutorialData.tutorialSubStep or 0,
- total = 7,
+ subStep = tutorialData.tutorialSubStep or '',
+ total = 6,
  stepId = stepDef and stepDef.id or "",
  })
 end
@@ -446,13 +481,13 @@ end
 advanceToStep = function(n)
  log('I', logTag, 'advanceToStep(' .. tostring(n) .. ') called')
  if not tutorialData then return end
- if n > 7 then
+ if n > 6 then
  completeTutorial()
  return
  end
 
  tutorialData.currentStep = n
- tutorialData.tutorialSubStep = 0 -- reset sub-step for new step
+ tutorialData.tutorialSubStep = '' -- reset sub-step for new step
  tutorialData.stepStartedAt = os.time()
  saveTutorialData()
 
@@ -465,7 +500,7 @@ advanceToStep = function(n)
  guihooks.trigger("ClearTasklist", {})
  guihooks.trigger("SetTasklistHeader", {
  label = t("Tutorial", "Tutorial"),
- subtext = t("Step " .. tostring(n) .. " of 7", "Paso " .. tostring(n) .. " de 7"),
+ subtext = t("Step " .. tostring(n) .. " of 6", "Paso " .. tostring(n) .. " de 6"),
  })
 
  local step = STEPS[n]
@@ -479,7 +514,7 @@ advanceToStep = function(n)
  })
  end
 
- -- Notify Vue of step change (includes subStep=0)
+ -- Notify Vue of step change (includes subStep='')
  broadcastStepState()
 
  -- Set GPS for navigation steps
@@ -487,13 +522,15 @@ advanceToStep = function(n)
 
  -- Configure radial menu for this step
  if core_recoveryPrompt then
- core_recoveryPrompt.setDefaultsForTutorial()
  if n == 5 then
- core_recoveryPrompt.setButtonActiveById("getFavoriteVehicle", true)
+ -- Step 5 (phone+sleep): restore career defaults, radial recovery no longer part of tutorial
+ core_recoveryPrompt.setDefaultsForCareer()
+ else
+ core_recoveryPrompt.setDefaultsForTutorial()
  end
  end
 
- -- Step 4: inject tutorial pack + start at subStep 1 (PC is already open since step 3 completed from it)
+ -- Step 4: inject tutorial pack + start at first sub-step (PC is already open since step 3 completed from it)
  if n == 4 then
  if bcm_planex and bcm_planex.injectTutorialPack then
  local ok, err = pcall(bcm_planex.injectTutorialPack)
@@ -503,20 +540,13 @@ advanceToStep = function(n)
  else
  log('W', logTag, 'bcm_planex.injectTutorialPack not available at step 4')
  end
- -- The computer is already open (step 3 = "use the computer"), skip subStep 0 ("open the computer")
- M.setSubStep(1)
+ -- The computer is already open (step 3 = "use the computer"), start at first sub-step
+ M.setSubStep('desktop_eboy')
  end
 
- -- Step 7: auto-complete after 4s delay
- if n == 7 then
- if core_jobsystem then
- core_jobsystem.create(function(job)
- job.sleep(4.0)
- completeTutorial()
- end)
- else
- completeTutorial()
- end
+ -- Step 6: tutorial complete — fire popup event and return (popup dismiss calls completeTutorial)
+ if n == 6 then
+ guihooks.trigger("BCMTutorialComplete", {})
  return
  end
 
@@ -587,7 +617,7 @@ completeTutorial = function()
 
  tutorialData.tutorialDone = true
  tutorialData.currentStep = 999
- tutorialData.tutorialSubStep = 0
+ tutorialData.tutorialSubStep = ''
  -- Mark spotlights already seen during linear tutorial (subSteps 1-3 covered these)
  tutorialData.shownContextualTutorials["garage_desktop"] = true
  saveTutorialData()
@@ -728,7 +758,7 @@ skipCurrentStep = function()
  if not tutorialData then return end
  if tutorialData.tutorialDone then return end
  local step = tutorialData.currentStep
- if step < 1 or step > 7 then return end
+ if step < 1 or step > 6 then return end
 
  log('I', logTag, 'Skipping individual step ' .. tostring(step))
  advanceToStep(step + 1)
@@ -791,7 +821,7 @@ isPhoneBlocked = function()
  return tutorialData ~= nil
  and not tutorialData.tutorialDone
  and (tutorialData.currentStep or 0) >= 1
- and (tutorialData.currentStep or 0) < 6
+ and (tutorialData.currentStep or 0) < 5
 end
 
 -- ============================================================
@@ -803,28 +833,6 @@ onVehicleSwitched = function(oldId, newId)
  if tutorialData.currentStep == 1 and newId and newId >= 0 then
  checkStepCompletion(1)
  end
- -- Step 4 sub-steps: loaner vehicle interactions
- if tutorialData.currentStep == 4 and bcm_planex then
- local loanerId = bcm_planex.getLoanerVehId and bcm_planex.getLoanerVehId()
- if loanerId then
- -- subStep 12: entered the loaner → subStep 13 "park at pickup zone"
- if (tutorialData.tutorialSubStep or 0) == 12 and newId == loanerId then
- M.setSubStep(13)
- guihooks.trigger("SetTasklistTask", {
- id = STEPS[4].id,
- label = t("Park at the pickup zone", "Aparca en la zona de carga"),
- subtext = t("Drive to the marked area at the depot to load your cargo.", "Conduce hasta la zona marcada del depósito para recoger la carga."),
- type = STEPS[4].type,
- })
- log('I', logTag, 'Step 4 subStep 13: park_at_depot (entered loaner)')
- end
- -- subStep 15: exited the loaner after delivery → complete step 4
- if (tutorialData.tutorialSubStep or 0) == 15 and oldId == loanerId then
- log('I', logTag, 'Step 4: exited loaner, completing step')
- checkStepCompletion(4)
- end
- end
- end
 end
 
 onComputerMenuOpened = function()
@@ -832,113 +840,156 @@ onComputerMenuOpened = function()
  if tutorialData.currentStep == 3 then
  checkStepCompletion(3)
  end
- -- Step 4 subStep 0: PC opened → advance to subStep 1 (start XP desktop spotlights)
- if tutorialData.currentStep == 4 and (tutorialData.tutorialSubStep or 0) == 0 then
- M.setSubStep(1)
- log('I', logTag, 'Step 4 subStep 1: PC opened, starting desktop spotlights')
+end
+
+-- onComputerAddFunctions: receives menuData (same data Vue uses for icons/CARamp).
+-- menuData.vehiclesInGarage has the exact list of vehicles visible at the computer.
+M.onComputerAddFunctions = function(menuData, computerFunctions)
+ if not tutorialData or tutorialData.tutorialDone then return end
+ if tutorialData.currentStep ~= 4 then return end
+
+ -- Don't re-evaluate during O'Really branch — let checkout flow finish
+ local sub = tutorialData.tutorialSubStep or ''
+ if sub:find('^oreally_') or sub == 'back_to_desktop' then
+ log('I', logTag, 'onComputerAddFunctions: skipping re-eval during O\'Really flow (sub="' .. sub .. '")')
+ return
+ end
+
+ -- Retrieve branch — don't re-evaluate, but ONLY for valid retrieve sub-steps
+ if RETRIEVE_SUBSTEP_INDEX[sub] then
+ log('I', logTag, 'onComputerAddFunctions: skipping re-eval during retrieve (sub="' .. sub .. '")')
+ return
+ end
+
+ -- Ensure tutorial pack exists
+ if bcm_planex and bcm_planex.injectTutorialPack then
+ pcall(bcm_planex.injectTutorialPack)
+ end
+
+ -- ══════════════════════════════════════════════════════════════
+ -- STEP 4: On every computer open, recalculate from real state.
+ -- menuData.vehiclesInGarage = same list that shows icons/CARamp.
+ -- If Miramar isn't in this list → retrieve. If it is → cargo check.
+ -- ══════════════════════════════════════════════════════════════
+
+ local allVehicles = career_modules_inventory and career_modules_inventory.getVehicles() or {}
+ local miramarVehObj = nil
+ local garageVehicles = menuData and menuData.vehiclesInGarage or {}
+ for _, vehData in ipairs(garageVehicles) do
+ local invId = vehData.inventoryId
+ local veh = allVehicles[invId]
+ if veh and veh.model == 'miramar' then
+ local objId = career_modules_inventory.getVehicleIdFromInventoryId(invId)
+ if objId then
+ miramarVehObj = be:getObjectByID(objId)
+ end
+ break
+ end
+ end
+ log('I', logTag, 'Step 4: vehiclesInGarage=' .. #garageVehicles .. ' miramarFound=' .. tostring(miramarVehObj ~= nil))
+
+ -- 1. Miramar not at computer → retrieve branch
+ if not miramarVehObj then
+ M.setSubStep('retrieve_open_my_vehicles')
+ log('I', logTag, 'Step 4: Miramar not spawned → retrieve branch')
+ return
+ end
+
+ -- 2. Miramar spawned → async cargo check to decide IE or O'Really
+ core_vehicleBridge.requestValue(miramarVehObj, function(data)
+ if not tutorialData or tutorialData.currentStep ~= 4 then return end
+ local totalSlots = 0
+ local containers = data and data[1] or nil
+ if containers then
+ for _, container in pairs(containers) do
+ totalSlots = totalSlots + (container.capacity or 0)
+ end
+ end
+ local hasCargo = totalSlots > 50
+ log('I', logTag, 'Step 4 cargo check: capacity=' .. totalSlots .. ' hasCargo=' .. tostring(hasCargo))
+ if hasCargo then
+ M.setSubStep('click_ie')
+ log('I', logTag, 'Step 4: has cargo → click_ie (IE/PlanEx flow)')
+ else
+ M.setSubStep('desktop_eboy')
+ log('I', logTag, 'Step 4: no cargo → desktop_eboy (O\'Really flow)')
+ end
+ end, 'getCargoContainers')
+end
+
+onBCMPartsShopCheckoutComplete = function(data)
+ if not tutorialData or tutorialData.tutorialDone then return end
+ if tutorialData.currentStep ~= 4 then return end
+ if data and data.deliveryType == 'fullservice' then
+ M.setSubStep('oreally_close_window')
+ log('I', logTag, 'Step 4 subStep oreally_close_window: fullservice checkout complete')
  end
 end
 
 onBCMTutorialPackComplete = function()
  if not tutorialData or tutorialData.tutorialDone then return end
  if tutorialData.currentStep ~= 4 then return end
- -- subStep 15: delivery complete, player must exit the loaner
- M.setSubStep(15)
+ -- Delivery complete, player must return to garage
+ M.setSubStep('toll_to_garage')
  guihooks.trigger("SetTasklistTask", {
  id = STEPS[4].id,
- label = t("Exit the loaner vehicle", "Sal del vehículo de préstamo"),
- subtext = t("Get out of the loaner vehicle. It will be returned automatically.", "Baja del vehículo de préstamo. Se devolverá automáticamente."),
+ label = t("Return to the garage", "Vuelve al garaje"),
+ subtext = t("Drive back to the Chinatown Garage. Press M to check the map.", "Conduce de vuelta al garaje de Chinatown. Pulsa M para consultar el mapa."),
  type = STEPS[4].type,
  })
- log('I', logTag, 'Step 4 subStep 15: exit_loaner')
+ -- Set GPS waypoint to garage for return
+ setWaypointForStep(4)
+ log('I', logTag, 'Step 4 subStep toll_to_garage: delivery complete, return to garage')
 end
 
--- Step 4 subStep 11: pack accepted → "go to loaner vehicle"
+-- Step 4: pack accepted → "drive to depot"
 M.onBCMTutorialPackAccepted = function()
  if not tutorialData or tutorialData.tutorialDone then return end
  if tutorialData.currentStep ~= 4 then return end
- M.setSubStep(11)
+ M.setSubStep('drive_to_depot')
  guihooks.trigger("SetTasklistTask", {
  id = STEPS[4].id,
- label = t("Go to your loaner vehicle", "Ve a por tu vehículo de préstamo"),
- subtext = t("Follow the GPS to the depot. Your loaner vehicle is parked there.", "Sigue el GPS hasta el depósito. Tu vehículo de préstamo está aparcado allí."),
+ label = t("Drive to the depot", "Conduce al deposito"),
+ subtext = t("Follow the GPS to the depot to pick up your cargo.", "Sigue el GPS hasta el deposito para recoger tu carga."),
  type = STEPS[4].type,
  })
- log('I', logTag, 'Step 4 subStep 11: go_to_loaner')
+ log('I', logTag, 'Step 4 subStep drive_to_depot: pack accepted')
 end
 
--- Step 4 subStep 12: player near loaner → "get in the loaner"
-M.onBCMTutorialNearLoaner = function()
- if not tutorialData or tutorialData.tutorialDone then return end
- if tutorialData.currentStep ~= 4 then return end
- if (tutorialData.tutorialSubStep or 0) ~= 11 then return end
- M.setSubStep(12)
- guihooks.trigger("SetTasklistTask", {
- id = STEPS[4].id,
- label = t("Get in the loaner vehicle", "Sube al vehículo de préstamo"),
- subtext = t("Enter the PlanEx loaner vehicle to begin loading.", "Sube al vehículo de PlanEx para empezar a cargar."),
- type = STEPS[4].type,
- })
- log('I', logTag, 'Step 4 subStep 12: enter_loaner')
-end
-
--- Step 4 subStep 14: cargo picked up at depot → "deliver the cargo"
+-- Step 4: cargo picked up at depot → "deliver the cargo"
 M.onBCMTutorialDepotPickup = function()
  if not tutorialData or tutorialData.tutorialDone then return end
  if tutorialData.currentStep ~= 4 then return end
- M.setSubStep(14)
+ M.setSubStep('complete_delivery')
  guihooks.trigger("SetTasklistTask", {
  id = STEPS[4].id,
- label = t("Deliver the cargo", "Entrega la mercancía"),
- subtext = t("Follow the GPS to the delivery location and drop off the cargo.", "Sigue el GPS hasta el punto de entrega y descarga la mercancía."),
+ label = t("Deliver the cargo", "Entrega la mercancia"),
+ subtext = t("Follow the GPS to the delivery location and drop off the cargo.", "Sigue el GPS hasta el punto de entrega y descarga la mercancia."),
  type = STEPS[4].type,
  })
- log('I', logTag, 'Step 4 subStep 14: delivering')
-end
-
-onRecoveryPromptButtonPressed = function(buttonId)
- if not tutorialData or tutorialData.tutorialDone then return end
- if tutorialData.currentStep == 5 then
- if buttonId == "getFavoriteVehicle" then
- -- Sub-step: radial used, now return to garage (subStep 1)
- M.setSubStep(1)
-
- -- Update tasklist subtext for return phase
- guihooks.trigger("SetTasklistTask", {
- id = STEPS[5].id,
- label = STEPS[5].label(),
- subtext = t("Now drive back to the Chinatown Garage.", "Ahora vuelve al garaje de Chinatown."),
- type = STEPS[5].type,
- })
-
- -- Set GPS waypoint to garage
- setWaypointForStep(5)
-
- log('I', logTag, 'Step 5: radial used, entering return-to-garage sub-phase')
- end
- end
+ log('I', logTag, 'Step 4 subStep complete_delivery: delivering')
 end
 
 onBCMSleepComplete = function(result)
  if not tutorialData or tutorialData.tutorialDone then return end
- if tutorialData.currentStep == 6 then
- checkStepCompletion(6)
+ if tutorialData.currentStep == 5 then
+ checkStepCompletion(5)
  end
 end
 
--- Step 6: phone opened → update tasklist (spotlights driven by Vue reading subStep)
+-- Step 5: phone opened → update tasklist (standalone spotlight pattern, keyed by step 5)
 M.onBCMPhoneOpened = function()
  if not tutorialData or tutorialData.tutorialDone then return end
- if tutorialData.currentStep ~= 6 then return end
- if (tutorialData.tutorialSubStep or 0) >= 1 then return end -- already advanced
- M.setSubStep(1)
+ if tutorialData.currentStep ~= 5 then return end
+ if (tutorialData.tutorialSubStep or '') ~= '' then return end -- already advanced
+ M.setSubStep('phone_opened')
  guihooks.trigger("SetTasklistTask", {
- id = STEPS[6].id,
+ id = STEPS[5].id,
  label = t("Sleep until 7 AM", "Duerme hasta las 7 AM"),
- subtext = t("Use the phone to sleep until 7:00 AM tomorrow.", "Usa el móvil para dormir hasta las 7:00 AM de mañana."),
- type = STEPS[6].type,
+ subtext = t("Use the phone to sleep until 7:00 AM tomorrow.", "Usa el movil para dormir hasta las 7:00 AM de manana."),
+ type = STEPS[5].type,
  })
- log('I', logTag, 'Step 6 subStep 1: phone_opened')
+ log('I', logTag, 'Step 5 subStep phone_opened')
 end
 
 -- ============================================================
@@ -950,11 +1001,12 @@ onUpdate = function(dtReal, dtSim, dtRaw)
  if tutorialData.tutorialDone then return end
 
  local step = tutorialData.currentStep
- if step < 1 or step > 7 then return end
+ if step < 1 or step > 6 then return end
 
- -- ---- Garage proximity polling (steps 2 and 5 return sub-phase) ----
+ -- ---- Garage proximity polling (step 2 and step 4 toll_to_garage) ----
+ local subStep = tutorialData.tutorialSubStep or ''
  local doGarageCheck = (step == 2)
- or (step == 5 and (tutorialData.tutorialSubStep or 0) == 1)
+ or (step == 4 and subStep == 'toll_to_garage')
 
  if doGarageCheck then
  garageProximityTimer = garageProximityTimer + dtReal
@@ -981,32 +1033,6 @@ onUpdate = function(dtReal, dtSim, dtRaw)
  if dist < 30 then
  log('I', logTag, 'Step ' .. tostring(step) .. ': garage proximity triggered (dist=' .. string.format("%.1f", dist) .. 'm)')
  checkStepCompletion(step)
- end
- end
- end
- end
- end
-
- -- ---- Loaner proximity polling (step 4 subStep 11 = go_to_loaner) ----
- if step == 4 and (tutorialData.tutorialSubStep or 0) == 11 then
- garageProximityTimer = garageProximityTimer + dtReal
- if garageProximityTimer >= 1.0 then
- garageProximityTimer = 0
- local loanerId = bcm_planex and bcm_planex.getLoanerVehId and bcm_planex.getLoanerVehId()
- if loanerId then
- local loanerObj = be:getObjectByID(loanerId)
- local playerVehId = be:getPlayerVehicleID(0)
- if loanerObj and playerVehId and playerVehId >= 0 then
- local playerObj = be:getObjectByID(playerVehId)
- if playerObj then
- local lp = loanerObj:getPosition()
- local pp = playerObj:getPosition()
- local dx = lp.x - pp.x
- local dy = lp.y - pp.y
- local dist = math.sqrt(dx*dx + dy*dy)
- if dist < 30 then
- M.onBCMTutorialNearLoaner()
- end
  end
  end
  end
@@ -1098,38 +1124,49 @@ restoreStepUI = function()
  if not step or step == 0 or step == 999 then return end
 
  -- ── Recovery: map saved step to a coherent restart point ──────────────
- -- Steps 1-4: recover to step=4 subStep=0 (open the computer)
- -- Steps 5-7: keep as-is (post-delivery, independent actions)
- if step >= 1 and step <= 4 then
- log('I', logTag, 'restoreStepUI: recovery step ' .. step .. ' subStep ' .. tostring(tutorialData.tutorialSubStep or 0) .. ' -> 4 subStep 0')
+ -- Steps 1-3: recover to step=4 subStep='' (go to computer)
+ -- Step 4: preserve subStep — onComputerMenuOpened will handle resume
+ -- Steps 5-6: keep as-is (post-delivery, independent actions)
+ if step >= 1 and step <= 3 then
+ log('I', logTag, 'restoreStepUI: recovery step ' .. step .. ' -> 4 subStep ""')
  tutorialData.currentStep = 4
- tutorialData.tutorialSubStep = 0
+ tutorialData.tutorialSubStep = ''
  tutorialData.stepStartedAt = os.time()
- -- Reset any in-progress PlanEx state
+ saveTutorialData()
+ step = 4
+ elseif step == 4 then
+ -- Preserve subStep, but validate it exists in known sub-step tables
+ local sub = tutorialData.tutorialSubStep or ''
+ if sub == 'drive_to_depot' or sub == 'complete_delivery' then
+ -- Mid-delivery: abandon pack and restart from click_ie
  if bcm_planex and bcm_planex.abandonPack then
  pcall(function() bcm_planex.abandonPack() end)
  end
+ tutorialData.tutorialSubStep = 'click_ie'
  saveTutorialData()
- step = 4
+ log('I', logTag, 'restoreStepUI: step 4 mid-delivery "' .. sub .. '" -> click_ie (pack abandoned)')
+ elseif sub ~= '' and not STEP4_SUBSTEP_INDEX[sub] and not RETRIEVE_SUBSTEP_INDEX[sub] then
+ -- Stale/removed sub-step: reset so onComputerAddFunctions can re-evaluate
+ tutorialData.tutorialSubStep = ''
+ saveTutorialData()
+ log('I', logTag, 'restoreStepUI: step 4 stale subStep "' .. sub .. '" -> "" (will re-evaluate)')
+ else
+ log('I', logTag, 'restoreStepUI: step 4 preserving subStep "' .. sub .. '"')
+ end
  end
 
  -- ── Re-fire tasklist UI ───────────────────────────────────────────────
  guihooks.trigger("SetTasklistHeader", {
  label = t("Tutorial", "Tutorial"),
- subtext = t("Step " .. tostring(step) .. " of 7", "Paso " .. tostring(step) .. " de 7"),
+ subtext = t("Step " .. tostring(step) .. " of 6", "Paso " .. tostring(step) .. " de 6"),
  })
 
  local stepDef = STEPS[step]
  if stepDef then
- local subtext = stepDef.subtext()
- if step == 5 and (tutorialData.tutorialSubStep or 0) == 1 then
- subtext = t("Now drive back to the Chinatown Garage.", "Ahora vuelve al garaje de Chinatown.")
- end
-
  guihooks.trigger("SetTasklistTask", {
  id = stepDef.id,
  label = stepDef.label(),
- subtext = subtext,
+ subtext = stepDef.subtext(),
  type = stepDef.type,
  attention = false,
  })
@@ -1252,7 +1289,7 @@ onCareerActive = function(active)
 
  -- Register migrations
  if bcm_versionMigration then
- bcm_versionMigration.registerModuleMigrations("tutorial", 3, {
+ bcm_versionMigration.registerModuleMigrations("tutorial", 4, {
  [1] = function(data)
  -- v1 -> v2: add contextualTutorialsDisabled
  if data.contextualTutorialsDisabled == nil then
@@ -1266,6 +1303,25 @@ onCareerActive = function(active)
  data.step4SubPhase = nil
  data.step5SubPhase = nil
  data.step6SubPhase = nil
+ return data
+ end,
+ [3] = function(data)
+ -- v3 -> v4: restructure 7 steps to 6, string sub-steps, remove loaner
+ local step = data.currentStep or 0
+ if step >= 1 and step <= 3 then
+ -- steps 1-3 map 1:1, no change
+ elseif step == 4 or step == 5 then
+ data.currentStep = 4
+ elseif step == 6 then
+ data.currentStep = 5
+ elseif step == 7 then
+ data.currentStep = 6
+ end
+ -- done/999 stays as-is
+ -- Sub-step is ephemeral: always reset (D-07)
+ data.tutorialSubStep = ''
+ -- Remove loaner field (D-08)
+ data.loanerInventoryId = nil
  return data
  end,
  })
@@ -1294,6 +1350,95 @@ onSaveCurrentSaveSlot = function(currentSavePath, oldSaveDate, forceSyncSave)
 end
 
 -- ============================================================
+-- Full tutorial reset (restart from step 1)
+-- ============================================================
+
+resetFullTutorial = function()
+ if not tutorialData then return end
+
+ -- Cancel any active PlanEx pack
+ if bcm_planex and bcm_planex.abandonPack then
+ pcall(function() bcm_planex.abandonPack() end)
+ end
+
+ -- Unpatch everything
+ unpatchPauseMenu()
+ unpatchInventorySell()
+
+ -- Restore radial menu
+ if core_recoveryPrompt and core_recoveryPrompt.setDefaultsForCareer then
+ core_recoveryPrompt.setDefaultsForCareer()
+ end
+
+ -- Reactivate police
+ if bcm_police and bcm_police.reactivatePool then
+ bcm_police.reactivatePool()
+ end
+
+ -- Reset all tutorial state
+ tutorialData.tutorialDone = false
+ tutorialData.tutorialSkipped = false
+ tutorialData.currentStep = 0
+ tutorialData.tutorialSubStep = ''
+ tutorialData.stepStartedAt = nil
+ tutorialData.shownContextualTutorials = {}
+ tutorialData.contextualTutorialsDisabled = false
+ -- Keep miramarInventoryId — the player still owns the Miramar
+
+ saveTutorialData()
+
+ -- Clear UI
+ guihooks.trigger("ClearTasklist", {})
+ guihooks.trigger("BCMTutorialShowResetButton", { visible = false })
+ broadcastStepState()
+
+ -- Start tutorial fresh
+ beginTutorial()
+
+ log('I', logTag, 'Full tutorial reset -- restarting from step 1')
+end
+
+-- ============================================================
+-- Debug commands (gated behind debugMode)
+-- ============================================================
+
+M.debugForceStep = function(step, subStep)
+ if not bcm_settings or not bcm_settings.getSetting('debugMode') then
+ log('W', logTag, 'debugForceStep: debugMode is off')
+ return
+ end
+ if not tutorialData then return end
+ tutorialData.currentStep = step or 0
+ tutorialData.tutorialSubStep = subStep or ''
+ tutorialData.tutorialDone = (step == 999)
+ tutorialData.tutorialSkipped = false
+ saveTutorialData()
+ restoreStepUI()
+ log('I', logTag, 'debugForceStep(' .. tostring(step) .. ', "' .. tostring(subStep) .. '")')
+end
+
+M.debugForceSpotlight = function(spotlightId)
+ if not bcm_settings or not bcm_settings.getSetting('debugMode') then
+ log('W', logTag, 'debugForceSpotlight: debugMode is off')
+ return
+ end
+ if not spotlightId then return end
+ guihooks.trigger('BCMDebugForceSpotlight', { id = spotlightId })
+ log('I', logTag, 'debugForceSpotlight("' .. tostring(spotlightId) .. '")')
+end
+
+-- ============================================================
+-- Extension reload: re-initialize if career is active
+-- ============================================================
+
+M.onExtensionLoaded = function()
+ if career_career and career_career.isActive() then
+ log('I', logTag, 'Extension reloaded while career active — re-initializing')
+ onCareerActive(true)
+ end
+end
+
+-- ============================================================
 -- Public API
 -- ============================================================
 
@@ -1306,30 +1451,112 @@ M.onUpdate = onUpdate
 M.onVehicleSwitched = onVehicleSwitched
 M.onComputerMenuOpened = onComputerMenuOpened
 M.onBCMTutorialPackComplete = onBCMTutorialPackComplete
-M.onRecoveryPromptButtonPressed = onRecoveryPromptButtonPressed
+
+M.isInTollToGarage = function()
+ return tutorialData and not tutorialData.tutorialDone
+ and tutorialData.currentStep == 4
+ and tutorialData.tutorialSubStep == 'toll_to_garage'
+end
+
+M.refreshGarageWaypoint = function()
+ setWaypointForStep(4)
+ log('I', logTag, 'refreshGarageWaypoint: re-set GPS after results dismiss')
+end
+M.onBCMPartsShopCheckoutComplete = onBCMPartsShopCheckoutComplete
 M.onBCMSleepComplete = onBCMSleepComplete
+M.completeTutorial = completeTutorial
+M.resetFullTutorial = resetFullTutorial
+
+-- Called from Vue after retrieve branch completes (My Vehicles window closed).
+-- Re-evaluates Miramar + cargo state without needing onComputerAddFunctions menuData.
+M.onComputerReevaluate = function()
+ if not tutorialData or tutorialData.tutorialDone then return end
+ if tutorialData.currentStep ~= 4 then return end
+ log('I', logTag, 'onComputerReevaluate: re-checking Miramar + cargo after retrieve')
+
+ -- Ensure tutorial pack
+ if bcm_planex and bcm_planex.injectTutorialPack then
+ pcall(bcm_planex.injectTutorialPack)
+ end
+
+ -- Find Miramar via inventory (same logic as onComputerAddFunctions)
+ local allVehicles = career_modules_inventory and career_modules_inventory.getVehicles() or {}
+ local miramarVehObj = nil
+ for invId, veh in pairs(allVehicles) do
+ if veh.model == 'miramar' then
+ local objId = career_modules_inventory.getVehicleIdFromInventoryId(invId)
+ if objId then
+ miramarVehObj = be:getObjectByID(objId)
+ end
+ break
+ end
+ end
+
+ if not miramarVehObj then
+ M.setSubStep('retrieve_open_my_vehicles')
+ log('I', logTag, 'onComputerReevaluate: still no Miramar → retrieve again')
+ return
+ end
+
+ core_vehicleBridge.requestValue(miramarVehObj, function(data)
+ if not tutorialData or tutorialData.currentStep ~= 4 then return end
+ local totalSlots = 0
+ local containers = data and data[1] or nil
+ if containers then
+ for _, container in pairs(containers) do
+ totalSlots = totalSlots + (container.capacity or 0)
+ end
+ end
+ local hasCargo = totalSlots > 50
+ log('I', logTag, 'onComputerReevaluate cargo: capacity=' .. totalSlots .. ' hasCargo=' .. tostring(hasCargo))
+ if hasCargo then
+ M.setSubStep('click_ie')
+ else
+ M.setSubStep('desktop_eboy')
+ end
+ end, 'getCargoContainers')
+end
 
 -- isTutorialActive: returns true when linear tutorial is actively in progress
 -- (step > 0, not done, not skipped). Used by Vue-side contextual tutorial gates.
--- setSubStep / advanceSubStep: called by Vue to advance sub-steps within step 4/6
-M.setSubStep = function(n)
+-- setSubStep / advanceSubStep: called by Vue to advance sub-steps within step 4
+M.setSubStep = function(id)
  if not tutorialData then return end
- tutorialData.tutorialSubStep = n
+ tutorialData.tutorialSubStep = id or ''
  saveTutorialData()
  broadcastStepState()
- log('I', logTag, 'setSubStep(' .. tostring(n) .. ') — step=' .. tostring(tutorialData.currentStep))
+ log('I', logTag, 'setSubStep("' .. tostring(id) .. '") -- step=' .. tostring(tutorialData.currentStep))
 end
 
 M.advanceSubStep = function()
  if not tutorialData then return end
- M.setSubStep((tutorialData.tutorialSubStep or 0) + 1)
+ local currentId = tutorialData.tutorialSubStep or ''
+ -- Check if in retrieve branch
+ local rIdx = RETRIEVE_SUBSTEP_INDEX[currentId]
+ if rIdx then
+ if rIdx < #RETRIEVE_SUBSTEPS then
+ M.setSubStep(RETRIEVE_SUBSTEPS[rIdx + 1])
+ else
+ -- Retrieve complete, return to normal flow
+ M.setSubStep('click_ie')
+ end
+ return
+ end
+ -- Normal STEP4 advance
+ local idx = STEP4_SUBSTEP_INDEX[currentId]
+ if idx and idx < #STEP4_SUBSTEPS then
+ M.setSubStep(STEP4_SUBSTEPS[idx + 1])
+ else
+ log('I', logTag, 'advanceSubStep: no next for "' .. tostring(currentId) .. '"')
+ end
 end
 
 M.getSubStep = function()
- return tutorialData and tutorialData.tutorialSubStep or 0
+ return tutorialData and tutorialData.tutorialSubStep or ''
 end
 
 M.isTutorialActive = function()
+ if spotlightsPaused then return false end
  return tutorialData ~= nil
  and not tutorialData.tutorialDone
  and not tutorialData.tutorialSkipped
@@ -1382,6 +1609,20 @@ end
 M.hasActiveSave = function()
  return tutorialData ~= nil
 end
+
+-- Debug: pause/resume spotlight system without changing tutorial state
+local spotlightsPaused = false
+M.pauseSpotlights = function()
+ spotlightsPaused = true
+ guihooks.trigger('BCMClearSpotlight', {})
+ log('I', logTag, 'Spotlights PAUSED (use bcm_tutorial.resumeSpotlights() to resume)')
+end
+M.resumeSpotlights = function()
+ spotlightsPaused = false
+ broadcastStepState()
+ log('I', logTag, 'Spotlights RESUMED')
+end
+M.areSpotlightsPaused = function() return spotlightsPaused end
 
 M.broadcastStepState = function()
  broadcastStepState()

@@ -2533,383 +2533,25 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "tags":{
+ "ignoreOthers":true
  },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking1",
- "oldId":2437,
- "pos":[
- -691.69494628906,
- 37.572971343994,
- 103.44195556641
- ],
- "rot":[
- 0.047374126007995,
- -0.10964715151259,
- 0.9114097537342,
- 0.39378351304785
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking2",
- "oldId":2438,
- "pos":[
- -693.69366455078,
- 35.743858337402,
- 103.42136383057
- ],
- "rot":[
- -0.00063999304452035,
- 0.0014979862302437,
- 0.91958799476516,
- 0.39288072786783
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking3",
- "oldId":2439,
- "pos":[
- -695.91162109375,
- 33.409362792969,
- 103.39694213867
- ],
- "rot":[
- 0.0012726600449815,
- -0.0029990871305423,
- 0.92054157324961,
- 0.3906310250504
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking4",
- "oldId":2440,
- "pos":[
- -697.30120849609,
- 31.862298965454,
- 103.3782043457
- ],
- "rot":[
- 0.004022100873857,
- -0.0089077317862961,
- 0.91135568672714,
- 0.41150369049267
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking5",
- "oldId":2441,
- "pos":[
- -699.11022949219,
- 29.816719055176,
- 103.34902954102
- ],
- "rot":[
- 0.004022100873857,
- -0.0089077317862961,
- 0.91135568672714,
- 0.41150369049267
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking6",
- "oldId":2442,
- "pos":[
- -700.68243408203,
- 28.031742095947,
- 103.33779144287
- ],
- "rot":[
- 0.004022100873857,
- -0.0089077317862961,
- 0.91135568672714,
- 0.41150369049267
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking7",
- "oldId":2443,
- "pos":[
- -702.79162597656,
- 25.626756668091,
- 103.29731750488
- ],
- "rot":[
- 0.004022100873857,
- -0.0089077317862961,
- 0.91135568672714,
- 0.41150369049267
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking8",
- "oldId":2444,
- "pos":[
- -704.45111083984,
- 23.726900100708,
- 103.2755355835
- ],
- "rot":[
- 0.004022100873857,
- -0.0089077317862961,
- 0.91135568672714,
- 0.41150369049267
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking9",
- "oldId":2445,
- "pos":[
- -706.36688232422,
- 21.559692382813,
- 103.24697875977
- ],
- "rot":[
- 0.004022100873857,
- -0.0089077317862961,
- 0.91135568672714,
- 0.41150369049267
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
- "isMultiSpot":false,
- "name":"bcmGarage_23_parking10",
- "oldId":2446,
- "pos":[
- -708.10333251953,
- 19.587530136108,
- 103.22381591797
- ],
- "rot":[
- 0.004022100873857,
- -0.0089077317862961,
- 0.91135568672714,
- 0.41150369049267
- ],
- "scl":[
- 2.5,
- 6,
- 3
- ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
- },
- {
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_chinatown_parking1",
- "oldId":2448,
+ "oldId":2384,
  "pos":[
- -807.80737304688,
- 605.73516845703,
- 117.35696716309
+ -819.75897216797,
+ 607.46112060547,
+ 117.01424872875
  ],
  "rot":[
- 0.17041166803911,
- 0.17059974910896,
- -0.68662017473964,
- 0.68586319673868
+ 0.00016013745478145,
+ 0.00012217499864887,
+ 0.00065361022904798,
+ 0.99999976611144
  ],
  "scl":[
  2.5,
@@ -2929,23 +2571,25 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "ignoreOthers":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_chinatown_parking2",
- "oldId":2449,
+ "oldId":2385,
  "pos":[
- -807.96850585938,
- 608.40698242188,
- 117.3637878418
+ -807.91125488281,
+ 605.55059814453,
+ 117.01303631067
  ],
  "rot":[
- -0.041301769950744,
- -0.043846156870252,
- -0.72658985370602,
- 0.68442593669302
+ -1.0789108018674e-05,
+ -1.0232276213064e-07,
+ 0.71378080773394,
+ 0.70036915865439
  ],
  "scl":[
  2.5,
@@ -2965,23 +2609,25 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "ignoreOthers":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_chinatown_parking3",
- "oldId":2450,
+ "oldId":2386,
  "pos":[
- -808.19555664063,
- 611.01904296875,
- 117.37366027832
+ -807.89654541016,
+ 608.30108642578,
+ 117.01302886009
  ],
  "rot":[
- 0.084683373538637,
- 0.081925300275081,
- -0.69046258460341,
- 0.71370749658647
+ 1.6183662107079e-05,
+ 1.5347543342417e-07,
+ 0.71378043075658,
+ 0.70036954274655
  ],
  "scl":[
  2.5,
@@ -3001,23 +2647,25 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "ignoreOthers":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_chinatown_parking4",
- "oldId":2451,
+ "oldId":2387,
  "pos":[
- -808.92657470703,
- 613.39782714844,
- 117.37527008057
+ -807.81622314453,
+ 611.21783447266,
+ 117.01300466061
  ],
  "rot":[
- -0.01808416290995,
- -0.018764850907702,
- -0.71980131454751,
- 0.69369078918343
+ 0,
+ 0,
+ 0.70459323928487,
+ 0.70961141983064
  ],
  "scl":[
  2.5,
@@ -3037,23 +2685,25 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "ignoreOthers":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_chinatown_parking5",
- "oldId":2452,
+ "oldId":2388,
  "pos":[
- -819.97204589844,
- 604.22149658203,
- 117.36268157959
+ -807.82110595703,
+ 613.60681152344,
+ 117.01300048828
  ],
  "rot":[
- 0.061840427835795,
- -0.0016140193958827,
- 0.026040889314511,
- 0.99774497167873
+ 0,
+ 0,
+ 0.70459323928487,
+ 0.70961141983064
  ],
  "scl":[
  2.5,
@@ -3073,23 +2723,25 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "ignoreOthers":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_chinatown_parking6",
- "oldId":2453,
+ "oldId":2389,
  "pos":[
- -819.99334716797,
- 614.99670410156,
- 117.35818023682
+ -818.92779541016,
+ 615.77380371094,
+ 117.01362580061
  ],
  "rot":[
- 0.047220014257382,
- -0.00050142779479767,
- 0.010606522809772,
- 0.99882807354298
+ 5.7946686367878e-05,
+ -2.0981691311981e-05,
+ 0.99945206966583,
+ -0.033099193987792
  ],
  "scl":[
  2.5,
@@ -3109,13 +2761,93 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "ignoreOthers":true
+ },
+ "types":{},
+ "values":{}
+ },
+ "isMultiSpot":false,
+ "name":"bcm_chinatown_parking7",
+ "oldId":2390,
+ "pos":[
+ -816.67443847656,
+ 620.49005126953,
+ 117.01246142387
+ ],
+ "rot":[
+ 0.00031449726311075,
+ 0.00041499703070559,
+ 0.99945170496435,
+ -0.03310616729249
+ ],
+ "scl":[
+ 2.5,
+ 6,
+ 3
+ ],
+ "spotAmount":1,
+ "spotDirection":"Left",
+ "spotOffset":0,
+ "spotRotation":0
+ },
+ {
+ "color":[
+ 1,
+ 1,
+ 1
+ ],
+ "customFields":{
+ "names":{},
+ "tags":{
+ "ignoreOthers":true
+ },
+ "types":{},
+ "values":{}
+ },
+ "isMultiSpot":false,
+ "name":"bcm_chinatown_parking8",
+ "oldId":2391,
+ "pos":[
+ -820.21826171875,
+ 625.72943115234,
+ 117.00678139925
+ ],
+ "rot":[
+ 0.00020654769773717,
+ 0.00073057403050028,
+ 0.73140774677526,
+ 0.68193997650583
+ ],
+ "scl":[
+ 2.5,
+ 6,
+ 3
+ ],
+ "spotAmount":1,
+ "spotDirection":"Left",
+ "spotOffset":0,
+ "spotRotation":0
+ },
+ {
+ "color":[
+ 1,
+ 1,
+ 1
+ ],
+ "customFields":{
+ "names":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_trackside_parking1",
- "oldId":2455,
+ "oldId":2393,
  "pos":[
  -213.0505065918,
  -314.92669677734,
@@ -3145,13 +2877,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_trackside_parking2",
- "oldId":2456,
+ "oldId":2394,
  "pos":[
  -215.60646057129,
  -310.46994018555,
@@ -3181,13 +2917,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_trackside_parking3",
- "oldId":2457,
+ "oldId":2395,
  "pos":[
  -215.85444641113,
  -305.92495727539,
@@ -3217,13 +2957,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_trackside_parking4",
- "oldId":2458,
+ "oldId":2396,
  "pos":[
  -217.36323547363,
  -318.6672668457,
@@ -3253,13 +2997,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_trackside_parking5",
- "oldId":2459,
+ "oldId":2397,
  "pos":[
  -220.45204162598,
  -313.92535400391,
@@ -3289,13 +3037,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_trackside_parking6",
- "oldId":2460,
+ "oldId":2398,
  "pos":[
  -224.8470916748,
  -310.95562744141,
@@ -3325,13 +3077,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_dragstrip_parking1",
- "oldId":2462,
+ "oldId":2400,
  "pos":[
  -204.87138366699,
  -201.74926757813,
@@ -3361,13 +3117,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_dragstrip_parking2",
- "oldId":2463,
+ "oldId":2401,
  "pos":[
  -201.21910095215,
  -199.40495300293,
@@ -3397,13 +3157,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_dragstrip_parking3",
- "oldId":2464,
+ "oldId":2402,
  "pos":[
  -186.79666137695,
  -208.20454406738,
@@ -3433,13 +3197,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_dragstrip_parking4",
- "oldId":2465,
+ "oldId":2403,
  "pos":[
  -185.14366149902,
  -211.03456115723,
@@ -3469,13 +3237,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking1",
- "oldId":2467,
+ "oldId":2405,
  "pos":[
  -214.82122802734,
  -26.855340957642,
@@ -3505,13 +3277,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking2",
- "oldId":2468,
+ "oldId":2406,
  "pos":[
  -208.2606048584,
  -25.933820724487,
@@ -3541,13 +3317,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking3",
- "oldId":2469,
+ "oldId":2407,
  "pos":[
  -200.81927490234,
  -24.777530670166,
@@ -3577,13 +3357,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking4",
- "oldId":2470,
+ "oldId":2408,
  "pos":[
  -223.46754455566,
  -27.957033157349,
@@ -3613,13 +3397,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking5",
- "oldId":2471,
+ "oldId":2409,
  "pos":[
  -232.90591430664,
  -29.246015548706,
@@ -3649,13 +3437,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking6",
- "oldId":2472,
+ "oldId":2410,
  "pos":[
  -229.74955749512,
  -33.967147827148,
@@ -3685,13 +3477,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking7",
- "oldId":2473,
+ "oldId":2411,
  "pos":[
  -203.72142028809,
  -35.680519104004,
@@ -3721,13 +3517,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking8",
- "oldId":2474,
+ "oldId":2412,
  "pos":[
  -195.62211608887,
  -34.613357543945,
@@ -3757,13 +3557,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking9",
- "oldId":2475,
+ "oldId":2413,
  "pos":[
  -212.35475158691,
  -31.673887252808,
@@ -3793,13 +3597,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking10",
- "oldId":2476,
+ "oldId":2414,
  "pos":[
  -252.13130187988,
  -29.26979637146,
@@ -3829,13 +3637,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking11",
- "oldId":2477,
+ "oldId":2415,
  "pos":[
  -179.20367431641,
  -17.934623718262,
@@ -3865,13 +3677,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking12",
- "oldId":2478,
+ "oldId":2416,
  "pos":[
  -174.64402770996,
  -23.930713653564,
@@ -3901,13 +3717,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking13",
- "oldId":2479,
+ "oldId":2417,
  "pos":[
  -173.46600341797,
  -26.042297363281,
@@ -3937,13 +3757,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking14",
- "oldId":2480,
+ "oldId":2418,
  "pos":[
  -171.58012390137,
  -28.245296478271,
@@ -3973,13 +3797,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_depot_parking15",
- "oldId":2481,
+ "oldId":2419,
  "pos":[
  -169.87109375,
  -30.226385116577,
@@ -4009,13 +3837,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking1",
- "oldId":2483,
+ "oldId":2421,
  "pos":[
  -106.75296020508,
  -885.02972412109,
@@ -4045,13 +3877,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking2",
- "oldId":2484,
+ "oldId":2422,
  "pos":[
  -100.80420684814,
  -890.45056152344,
@@ -4081,13 +3917,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking3",
- "oldId":2485,
+ "oldId":2423,
  "pos":[
  -115.26900482178,
  -885.12854003906,
@@ -4117,13 +3957,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking4",
- "oldId":2486,
+ "oldId":2424,
  "pos":[
  -118.08251953125,
  -887.98016357422,
@@ -4153,13 +3997,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking5",
- "oldId":2487,
+ "oldId":2425,
  "pos":[
  -119.76516723633,
  -880.55047607422,
@@ -4189,13 +4037,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking6",
- "oldId":2488,
+ "oldId":2426,
  "pos":[
  -135.57708740234,
  -888.18463134766,
@@ -4225,13 +4077,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking7",
- "oldId":2489,
+ "oldId":2427,
  "pos":[
  -129.03663635254,
  -884.35375976563,
@@ -4261,13 +4117,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking8",
- "oldId":2490,
+ "oldId":2428,
  "pos":[
  -126.74253082275,
  -877.13568115234,
@@ -4297,13 +4157,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking9",
- "oldId":2491,
+ "oldId":2429,
  "pos":[
  -130.57098388672,
  -871.18505859375,
@@ -4333,13 +4197,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_culdesac_parking10",
- "oldId":2492,
+ "oldId":2430,
  "pos":[
  -120.57077026367,
  -883.5302734375,
@@ -4369,13 +4237,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking1",
- "oldId":2494,
+ "oldId":2432,
  "pos":[
  902.45709228516,
  -545.75219726563,
@@ -4405,13 +4277,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking2",
- "oldId":2495,
+ "oldId":2433,
  "pos":[
  910.90014648438,
  -546.01959228516,
@@ -4441,13 +4317,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking3",
- "oldId":2496,
+ "oldId":2434,
  "pos":[
  915.08038330078,
  -537.74041748047,
@@ -4477,13 +4357,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking4",
- "oldId":2497,
+ "oldId":2435,
  "pos":[
  905.61785888672,
  -521.64581298828,
@@ -4513,13 +4397,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking5",
- "oldId":2498,
+ "oldId":2436,
  "pos":[
  912.99334716797,
  -522.35632324219,
@@ -4549,13 +4437,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking6",
- "oldId":2499,
+ "oldId":2437,
  "pos":[
  920.50268554688,
  -523.62188720703,
@@ -4585,13 +4477,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking7",
- "oldId":2500,
+ "oldId":2438,
  "pos":[
  893.03186035156,
  -531.48669433594,
@@ -4621,13 +4517,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking8",
- "oldId":2501,
+ "oldId":2439,
  "pos":[
  892.50671386719,
  -536.97088623047,
@@ -4657,13 +4557,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking9",
- "oldId":2502,
+ "oldId":2440,
  "pos":[
  878.88415527344,
  -543.66833496094,
@@ -4693,13 +4597,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking10",
- "oldId":2503,
+ "oldId":2441,
  "pos":[
  878.58770751953,
  -546.34710693359,
@@ -4729,13 +4637,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking11",
- "oldId":2504,
+ "oldId":2442,
  "pos":[
  879.11053466797,
  -548.90069580078,
@@ -4765,13 +4677,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking12",
- "oldId":2505,
+ "oldId":2443,
  "pos":[
  879.10668945313,
  -551.62017822266,
@@ -4801,13 +4717,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking13",
- "oldId":2506,
+ "oldId":2444,
  "pos":[
  879.07879638672,
  -554.32916259766,
@@ -4837,13 +4757,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking14",
- "oldId":2507,
+ "oldId":2445,
  "pos":[
  879.05932617188,
  -556.92828369141,
@@ -4873,13 +4797,17 @@
  ],
  "customFields":{
  "names":{},
- "tags":{},
+ "tags":{
+ "forwards":true,
+ "ignoreOthers":true,
+ "perfect":true
+ },
  "types":{},
  "values":{}
  },
  "isMultiSpot":false,
  "name":"bcm_belasco_parking15",
- "oldId":2508,
+ "oldId":2446,
  "pos":[
  879.09344482422,
  -559.77484130859,
@@ -5200,81 +5128,8 @@
  "types":{},
  "values":{}
  },
- "name":"bcmGarage_23",
- "oldId":2436,
- "top":{
- "active":false,
- "normal":[
- 0,
- 0,
- 1
- ],
- "pos":[
- 0,
- 0,
- 10
- ]
- },
- "vertices":[
- [
- -689.55297851563,
- 40.314167022705,
- 103.47431945801
- ],
- [
- -709.95092773438,
- 20.761594772339,
- 103.18807983398
- ],
- [
- -702.42254638672,
- 11.130167961121,
- 103.22477722168
- ],
- [
- -679.47906494141,
- 32.352230072021,
- 103.52130126953
- ],
- [
- -682.76116943359,
- 36.774555206299,
- 103.49468994141
- ],
- [
- -686.70404052734,
- 35.68087387085,
- 103.45010375977
- ]
- ]
- },
- {
- "bot":{
- "active":false,
- "normal":[
- 0,
- 0,
- -1
- ],
- "pos":[
- 0,
- 0,
- -10
- ]
- },
- "color":[
- 1,
- 1,
- 1
- ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
- },
  "name":"bcm_chinatown",
- "oldId":2447,
+ "oldId":2383,
  "top":{
  "active":false,
  "normal":[
@@ -5295,14 +5150,14 @@
  117.49309082031
  ],
  [
- -820.83264160156,
- 618.66448974609,
- 117.36676330566
+ -825.92547607422,
+ 628.96875,
+ 116.99593174458
  ],
  [
- -813.19256591797,
- 614.42352294922,
- 117.37288208008
+ -813.33422851563,
+ 629.00085449219,
+ 117.16300201416
  ],
  [
  -804.95446777344,
@@ -5352,7 +5207,7 @@
  "values":{}
  },
  "name":"bcm_trackside",
- "oldId":2454,
+ "oldId":2392,
  "top":{
  "active":false,
  "normal":[
@@ -5415,7 +5270,7 @@
  "values":{}
  },
  "name":"bcm_dragstrip",
- "oldId":2461,
+ "oldId":2399,
  "top":{
  "active":false,
  "normal":[
@@ -5493,7 +5348,7 @@
  "values":{}
  },
  "name":"bcm_depot",
- "oldId":2466,
+ "oldId":2404,
  "top":{
  "active":false,
  "normal":[
@@ -5561,7 +5416,7 @@
  "values":{}
  },
  "name":"bcm_culdesac",
- "oldId":2482,
+ "oldId":2420,
  "top":{
  "active":false,
  "normal":[
@@ -5659,7 +5514,7 @@
  "values":{}
  },
  "name":"bcm_belasco",
- "oldId":2493,
+ "oldId":2431,
  "top":{
  "active":false,
  "normal":[

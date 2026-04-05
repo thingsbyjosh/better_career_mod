@@ -583,6 +583,12 @@ local BODY_STYLE_TO_CLASS = {
 }
 
 classifyVehicle = function(vehicleData)
+ -- Step 0: Trailer detection — trailers have Type.Trailer in aggregates
+ local aType = vehicleData.aggregates and vehicleData.aggregates.Type
+ if aType and (aType.Trailer or aType.Prop or aType.Utility) then
+ return "Trailer"
+ end
+
  local bodyStyle = firstAggregateKey(vehicleData, "Body Style")
  local hp = vehicleData.Power or 0
  local value = vehicleData.Value or 0
@@ -1082,9 +1088,7 @@ generateListing = function(params)
  })
  realValueCents = pricingEngine.clampPrice(realBaseCents)
 
- log('I', 'listingGenerator', 'SCAMMER realValue: configVal=' .. tostring(realConfigBaseValue)
- .. ' mileage=' .. tostring(realMileage) .. 'km power=' .. tostring(realPowerHP) .. 'hp'
- .. ' class=' .. tostring(realVehicleClass) .. ' => $' .. tostring(math.floor((realValueCents or 0) / 100)))
+ log('D', 'listingGenerator', 'SCAMMER realValue: $' .. tostring(math.floor((realValueCents or 0) / 100)))
  end
 
  -- Generate seller identity
@@ -1118,10 +1122,7 @@ generateListing = function(params)
 
  local listingText = generateListingText(vehicleData, archetypeKey, language, seed, textOverrides)
 
- -- DEBUG: dump listing text to log (remove after text review)
- log("I", "listingGenerator", "LISTING TEXT [" .. archetypeKey .. "/" .. language .. "] id=listing_" .. seed .. " brand=" .. (vehicleData.Brand or "?") .. " model=" .. (vehicleData.Name or "?"))
- log("I", "listingGenerator", " TITLE: " .. (listingText.title or "(nil)"))
- log("I", "listingGenerator", " DESC: " .. (listingText.description or "(nil)"))
+ -- Listing text logging removed (was debug-only, caused stutter with 150+ listings)
 
  -- Compute market value (BUG FIX: now stored in listing table)
  local marketValueCents = basePriceCents

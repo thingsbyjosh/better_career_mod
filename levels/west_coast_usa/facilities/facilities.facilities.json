@@ -9,45 +9,7 @@
  "keyLabel":"Vehicle & Parts Shopping"
  }
  ],
- "description":"ui.career.computer.bigmapLabel.garage",
- "doors":[
- [
- "bcmGarage_23_area",
- "bcmGarage_23_icon"
- ]
- ],
- "functions":{
- "insurances":true,
- "painting":true,
- "partInventory":true,
- "partShop":true,
- "playerAbstract":true,
- "sleep":true,
- "tuning":true,
- "vehicleInventory":true,
- "vehicleShop":true
- },
- "garageId":"bcmGarage_23",
- "icon":"poi_laptop_round",
- "iconLift":0.24,
- "iconOffsetHeight":0.24,
- "id":"bcmGarage_23_area",
- "name":"Test1",
- "preview":"",
- "screens":[
- "commercialGarageComputer_screen_2"
- ]
- },
- {
- "activityAcceptProps":[
- {
- "keyLabel":"Vehicle & Parts Management"
- },
- {
- "keyLabel":"Vehicle & Parts Shopping"
- }
- ],
- "description":"ui.career.computer.bigmapLabel.garage",
+ "description":"Hidden between the streets of Chinatown, this small workshop has been standing longer than anyone remembers. There’s no luxury here, no extra space — just tools that have seen too many hands and cars that probably shouldn’t have started again… but did.",
  "doors":[
  [
  "bcm_chinatown_area",
@@ -85,7 +47,7 @@
  "keyLabel":"Vehicle & Parts Shopping"
  }
  ],
- "description":"ui.career.computer.bigmapLabel.garage",
+ "description":"Just outside the racetrack, where podium dreams meet unpaid bills. No fancy floors here — just real oil stains and tools that have survived more failures than successes.If it breaks, we fix it. If we can’t fix it… we pretend it’s not a problem until race day.",
  "doors":[
  [
  "bcm_trackside_area",
@@ -161,7 +123,7 @@
  "keyLabel":"Vehicle & Parts Shopping"
  }
  ],
- "description":"ui.career.computer.bigmapLabel.garage",
+ "description":"Welcome to the place where cars come when they need space, attention… or a place to hide from their previous owner. With room for dozens of vehicles and enough concrete to lose a car for weeks, this depot is the logistical heart of any serious operation.\n\nFrom quick inspections to “creative solutions” for mechanical problems, something is always moving here. Usually cars. Sometimes invoices.",
  "doors":[
  [
  "bcm_depot_area",
@@ -199,7 +161,7 @@
  "keyLabel":"Vehicle & Parts Shopping"
  }
  ],
- "description":"ui.career.computer.bigmapLabel.garage",
+ "description":"Located at the end of a quiet cul-de-sac, this elegant home offers more than just a beautiful façade and perfectly trimmed lawn. It offers enough space for all those cars you promised were “just a quick project.”\n\nWith a spacious garage and a driveway capable of holding more vehicles than you’d comfortably admit, this property is ideal for anyone who wants suburban comfort while collecting engines, tools and questionable financial decisions.\n\nThe neighbors say it’s a very peaceful place. Except on weekends.",
  "doors":[
  [
  "bcm_culdesac_area",
@@ -271,32 +233,7 @@
  {
  "capacity":2,
  "defaultPrice":105000,
- "description":"",
- "icon":"poi_garage_2_round",
- "id":"bcmGarage_23",
- "name":"Test1",
- "parkingSpotNames":[
- "bcmGarage_23_parking1",
- "bcmGarage_23_parking2",
- "bcmGarage_23_parking3",
- "bcmGarage_23_parking4",
- "bcmGarage_23_parking5",
- "bcmGarage_23_parking6",
- "bcmGarage_23_parking7",
- "bcmGarage_23_parking8",
- "bcmGarage_23_parking9",
- "bcmGarage_23_parking10"
- ],
- "preview":"garage_servicestation.jpg",
- "tags":{},
- "zoneNames":[
- "bcmGarage_23"
- ]
- },
- {
- "capacity":2,
- "defaultPrice":105000,
- "description":"",
+ "description":"Hidden between the streets of Chinatown, this small workshop has been standing longer than anyone remembers. There’s no luxury here, no extra space — just tools that have seen too many hands and cars that probably shouldn’t have started again… but did.",
  "icon":"poi_garage_2_round",
  "id":"bcm_chinatown",
  "name":"The chinatown",
@@ -306,7 +243,9 @@
  "bcm_chinatown_parking3",
  "bcm_chinatown_parking4",
  "bcm_chinatown_parking5",
- "bcm_chinatown_parking6"
+ "bcm_chinatown_parking6",
+ "bcm_chinatown_parking7",
+ "bcm_chinatown_parking8"
  ],
  "preview":"bcm_chinatown.png",
  "tags":{},
@@ -317,7 +256,7 @@
  {
  "capacity":2,
  "defaultPrice":125000,
- "description":"",
+ "description":"Just outside the racetrack, where podium dreams meet unpaid bills. No fancy floors here — just real oil stains and tools that have survived more failures than successes.If it breaks, we fix it. If we can’t fix it… we pretend it’s not a problem until race day.",
  "icon":"poi_garage_2_round",
  "id":"bcm_trackside",
  "name":"Trackside Private Workshop",
@@ -356,8 +295,8 @@
  },
  {
  "capacity":5,
- "defaultPrice":1000000,
- "description":"",
+ "defaultPrice":5000000,
+ "description":"Welcome to the place where cars come when they need space, attention… or a place to hide from their previous owner. With room for dozens of vehicles and enough concrete to lose a car for weeks, this depot is the logistical heart of any serious operation.\n\nFrom quick inspections to “creative solutions” for mechanical problems, something is always moving here. Usually cars. Sometimes invoices.",
  "icon":"poi_garage_2_round",
  "id":"bcm_depot",
  "name":"Industrial Vehicle Depot",
@@ -387,7 +326,7 @@
  {
  "capacity":4,
  "defaultPrice":750000,
- "description":"",
+ "description":"Located at the end of a quiet cul-de-sac, this elegant home offers more than just a beautiful façade and perfectly trimmed lawn. It offers enough space for all those cars you promised were “just a quick project.”\n\nWith a spacious garage and a driveway capable of holding more vehicles than you’d comfortably admit, this property is ideal for anyone who wants suburban comfort while collecting engines, tools and questionable financial decisions.\n\nThe neighbors say it’s a very peaceful place. Except on weekends.",
  "icon":"poi_garage_2_round",
  "id":"bcm_culdesac",
  "name":"Cul-de-Sac Executive Garage",
@@ -403,7 +342,7 @@
  "bcm_culdesac_parking9",
  "bcm_culdesac_parking10"
  ],
- "preview":"",
+ "preview":"bcm_culdesac.png",
  "tags":{},
  "zoneNames":[
  "bcm_culdesac"
@@ -411,7 +350,7 @@
  },
  {
  "capacity":2,
- "defaultPrice":100000,
+ "defaultPrice":300000,
  "description":"",
  "icon":"poi_garage_2_round",
  "id":"bcm_belasco",

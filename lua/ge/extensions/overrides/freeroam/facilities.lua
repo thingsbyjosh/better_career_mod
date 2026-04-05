@@ -217,6 +217,7 @@ local function getDealership(id) return getFacility("dealership", id) end
 
 
 local function getAverageDoorPositionForFacility(facility)
+ if not facility then return nil end
  local center, count = vec3(0,0,0), 0
 
  for _, pair in ipairs(facility.doors or {}) do
@@ -242,6 +243,7 @@ local function getAverageDoorPositionForFacility(facility)
 end
 
 local function getClosestDoorPositionForFacility(facility)
+ if not facility then return nil end
  local camPos = core_camera.getPosition()
  local center = getAverageDoorPositionForFacility(facility)
  local closest = nil

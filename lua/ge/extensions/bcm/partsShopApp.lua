@@ -42,6 +42,13 @@ local carts = {}
 -- Whether a shopping session is active (we initiated it)
 local sessionActive = false
 
+-- Garage ID where the current shopping session was started (for order destination)
+local currentGarageId = nil
+
+-- Cached part masses from jbeam nodes (calculated on startPartsShop, used at checkout)
+-- { [partOriginName] = massKg }
+local cachedPartMasses = {}
+
 -- ============================================================================
 -- Cart persistence
 -- ============================================================================
@@ -143,6 +150,15 @@ startPartsShop = function(inventoryId, originComputerId)
  spawnedVehicles = spawnedList,
  })
 
+ -- Resolve garage ID from computer (for order destination — D-17)
+ currentGarageId = nil
+ if originComputerId and freeroam_facilities then
+ local comp = freeroam_facilities.getFacility("computer", originComputerId)
+ if comp and comp.garageId then
+ currentGarageId = comp.garageId
+ end
+ end
+
  log('I', logTag, 'startPartsShop: entered for inventoryId=' .. tostring(inventoryId))
 end
 
@@ -177,7 +193,7 @@ end
 -- applyCheckout
 -- ============================================================================
 
-applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents)
+applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents, pickupNow)
  inventoryId = tonumber(inventoryId) or inventoryId
  totalCents = tonumber(totalCents) or 0
 
@@ -230,21 +246,46 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents)
  vehicleModel = vehicles[inventoryId].model or ''
  end
 
+ -- Calculate part masses from jbeam nodes NOW (vehicle has preview parts installed).
+ -- Must be done BEFORE endShopping/cancelShopping which respawns the vehicle.
+ -- partOrigin in nodes matches the installed part variant name (e.g., miramar_engine_1.9_dohc).
+ cachedPartMasses = {}
+ local vehIdMap = career_modules_inventory.getMapInventoryIdToVehId()
+ local shopVehId = vehIdMap and vehIdMap[inventoryId]
+ if shopVehId then
+ local vd = core_vehicle_manager.getVehicleData(shopVehId)
+ if vd and vd.vdata and vd.vdata.nodes then
+ for _, node in ipairs(vd.vdata.nodes) do
+ local po = node.partOrigin
+ if po then
+ cachedPartMasses[po] = (cachedPartMasses[po] or 0) + (node.nodeWeight or 0)
+ end
+ end
+ end
+ end
+
  -- Create order records for ALL delivery types (purchase history)
  for _, item in ipairs(cartItems) do
  if bcm_partsOrders then
+ local partMass = cachedPartMasses[item.partName] or nil
+ if partMass then
+ partMass = math.floor(partMass * 10) / 10 -- round to 1 decimal
+ end
  bcm_partsOrders.createOrder(
  {
  partName = item.partName or '',
  vehicleModel = vehicleModel,
- value = math.floor((item.price or 0) / 2),
+ value = math.floor((item.price or 0) / 200), -- cents→dollars, halved for resale margin
  slot = item.slot or '',
  partCondition = {},
  description = item.partLabel or item.partName or '',
  partPath = (item.slot or '') .. (item.partName or ''),
+ mass = partMass,
+ garageId = currentGarageId,
  },
  deliveryType or 'pickup',
- { purchasePrice = item.price or 0 }
+ { purchasePrice = item.price or 0 },
+ { pickupNow = pickupNow }
  )
  end
  end
@@ -285,6 +326,16 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents)
  -- Notify Vue to clean up state
  guihooks.trigger('BCMExitPartsShopMode', {})
  guihooks.trigger('BCMPartsShopCheckoutComplete', { ordersCreated = #cartItems, deliveryType = deliveryType })
+
+ -- Notify tutorial FSM of fullservice checkout completion
+ -- Note: fullservice uses vanilla applyShopping which is synchronous (no async replaceVehicle).
+ -- The tutorial call fires immediately after the synchronous checkout completes.
+ if extensions.isExtensionLoaded('bcm_tutorial') then
+ local tut = extensions.bcm_tutorial
+ if tut and tut.onBCMPartsShopCheckoutComplete then
+ tut.onBCMPartsShopCheckoutComplete({ ordersCreated = #cartItems, deliveryType = deliveryType })
+ end
+ end
 
  log('I', logTag, 'applyCheckout FULLSERVICE: ' .. #cartItems .. ' parts, applyShopping=' .. tostring(applyOk) .. ', total=' .. totalCents)
  else
@@ -374,6 +425,23 @@ M.startPartsShop = function(inventoryId, originComputerId)
  startPartsShop(inventoryId, compId)
 end
 M.exitPartsShop = function(inventoryId, revert) exitPartsShop(inventoryId, revert) end
-M.applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents) applyCheckout(inventoryId, cartItemsJson, deliveryType, tonumber(totalCents)) end
+M.applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents, pickupNow) applyCheckout(inventoryId, cartItemsJson, deliveryType, tonumber(totalCents), pickupNow) end
+
+-- Order management bridge (called from Vue via engineLua)
+M.prepareForPickup = function(orderId)
+ if bcm_partsOrders then return bcm_partsOrders.prepareForPickup(orderId) end
+end
+
+M.restartDelivery = function(orderId)
+ if bcm_partsOrders then return bcm_partsOrders.restartDelivery(orderId) end
+end
+
+M.setPickupGPS = function(orderId)
+ if bcm_partsOrders then return bcm_partsOrders.setPickupGPS(orderId) end
+end
+
+M.prepareAllForPickup = function(facId)
+ if bcm_partsOrders then return bcm_partsOrders.prepareAllForPickup(facId) end
+end
 
 return M

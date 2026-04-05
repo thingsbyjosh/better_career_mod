@@ -64,8 +64,9 @@ local defaults = {
  policeCount = 3, -- integer 1-12: number of police units to spawn
  policeAdditive = false, -- boolean: if true, police are EXTRA vehicles on top of traffic; if false, they replace traffic slots
  policeSpawnMode = "flexible", -- "flexible" | "static": flexible deactivates reserve police outside pursuits
- policeFlexMin = 1, -- integer 1-3: active police when no pursuit (flexible mode)
+ policeFlexMin = 1, -- integer 0-3: active police when no pursuit (flexible mode)
  policeFlexMax = 4, -- integer 2-6: max police during pursuit (flexible mode)
+ policePresenceCycle = 45, -- integer: -1=off, 0=always, 10-300=seconds between presence rolls
  pursuitHudEnabled = true, -- boolean: show pursuit HUD overlay during active chases
  turboEncabulator = false, -- Joke setting: does absolutely nothing. Certified by engineers.
  planexTimeMultiplier = 1.0, -- PlanEx: scales all timers (urgent, temperature). 1.0 = default, 2.0 = double time
@@ -201,7 +202,8 @@ applySettingToModule = function(key, value)
  log('D', logTag, 'Applied language=' .. tostring(value))
 
  elseif key == "policeEnabled" or key == "policeCount" or key == "policeAdditive"
- or key == "policeSpawnMode" or key == "policeFlexMin" or key == "policeFlexMax" then
+ or key == "policeSpawnMode" or key == "policeFlexMin" or key == "policeFlexMax"
+ or key == "policePresenceCycle" then
  pcall(function()
  if bcm_police then bcm_police.onSettingChanged(key, value) end
  end)

@@ -32,6 +32,8 @@ local resolveEffectiveCapacity
 local reorderStops
 local optimizeRoute
 local pinStopAtPosition
+local getTrailerForVehicle
+local getVehicleNiceName
 
 local logTag = 'bcm_planexApp'
 
@@ -247,13 +249,17 @@ resolveEffectiveCapacity = function()
 end
 
 -- After getting vehicle capacity, store it, recalc pool estimates, and notify Vue
-local function onVehicleCapacityReady(inventoryId, capacity, largestContainer)
+local function onVehicleCapacityReady(inventoryId, capacity, largestContainer, trailerName, tractorCapacity, trailerCapacity)
  lastQueriedCapacity = capacity or 0
  lastQueriedLargestContainer = largestContainer or capacity or 0
  guihooks.trigger('BCMPlanexVehicleSelected', {
  inventoryId = inventoryId,
  capacity = capacity,
  largestContainer = largestContainer or capacity,
+ -- trailer coupling info
+ trailerName = trailerName, -- nil if no trailer
+ tractorCapacity = tractorCapacity or capacity or 0,
+ trailerCapacity = trailerCapacity or 0,
  })
  -- Generate cargo for all packs at full vehicle capacity (pricing from real manifests)
  if bcm_planex and capacity and capacity > 0 then
@@ -261,27 +267,108 @@ local function onVehicleCapacityReady(inventoryId, capacity, largestContainer)
  end
 end
 
+-- Resolve trailer object for a tractor (if coupled)
+getTrailerForVehicle = function(tractorObjId)
+ local trailerData = core_trailerRespawn and core_trailerRespawn.getTrailerData and core_trailerRespawn.getTrailerData()
+ if not trailerData then return nil end
+ local entry = trailerData[tractorObjId]
+ return entry and entry.trailerId and be:getObjectByID(entry.trailerId) or nil
+end
+
+-- Resolve nice name for any vehicle (inventory or model fallback)
+getVehicleNiceName = function(vehObjId)
+ local invId = career_modules_inventory.getInventoryIdFromVehicleId(vehObjId)
+ local vehData = invId and career_modules_inventory.getVehicles()[invId]
+ if vehData and vehData.niceName then return vehData.niceName end
+ if vehData and vehData.model then
+ local modelInfo = core_vehicles and core_vehicles.getModel(vehData.model)
+ if modelInfo and modelInfo.Brand and modelInfo.Name then
+ return modelInfo.Brand .. ' ' .. modelInfo.Name
+ end
+ if modelInfo and modelInfo.Name then return modelInfo.Name end
+ end
+ return 'Trailer'
+end
+
 -- Query cargo containers via core_vehicleBridge.requestValue (vanilla API).
 -- Works on any spawned vehicle — does NOT require player to be mounted.
 -- extracts both totalCapacity and largestContainer.
+-- extended with trailer aggregation (tractor + trailer containers).
 queryCargoContainers = function(vehObj, inventoryId)
  core_vehicleBridge.requestValue(vehObj, function(data)
  local totalSlots = 0
  local largestContainer = 0
+ local tractorCapacity = 0
  -- data structure from getCargoContainers: { { {capacity=N, ...}, {capacity=M, ...} } }
  local containers = data and data[1] or nil
  if containers then
  for _, container in pairs(containers) do
+ -- Only count containers that accept parcels (skip dryBulk/fluid aggregate boxes)
+ local validForParcels = false
+ if container.cargoTypes then
+ for _, ct in ipairs(container.cargoTypes) do
+ if ct == "parcel" then validForParcels = true break end
+ end
+ else
+ validForParcels = true -- no type restriction = accepts anything
+ end
+ if validForParcels then
  local cap = container.capacity or 0
  totalSlots = totalSlots + cap
  if cap > largestContainer then largestContainer = cap end
  end
  end
- log('I', logTag, string.format('getCargoContainers invId=%s total=%d largest=%d',
+ end
+ tractorCapacity = totalSlots
+
+ -- Check for coupled trailer (per D-04)
+ local tractorObjId = vehObj:getID()
+ local trailerObj = getTrailerForVehicle(tractorObjId)
+
+ if trailerObj then
+ -- Query trailer containers (sequential chaining per research recommendation)
+ core_vehicleBridge.requestValue(trailerObj, function(trailerData)
+ local trailerSlots = 0
+ local trailerLargest = 0
+ local trailerContainers = trailerData and trailerData[1] or nil
+ if trailerContainers then
+ for _, container in pairs(trailerContainers) do
+ local validForParcels = false
+ if container.cargoTypes then
+ for _, ct in ipairs(container.cargoTypes) do
+ if ct == "parcel" then validForParcels = true break end
+ end
+ else
+ validForParcels = true
+ end
+ if validForParcels then
+ local cap = container.capacity or 0
+ trailerSlots = trailerSlots + cap
+ if cap > trailerLargest then trailerLargest = cap end
+ end
+ end
+ end
+ -- Aggregate per D-01, D-02
+ totalSlots = totalSlots + trailerSlots
+ if trailerLargest > largestContainer then largestContainer = trailerLargest end
+
+ log('I', logTag, string.format('getCargoContainers invId=%s tractor=%d trailer=%d total=%d largest=%d',
+ tostring(inventoryId), tractorCapacity, trailerSlots, totalSlots, largestContainer))
+ if largestContainer <= 0 then largestContainer = totalSlots end
+ -- Per D-03: single aggregate call
+ bcm_planex.setVehicleCapacity(inventoryId, totalSlots, largestContainer)
+
+ local trailerName = getVehicleNiceName(trailerObj:getID())
+ onVehicleCapacityReady(inventoryId, totalSlots, largestContainer, trailerName, tractorCapacity, trailerSlots)
+ end, 'getCargoContainers')
+ else
+ -- No trailer — finalize with tractor-only
+ log('I', logTag, string.format('getCargoContainers invId=%s total=%d largest=%d (no trailer)',
  tostring(inventoryId), totalSlots, largestContainer))
  if largestContainer <= 0 then largestContainer = totalSlots end
  bcm_planex.setVehicleCapacity(inventoryId, totalSlots, largestContainer)
- onVehicleCapacityReady(inventoryId, totalSlots, largestContainer)
+ onVehicleCapacityReady(inventoryId, totalSlots, largestContainer, nil, totalSlots, 0)
+ end
  end, 'getCargoContainers')
 end
 
@@ -353,12 +440,20 @@ requestGarageVehicles = function()
  -- Always query fresh capacity (async — UI updates when callback fires)
  queryCargoContainers(vehObj, invId)
 
+ -- detect coupled trailer for this vehicle
+ local trailerObj = getTrailerForVehicle(vehObjId)
+ local trailerName = nil
+ if trailerObj then
+ trailerName = getVehicleNiceName(trailerObj:getID())
+ end
+
  table.insert(list, {
  inventoryId = invId,
  niceName = niceName or 'Vehicle #' .. tostring(invId),
  model = veh.model or '',
  config = veh.config or '',
  capacity = nil, -- filled async by queryCargoContainers callback
+ trailerName = trailerName, -- nil if no trailer coupled
  })
  log('I', logTag, 'Spawned vehicle: invId=' .. tostring(invId) .. ' niceName=' .. tostring(niceName) .. ' model=' .. tostring(veh.model))
  end
@@ -386,6 +481,13 @@ dismissResults = function()
  be:setSimulationTimeScale(1)
  end
  log('I', logTag, 'dismissResults: game unpaused')
+
+ -- Re-set GPS waypoint for tutorial toll_to_garage (vanilla clears nav on route complete)
+ if extensions.bcm_tutorial and extensions.bcm_tutorial.isInTollToGarage then
+ if extensions.bcm_tutorial.isInTollToGarage() then
+ extensions.bcm_tutorial.refreshGarageWaypoint()
+ end
+ end
 end
 
 -- Auto-detect current player vehicle for phone app.
@@ -467,5 +569,58 @@ M.pinStopAtPosition = pinStopAtPosition
 M.setCargoLoadPercent = function(pct) cargoLoadPercent = math.max(10, math.min(100, tonumber(pct) or 50)) end
 M.getCargoLoadPercent = function() return cargoLoadPercent end
 M.onCareerModulesActivated = onCareerModulesActivated
+
+-- ============================================================================
+-- Coupler lifecycle hooks for trailer capacity reactivity
+-- ============================================================================
+
+-- onCouplerAttached: fires on physics coupler connection (per D-05, D-06)
+M.onCouplerAttached = function(objId1, objId2, nodeId, obj2nodeId)
+ local playerVehId = be:getPlayerVehicleID(0)
+ if objId1 ~= playerVehId and objId2 ~= playerVehId then return end
+
+ local deliveryInvId = bcm_planex and bcm_planex.getDeliveryVehicleInventoryId
+ and bcm_planex.getDeliveryVehicleInventoryId()
+ if not deliveryInvId then return end
+
+ local vehObj = be:getObjectByID(playerVehId)
+ if vehObj then
+ log('I', logTag, 'onCouplerAttached: re-querying capacity for player vehicle')
+ queryCargoContainers(vehObj, deliveryInvId)
+ end
+end
+
+-- onCouplerDetached: fires on physics breakage (crash-induced) (per D-05, D-07)
+M.onCouplerDetached = function(objId1, objId2, nodeId, obj2nodeId)
+ local playerVehId = be:getPlayerVehicleID(0)
+ if objId1 ~= playerVehId and objId2 ~= playerVehId then return end
+
+ local deliveryInvId = bcm_planex and bcm_planex.getDeliveryVehicleInventoryId
+ and bcm_planex.getDeliveryVehicleInventoryId()
+ if not deliveryInvId then return end
+
+ local vehObj = be:getObjectByID(playerVehId)
+ if vehObj then
+ log('I', logTag, 'onCouplerDetached: re-querying capacity (trailer detached by physics)')
+ queryCargoContainers(vehObj, deliveryInvId)
+ end
+end
+
+-- onCouplerDetach: fires on user-initiated detach via UI menu (different signature!)
+-- Per research Pitfall 1: this is a DIFFERENT hook from onCouplerDetached
+M.onCouplerDetach = function(objId, nodeId)
+ local playerVehId = be:getPlayerVehicleID(0)
+ if objId ~= playerVehId then return end
+
+ local deliveryInvId = bcm_planex and bcm_planex.getDeliveryVehicleInventoryId
+ and bcm_planex.getDeliveryVehicleInventoryId()
+ if not deliveryInvId then return end
+
+ local vehObj = be:getObjectByID(playerVehId)
+ if vehObj then
+ log('I', logTag, 'onCouplerDetach: re-querying capacity (user-initiated detach)')
+ queryCargoContainers(vehObj, deliveryInvId)
+ end
+end
 
 return M

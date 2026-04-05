@@ -31,6 +31,27 @@ M.onCareerActivated = function()
  dParcelMods = career_modules_delivery_parcelMods
  dVehicleTasks = career_modules_delivery_vehicleTasks
  step = util_stepHandler
+
+ -- BCM: patch cargoCards.getFilterSets to match BCM unlock thresholds
+ -- BCM info.json unlocks trailers at level 1, not vanilla's level 3
+ local dCargoCards = career_modules_delivery_cargoCards
+ local origGetFilterSets = dCargoCards.getFilterSets
+ dCargoCards.getFilterSets = function(cardsById)
+ local filterSets = origGetFilterSets(cardsById)
+ local deliveryLevel = career_branches.getBranchLevel("logistics-delivery")
+ for _, filter in ipairs(filterSets) do
+ if filter.value == "trailer" then
+ if deliveryLevel >= 1 then
+ filter.lockedInfo = nil
+ elseif filter.lockedInfo then
+ filter.lockedInfo.longLabel = "Requires 'Cargo Delivery' lvl 1"
+ filter.lockedInfo.shortLabel = "lvl 1"
+ filter.lockedInfo.minLevel = 1
+ end
+ end
+ end
+ return filterSets
+ end
 end
 
 -- data holders
@@ -490,6 +511,16 @@ local function finalizeVehicleOffer(offer)
 
  if not vehInfo then -- BCM: guard against nil vehicle info
  log("E","","finalizeVehicleOffer: no vehicle found for filterId: " .. tostring(offer.vehicle.filterId))
+ -- Force-expire the offer so cargoScreen skips it naturally
+ offer.offerExpiresAt = 0
+ offer.vehicle.model = offer.vehicle.filterId or "unknown"
+ offer.vehicle.config = ""
+ offer.vehicle.mileage = 0
+ offer.vehicle.brand = ""
+ offer.vehicle.name = ""
+ offer.vehicle.filterName = ""
+ offer.data.originalDistance = 0
+ offer.rewards = { money = 0 }
  return
  end
 

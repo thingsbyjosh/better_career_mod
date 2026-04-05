@@ -75,11 +75,14 @@ local getFlexPoolVehIds
 local checkCitizenReports
 local checkReportedSighting
 local getSpeedLimitAtPosition
+-- Presence cycle (randomized patrol presence)
+local updatePresenceCycle
 -- Debug commands
 local spawnPolice
 local triggerPursuit
 local resetPursuit
 local printStatus
+local setPresence
 
 -- ============================================================================
 -- Constants
@@ -273,7 +276,8 @@ local reportCheckTimer = 0 -- accumulator for report check interval
 local REPORT_DURATION = 120 -- seconds (2 minutes)
 local REPORT_CHECK_INTERVAL = 1.0 -- seconds between report checks
 local REPORT_SPEED_FACTOR = 2.0 -- double the speed limit
-local REPORT_TRAFFIC_PROXIMITY = 50 -- meters — must be near traffic to trigger speed report
+local REPORT_TRAFFIC_PROXIMITY = 15 -- meters — must be near traffic to trigger speed report
+local REPORT_COLLISION_PROXIMITY = 15 -- meters — safety check: NPC must be nearby to trigger collision report
 local REPORT_DAMAGE_THRESHOLD = 30 -- minimum damage delta to count as collision
 local REPORT_VISIBLE_DAMAGE_THRESHOLD = 40000 -- player vehicle damage level (~80% of totaled) to trigger report
 local REPORT_VISIBLE_DAMAGE_COOLDOWN = 120 -- 2 min cooldown between visible damage reports
@@ -286,9 +290,23 @@ local reserveVehIds = {} -- vehicle IDs currently deactivated (reserve pool)
 local activeFlexVehIds = {} -- vehicle IDs currently active in traffic
 local reinforcementTimer = 0 -- accumulator for next reserve activation
 local deactivatingVehIds = {} -- { [vehId] = true } — vehicles driving away, pending deactivation
-local DEACTIVATE_DISTANCE = 250 -- meters from player before reserve is deactivated
+local DEACTIVATE_DISTANCE = 30 -- meters from player before reserve is deactivated
 local REINFORCEMENT_INTERVAL_MIN = 1 -- seconds (heat 10)
 local REINFORCEMENT_INTERVAL_MAX = 8 -- seconds (heat 0)
+
+-- Presence cycle state
+local presenceCycleTimer = 0 -- accumulator for next presence roll
+local presenceActive = true -- whether patrol is currently "present"
+local presenceManualOverride = false -- when true, cycle is frozen (debug command)
+
+-- Post-arrest cooldown: block deactivation until vanilla emits 'release'
+local arrestPendingRelease = false -- true between arrest and release
+local arrestPendingTimer = 0 -- safety timeout
+local ARREST_RELEASE_TIMEOUT = 15 -- seconds to wait for release before forcing unblock
+
+-- Citizen report boost: doubles presence chance after a report
+local citizenReportBoostTimer = 0 -- countdown, >0 means boosted
+local CITIZEN_REPORT_BOOST_DURATION = 120 -- 2 minutes
 
 -- ============================================================================
 -- FMOD Action Queue (serializes audio-critical operations)
@@ -525,6 +543,23 @@ onVehicleGroupSpawned = function(vehIds, groupId, groupName)
 
  log('I', logTag, 'BCM police group spawned: ' .. #vehIds .. ' vehicles')
 
+ -- Clean up previous pool if it exists (prevents orphan police from double-spawn)
+ if #flexPoolVehIds > 0 then
+ log('I', logTag, 'Cleaning up previous pool: ' .. #flexPoolVehIds .. ' vehicles')
+ for _, oldVehId in ipairs(flexPoolVehIds) do
+ pcall(function()
+ gameplay_traffic.removeTraffic(oldVehId, true)
+ end)
+ pcall(function()
+ local obj = be:getObjectByID(oldVehId)
+ if obj then obj:delete() end
+ end)
+ end
+ activeFlexVehIds = {}
+ reserveVehIds = {}
+ deactivatingVehIds = {}
+ end
+
  -- Store all spawned IDs for flexible mode tracking
  flexPoolVehIds = {}
  for _, vehId in ipairs(vehIds) do
@@ -545,7 +580,7 @@ onVehicleGroupSpawned = function(vehIds, groupId, groupName)
  flexMin = bcm_settings.getSetting('policeFlexMin') or 1
  end
  end)
- flexMin = math.max(1, math.min(#vehIds, flexMin))
+ flexMin = math.max(0, math.min(#vehIds, flexMin))
 
  -- First flexMin vehicles stay active, rest go to reserve
  activeFlexVehIds = {}
@@ -999,10 +1034,12 @@ checkCitizenReports = function(dtSim)
  local delta = curDamage - prevDamage
  reportDamageSnapshot[vehId] = curDamage
  if delta > REPORT_DAMAGE_THRESHOLD then
- -- Verify this NPC is actually in physical contact with the player vehicle
+ -- Verify this NPC is actually in physical contact with the player vehicle + proximity safety
  local npcObj = map.objects[vehId]
  local inContact = npcObj and npcObj.objectCollisions and npcObj.objectCollisions[playerVehId] == 1
- if inContact then
+ local tpx, tpy, tpz = be:getObjectPositionXYZ(vehId)
+ local dist = playerPos:distance(vec3(tpx, tpy, tpz))
+ if inContact and dist <= REPORT_COLLISION_PROXIMITY then
  triggered = true
  reportReason = 'collision'
  log('I', logTag, string.format('[CITIZEN REPORT] Collision with traffic: veh=%d delta=%.0f speed=%.0f km/h (contact confirmed)', vehId, delta, playerSpeed * 3.6))
@@ -1085,6 +1122,9 @@ checkCitizenReports = function(dtSim)
  local wasActive = reportActive
  reportActive = true
  reportTimer = REPORT_DURATION -- reset to 2 minutes
+
+ -- Boost presence chance for 2 minutes after a citizen report
+ citizenReportBoostTimer = CITIZEN_REPORT_BOOST_DURATION
 
  -- Send phone notification only on new report (not on refresh)
  if not wasActive then
@@ -1377,8 +1417,9 @@ end
 updateReserveDeactivation = function(dt)
  if not isFlexibleMode() then return end
  if bcmPursuitActive then return end -- don't deactivate during pursuit
+ if arrestPendingRelease then return end -- wait for vanilla to finish arrest→release cycle
 
- -- Check if we have more active units than flexMin
+ -- Check if we have more active units than target minimum
  local flexMin = 1
  pcall(function()
  if bcm_settings then
@@ -1386,9 +1427,29 @@ updateReserveDeactivation = function(dt)
  end
  end)
 
- if #activeFlexVehIds <= flexMin then
- deactivatingVehIds = {}
- return -- already at minimum
+ -- When presence cycle says "no patrol", target is 0
+ if not presenceActive then
+ flexMin = 0
+ end
+
+ -- Count truly active (exclude units already driving away)
+ local trulyActive = 0
+ for _, vehId in ipairs(activeFlexVehIds) do
+ if not deactivatingVehIds[vehId] then trulyActive = trulyActive + 1 end
+ end
+
+ -- Below target: activate reserves to reach flexMin
+ if trulyActive < flexMin and #reserveVehIds > 0 then
+ while trulyActive < flexMin and #reserveVehIds > 0 do
+ activateReserveUnit()
+ trulyActive = trulyActive + 1
+ end
+ log('I', logTag, 'Presence: activated to flexMin=' .. flexMin .. ' (active=' .. trulyActive .. ')')
+ return
+ end
+
+ if trulyActive <= flexMin then
+ return -- already at or below target
  end
 
  local playerVehId = be:getPlayerVehicleID(0)
@@ -1400,18 +1461,19 @@ updateReserveDeactivation = function(dt)
  end)
  local playerPos = vec3(px, py, pz)
 
- -- Mark excess active units as "deactivating" (they should drive away)
+ -- Mark excess active units as "deactivating" — keep AI alive so they drive away naturally
  for i, vehId in ipairs(activeFlexVehIds) do
  if i > flexMin and not deactivatingVehIds[vehId] then
  deactivatingVehIds[vehId] = true
- -- Turn off siren and reset pursuit action so they drive away as traffic
  queueFmodAction({ type = 'siren', vehId = vehId, signal = 0 })
+ -- Switch to random driving so the unit leaves the area organically
+ local obj = be:getObjectByID(vehId)
+ if obj then
  pcall(function()
- local td = gameplay_traffic.getTrafficData()
- if td and td[vehId] and td[vehId].role then
- td[vehId].role:resetAction()
- end
+ obj:queueLuaCommand('ai.setMode("random")')
+ obj:queueLuaCommand('ai.setAggression(0.3)')
  end)
+ end
  log('D', logTag, 'Marked unit ' .. tostring(vehId) .. ' for deactivation (driving away)')
  end
  end
@@ -1437,6 +1499,51 @@ updateReserveDeactivation = function(dt)
 
  for _, vehId in ipairs(toDeactivate) do
  deactivateReserveUnit(vehId)
+ end
+end
+
+-- ============================================================================
+-- Presence cycle (randomized patrol visibility outside pursuit)
+-- ============================================================================
+
+updatePresenceCycle = function(dt)
+ if not isFlexibleMode() then return end
+ if bcmPursuitActive then return end
+ if arrestPendingRelease then return end
+ if presenceManualOverride then return end
+
+ local cycleInterval = 45
+ pcall(function()
+ if bcm_settings then
+ cycleInterval = bcm_settings.getSetting('policePresenceCycle') or 45
+ end
+ end)
+
+ -- 0 = Always on, no cycling
+ if cycleInterval == 0 then
+ if not presenceActive then
+ presenceActive = true
+ log('D', logTag, 'Presence cycle Always — patrol on')
+ end
+ return
+ end
+
+ presenceCycleTimer = presenceCycleTimer + dt
+ if presenceCycleTimer < cycleInterval then return end
+ presenceCycleTimer = 0
+
+ -- Roll dice: 50% base chance, 70% if citizen report boost active
+ local chance = citizenReportBoostTimer > 0 and 0.7 or 0.5
+ local roll = math.random() < chance
+
+ if presenceActive and not roll then
+ presenceActive = false
+ log('I', logTag, 'Presence cycle: patrol leaving')
+ -- updateReserveDeactivation will mark units for deactivation with respawn disabled
+ elseif not presenceActive and roll then
+ presenceActive = true
+ log('I', logTag, 'Presence cycle: patrol arriving')
+ -- updateReserveDeactivation will activate reserves on next tick
  end
 end
 
@@ -2100,6 +2207,8 @@ onPursuitAction = function(vehId, action, pursuitData)
  pursuitStartTime = 0
  stuckTimer = 0
  stuckRespawnAttempts = 0
+ arrestPendingRelease = true -- block deactivation until vanilla sends 'release'
+ arrestPendingTimer = 0
 
  -- Clean up spike strips + orphaned police
  cleanupSpikeStrips()
@@ -2170,6 +2279,10 @@ onPursuitAction = function(vehId, action, pursuitData)
 
  cleanupOrphanedPolice()
  resetBcmPursuitState()
+
+ elseif action == 'release' then
+ arrestPendingRelease = false
+ log('I', logTag, 'PURSUIT EVENT: action=release — deactivation unblocked')
  end
 
  -- Detect level change (synthesize level_change event)
@@ -2550,6 +2663,9 @@ onSettingChanged = function(key, value)
  -- This will happen naturally via updateReserveDeactivation on next tick
  log('I', logTag, 'Switched to flexible mode — excess units will deactivate')
  end
+ elseif key == 'policePresenceCycle' then
+ presenceCycleTimer = 0
+ log('I', logTag, 'Presence cycle interval changed to ' .. tostring(value) .. 's')
  end
 end
 
@@ -2732,11 +2848,39 @@ printStatus = function()
  log('I', logTag, 'deactivatingVehIds: ' .. tableSize(deactivatingVehIds))
  log('I', logTag, 'reinforcementTimer: ' .. string.format('%.1f', reinforcementTimer))
  log('I', logTag, 'reinforcementInterval: ' .. string.format('%.1f', getReinforcementInterval()))
+ log('I', logTag, '--- Presence Cycle ---')
+ log('I', logTag, 'presenceActive: ' .. tostring(presenceActive))
+ log('I', logTag, 'presenceCycleTimer: ' .. string.format('%.1f', presenceCycleTimer))
+ local cycleVal = 45
+ pcall(function() if bcm_settings then cycleVal = bcm_settings.getSetting('policePresenceCycle') or 45 end end)
+ log('I', logTag, 'presenceCycleInterval: ' .. tostring(cycleVal) .. 's')
  log('I', logTag, '--- Citizen Reports ---')
  log('I', logTag, 'reportActive: ' .. tostring(reportActive))
  log('I', logTag, 'reportTimer: ' .. string.format('%.1f', reportTimer) .. 's')
  log('I', logTag, 'reportReason: ' .. tostring(reportReason))
  log('I', logTag, '========================================')
+end
+
+-- Debug: force presence on/off or set cycle interval
+-- Usage: bcm_police.setPresence(true) — force patrol on
+-- bcm_police.setPresence(false) — force patrol off
+-- bcm_police.setPresence(30) — set cycle to 30s
+-- bcm_police.setPresence(0) — disable cycle (always on)
+setPresence = function(value)
+ if type(value) == 'boolean' then
+ presenceActive = value
+ presenceCycleTimer = 0
+ presenceManualOverride = true -- freeze cycle until reset
+ log('I', logTag, 'setPresence: ' .. (value and 'ON' or 'OFF') .. ' (manual override, cycle frozen)')
+ -- updateReserveDeactivation on next tick handles activate/deactivate
+ elseif type(value) == 'number' then
+ presenceCycleTimer = 0
+ presenceManualOverride = false -- unfreeze cycle
+ if bcm_settings then
+ bcm_settings.setSetting('policePresenceCycle', value)
+ end
+ log('I', logTag, 'setPresence: cycle interval set to ' .. value .. 's (override released)')
+ end
 end
 
 -- ============================================================================
@@ -2766,10 +2910,26 @@ local function onUpdate(dtReal, dtSim, dtRaw)
  end
  end
 
+ -- Citizen report boost countdown
+ if citizenReportBoostTimer > 0 then
+ citizenReportBoostTimer = citizenReportBoostTimer - dtReal
+ end
+
+ -- Safety timeout for arrest→release cycle
+ if arrestPendingRelease then
+ arrestPendingTimer = arrestPendingTimer + dtReal
+ if arrestPendingTimer >= ARREST_RELEASE_TIMEOUT then
+ arrestPendingRelease = false
+ log('W', logTag, 'Arrest release timeout — forcing unblock after ' .. ARREST_RELEASE_TIMEOUT .. 's')
+ end
+ end
+
  -- Flexible spawn mode: reinforcement timer during pursuit
  updateReinforcementTimer(dtReal)
  -- Flexible spawn mode: deactivate excess units after pursuit
  updateReserveDeactivation(dtReal)
+ -- Presence cycle: randomize patrol presence outside pursuit
+ updatePresenceCycle(dtReal)
 
  -- BCM pursuit tick (damage check, passive score, recycling, interceptors)
  if bcmPursuitActive then
@@ -2939,6 +3099,7 @@ M.spawnPolice = spawnPolice
 M.triggerPursuit = triggerPursuit
 M.resetPursuit = resetPursuit
 M.printStatus = printStatus
+M.setPresence = setPresence
 
 -- Tutorial API: disable all police activity
 M.deactivateAllUnits = function()

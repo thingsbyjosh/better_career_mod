@@ -437,6 +437,12 @@ local function retrieveVehicle(inventoryId)
  return
  end
 
+ -- Remove existing physical instance if already spawned (prevents duplication)
+ local existingVehId = career_modules_inventory.getVehicleIdFromInventoryId(inventoryId)
+ if existingVehId then
+ career_modules_inventory.removeVehicleObject(inventoryId)
+ end
+
  ui_fadeScreen.start(0.5)
  career_modules_inventory.spawnVehicle(inventoryId, nil, function()
  local vehId = career_modules_inventory.getVehicleIdFromInventoryId(inventoryId)

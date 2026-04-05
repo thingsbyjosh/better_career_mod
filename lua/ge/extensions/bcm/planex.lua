@@ -79,6 +79,7 @@ local getVehicleCapacity
 local setVehicleCapacity
 local generateCargoForPack
 local setDeliveryVehicle
+local getDeliveryVehicleInventoryId
 local packHasMechanic
 local checkSpeedInfraction
 local estimateDriveSeconds
@@ -206,8 +207,8 @@ end
 
 -- Pack density configs
 local DENSITY_CONFIG = {
- high = { minStops = 8, maxStops = 15 },
- low = { minStops = 3, maxStops = 7 },
+ high = { minStops = 8, maxStopsFallback = 15, maxStopsRatio = 0.35, maxStopsCap = 40 },
+ low = { minStops = 3, maxStopsFallback = 7, maxStopsRatio = 0.15, maxStopsCap = 15 },
 }
 
 -- Fatigue multipliers: packs 1-2 = 1.0, pack 3 = 0.85, pack 4+ = 0.70
@@ -226,7 +227,7 @@ local TIER_WEIGHTS = {
 -- Per-parcel pricing multipliers
 local FRAGILE_MULTIPLIER = 1.5 -- fragile parcels pay 50% more
 local URGENT_MULTIPLIER = 1.75 -- urgent parcels pay 75% more
-local DISTANCE_BONUS_PER_KM = 50 -- 50 cents per km per parcel ($0.50/km/parcel)
+local DISTANCE_BONUS_PER_KM = 25 -- 25 cents per km per parcel ($0.25/km/parcel)
 
 -- Default vehicle capacity for estimatedPay on pack cards (before vehicle selection)
 local DEFAULT_ESTIMATE_CAPACITY = 30
@@ -277,9 +278,12 @@ local GFORCE_DEDUCTION_PER_HARSH = 3 -- score points deducted per harsh event
 local GFORCE_DEDUCTION_PER_SEVERE = 6 -- score points deducted per severe event (x2)
 local GFORCE_SAMPLE_INTERVAL = 0.5 -- seconds between G-force samples
 
--- Precision thresholds (distance-based scoring, meters)
-local PRECISION_PERFECT_DISTANCE = 1.0 -- <= 1m = 100%
-local PRECISION_ZERO_DISTANCE = 5.0 -- >= 5m = 0%
+-- Precision scoring: 3-component system (vanilla-style) — angle, side dist, forward dist
+-- Score scale: 0-20 internally, mapped to 0-100 for BCM star rating
+local PRECISION_ANGLE_MAX = 7.5 -- degrees: above this = 0 angle score
+local PRECISION_ANGLE_MIN = 1.6 -- degrees: below this = perfect angle score
+local PRECISION_DEFAULT_SPOT_WIDTH = 2.5 -- meters (fallback if parking spot has no width)
+local PRECISION_DEFAULT_SPOT_LENGTH = 5.0 -- meters (fallback if parking spot has no length)
 
 -- ============================================================================
 -- Private state
@@ -314,7 +318,7 @@ local planexState = {
  speedPenaltyAccumulated = 0, -- accumulated penalty (0.0–0.5) applied at completePack
  speedInfractionCount = 0, -- number of 5s infractions this route
  -- Star rating per-route tracking
- routeStartTime = 0, -- os.clock() when en_route begins
+ routeElapsedTime = 0, -- accumulated dtReal seconds while en_route/returning (pause-safe)
  routeArrestCount = 0, -- arrests during this route
  stopPrecisionScores = {}, -- {[stopIndex] = 0-100}
  stopDamageScores = {}, -- {[stopIndex] = 0-100} from payoutMultiplier * 100
@@ -477,7 +481,6 @@ enumerateStopCandidates = function()
  if c.isProvider then
  providerCount = providerCount + 1
  end
- log('D', logTag, string.format(' facility: %s (%s) — %s', c.facId, c.displayName, c.isProvider and 'PROVIDER' or 'receiver'))
  end
  log('I', logTag, string.format('Enumerated %d delivery facilities from generator (%d providers, %d receivers)',
  #candidates, providerCount, #candidates - providerCount))
@@ -587,7 +590,7 @@ end
 -- typeDef optional, applies payMultiplier if provided.
 computePackPay = function(tier, stopCount, totalDistanceM, typeDef)
  local parcelDefs = jsonReadFile('gameplay/delivery/bcm_planex.deliveryParcels.json')
- if not parcelDefs then return stopCount * 40000 end -- fallback
+ if not parcelDefs then return stopCount * 20000 end -- fallback
 
  -- Build list of parcels available at this tier
  local available = {}
@@ -596,7 +599,7 @@ computePackPay = function(tier, stopCount, totalDistanceM, typeDef)
  table.insert(available, def)
  end
  end
- if #available == 0 then return stopCount * 40000 end
+ if #available == 0 then return stopCount * 20000 end
 
  -- Simulate distributing DEFAULT_ESTIMATE_CAPACITY TOTAL across all stops
  -- (matches generateCargoForPack logic: vehicle loads once at depot, delivers across stops)
@@ -622,7 +625,7 @@ computePackPay = function(tier, stopCount, totalDistanceM, typeDef)
  local remaining = math.min(thisStopBudget - slotsFilled, globalFillTarget - globalSlotsFilled)
  if slotCount > remaining then break end
 
- local parcelPay = def.basePriceCents or 2400
+ local parcelPay = def.basePriceCents or 1200
  if def.fragile then parcelPay = parcelPay * FRAGILE_MULTIPLIER end
  if def.urgent then parcelPay = parcelPay * URGENT_MULTIPLIER end
  parcelPay = parcelPay + (distKmPerStop * s * DISTANCE_BONUS_PER_KM * 0.5)
@@ -634,7 +637,7 @@ computePackPay = function(tier, stopCount, totalDistanceM, typeDef)
  end
 
  -- Stop-count bonus (matches generateCargoForPack logic)
- local stopBonus = 1 + math.max(0, stopCount - 3) * 0.06
+ local stopBonus = 1 + math.max(0, stopCount - 3) * 0.03
  -- apply pack type pay multiplier to base estimate
  local payMult = (typeDef and typeDef.payMultiplier) or 1.0
  return math.floor(totalPay * stopBonus * payMult)
@@ -789,18 +792,19 @@ checkGForce = function(dtReal)
 end
 
 -- Precision measurement — called in assessDamageAtStop callback for each stop
--- Returns 0-100 score based on vehicle distance from ideal parking spot
+-- Returns 0-100 score using 3-component system: angle alignment + side distance + forward distance
+-- Adapts tolerances to vehicle/parking spot dimensions (vanilla-style scoring)
 measurePrecision = function(stop)
  local veh = getPlayerVehicle(0)
  if not veh then return 100 end -- full score if no vehicle (debug flow)
 
  -- Resolve parking spot position from facility and psName
- if not stop.facId then return 100 end
+ if not stop.facId then return 50 end -- neutral if no facility data
 
  local fac = career_modules_delivery_generator and career_modules_delivery_generator.getFacilityById(stop.facId)
  if not fac then
  log('W', logTag, 'measurePrecision: no facility for facId=' .. tostring(stop.facId))
- return 100
+ return 50
  end
 
  -- Try to resolve psPath from access points (same logic as spawnPlanexCargoAtDepot)
@@ -825,22 +829,78 @@ measurePrecision = function(stop)
 
  if not psPath then
  log('W', logTag, 'measurePrecision: could not resolve psPath for facId=' .. tostring(stop.facId))
- return 100 -- full score if no parking spot data (Pitfall 3)
+ return 50 -- neutral score when parking data is missing
  end
 
  local ps = career_modules_delivery_generator.getParkingSpotByPath(psPath)
  if not ps or not ps.pos then
  log('W', logTag, 'measurePrecision: no parking spot data for psPath=' .. tostring(psPath))
- return 100
+ return 50
  end
 
- local vehPos = veh:getPosition()
- local distance = vehPos:distance(ps.pos)
+ -- 3-component precision scoring (vanilla-style: angle + side dist + forward dist)
+ local vehObj = be:getObjectByID(be:getPlayerVehicleID(0))
+ if not vehObj then return 50 end
 
- -- Linear decay: 100% at <= PRECISION_PERFECT_DISTANCE, 0% at >= PRECISION_ZERO_DISTANCE
- if distance <= PRECISION_PERFECT_DISTANCE then return 100 end
- if distance >= PRECISION_ZERO_DISTANCE then return 0 end
- return math.floor(100 * (1 - (distance - PRECISION_PERFECT_DISTANCE) / (PRECISION_ZERO_DISTANCE - PRECISION_PERFECT_DISTANCE)))
+ local vehicleDir = vehObj:getDirectionVector()
+ local targetRot = ps.rot
+ if not targetRot then
+ -- No rotation data: fall back to simple distance scoring
+ local dist = veh:getPosition():distance(ps.pos)
+ if dist <= 1.0 then return 100 end
+ if dist >= 5.0 then return 0 end
+ return math.floor(100 * (1 - (dist - 1.0) / 4.0))
+ end
+
+ local targetDir = targetRot * vec3(0, 1, 0) -- forward direction of parking spot
+
+ -- 1) Angle scoring — dot product, handle forward+backward parking
+ local dotAngle = vehicleDir:dot(targetDir)
+ local angle = math.acos(math.max(-1, math.min(1, dotAngle))) / math.pi * 180
+ if angle ~= angle then angle = 0 end -- NaN guard
+ local adjustedAngle = angle
+ if angle > 90 then
+ adjustedAngle = 180 - angle -- backward parking is valid (180° → 0°)
+ end
+
+ -- 2) Side + forward distance scoring — project offset onto parking spot axes
+ local vehicleBB = vehObj:getSpawnWorldOOBB()
+ local bbCenter = vehicleBB:getCenter()
+ local alignedOffset = (bbCenter - ps.pos):projectToOriginPlane(vec3(0, 0, 1))
+
+ local xVec = targetRot * vec3(1, 0, 0) -- right direction of spot
+ local yVec = targetRot * vec3(0, 1, 0) -- forward direction of spot
+
+ local sideDist = math.abs(alignedOffset:dot(xVec))
+ local forwardDist = math.abs(alignedOffset:dot(yVec))
+
+ -- Adaptive tolerances based on vehicle and parking spot dimensions
+ local vehicleHalfExtents = vehicleBB:getHalfExtents()
+ local vehicleWidth = vehicleHalfExtents.x * 2
+ local vehicleLength = vehicleHalfExtents.y * 2
+ local spotWidth = ps.width or PRECISION_DEFAULT_SPOT_WIDTH
+ local spotLength = ps.length or PRECISION_DEFAULT_SPOT_LENGTH
+
+ local maxSideTolerance = math.max(0.3, (spotWidth - vehicleWidth) * 0.3)
+ local maxForwardTolerance = math.max(0.4, (spotLength - vehicleLength) * 0.3)
+ local minSideTolerance = math.max(0.1, maxSideTolerance * 0.3)
+ local minForwardTolerance = math.max(0.15, maxForwardTolerance * 0.3)
+
+ -- inverseLerp: returns 1 when value <= min, 0 when value >= max, linear between
+ local function invLerp(maxVal, minVal, value)
+ if maxVal <= minVal then return value <= minVal and 1 or 0 end
+ return math.max(0, math.min(1, (maxVal - value) / (maxVal - minVal)))
+ end
+
+ local angleScore = invLerp(PRECISION_ANGLE_MAX, PRECISION_ANGLE_MIN, adjustedAngle)
+ local sideScore = invLerp(maxSideTolerance, minSideTolerance, sideDist)
+ local forwardScore = invLerp(maxForwardTolerance, minForwardTolerance, forwardDist)
+
+ -- Combine: 0-20 scale (vanilla), then map to 0-100 for BCM
+ local totalScore20 = math.min(20, (angleScore + sideScore + forwardScore) * 6 + 2)
+ local score100 = math.floor(totalScore20 * 5) -- 0-20 → 0-100
+
+ return score100
 end
 
 -- Helper: average of per-stop damage scores (0-100)
@@ -864,8 +924,8 @@ end
 -- Helper: time score based on actual vs estimated route time (0-100)
 computeTimeScore = function(pack)
  local estimatedSecs = estimateDriveSeconds(pack)
- local actualSecs = os.clock() - (planexState.routeStartTime or os.clock())
- if estimatedSecs <= 0 then return 100 end
+ local actualSecs = planexState.routeElapsedTime or 0
+ if estimatedSecs <= 0 or actualSecs <= 0 then return 100 end
  local timeRatio = actualSecs / estimatedSecs
  -- 100% at or under estimated, linear decay: 2x = 0%
  local timeScore
@@ -2482,11 +2542,15 @@ buildStopsForPack = function(candidates, density, packTypeDef)
  isSingleFacilityType = (tag == 'medical' or tag == 'government')
  end
 
+ -- Dynamic maxStops: scales with available facilities, clamped to [fallback, cap]
+ local facCount = #activeCandidates
+ local dynamicMax = math.max(config.maxStopsFallback, math.min(config.maxStopsCap, math.floor(facCount * config.maxStopsRatio)))
+
  local stopCount
  if isSingleFacilityType then
  stopCount = 1
  else
- stopCount = math.random(config.minStops, config.maxStops)
+ stopCount = math.random(config.minStops, math.min(dynamicMax, facCount))
  end
 
  local stops = {}
@@ -3092,7 +3156,6 @@ generatePool = function(rotationId)
  -- Routes with no pickups end at the last delivery stop (no pointless drive-back)
  if pack.totalPickupCount == 0 and pack.hasDepotReturn then
  pack.hasDepotReturn = false
- log('D', logTag, string.format('Pack %s: no pickups at any stop — depot return disabled', pack.id))
  end
 
  -- Add depot as last stop (for depot-return routes)
@@ -3126,7 +3189,6 @@ generatePool = function(rotationId)
  -- No depot return if no pickups to bring back
  if (specialPack.totalPickupCount or 0) == 0 and specialPack.hasDepotReturn then
  specialPack.hasDepotReturn = false
- log('D', logTag, string.format('Special pack %s: no pickups — depot return disabled', specialPack.id))
  end
  appendDepotStop(specialPack, candidates)
  optimizeStopOrder(specialPack)
@@ -3427,7 +3489,7 @@ acceptPack = function(packId)
  planexState.speedInfractionCount = 0
 
  -- reset star rating tracking for new route
- planexState.routeStartTime = 0
+ planexState.routeElapsedTime = 0
  planexState.routeArrestCount = 0
  planexState.stopPrecisionScores = {}
  planexState.stopDamageScores = {}
@@ -3537,7 +3599,7 @@ onArriveAtDepot = function()
  planexState.routeState = 'en_route'
 
  -- initialize route timer and G-force tracking on en_route start
- planexState.routeStartTime = os.clock()
+ planexState.routeElapsedTime = 0 -- accumulated via dtReal in onUpdate (pause-safe)
  planexState.prevVehVel = nil
  planexState.gforceTimer = 0
 
@@ -4029,7 +4091,7 @@ completePack = function()
  planexState.speedPenaltyAccumulated = 0
  planexState.speedInfractionCount = 0
  -- reset star tracking fields
- planexState.routeStartTime = 0
+ planexState.routeElapsedTime = 0
  planexState.routeArrestCount = 0
  planexState.stopPrecisionScores = {}
  planexState.stopDamageScores = {}
@@ -4322,6 +4384,8 @@ savePlanexData = function(currentSavePath)
  -- 75.1 Plan 02: speed tracking (persist across save/load during active route)
  speedPenaltyAccumulated = planexState.speedPenaltyAccumulated,
  speedInfractionCount = planexState.speedInfractionCount,
+ -- Route elapsed time (accumulated dtReal, pause-safe)
+ routeElapsedTime = planexState.routeElapsedTime or 0,
  -- streak persistence
  bestStreak = planexState.bestStreak,
  currentStreak = planexState.currentStreak,
@@ -4422,6 +4486,9 @@ loadPlanexData = function()
  planexState.speedPenaltyAccumulated = data.speedPenaltyAccumulated or 0
  planexState.speedInfractionCount = data.speedInfractionCount or 0
  planexState.speedOverLimitTimer = 0 -- reset timer on load (we don't know how long they were stopped)
+
+ -- Route elapsed time (accumulated dtReal, pause-safe — persisted across save/load)
+ planexState.routeElapsedTime = data.routeElapsedTime or 0
 
  -- restore streak persistence
  planexState.bestStreak = data.bestStreak or 0
@@ -4749,7 +4816,7 @@ resetModule = function()
  planexState.speedInfractionCount = 0
  planexState.lockedTeasers = {}
  -- reset star tracking on module reset
- planexState.routeStartTime = 0
+ planexState.routeElapsedTime = 0
  planexState.routeArrestCount = 0
  planexState.stopPrecisionScores = {}
  planexState.stopDamageScores = {}
@@ -4982,8 +5049,8 @@ debugCompletePack = function()
  table.insert(planexState.stopPrecisionScores, 100)
  end
  end
- if planexState.routeStartTime == 0 then
- planexState.routeStartTime = os.clock() - 120 -- simulate 2 min route
+ if (planexState.routeElapsedTime or 0) == 0 then
+ planexState.routeElapsedTime = 120 -- simulate 2 min route
  end
  end
  local success, pay = completePack()
@@ -5296,9 +5363,10 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
  end
  end
 
- -- G-force sampling — 0.5s interval (separate from 1s depot timer)
- -- Active during both en_route and returning (pickups can be damaged during return leg)
+ -- route elapsed time accumulation (pause-safe — dtReal is 0 when paused)
+ -- Active during both en_route and returning (route timer runs until completePack)
  if planexState.routeState == 'en_route' or planexState.routeState == 'returning' then
+ planexState.routeElapsedTime = (planexState.routeElapsedTime or 0) + dtReal
  checkGForce(dtReal)
  end
 
@@ -5659,6 +5727,11 @@ setDeliveryVehicle = function(inventoryId)
 end
 M.setDeliveryVehicle = setDeliveryVehicle
 
+getDeliveryVehicleInventoryId = function()
+ return planexState.deliveryVehicleInventoryId
+end
+M.getDeliveryVehicleInventoryId = getDeliveryVehicleInventoryId
+
 -- Generate cargo for a pack and compute real per-parcel pay.
 -- Each parcel's price = basePriceCents × fragileMultiplier × urgentMultiplier + distanceBonus.
 -- Pack's totalPay (cargo-based) replaces the old flat estimate.
@@ -5827,7 +5900,7 @@ M.generateCargoForPack = function(packId, totalSlots)
  end
 
  -- Compute this parcel's pay
- local parcelPay = def.basePriceCents or 2400
+ local parcelPay = def.basePriceCents or 1200
  if def.fragile then parcelPay = parcelPay * FRAGILE_MULTIPLIER end
  if def.urgent then parcelPay = parcelPay * URGENT_MULTIPLIER end
  -- Distance bonus: further stops pay more per parcel
@@ -5885,7 +5958,7 @@ M.generateCargoForPack = function(packId, totalSlots)
 
  -- Stop-count bonus: more stops = more work = more pay
  -- 3 stops = ×1.0, 8 stops = ×1.30, 12 stops = ×1.54, 16 stops = ×1.78
- local stopBonus = 1 + math.max(0, numStops - 3) * 0.06
+ local stopBonus = 1 + math.max(0, numStops - 3) * 0.03
  -- Pack type pay multiplier (e.g. "Billionaire's Whim" = ×2.0 for harder mechanics)
  local packTypeMult = pack.payMultiplier or 1.0
  totalCargoPay = math.floor(totalCargoPay * stopBonus * packTypeMult)

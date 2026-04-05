@@ -39,6 +39,16 @@
  "receiverTags": ["residential", "retail"],
  "category": "household"
  },
+ "home_delivery": {
+ "senderNames": ["PlanEx Home", "UrbanDrop Residential", "DoorDash Parcels"],
+ "receiverTags": ["residential"],
+ "category": "household"
+ },
+ "appliance_delivery": {
+ "senderNames": ["ApplianceDirect", "HomeGear Logistics"],
+ "receiverTags": ["residential"],
+ "category": "electronics"
+ },
  "luxury_goods": {
  "senderNames": ["LuxLine Couriers", "Prestige Logistics"],
  "receiverTags": ["retail", "residential", "office"],

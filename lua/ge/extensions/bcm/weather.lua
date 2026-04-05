@@ -793,11 +793,28 @@ selectAndApplyWeather = function()
  dateInfo = extensions.bcm_timeSystem.getDateInfo()
  end
 
+ -- Guard: if timeSystem hasn't loaded yet (gameTimeDays still 0 → Jan 1),
+ -- fall back to OS date so weather matches the real calendar date
+ if dateInfo and dateInfo.totalGameDays == 0 then
+ local ok, now = pcall(os.date, "*t")
+ if ok and type(now) == "table" then
+ dateInfo = {month = now.month, season = nil}
+ if now.month >= 3 and now.month <= 5 then dateInfo.season = "spring"
+ elseif now.month >= 6 and now.month <= 8 then dateInfo.season = "summer"
+ elseif now.month >= 9 and now.month <= 11 then dateInfo.season = "autumn"
+ else dateInfo.season = "winter" end
+ log('I', logTag, 'TimeSystem not ready, using OS date for weather (month: ' .. now.month .. ')')
+ else
+ dateInfo = nil
+ end
+ end
+
  if dateInfo then
  weatherState.month = dateInfo.month
  weatherState.season = dateInfo.season
  else
- weatherState.month = 3
+ -- Ultimate fallback: May (spring)
+ weatherState.month = 5
  weatherState.season = "spring"
  end
 
@@ -1141,8 +1158,25 @@ onCareerActive = function(active)
  math.randomseed(os.clock() * 1000 + os.time())
  -- Initialize scenetree objects
  initWeatherObjects()
- -- Select and apply initial weather
+ -- Select seasonal context (month/season), then force sunny start instantly
  selectAndApplyWeather()
+ if weatherState.currentState ~= "sunny" then
+ -- Snap to sunny immediately (no 180s transition)
+ local sunnyProfile = WEATHER_PROFILES["sunny"]
+ if sunnyProfile then
+ weatherState.previousState = weatherState.currentState
+ weatherState.currentState = "sunny"
+ weatherState.transitioning = false
+ weatherState.transitionProgress = 0
+ switchRainDataBlock(false)
+ applyScenetreeValues(sunnyProfile, true)
+ updateRainSound(0, false)
+ weatherState.temperature = generateTemperature(weatherState.season, "sunny")
+ broadcastWeatherUpdate()
+ -- Keep existing scheduledDuration — next change uses seasonal flow
+ end
+ log('I', logTag, 'Forced sunny start — seasonal cycle will take over')
+ end
  -- Set initial traffic speed
  updateTrafficSpeed()
  log('I', logTag, 'Weather system activated')

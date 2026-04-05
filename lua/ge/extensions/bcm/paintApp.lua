@@ -14,6 +14,7 @@ local previewAllSlotPaints
 local previewPartPaint
 local applyPaint
 local closePaint
+local buildPalette
 
 -- ============================================================================
 -- Constants
@@ -24,8 +25,8 @@ local logTag = 'bcm_paintApp'
 local paintSessionActive = false
 local paintSessionInventoryId = nil
 
--- Curated 16-color palette for T0/T1
-local T0_PALETTE = {
+-- Curated 16-color fallback palette (used when vehicle has 4 or fewer factory presets)
+local FALLBACK_PALETTE = {
  { name = "Arctic White", baseColor = {0.95, 0.95, 0.95, 1} },
  { name = "Bone", baseColor = {0.85, 0.82, 0.75, 1} },
  { name = "Silver", baseColor = {0.65, 0.65, 0.65, 1} },
@@ -106,6 +107,69 @@ end
 -- ============================================================================
 -- Paint mode entry
 -- ============================================================================
+
+-- Build palette from factory presets + fallback.
+-- Extracts only baseColor from factory paints. If factory has 4 or fewer,
+-- appends non-duplicate colors from FALLBACK_PALETTE.
+buildPalette = function(factoryPresets)
+ local palette = {}
+ local usedColors = {}
+
+ -- Helper: check if a baseColor is "close enough" to an existing one
+ local function isDuplicate(bc)
+ for _, existing in ipairs(usedColors) do
+ local close = true
+ for c = 1, 3 do
+ if math.abs((existing[c] or 0) - (bc[c] or 0)) > 0.05 then
+ close = false
+ break
+ end
+ end
+ if close then return true end
+ end
+ return false
+ end
+
+ -- 1. Add factory presets (baseColor only)
+ if factoryPresets and type(factoryPresets) == 'table' then
+ for name, paintData in pairs(factoryPresets) do
+ local bc = nil
+ if type(paintData) == 'table' then
+ if paintData.baseColor then
+ bc = paintData.baseColor
+ elseif #paintData >= 3 then
+ -- Array format: {r, g, b, a, ...}
+ bc = {paintData[1], paintData[2], paintData[3], paintData[4] or 1}
+ end
+ elseif type(paintData) == 'string' then
+ local vals = {}
+ for v in paintData:gmatch('[%d%.%-]+') do
+ table.insert(vals, tonumber(v))
+ end
+ if #vals >= 3 then
+ bc = {vals[1], vals[2], vals[3], vals[4] or 1}
+ end
+ end
+
+ if bc then
+ table.insert(palette, { name = name, baseColor = {bc[1], bc[2], bc[3], bc[4] or 1} })
+ table.insert(usedColors, {bc[1], bc[2], bc[3], bc[4] or 1})
+ end
+ end
+ end
+
+ -- 2. If 4 or fewer factory colors, fill from fallback
+ if #palette <= 4 then
+ for _, fallback in ipairs(FALLBACK_PALETTE) do
+ if not isDuplicate(fallback.baseColor) then
+ table.insert(palette, { name = fallback.name, baseColor = {fallback.baseColor[1], fallback.baseColor[2], fallback.baseColor[3], fallback.baseColor[4] or 1} })
+ table.insert(usedColors, fallback.baseColor)
+ end
+ end
+ end
+
+ return palette
+end
 
 -- Entry point for painting a vehicle
 startPaint = function(inventoryId, computerId)
@@ -195,6 +259,9 @@ startPaint = function(inventoryId, computerId)
  factoryPresets = vehDetails.model.paints
  end
 
+ -- Build palette from factory presets (+ fallback if <= 4 colors)
+ local vehiclePalette = buildPalette(factoryPresets)
+
  -- Build paint data for Vue
  local paintData = {
  tier = tier,
@@ -203,7 +270,7 @@ startPaint = function(inventoryId, computerId)
  vehObjId = vehObjId,
  currentPaints = currentPaints,
  partConditions = partConditions,
- t0Palette = T0_PALETTE,
+ t0Palette = vehiclePalette,
  t0Finish = T0_FINISH,
  colorClasses = COLOR_CLASSES,
  slotPrices = slotPrices,

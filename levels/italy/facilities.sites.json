@@ -1,737 +1,813 @@
 {
- "description":"Description of theses Sites. Contains Locations and Zones.",
- "dir":"/levels/italy/",
- "filename":"facilities.sites.json",
- "locations":{},
- "name":"facilities.sites.json",
- "parkingSpots":[
+ "description": "Description of theses Sites. Contains Locations and Zones.",
+ "dir": "/levels/italy/",
+ "filename": "facilities.sites.json",
+ "locations": {},
+ "name": "facilities.sites.json",
+ "parkingSpots": [
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_villa_parking1",
- "oldId":5164,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_villa_parking1",
+ "oldId": 5164,
+ "pos": [
  696.08697509766,
  832.265625,
  184.22224634886
  ],
- "rot":[
+ "rot": [
  0.095542778267457,
  -0.037888555778251,
  0.36668102208074,
  0.92465186038195
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_villa_parking2",
- "oldId":5165,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_villa_parking2",
+ "oldId": 5165,
+ "pos": [
  694.89001464844,
  841.91217041016,
  184.22080826759
  ],
- "rot":[
+ "rot": [
  0.034985702780153,
  -0.11032022520101,
  0.94680993521157,
  0.30026054535561
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_villa_parking3",
- "oldId":5166,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_villa_parking3",
+ "oldId": 5166,
+ "pos": [
  698.31451416016,
  838.14904785156,
  184.22738271952
  ],
- "rot":[
+ "rot": [
  0.015587436442143,
  -0.040602468606311,
  0.93268469516288,
  0.35806107129534
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_villa_parking4",
- "oldId":5167,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_villa_parking4",
+ "oldId": 5167,
+ "pos": [
  701.46893310547,
  834.62664794922,
  184.22833108902
  ],
- "rot":[
+ "rot": [
  0.015587436442143,
  -0.040602468606311,
  0.93268469516288,
  0.35806107129534
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_villa_parking5",
- "oldId":5168,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_villa_parking5",
+ "oldId": 5168,
+ "pos": [
  712.30914306641,
  849.54266357422,
  184.73732811213
  ],
- "rot":[
+ "rot": [
  0.0054412682724711,
  -0.07255886529906,
  0.99455668339141,
  0.074582888034523
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_villa_parking6",
- "oldId":5169,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_villa_parking6",
+ "oldId": 5169,
+ "pos": [
  710.31610107422,
  846.470703125,
  184.73205333948
  ],
- "rot":[
+ "rot": [
  0.0098315659668441,
  -0.077010645326018,
  0.98895519532711,
  0.12625498981278
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_villa_parking7",
- "oldId":5170,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_villa_parking7",
+ "oldId": 5170,
+ "pos": [
  707.59210205078,
  843.2001953125,
  184.94094848633
  ],
- "rot":[
+ "rot": [
  -0.016015001277216,
  -0.17348138218246,
  0.98053765455817,
  -0.090518714991511
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking1",
- "oldId":5172,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking1",
+ "oldId": 5172,
+ "pos": [
  -699.98815917969,
  -1348.0734863281,
  140.26022541523
  ],
- "rot":[
+ "rot": [
  0.11496776518864,
  0.0099725488241696,
  -0.085840285534279,
  0.98960315612718
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking2",
- "oldId":5173,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking2",
+ "oldId": 5173,
+ "pos": [
  -697.53002929688,
  -1347.6754150391,
  140.24753159285
  ],
- "rot":[
+ "rot": [
  0.11496776518864,
  0.0099725488241696,
  -0.085840285534279,
  0.98960315612718
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking3",
- "oldId":5174,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking3",
+ "oldId": 5174,
+ "pos": [
  -694.66937255859,
  -1347.2034912109,
  140.26690202951
  ],
- "rot":[
+ "rot": [
  0.11496776518864,
  0.0099725488241696,
  -0.085840285534279,
  0.98960315612718
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking4",
- "oldId":5175,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking4",
+ "oldId": 5175,
+ "pos": [
  -692.11303710938,
  -1346.732421875,
  140.27493977547
  ],
- "rot":[
+ "rot": [
  0.11496776518864,
  0.0099725488241696,
  -0.085840285534279,
  0.98960315612718
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking5",
- "oldId":5176,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking5",
+ "oldId": 5176,
+ "pos": [
  -689.70739746094,
  -1346.2962646484,
  140.27557229996
  ],
- "rot":[
+ "rot": [
  0.11496776518864,
  0.0099725488241696,
  -0.085840285534279,
  0.98960315612718
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking6",
- "oldId":5177,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking6",
+ "oldId": 5177,
+ "pos": [
  -684.83941650391,
  -1342.4488525391,
  140.25716614723
  ],
- "rot":[
+ "rot": [
  0.069363385426281,
  0.0093341881628161,
  -0.13304019092129,
  0.98863638477105
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking7",
- "oldId":5178,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking7",
+ "oldId": 5178,
+ "pos": [
  -687.92230224609,
  -1340.4921875,
  140.29845821857
  ],
- "rot":[
+ "rot": [
  0.062901081255587,
  0.064767471400002,
  -0.71443759628381,
  0.69384980337357
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_portino_parking8",
- "oldId":5179,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_portino_parking8",
+ "oldId": 5179,
+ "pos": [
  -695.78430175781,
  -1339.8513183594,
  140.2984597683
  ],
- "rot":[
+ "rot": [
  0.035248544028753,
  0.051822965320624,
  -0.8252346769018,
  0.5613017445617
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_fbx_parking1",
- "oldId":5181,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_fbx_parking1",
+ "oldId": 5181,
+ "pos": [
  1201.6026611328,
  -829.05242919922,
  145.84503000975
  ],
- "rot":[
+ "rot": [
  0.14102620505058,
  -0.043877391242186,
  0.29382434284645,
  0.9443800292137
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_fbx_parking2",
- "oldId":5182,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_fbx_parking2",
+ "oldId": 5182,
+ "pos": [
  1193.9421386719,
  -826.96514892578,
  145.8522156477
  ],
- "rot":[
+ "rot": [
  0.052391357164678,
  -0.10372828424744,
  0.88655756600643,
  0.44778484889318
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_fbx_parking3",
- "oldId":5183,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_fbx_parking3",
+ "oldId": 5183,
+ "pos": [
  1197.7659912109,
  -824.7734375,
  145.85545128584
  ],
- "rot":[
+ "rot": [
  0.052788017062101,
  -0.097125519045558,
  0.87323055164391,
  0.47460347921234
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  },
  {
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {
+ "ignoreOthers": true,
+ "perfect": true,
+ "forwards": true
  },
- "isMultiSpot":false,
- "name":"bcm_it_fbx_parking4",
- "oldId":5184,
- "pos":[
+ "types": {},
+ "values": {}
+ },
+ "isMultiSpot": false,
+ "name": "bcm_it_fbx_parking4",
+ "oldId": 5184,
+ "pos": [
  1207.3919677734,
  -830.36224365234,
  145.78899276257
  ],
- "rot":[
+ "rot": [
  0.095051534274889,
  0.051517622977681,
  -0.4737144036162,
  0.8740170502692
  ],
- "scl":[
+ "scl": [
  2.5,
  6,
  3
  ],
- "spotAmount":1,
- "spotDirection":"Left",
- "spotOffset":0,
- "spotRotation":0
+ "spotAmount": 1,
+ "spotDirection": "Left",
+ "spotOffset": 0,
+ "spotRotation": 0
  }
  ],
- "zones":[
+ "zones": [
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"fuel_apex_fastello",
- "oldId":5157,
- "top":{
- "active":false,
- "normal":[
+ "name": "fuel_apex_fastello",
+ "oldId": 5157,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  1202.159912,
  -808.0406494,
@@ -760,46 +836,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"fuel_apex_norte",
- "oldId":5158,
- "top":{
- "active":false,
- "normal":[
+ "name": "fuel_apex_norte",
+ "oldId": 5158,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  471.4711304,
  1266.578735,
@@ -823,46 +899,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"fuel_apex_airport",
- "oldId":5159,
- "top":{
- "active":false,
- "normal":[
+ "name": "fuel_apex_airport",
+ "oldId": 5159,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  -1615.227783,
  1514.054932,
@@ -886,46 +962,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"fuel_apex_castelletto",
- "oldId":5160,
- "top":{
- "active":false,
- "normal":[
+ "name": "fuel_apex_castelletto",
+ "oldId": 5160,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  -1128.296875,
  762.854248,
@@ -949,46 +1025,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"fuel_apex_crossroads",
- "oldId":5161,
- "top":{
- "active":false,
- "normal":[
+ "name": "fuel_apex_crossroads",
+ "oldId": 5161,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  679.1307373,
  597.3775635,
@@ -1012,46 +1088,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"fuel_apex_lucera",
- "oldId":5162,
- "top":{
- "active":false,
- "normal":[
+ "name": "fuel_apex_lucera",
+ "oldId": 5162,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  129.9176941,
  -259.7232056,
@@ -1075,46 +1151,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"bcm_it_villa",
- "oldId":5163,
- "top":{
- "active":false,
- "normal":[
+ "name": "bcm_it_villa",
+ "oldId": 5163,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  719.10296630859,
  848.51953125,
@@ -1138,46 +1214,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"bcm_it_portino",
- "oldId":5171,
- "top":{
- "active":false,
- "normal":[
+ "name": "bcm_it_portino",
+ "oldId": 5171,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  -695.84246826172,
  -1325.6297607422,
@@ -1211,46 +1287,46 @@
  ]
  },
  {
- "bot":{
- "active":false,
- "normal":[
+ "bot": {
+ "active": false,
+ "normal": [
  0,
  0,
  -1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  -10
  ]
  },
- "color":[
+ "color": [
  1,
  1,
  1
  ],
- "customFields":{
- "names":{},
- "tags":{},
- "types":{},
- "values":{}
+ "customFields": {
+ "names": {},
+ "tags": {},
+ "types": {},
+ "values": {}
  },
- "name":"bcm_it_fbx",
- "oldId":5180,
- "top":{
- "active":false,
- "normal":[
+ "name": "bcm_it_fbx",
+ "oldId": 5180,
+ "top": {
+ "active": false,
+ "normal": [
  0,
  0,
  1
  ],
- "pos":[
+ "pos": [
  0,
  0,
  10
  ]
  },
- "vertices":[
+ "vertices": [
  [
  1200.4580078125,
  -838.01501464844,

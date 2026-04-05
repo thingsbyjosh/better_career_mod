@@ -224,12 +224,13 @@
  "rewardPerKm": 165,
  "filter": {
  "whiteList": {
- "model_key": ["boxutility", "tsfb", "boxutility_large"],
- "hasLoad": [false]
+ "model_key": ["boxutility", "tsfb", "boxutility_large"]
  },
- "blackList": {}
+ "blackList": {
+ "hasLoad": [true]
+ }
  },
- "connectorTag": "towhitch",
+ "connector": "towhitch",
  "subFilters": []
  },
  "smallCratePlanksTrailers": {
@@ -244,10 +245,10 @@
  "hasLoad": [true]
  },
  "blackList": {
- "load_key": ["loaded_couch", "loaded_armchairs"]
+ "key": ["loaded_couch", "loaded_armchairs"]
  }
  },
- "connectorTag": "towhitch",
+ "connector": "towhitch",
  "subFilters": []
  },
  "smallFurnitureTrailers": {
@@ -259,11 +260,11 @@
  "filter": {
  "whiteList": {
  "model_key": ["boxutility", "tsfb", "boxutility_large"],
- "load_key": ["loaded_couch", "loaded_armchairs"]
+ "hasLoad": [true],
+ "key": ["loaded_couch", "loaded_armchairs"]
+ }
  },
- "blackList": {}
- },
- "connectorTag": "towhitch",
+ "connector": "towhitch",
  "subFilters": []
  },
  "mediumEmptyTrailer": {
@@ -274,11 +275,13 @@
  "rewardPerKm": 220,
  "filter": {
  "whiteList": {
- "model_key": ["cargotrailer"],
- "hasLoad": [false]
+ "model_key": ["cargotrailer"]
  },
- "blackList": {}
+ "blackList": {
+ "hasLoad": [true]
+ }
  },
+ "connector": "towhitch",
  "subFilters": []
  },
  "mediumCratePlanksTrailers": {
@@ -293,9 +296,10 @@
  "hasLoad": [true]
  },
  "blackList": {
- "load_key": ["loaded_couch", "loaded_armchairs"]
+ "key": ["loaded_couch", "loaded_armchairs"]
  }
  },
+ "connector": "towhitch",
  "subFilters": []
  },
  "mediumFurnitureTrailers": {
@@ -307,10 +311,11 @@
  "filter": {
  "whiteList": {
  "model_key": ["cargotrailer"],
- "load_key": ["loaded_couch", "loaded_armchairs"]
+ "hasLoad": [true],
+ "key": ["loaded_couch", "loaded_armchairs"]
+ }
  },
- "blackList": {}
- },
+ "connector": "towhitch",
  "subFilters": []
  },
  "bigEmptyTrailers": {
@@ -321,13 +326,14 @@
  "rewardPerKm": 1050,
  "filter": {
  "whiteList": {
- "model_key": ["flatbed", "containerTrailer", "dryvan"],
- "hasLoad": [false]
+ "model_key": ["flatbed", "containerTrailer", "dryvan"]
  },
  "blackList": {
- "load_key": ["48ft_loading_ramps"]
+ "hasLoad": [true],
+ "key": ["48ft_loadingramp", "48ft_loadingramp_offset"]
  }
  },
+ "connector": "towhitch",
  "subFilters": []
  },
  "bigConstructionMaterials": {
@@ -340,9 +346,9 @@
  "whiteList": {
  "model_key": ["flatbed", "containerTrailer"],
  "hasLoad": [true]
+ }
  },
- "blackList": {}
- },
+ "connector": "towhitch",
  "subFilters": []
  }
 }

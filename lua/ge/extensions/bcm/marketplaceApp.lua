@@ -1499,6 +1499,9 @@ regenerateListingText = function(language)
  local listings = state.listings or {}
  local gen = getListingGenerator()
 
+ -- Build curated lookup once (avoids O(n²) per-listing scan)
+ local curatedById = nil
+
  for _, listing in ipairs(listings) do
  if not listing.isCurated then
  -- Regenerate text for procedural listings
@@ -1515,15 +1518,15 @@ regenerateListingText = function(language)
  listing.description = text.description
  listing.language = language
  elseif listing.isCurated and listing.curatedEntryId then
- -- Look up the original curated entry and apply the correct language block
- local curatedListings = require('lua/ge/extensions/bcm/curatedListings').getCuratedListings()
- local entry = nil
- for _, e in ipairs(curatedListings) do
- if e.id == listing.curatedEntryId then
- entry = e
- break
+ -- Lazy-init curated index on first curated listing
+ if not curatedById then
+ curatedById = {}
+ local allCurated = require('lua/ge/extensions/bcm/curatedListings').getCuratedListings()
+ for _, e in ipairs(allCurated) do
+ curatedById[e.id] = e
  end
  end
+ local entry = curatedById[listing.curatedEntryId]
  if entry then
  local langContent = entry[language] or entry.en
  if langContent then
@@ -1531,7 +1534,6 @@ regenerateListingText = function(language)
  listing.description = langContent.description
  listing.language = language
  end
- -- Also update seller name for the new language
  if entry.sellerName and entry.sellerName[language] then
  listing.seller.name = entry.sellerName[language]
  end
@@ -1957,28 +1959,41 @@ computeVehicleMarketValue = function(inventoryId)
  local changedSlots = vehicleData.changedSlots or {}
  local addedParts, removedParts = vc.getPartDifference(originalParts, newParts, changedSlots)
 
+ -- Use vanilla's valueCalculator for part valuation (50% of depreciated value, same as vanilla)
+ -- Safety: parts purchased via BCM before fix stored value in cents instead of dollars.
+ -- Detect by comparing part value to vehicle configBaseValue — if a single part exceeds
+ -- the vehicle's base value, it's almost certainly in cents and needs /100.
+ local baseValue = configBaseValue or 0
  local addedValueDollars = 0
  if addedParts then
  for slot, _ in pairs(addedParts) do
  local part = partInv.getPart(invId, slot)
  if part then
- -- Use catalog value (part.value) — what the player paid for the part
- addedValueDollars = addedValueDollars + (part.value or 0)
+ local pv = vc.getPartValue(part)
+ if pv > baseValue and baseValue > 0 then
+ pv = pv / 100
+ end
+ addedValueDollars = addedValueDollars + 0.5 * pv
  end
  end
  end
  local removedValueDollars = 0
  if removedParts and originalParts then
+ local mileage = 0
+ pcall(function()
+ mileage = vc.getVehicleMileageById and vc.getVehicleMileageById(invId) or 0
+ end)
  for slot, _ in pairs(removedParts) do
  local orig = originalParts[slot]
  if orig then
- removedValueDollars = removedValueDollars + (orig.value or 0)
+ local fakePart = { value = orig.value, year = vehicleData.year or 2023, partCondition = { odometer = mileage } }
+ removedValueDollars = removedValueDollars + 0.5 * vc.getPartValue(fakePart)
  end
  end
  end
 
- -- 120% of what player paid for added parts, minus removed parts value, converted to cents
- local partsDeltaCents = math.floor((addedValueDollars * 1.20 - removedValueDollars) * 100)
+ -- Convert to cents (values from getPartValue are already in dollars)
+ local partsDeltaCents = math.floor((addedValueDollars - removedValueDollars) * 100)
  if partsDeltaCents ~= 0 then
  valueCents = math.max(valueCents + partsDeltaCents, 100) -- floor $1
  log('D', 'marketplaceApp', 'computeVehicleMarketValue: parts delta $'
@@ -3307,8 +3322,8 @@ M.onBCMMidday = function(data)
 
  for i = #listings, 1, -1 do
  local listing = listings[i]
- if not listing.isSold and not hasActiveNego[listing.id] then
- -- Check expiry
+ if not listing.isSold and not listing.isPlayerListing and not hasActiveNego[listing.id] then
+ -- Check expiry (NPC listings only — player listings are never auto-rotated)
  if listing.expiresGameDay and gameDay >= listing.expiresGameDay then
  listing.isSold = true
  listing.soldGameDay = gameDay

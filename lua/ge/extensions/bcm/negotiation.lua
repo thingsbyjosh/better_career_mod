@@ -2197,6 +2197,9 @@ local function getContinuousGameHours()
  return _lastContinuousHours
 end
 
+local _lastBuyerTickRealTime = 0
+local BUYER_TICK_REAL_COOLDOWN = 30 -- minimum 30 real seconds between buyer arrivals
+
 tickDistributedBuyers = function()
  if not activated then return end
 
@@ -2215,7 +2218,16 @@ tickDistributedBuyers = function()
  local hoursSinceLast = currentHours - lastTickHours
  if hoursSinceLast < BUYER_TICK_INTERVAL_HOURS then return end
 
- -- Live gameplay: process only 1 tick per call (buyers arrive one by one)
+ -- Real-time cooldown: don't spam buyers even if game time jumped
+ local now = os.time()
+ if now - _lastBuyerTickRealTime < BUYER_TICK_REAL_COOLDOWN then
+ -- Advance pointer so ticks don't pile up, but skip buyer generation
+ local newTickHours = lastTickHours + BUYER_TICK_INTERVAL_HOURS
+ if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(newTickHours) end
+ return
+ end
+
+ -- Process 1 tick
  local newTickHours = lastTickHours + BUYER_TICK_INTERVAL_HOURS
  if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(newTickHours) end
 
@@ -2234,6 +2246,7 @@ tickDistributedBuyers = function()
  end
 
  if newBuyerCount > 0 then
+ _lastBuyerTickRealTime = now
  log('I', logTag, 'Distributed buyer tick #' .. tickIndex .. ': generated ' .. newBuyerCount .. ' buyers')
  end
 end
@@ -2252,10 +2265,29 @@ processRetroactiveBuyers = function()
  return
  end
 
- -- If game time went backwards (reloaded older save), reset pointer
+ -- If game time went backwards (reloaded older save), reset pointer and seed immediate buyers
  if currentHours < lastTickHours - 24 then
- log('W', logTag, 'lastBuyerTickGameHours (' .. string.format("%.0f", lastTickHours) .. ') ahead of current (' .. string.format("%.0f", currentHours) .. ') — resetting')
+ log('W', logTag, 'lastBuyerTickGameHours (' .. string.format("%.0f", lastTickHours) .. ') ahead of current (' .. string.format("%.0f", currentHours) .. ') — resetting with seed buyers')
  if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(currentHours) end
+
+ -- Seed a few immediate buyers so listings don't feel dead after reload
+ local playerListings = mp.getPlayerListings and mp.getPlayerListings() or {}
+ local seedTicks = 5
+ local newBuyerCount = 0
+ for t = 1, seedTicks do
+ for _, listing in ipairs(playerListings) do
+ if not listing.isSold then
+ local session = mp.generateTickBuyer and mp.generateTickBuyer(listing, t)
+ if session then
+ newBuyerCount = newBuyerCount + 1
+ processBuyerInit(session.listingId, session.buyerId, true)
+ end
+ end
+ end
+ end
+ if newBuyerCount > 0 then
+ log('I', logTag, 'Seeded ' .. newBuyerCount .. ' buyers after time reset')
+ end
  return
  end
 
