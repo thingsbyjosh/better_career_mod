@@ -41,10 +41,7 @@ local logTag = 'bcm_timeSystem'
 local START_EPOCH = {year = 2026, month = 5, day = 15} -- Fallback start date when OS date unavailable (May 15)
 local START_TOD = 0.2083 -- 17:00 (5 PM) as tod.time: ((17-12)%24)/24
 
-local DAYS_PER_SEASON = 14
-local DAYS_PER_YEAR = 56
 local SEASONS = {"spring", "summer", "autumn", "winter"}
-local SEASON_MONTHS = {3, 6, 9, 12} -- Map season index to representative month
 
 -- Leap year check
 local function isLeapYear(y)

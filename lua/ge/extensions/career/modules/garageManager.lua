@@ -239,11 +239,22 @@ local function showPurchaseGaragePrompt(garageId)
 
  -- BCM: redirect to real estate website for BCM-defined garages
  if bcm_garages and bcm_garages.getGarageDefinition(garageId) then
+ -- Open the computer menu first so computerFunctions is initialised;
+ -- without this, the ChangeState→'computer' causes getComputerUIData()
+ -- to crash because openMenu was never called.
+ local computers = freeroam_facilities.getFacilitiesByType("computer")
+ if computers then
+ for _, computer in pairs(computers) do
+ if computer.garageId == garageId then
+ career_modules_computer.openMenu(computer, false)
+ break
+ end
+ end
+ end
  guihooks.trigger('BCMOpenXPWithIE', {
  url = 'http://belascorealty.com/listings?id=' .. garageId,
  restricted = true
  })
- guihooks.trigger('ChangeState', { state = 'computer' })
  return
  end
 

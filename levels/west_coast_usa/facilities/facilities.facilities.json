@@ -227,6 +227,44 @@
  "screens":[
  "commercialGarageComputer_screen_2"
  ]
+ },
+ {
+ "categories":[
+ {
+ "keyLabel":"Vehicle & Parts Management"
+ },
+ {
+ "keyLabel":"Vehicle & Parts Shopping"
+ }
+ ],
+ "description":"Motel",
+ "doors":[
+ [
+ "bcm_motel_area",
+ "bcm_motel_icon"
+ ]
+ ],
+ "functions":{
+ "insurances":true,
+ "painting":true,
+ "partInventory":true,
+ "partShop":true,
+ "playerAbstract":true,
+ "sleep":true,
+ "tuning":true,
+ "vehicleInventory":true,
+ "vehicleShop":true
+ },
+ "garageId":"bcm_motel",
+ "icon":"poi_laptop_round",
+ "iconLift":0.24,
+ "iconOffsetHeight":0.24,
+ "id":"bcm_motel_area",
+ "name":"Motel",
+ "preview":"",
+ "screens":[
+ "commercialGarageComputer_screen_2"
+ ]
  }
  ],
  "garages":[
@@ -376,6 +414,25 @@
  "tags":{},
  "zoneNames":[
  "bcm_belasco"
+ ]
+ },
+ {
+ "capacity":2,
+ "defaultPrice":100000,
+ "description":"Motel",
+ "icon":"poi_garage_2_round",
+ "id":"bcm_motel",
+ "name":"Motel",
+ "parkingSpotNames":[
+ "bcm_motel_parking1",
+ "bcm_motel_parking2",
+ "bcm_motel_parking3",
+ "bcm_motel_parking4"
+ ],
+ "preview":"bcm_motel.png",
+ "tags":{},
+ "zoneNames":[
+ "bcm_motel"
  ]
  }
  ],

@@ -95,6 +95,22 @@
  }
  ],
  "name":"Belasco City Garage"
+ },
+ {
+ "description":"BCM Garage - Parts receiver",
+ "id":"bcm_motel",
+ "logisticGenerators":{},
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":[
+ "bcm_parts"
+ ],
+ "multiDropOffSpotFilter":[
+ {
+ "type":"byZone",
+ "zoneName":"bcm_motel"
+ }
+ ],
+ "name":"Motel"
  }
  ]
 }
