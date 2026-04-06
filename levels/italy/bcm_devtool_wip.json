@@ -2,8 +2,41 @@
  "cameraWizardStep":0,
  "cameras":{},
  "deletedGarageIds":{},
- "deliveryFacilities":{},
- "deliveryWizardStep":0,
+ "deliveryFacilities":[
+ {
+ "associatedOrganization":"",
+ "description":"",
+ "facilityType":"custom",
+ "id":"bcmFacility_1",
+ "logisticGenerators":{},
+ "logisticMaxItems":8,
+ "name":"",
+ "parkingSpots":[
+ {
+ "dir":[
+ -0.93257577334804,
+ 0.2863912883359,
+ -0.2197326942665
+ ],
+ "isInspectSpot":true,
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":{},
+ "normal":[
+ -0.015233973768732,
+ -0.0045694292876668,
+ 0.99987351518039
+ ],
+ "pos":[
+ 1220.0603027344,
+ -813.15093994141,
+ 145.24093008041
+ ]
+ }
+ ]
+ }
+ ],
+ "deliveryTemplates":{},
+ "deliveryWizardStep":5,
  "devtoolMode":"garages",
  "garages":[
  {
@@ -1547,15 +1580,15 @@
  ],
  "description":"",
  "flavorText":{
- "en":"Si tu coche necesita algo más que un martillo y optimismo, probablemente acabará aquí. FBX Garage es un taller moderno donde los problemas se diagnostican con ordenadores, herramientas caras y mecánicos que saben exactamente cuánto te va a costar arreglarlo.\n\nRápido, profesional y sorprendentemente limpio para un sitio lleno de motores abiertos.",
- "es":"If your car needs more than a hammer and optimism, it will probably end up here. FBX Garage is a modern workshop where problems are diagnosed with computers, expensive tools and mechanics who know exactly how much it will cost to fix.\n\nFast, professional and surprisingly clean for a place full of open engines."
+ "en":"If your car needs more than a hammer and optimism, it will probably end up here. FBX Garage is a modern workshop where problems are diagnosed with computers, expensive tools and mechanics who know exactly how much it will cost to fix.\n\nFast, professional and surprisingly clean for a place full of open engines.",
+ "es":"Si tu coche necesita algo más que un martillo y optimismo, probablemente acabará aquí. FBX Garage es un taller moderno donde los problemas se diagnostican con ordenadores, herramientas caras y mecánicos que saben exactamente cuánto te va a costar arreglarlo.\n\nRápido, profesional y sorprendentemente limpio para un sitio lleno de motores abiertos."
  },
  "id":"bcm_it_fbx",
  "images":{
  "preview":"bcm_it_fbx.png"
  },
  "isExisting":false,
- "isStarterGarage":true,
+ "isStarterGarage":false,
  "maxCapacity":6,
  "name":"FBX Garage",
  "parkingSpots":[
@@ -2259,9 +2292,10 @@
  ]
  }
  ],
- "lastSaved":1773246497,
+ "lastSaved":1775492992,
  "levelName":"italy",
  "radarSpots":{},
+ "selectedDeliveryIdx":1,
  "selectedIdx":3,
  "wizardStep":6
 }

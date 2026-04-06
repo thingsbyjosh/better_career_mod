@@ -1,56 +1,406 @@
 [
  {
- "baseCapacity": 2,
- "basePrice": 250000,
- "description": "In the Italian countryside, where the wine is good and the roads are even better, sits this old villa turned sanctuary for cars and overly optimistic mechanics.\n\nFrom the outside it looks like a peaceful rural home. Inside, it’s a haven for engines that are far too loud for such a small village.\n\nThe coffee is strong, the tools are old… and the cars have character.",
- "id": "bcm_it_villa",
- "images": {},
- "isStarterGarage": false,
- "mapName": "italy",
- "maxCapacity": 7,
- "name": "Villa Officina",
- "slotUpgradeBasePrice": 25000,
- "slotUpgradeMultiplier": 1.5,
- "tierUpgradeCosts": {
- "t1": 75000,
- "t2": 175000
- },
- "type": "garage"
+ "baseCapacity":2,
+ "basePrice":250000,
+ "center":[
+ 700.41729736328,
+ 846.42779541016,
+ 185.43341810703
+ ],
+ "computerPoint":[
+ 700.41912841797,
+ 846.43023681641,
+ 184.7334318161
+ ],
+ "description":"",
+ "id":"bcm_it_villa",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"italy",
+ "maxCapacity":7,
+ "name":"Villa Officina",
+ "parkingSpots":[
+ {
+ "dir":[
+ 0.67086462270024,
+ 0.71283321113351,
+ -0.20447364405799
+ ],
+ "pos":[
+ 696.08697509766,
+ 832.265625,
+ 184.22224634886
+ ]
  },
  {
- "baseCapacity": 2,
- "basePrice": 150000,
- "description": "Portino is one of those garages that looks small… until you realize how many cars have passed through it. Everything gets fixed here — from tired daily drivers to sports cars that “just came in for a quick check.”\n\nIt may not be the most modern place around, but the engine always leaves working. Or at least sounding different.",
- "id": "bcm_it_portino",
- "images": {},
- "isStarterGarage": false,
- "mapName": "italy",
- "maxCapacity": 8,
- "name": "Portino Auto Service",
- "slotUpgradeBasePrice": 15000,
- "slotUpgradeMultiplier": 1.5,
- "tierUpgradeCosts": {
- "t1": 45000,
- "t2": 105000
- },
- "type": "garage"
+ "dir":[
+ 0.56086007377043,
+ -0.7953461056287,
+ -0.22991422294301
+ ],
+ "pos":[
+ 694.89001464844,
+ 841.91217041016,
+ 184.22080826759
+ ]
  },
  {
- "baseCapacity": 2,
- "basePrice": 100000,
- "description": "Si tu coche necesita algo más que un martillo y optimismo, probablemente acabará aquí. FBX Garage es un taller moderno donde los problemas se diagnostican con ordenadores, herramientas caras y mecánicos que saben exactamente cuánto te va a costar arreglarlo.\n\nRápido, profesional y sorprendentemente limpio para un sitio lleno de motores abiertos.",
- "id": "bcm_it_fbx",
- "images": {},
- "isStarterGarage": true,
- "mapName": "italy",
- "maxCapacity": 6,
- "name": "FBX Garage",
- "slotUpgradeBasePrice": 10000,
- "slotUpgradeMultiplier": 1.5,
- "tierUpgradeCosts": {
- "t1": 30000,
- "t2": 70000
+ "dir":[
+ 0.66665038546398,
+ -0.74028741753182,
+ -0.086901110492318
+ ],
+ "pos":[
+ 698.31451416016,
+ 838.14904785156,
+ 184.22738271952
+ ]
  },
- "type": "garage"
+ {
+ "dir":[
+ 0.66665038546398,
+ -0.74028741753182,
+ -0.086901110492318
+ ],
+ "pos":[
+ 701.46893310547,
+ 834.62664794922,
+ 184.22833108902
+ ]
+ },
+ {
+ "dir":[
+ 0.14756419501946,
+ -0.97834520775789,
+ -0.14513945984962
+ ],
+ "pos":[
+ 712.30914306641,
+ 849.54266357422,
+ 184.73732811213
+ ]
+ },
+ {
+ "dir":[
+ 0.24820678574329,
+ -0.95625807610769,
+ -0.15480272410329
+ ],
+ "pos":[
+ 710.31610107422,
+ 846.470703125,
+ 184.73205333948
+ ]
+ },
+ {
+ "dir":[
+ -0.17195740786834,
+ -0.9234211445447,
+ -0.34310936986181
+ ],
+ "pos":[
+ 707.59210205078,
+ 843.2001953125,
+ 184.94094848633
+ ]
+ }
+ ],
+ "slotUpgradeBasePrice":25000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":75000,
+ "t2":175000
+ },
+ "type":"garage",
+ "zoneVertices":[
+ [
+ 719.10296630859,
+ 848.51953125,
+ 184.32769024372
+ ],
+ [
+ 696.90356445313,
+ 826.89868164063,
+ 183.59534788132
+ ],
+ [
+ 680.21032714844,
+ 839.41912841797,
+ 185.47708302736
+ ],
+ [
+ 704.11688232422,
+ 863.43499755859,
+ 185.35019469261
+ ]
+ ]
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":150000,
+ "center":[
+ -705.0791015625,
+ -1329.7864990234,
+ 141.32376838922
+ ],
+ "computerPoint":[
+ -705.0791015625,
+ -1329.7864990234,
+ 140.62376838923
+ ],
+ "description":"",
+ "id":"bcm_it_portino",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"italy",
+ "maxCapacity":8,
+ "name":"Portino Auto Service",
+ "parkingSpots":[
+ {
+ "dir":[
+ -0.16760259167206,
+ 0.95882771669385,
+ -0.22925701944427
+ ],
+ "pos":[
+ -699.98815917969,
+ -1348.0734863281,
+ 140.26022541523
+ ]
+ },
+ {
+ "dir":[
+ -0.16760259167206,
+ 0.95882771669385,
+ -0.22925701944427
+ ],
+ "pos":[
+ -697.53002929688,
+ -1347.6754150391,
+ 140.24753159285
+ ]
+ },
+ {
+ "dir":[
+ -0.16760259167206,
+ 0.95882771669385,
+ -0.22925701944427
+ ],
+ "pos":[
+ -694.66937255859,
+ -1347.2034912109,
+ 140.26690202951
+ ]
+ },
+ {
+ "dir":[
+ -0.16760259167206,
+ 0.95882771669385,
+ -0.22925701944427
+ ],
+ "pos":[
+ -692.11303710938,
+ -1346.732421875,
+ 140.27493977547
+ ]
+ },
+ {
+ "dir":[
+ -0.16760259167206,
+ 0.95882771669385,
+ -0.22925701944427
+ ],
+ "pos":[
+ -689.70739746094,
+ -1346.2962646484,
+ 140.27557229996
+ ]
+ },
+ {
+ "dir":[
+ -0.26176184498099,
+ 0.95497805672367,
+ -0.13963397755719
+ ],
+ "pos":[
+ -684.83941650391,
+ -1342.4488525391,
+ 140.25716614723
+ ]
+ },
+ {
+ "dir":[
+ -0.98327688344591,
+ -0.028755250013826,
+ -0.17983243889114
+ ],
+ "pos":[
+ -687.92230224609,
+ -1340.4921875,
+ 140.29845821857
+ ]
+ },
+ {
+ "dir":[
+ -0.92275795948598,
+ -0.36450946363473,
+ -0.12510235459811
+ ],
+ "pos":[
+ -695.78430175781,
+ -1339.8513183594,
+ 140.2984597683
+ ]
+ }
+ ],
+ "slotUpgradeBasePrice":15000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":45000,
+ "t2":105000
+ },
+ "type":"garage",
+ "zoneVertices":[
+ [
+ -695.84246826172,
+ -1325.6297607422,
+ 140.42352586985
+ ],
+ [
+ -708.876953125,
+ -1331.9593505859,
+ 140.59294253588
+ ],
+ [
+ -705.17816162109,
+ -1350.2003173828,
+ 140.25883406401
+ ],
+ [
+ -684.68377685547,
+ -1347.1918945313,
+ 140.32710659504
+ ],
+ [
+ -683.52276611328,
+ -1339.8563232422,
+ 140.21344095469
+ ],
+ [
+ -684.13287353516,
+ -1333.1879882813,
+ 140.17105144262
+ ]
+ ]
+ },
+ {
+ "baseCapacity":2,
+ "basePrice":100000,
+ "center":[
+ 1203.8205566406,
+ -833.50085449219,
+ 146.45020601749
+ ],
+ "computerPoint":[
+ 1203.8205566406,
+ -833.50091552734,
+ 145.85020267963
+ ],
+ "description":"",
+ "id":"bcm_it_fbx",
+ "images":{},
+ "isStarterGarage":false,
+ "mapName":"italy",
+ "maxCapacity":6,
+ "name":"FBX Garage",
+ "parkingSpots":[
+ {
+ "dir":[
+ 0.54258795901324,
+ 0.78755773007976,
+ -0.29214915458624
+ ],
+ "pos":[
+ 1201.6026611328,
+ -829.05242919922,
+ 145.84503000975
+ ]
+ },
+ {
+ "dir":[
+ 0.7831051602824,
+ -0.57745834429759,
+ -0.23084230231946
+ ],
+ "pos":[
+ 1193.9421386719,
+ -826.96514892578,
+ 145.8522156477
+ ]
+ },
+ {
+ "dir":[
+ 0.81862238881634,
+ -0.53063634213934,
+ -0.21973269426649
+ ],
+ "pos":[
+ 1197.7659912109,
+ -824.7734375,
+ 145.85545128584
+ ]
+ },
+ {
+ "dir":[
+ -0.81827527322488,
+ 0.53311973927707,
+ -0.21496260331019
+ ],
+ "pos":[
+ 1207.3919677734,
+ -830.36224365234,
+ 145.78899276257
+ ]
+ }
+ ],
+ "slotUpgradeBasePrice":10000,
+ "slotUpgradeMultiplier":1.5,
+ "tierUpgradeCosts":{
+ "t1":30000,
+ "t2":70000
+ },
+ "type":"garage",
+ "zoneVertices":[
+ [
+ 1200.4580078125,
+ -838.01501464844,
+ 145.84295409918
+ ],
+ [
+ 1189.5015869141,
+ -830.60681152344,
+ 145.85034769773
+ ],
+ [
+ 1196.625,
+ -815.77410888672,
+ 145.73338860273
+ ],
+ [
+ 1211.58203125,
+ -824.29229736328,
+ 145.20570266247
+ ],
+ [
+ 1214.1588134766,
+ -828.69055175781,
+ 145.09108668566
+ ],
+ [
+ 1208.7202148438,
+ -833.48748779297,
+ 145.70082449913
+ ]
+ ]
  }
 ]

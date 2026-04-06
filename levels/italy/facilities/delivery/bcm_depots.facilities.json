@@ -1,0 +1,25 @@
+{
+ "deliveryProviders":[
+ {
+ "associatedOrganization":"bcmFacility_1",
+ "description":"",
+ "facilityType":"custom",
+ "id":"bcmFacility_1",
+ "logisticGenerators":{},
+ "logisticMaxItems":8,
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":{},
+ "manualAccessPoints":[
+ {
+ "isInspectSpot":true,
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":{},
+ "psName":"bcmFacility_1_parking1"
+ }
+ ],
+ "name":"",
+ "preview":"",
+ "sitesFile":"bcm_depots.sites.json"
+ }
+ ]
+}

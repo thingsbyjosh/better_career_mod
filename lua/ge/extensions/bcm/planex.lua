@@ -4657,23 +4657,21 @@ initModule = function()
  -- so we must intercept at the setPath level to ensure our routing always wins.
  if core_groundMarkers and core_groundMarkers.setPath and not planexState._originalSetPath then
  planexState._originalSetPath = core_groundMarkers.setPath
+ local isRouting = false -- reentrancy guard: prevents setPath↔setBestRoute recursion
  core_groundMarkers.setPath = function(wp, options)
  if planexState.activePack and (planexState.routeState == 'en_route' or planexState.routeState == 'traveling_to_depot') then
- -- Check if this call is from US (setBestRoute [PlanEx]) or from vanilla
- local info = debug.getinfo(2, 'Sl')
- local caller = info and info.short_src or ''
- if caller:find('bcm/planex') or caller:find('bcm\\planex') then
- -- Our call — pass through
+ if isRouting then
+ -- Reentrant call from our own setBestRoute — pass through
  return planexState._originalSetPath(wp, options)
- else
+ end
  -- Vanilla trying to set path — override with our routing
- log('I', logTag, 'setPath intercepted from vanilla (' .. (caller or '?') .. ') — re-routing via PlanEx setBestRoute')
- -- Call our setBestRoute which uses the monkey-patched M.setBestRoute
+ log('I', logTag, 'setPath intercepted from vanilla — re-routing via PlanEx setBestRoute')
+ isRouting = true
  if career_modules_delivery_cargoScreen and career_modules_delivery_cargoScreen.setBestRoute then
  career_modules_delivery_cargoScreen.setBestRoute(true)
  end
+ isRouting = false
  return
- end
  end
  return planexState._originalSetPath(wp, options)
  end
