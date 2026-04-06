@@ -111,6 +111,22 @@
  }
  ],
  "name":"Motel"
+ },
+ {
+ "description":"BCM Garage - Parts receiver",
+ "id":"bcm_bungalow",
+ "logisticGenerators":{},
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":[
+ "bcm_parts"
+ ],
+ "multiDropOffSpotFilter":[
+ {
+ "type":"byZone",
+ "zoneName":"bcm_bungalow"
+ }
+ ],
+ "name":"Bungalow"
  }
  ]
 }

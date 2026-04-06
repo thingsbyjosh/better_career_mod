@@ -229,7 +229,7 @@
  ]
  },
  {
- "categories":[
+ "activityAcceptProps":[
  {
  "keyLabel":"Vehicle & Parts Management"
  },
@@ -237,7 +237,7 @@
  "keyLabel":"Vehicle & Parts Shopping"
  }
  ],
- "description":"Motel",
+ "description":"ui.career.computer.bigmapLabel.garage",
  "doors":[
  [
  "bcm_motel_area",
@@ -261,6 +261,44 @@
  "iconOffsetHeight":0.24,
  "id":"bcm_motel_area",
  "name":"Motel",
+ "preview":"",
+ "screens":[
+ "commercialGarageComputer_screen_2"
+ ]
+ },
+ {
+ "activityAcceptProps":[
+ {
+ "keyLabel":"Vehicle & Parts Management"
+ },
+ {
+ "keyLabel":"Vehicle & Parts Shopping"
+ }
+ ],
+ "description":"ui.career.computer.bigmapLabel.garage",
+ "doors":[
+ [
+ "bcm_bungalow_area",
+ "bcm_bungalow_icon"
+ ]
+ ],
+ "functions":{
+ "insurances":true,
+ "painting":true,
+ "partInventory":true,
+ "partShop":true,
+ "playerAbstract":true,
+ "sleep":true,
+ "tuning":true,
+ "vehicleInventory":true,
+ "vehicleShop":true
+ },
+ "garageId":"bcm_bungalow",
+ "icon":"poi_laptop_round",
+ "iconLift":0.24,
+ "iconOffsetHeight":0.24,
+ "id":"bcm_bungalow_area",
+ "name":"Bungalow",
  "preview":"",
  "screens":[
  "commercialGarageComputer_screen_2"
@@ -417,22 +455,41 @@
  ]
  },
  {
- "capacity":2,
+ "capacity":1,
  "defaultPrice":100000,
- "description":"Motel",
+ "description":"",
  "icon":"poi_garage_2_round",
  "id":"bcm_motel",
  "name":"Motel",
  "parkingSpotNames":[
  "bcm_motel_parking1",
  "bcm_motel_parking2",
- "bcm_motel_parking3",
- "bcm_motel_parking4"
+ "bcm_motel_parking3"
  ],
  "preview":"bcm_motel.png",
  "tags":{},
  "zoneNames":[
  "bcm_motel"
+ ]
+ },
+ {
+ "capacity":1,
+ "defaultPrice":500000,
+ "description":"",
+ "icon":"poi_garage_2_round",
+ "id":"bcm_bungalow",
+ "name":"Bungalow",
+ "parkingSpotNames":[
+ "bcm_bungalow_parking1",
+ "bcm_bungalow_parking2",
+ "bcm_bungalow_parking3",
+ "bcm_bungalow_parking4",
+ "bcm_bungalow_parking5"
+ ],
+ "preview":"bcm_bungalow.png",
+ "tags":{},
+ "zoneNames":[
+ "bcm_bungalow"
  ]
  }
  ],

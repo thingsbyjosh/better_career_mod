@@ -2,42 +2,9 @@
  "cameraWizardStep":0,
  "cameras":{},
  "deletedGarageIds":{},
- "deliveryFacilities":[
- {
- "associatedOrganization":"",
- "description":"",
- "facilityType":"custom",
- "id":"bcmFacility_1",
- "logisticGenerators":{},
- "logisticMaxItems":8,
- "name":"",
- "parkingSpots":[
- {
- "dir":[
- -0.93257577334804,
- 0.2863912883359,
- -0.2197326942665
- ],
- "isInspectSpot":true,
- "logisticTypesProvided":{},
- "logisticTypesReceived":{},
- "normal":[
- -0.015233973768732,
- -0.0045694292876668,
- 0.99987351518039
- ],
- "pos":[
- 1220.0603027344,
- -813.15093994141,
- 145.24093008041
- ]
- }
- ]
- }
- ],
- "deliveryTemplates":{},
- "deliveryWizardStep":3,
- "devtoolMode":"delivery",
+ "deliveryFacilities":{},
+ "deliveryWizardStep":0,
+ "devtoolMode":"garages",
  "garages":[
  {
  "baseCapacity":2,
@@ -2292,10 +2259,9 @@
  ]
  }
  ],
- "lastSaved":1775491005,
+ "lastSaved":1773246497,
  "levelName":"italy",
  "radarSpots":{},
- "selectedDeliveryIdx":1,
  "selectedIdx":3,
  "wizardStep":6
 }

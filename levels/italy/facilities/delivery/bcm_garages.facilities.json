@@ -1,0 +1,52 @@
+{
+ "deliveryProviders":[
+ {
+ "description":"BCM Garage - Parts receiver",
+ "id":"bcm_it_villa",
+ "logisticGenerators":{},
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":[
+ "bcm_parts"
+ ],
+ "multiDropOffSpotFilter":[
+ {
+ "type":"byZone",
+ "zoneName":"bcm_it_villa"
+ }
+ ],
+ "name":"Villa Officina"
+ },
+ {
+ "description":"BCM Garage - Parts receiver",
+ "id":"bcm_it_portino",
+ "logisticGenerators":{},
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":[
+ "bcm_parts"
+ ],
+ "multiDropOffSpotFilter":[
+ {
+ "type":"byZone",
+ "zoneName":"bcm_it_portino"
+ }
+ ],
+ "name":"Portino Auto Service"
+ },
+ {
+ "description":"BCM Garage - Parts receiver",
+ "id":"bcm_it_fbx",
+ "logisticGenerators":{},
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":[
+ "bcm_parts"
+ ],
+ "multiDropOffSpotFilter":[
+ {
+ "type":"byZone",
+ "zoneName":"bcm_it_fbx"
+ }
+ ],
+ "name":"FBX Garage"
+ }
+ ]
+}
