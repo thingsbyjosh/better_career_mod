@@ -1,0 +1,2 @@
+{"continent":"","country":"italy","worldMapPos":[0,0],"fuelPriceMultiplier":1,"type":"mapInfo","localPartsDepot":"","importPartsDepot":"","displayName":""}
+{"name":"Italy port","center":[487.19583129883,1593.4371337891,139.74006652832],"connections":[{"toll":0,"targetNode":"wc_port","minDistanceLevel":1,"connectionType":"ship","targetMap":"west_coast_usa"}],"type":"travelNode","rotation":[0,0,0.097167404279527,0.99526805210736],"id":"it_port1","triggerSize":[8,8,4]}

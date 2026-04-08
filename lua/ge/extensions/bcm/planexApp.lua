@@ -34,6 +34,9 @@ local optimizeRoute
 local pinStopAtPosition
 local getTrailerForVehicle
 local getVehicleNiceName
+-- pause/resume bridge
+local pauseRoute
+local resumeRoute
 
 local logTag = 'bcm_planexApp'
 
@@ -54,6 +57,7 @@ end
 
 requestPoolData = function()
  if not bcm_planex then return end
+ bcm_planex.checkRotation() -- D-13: on-demand rotation check (moved from onUpdate 30s polling)
  local pool = bcm_planex.getFullPool()
  -- If pool is empty, the generator might not have been ready at init — retry
  if not pool or #pool == 0 then
@@ -66,6 +70,11 @@ end
 requestPackDetail = function(packId)
  if not bcm_planex then return end
  local pack = bcm_planex.getPackById(packId)
+ -- Lazy optimize stop order on first detail view (deferred from generatePool)
+ if pack and not pack._stopOrderOptimized then
+ bcm_planex.optimizeStopOrder(pack)
+ pack._stopOrderOptimized = true
+ end
  -- Generate manifest on-demand for available non-tutorial packs
  if pack and pack.status == 'available' and not pack.isTutorialPack then
  local effectiveCap = resolveEffectiveCapacity()
@@ -142,6 +151,24 @@ abandonPack = function()
  bcm_planex.abandonPack()
  bcm_planex.broadcastState()
  requestPoolData()
+end
+
+-- Pause/resume bridge functions
+pauseRoute = function()
+ if not bcm_planex then return end
+ local ok = bcm_planex.pauseRoute()
+ if ok then
+ bcm_planex.broadcastState()
+ end
+end
+
+resumeRoute = function()
+ if not bcm_planex then return end
+ local ok = bcm_planex.resumeRoute()
+ if ok then
+ bcm_planex.broadcastState()
+ requestPoolData()
+ end
 end
 
 -- Phase 81.2-02: Stop reorder bridge — Vue sends JSON-encoded array of stop indices
@@ -554,6 +581,8 @@ M.requestPoolData = requestPoolData
 M.requestPackDetail = requestPackDetail
 M.acceptPack = acceptPack
 M.abandonPack = abandonPack
+M.pauseRoute = pauseRoute
+M.resumeRoute = resumeRoute
 M.requestHistory = requestHistory
 M.requestDriverStats = requestDriverStats
 M.selectVehicle = selectVehicle

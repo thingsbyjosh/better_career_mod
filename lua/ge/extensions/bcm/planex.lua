@@ -126,14 +126,17 @@ local optimizeStopOrder
 local respawnPickupCargoOnLoad
 local getDepotPosition
 local resolveFacilityPsPath
+-- pause/resume route system
+local pauseRoute
+local resumeRoute
 
 -- ============================================================================
 -- Constants
 -- ============================================================================
 local logTag = 'bcm_planex'
 
--- 6 game-hours = 0.25 game-days (4 rotations per game-day)
-local ROTATION_PERIOD_DAYS = 6 / 24
+-- 12 game-hours = 0.5 game-days (2 rotations per game-day)
+local ROTATION_PERIOD_DAYS = 12 / 24
 
 local MAX_LEVEL = 20
 
@@ -205,11 +208,15 @@ local function getPlanexRepData()
  return { level = -1, label = REP_LEVEL_LABELS[-1], value = 0, progress = 0, toNext = 30 }
 end
 
--- Pack density configs
+-- Pack density configs (Phase 96.1: 4-tier distribution ~25% each)
 local DENSITY_CONFIG = {
- high = { minStops = 8, maxStopsFallback = 15, maxStopsRatio = 0.35, maxStopsCap = 40 },
- low = { minStops = 3, maxStopsFallback = 7, maxStopsRatio = 0.15, maxStopsCap = 15 },
+ micro = { minStops = 2, maxStopsFallback = 3, maxStopsRatio = 0.05, maxStopsCap = 3 },
+ short = { minStops = 4, maxStopsFallback = 6, maxStopsRatio = 0.10, maxStopsCap = 6 },
+ medium = { minStops = 7, maxStopsFallback = 12, maxStopsRatio = 0.20, maxStopsCap = 12 },
+ long = { minStops = 13, maxStopsFallback = 20, maxStopsRatio = 0.35, maxStopsCap = 40 },
 }
+
+local DENSITY_TIERS = { 'micro', 'short', 'medium', 'long' }
 
 -- Fatigue multipliers: packs 1-2 = 1.0, pack 3 = 0.85, pack 4+ = 0.70
 local FATIGUE_MULTIPLIERS = { 1.0, 1.0, 0.85, 0.70 }
@@ -636,8 +643,8 @@ computePackPay = function(tier, stopCount, totalDistanceM, typeDef)
  end
  end
 
- -- Stop-count bonus (matches generateCargoForPack logic)
- local stopBonus = 1 + math.max(0, stopCount - 3) * 0.03
+ -- Stop-count bonus (matches generateCargoForPack logic) — Phase 96.1: 7% per extra stop
+ local stopBonus = 1 + math.max(0, stopCount - 3) * 0.07
  -- apply pack type pay multiplier to base estimate
  local payMult = (typeDef and typeDef.payMultiplier) or 1.0
  return math.floor(totalPay * stopBonus * payMult)
@@ -3058,7 +3065,7 @@ generatePool = function(rotationId)
 
  for i = 1, poolSize do
  local tier = pickTierForLevel(planexState.driverLevel)
- local density = math.random() < 0.5 and "high" or "low"
+ local density = DENSITY_TIERS[((i - 1) % #DENSITY_TIERS) + 1]
 
  -- pick pack type for this tier
  local typeId, typeDef = pickPackType(tier, typeDefs)
@@ -3161,9 +3168,8 @@ generatePool = function(rotationId)
  -- Add depot as last stop (for depot-return routes)
  appendDepotStop(pack, candidates)
 
- -- Pre-optimize stop order so the UI shows an optimized route before the user accepts.
- -- User can reorder manually before/after accepting; onArriveAtDepot respects current order.
- optimizeStopOrder(pack)
+ -- optimizeStopOrder moved to requestPackDetail (lazy, on-demand).
+ -- Stop order is optimized when the player views pack detail, not at pool generation time.
 
  table.insert(pool, pack)
  tierCounts[tier] = (tierCounts[tier] or 0) + 1
@@ -3191,7 +3197,7 @@ generatePool = function(rotationId)
  specialPack.hasDepotReturn = false
  end
  appendDepotStop(specialPack, candidates)
- optimizeStopOrder(specialPack)
+ -- optimizeStopOrder deferred to requestPackDetail (lazy)
  table.insert(pool, specialPack)
  end
  end
@@ -3519,6 +3525,9 @@ acceptPack = function(packId)
  broadcastState()
  return nil
  end
+
+ -- Store loaner tier in pack so it survives save/load regardless of state cleanup
+ pack.loanerTier = planexState.loanerSelectedTier or nil
 
  -- Loaner vehicle handling
  if planexState.loanerSelectedTier then
@@ -3992,12 +4001,16 @@ completePack = function()
  if s.overtimePenalty then routeHadOvertime = true; break end
  end
 
+ -- Use original totals if route was resumed (pre-pause + post-resume combined)
+ local totalDeliveryStops = pack._originalStopCount or ((pack.stopCount or #pack.stops) - (pack.hasDepotReturn ~= false and 1 or 0))
+ local totalDelivered = (pack._deliveredPreResume or 0) + (pack.stopsDelivered or 0)
+
  guihooks.trigger('BCMPlanexRouteComplete', {
  packId = pack.id,
  packTypeId = pack.packTypeId or 'generic',
  tier = pack.tier,
- stopCount = (pack.stopCount or #pack.stops) - (pack.hasDepotReturn ~= false and 1 or 0),
- stopsDelivered = pack.stopsDelivered or 0,
+ stopCount = totalDeliveryStops,
+ stopsDelivered = totalDelivered,
  totalEarned = finalPay,
  grossEarnings = preStarPay,
  xpGained = totalXP,
@@ -4222,6 +4235,210 @@ abandonPack = function()
 end
 
 -- ============================================================================
+-- Pause / Resume route
+-- ============================================================================
+
+-- en_route|returning -> paused (D-09)
+pauseRoute = function()
+ if planexState.routeState ~= 'en_route' and planexState.routeState ~= 'returning' then
+ log('W', logTag, 'pauseRoute: invalid state ' .. tostring(planexState.routeState))
+ return false
+ end
+ local pack = planexState.activePack
+ if not pack then return false end
+
+ -- D-02: Immediate cargo despawn (delete all undelivered parcels)
+ if pack.cargoLoaded and pack.stops then
+ for _, stop in ipairs(pack.stops) do
+ if stop.parcelId and stop.status ~= 'delivered' then
+ local cargo = career_modules_delivery_parcelManager.getCargoById(stop.parcelId)
+ if cargo then cargo.location = {type = "delete"} end
+ stop.parcelId = nil
+ end
+ end
+ end
+
+ -- D-11: Discard all pickups (lost on pause)
+ if pack.pickupCargoIds then
+ for _, cid in ipairs(pack.pickupCargoIds) do
+ local cargo = career_modules_delivery_parcelManager.getCargoById(cid)
+ if cargo then cargo.location = {type = "delete"} end
+ end
+ pack.pickupCargoIds = {}
+ pack.pickupsCollected = 0
+ end
+
+ -- D-05: Start loaner idle timer (same as completePack)
+ if planexState.loanerInventoryId or planexState.loanerVehId then
+ planexState.loanerIdleTimer = LOANER_IDLE_TIMEOUT
+ loanerIdleWarningShown = false
+ end
+
+ -- Clear GPS/waypoints
+ clearAllPlanexWaypoints()
+
+ -- Exit vanilla delivery mode
+ if career_modules_delivery_general and career_modules_delivery_general.exitDeliveryMode then
+ career_modules_delivery_general.exitDeliveryMode()
+ end
+
+ log('I', logTag, string.format('ROUTE PAUSED: %s | %d/%d stops delivered | FSM: %s -> paused',
+ pack.id, pack.stopsDelivered or 0, #pack.stops, planexState.routeState))
+
+ planexState.routeState = 'paused'
+ broadcastState()
+ savePlanexData()
+ return true
+end
+
+-- paused -> traveling_to_depot (D-06, D-12)
+-- Treats resume as a fresh route start: strips delivered stops, regenerates cargo,
+-- spawns loaner, and enters the normal acceptPack flow (traveling_to_depot → pickup → deliver).
+-- Accumulated stats (pay, XP, damage, stopHistory) are preserved from the original route.
+resumeRoute = function()
+ if planexState.routeState ~= 'paused' then
+ log('W', logTag, 'resumeRoute: invalid state ' .. tostring(planexState.routeState))
+ return false
+ end
+ local pack = planexState.activePack
+ if not pack then return false end
+
+ -- Track original totals for final summary (pre-pause + post-resume combined)
+ local deliveredPrePause = pack.stopsDelivered or 0
+ -- Count non-depot stops for the original total
+ local originalDeliveryStops = 0
+ for _, stop in ipairs(pack.stops) do
+ if not stop.isDepotStop then originalDeliveryStops = originalDeliveryStops + 1 end
+ end
+ pack._originalStopCount = pack._originalStopCount or originalDeliveryStops
+ pack._deliveredPreResume = (pack._deliveredPreResume or 0) + deliveredPrePause
+
+ -- Collect pickups from already-delivered stops (these get loaded at depot on resume)
+ local carriedPickups = {}
+ for _, stop in ipairs(pack.stops) do
+ if stop.status == 'delivered' and stop.pickups and #stop.pickups > 0 then
+ for _, pickup in ipairs(stop.pickups) do
+ table.insert(carriedPickups, pickup)
+ end
+ end
+ end
+
+ -- D-12: Keep only uncompleted delivery stops, remove delivered + depot stops
+ local newStops = {}
+ for _, stop in ipairs(pack.stops) do
+ if stop.status ~= 'delivered' and not stop.isDepotStop then
+ -- Reset parcel state (old parcelIds are invalid after reload)
+ stop.parcelId = nil
+ stop.status = 'pending'
+ -- Keep stop.pickups intact (pickups for remaining stops stay)
+ stop.pickupCargoIds = {}
+ table.insert(newStops, stop)
+ end
+ end
+
+ -- All delivered — go straight to completing
+ if #newStops == 0 then
+ planexState.routeState = 'completing'
+ completePack()
+ return true
+ end
+
+ -- Check if any remaining stops have pickups OR we have carried pickups from delivered stops
+ local hasAnyPickups = #carriedPickups > 0
+ if not hasAnyPickups then
+ for _, stop in ipairs(newStops) do
+ if stop.pickups and #stop.pickups > 0 then
+ hasAnyPickups = true
+ break
+ end
+ end
+ end
+
+ -- If we have carried pickups from delivered stops, inject them into the first remaining stop
+ -- (they'll be spawned when that stop is completed, simulating "loaded at depot")
+ if #carriedPickups > 0 and #newStops > 0 then
+ if not newStops[1].pickups then newStops[1].pickups = {} end
+ for _, pickup in ipairs(carriedPickups) do
+ table.insert(newStops[1].pickups, pickup)
+ end
+ log('I', logTag, string.format('resumeRoute: %d pickups from delivered stops added to first remaining stop', #carriedPickups))
+ end
+
+ pack.stops = newStops
+ pack.stopCount = #newStops
+ pack.stopsDelivered = 0 -- Reset — pre-pause count is in _deliveredPreResume
+ pack.hasDepotReturn = hasAnyPickups -- Depot return only if there are pickups to bring back
+ pack.cargoLoaded = false -- Force fresh cargo pickup at depot
+ pack._transientMovesRegistered = nil -- Reset so checkDepotPickup re-registers transient moves
+ pack.pickupCargoIds = {} -- Reset pickup cargo tracking
+ pack.pickupsCollected = 0
+
+ -- Recalculate total pickup count for the resumed route
+ local resumePickupCount = 0
+ for _, stop in ipairs(newStops) do
+ resumePickupCount = resumePickupCount + (stop.pickups and #stop.pickups or 0)
+ end
+ pack.totalPickupCount = resumePickupCount
+
+ -- Rebuild stopOrder as 1..N
+ local newOrder = {}
+ for i = 1, #newStops do newOrder[i] = i end
+ pack.stopOrder = newOrder
+ pack.pinnedPositions = {}
+
+ -- Add depot as last stop only if there are pickups to return
+ if hasAnyPickups then
+ appendDepotStop(pack, enumerateStopCandidates())
+ end
+
+ -- Re-optimize route from depot
+ optimizeStopOrder(pack)
+
+ -- Restore loaner from pack (source of truth)
+ local loanerTier = pack.loanerTier or planexState.loanerSelectedTier
+ planexState.loanerIdleTimer = nil
+ if loanerTier then
+ planexState.loanerSelectedTier = loanerTier
+ if not planexState.loanerVehId or not be:getObjectByID(planexState.loanerVehId) then
+ local tierDef = LOANER_TIERS[loanerTier]
+ if tierDef then
+ spawnLoanerAtDepot(pack.warehouseId, tierDef)
+ log('I', logTag, 'resumeRoute: spawned loaner tier ' .. loanerTier .. ' at depot')
+ end
+ end
+ end
+
+ -- Regenerate cargo manifest for remaining stops (fresh parcels at depot)
+ -- generateCargoForPack now also checks activePack, so no pool injection needed
+ local effectiveCapacity = pack.vehicleCapacity or DEFAULT_ESTIMATE_CAPACITY
+ if loanerTier and LOANER_TIERS[loanerTier] then
+ effectiveCapacity = LOANER_TIERS[loanerTier].capacity
+ end
+ M.generateCargoForPack(pack.id, effectiveCapacity)
+ pack.totalPay = getPayoutForPack(pack)
+ planexState.activePack = pack
+
+ -- Enter traveling_to_depot — same flow as acceptPack from here
+ planexState.routeState = 'traveling_to_depot'
+
+ -- Spawn parcels at depot (player picks up by driving there)
+ spawnPlanexCargoAtDepot(pack)
+ setGPSToDepot(pack.warehouseId)
+
+ local depotLabel = pack.depotName or pack.warehouseId or 'the depot'
+ ui_message(string.format(
+ "Route resumed! Head to %s to pick up your cargo. (%d stops remaining)",
+ depotLabel, #newStops), 8, "planexResume")
+
+ log('I', logTag, string.format('ROUTE RESUMED: %s | %d remaining stops | loaner=%s | FSM: paused -> traveling_to_depot',
+ pack.id, #newStops, tostring(loanerTier or 'none')))
+
+ broadcastState()
+ savePlanexData()
+ return true
+end
+
+-- ============================================================================
 -- Broadcast state to Vue
 -- ============================================================================
 
@@ -4369,10 +4586,10 @@ savePlanexData = function(currentSavePath)
  packsToday = planexState.packsToday,
  lastGameDay = planexState.lastGameDay,
  nextPackId = planexState.nextPackId,
- -- Phase 74 Wave 2: persist damage tracking when route is in progress
- damageHistory = (planexState.routeState == 'en_route' or planexState.routeState == 'returning' or planexState.routeState == 'completing')
+ -- Phase 74 Wave 2: persist damage tracking when route is in progress (Phase 96.1: include paused)
+ damageHistory = (planexState.routeState == 'en_route' or planexState.routeState == 'returning' or planexState.routeState == 'completing' or planexState.routeState == 'paused')
  and planexState.damageHistory or {},
- accumulatedPay = (planexState.routeState == 'en_route' or planexState.routeState == 'returning' or planexState.routeState == 'completing')
+ accumulatedPay = (planexState.routeState == 'en_route' or planexState.routeState == 'returning' or planexState.routeState == 'completing' or planexState.routeState == 'paused')
  and planexState.accumulatedPay or 0,
  -- history, lifetime stats
  completedRoutes = planexState.completedRoutes,
@@ -4411,6 +4628,13 @@ savePlanexData = function(currentSavePath)
  return timers
  end)(),
  }
+
+ -- D-08: auto-pause active routes on save (game exit = implicit pause)
+ -- Any active state becomes paused in serialized data — player resumes explicitly on reload.
+ -- Override only the serialized data, not live state (game may continue after autosave)
+ if data.routeState == 'en_route' or data.routeState == 'returning' or data.routeState == 'traveling_to_depot' then
+ data.routeState = 'paused'
+ end
 
  career_saveSystem.jsonWriteFileSafe(bcmDir .. "/planex.json", data, true)
  log('I', logTag, string.format('PlanEx data saved. Level: %d, Route: %s, Active: %s',
@@ -4573,6 +4797,18 @@ loadPlanexData = function()
  log('I', logTag, 'loadPlanexData: applied pre-75.1 backward compat (packTypeId = standard_courier)')
  end
 
+ -- Any active route state on load → force to paused.
+ -- Player resumes explicitly; no state should auto-continue after reload.
+ if planexState.routeState == 'en_route' or planexState.routeState == 'returning' or planexState.routeState == 'traveling_to_depot' then
+ log('I', logTag, 'loadPlanexData: converting ' .. planexState.routeState .. ' -> paused (auto-pause on load)')
+ planexState.routeState = 'paused'
+ end
+
+ -- D-20/D-22: trigger paused route popup after a short delay
+ if planexState.routeState == 'paused' and planexState.activePack then
+ planexState._showPausedPopupTimer = 3 -- seconds delay after world ready
+ end
+
  log('I', logTag, string.format('PlanEx data loaded. Level: %d, Route: %s, Active: %s',
  planexState.driverLevel,
  planexState.routeState, tostring(planexState.activePack and planexState.activePack.id or 'none')
@@ -4640,17 +4876,20 @@ initModule = function()
  end
  end
 
- -- Clear loaner state (loaner was cleaned up or never existed after reload)
+ -- Clear loaner vehicle refs (vehicle doesn't survive reload)
  planexState.loanerInventoryId = nil
  planexState.loanerVehId = nil
+ -- Preserve loanerSelectedTier while route is active — resumeRoute needs it to respawn at depot
+ if planexState.routeState == 'idle' then
  planexState.loanerSelectedTier = nil
+ end
 
- -- Clear candidate cache and regenerate pool fresh on every init (map load / career start)
+ -- Phase 96.1 D-13: Pool generation deferred to first requestPoolData (on-demand).
+ -- Only clear caches here; generatePool runs when player opens PlanEx.
  cachedStopCandidates = {}
  distanceCache = {}
  planexState.pool = {}
- local currentRotationId = getCurrentRotationId()
- generatePool(currentRotationId)
+ planexState.lastRotationId = 0 -- Force rotation check on first requestPoolData
 
  -- Monkey-patch core_groundMarkers.setPath: when PlanEx en_route, intercept ALL setPath calls.
  -- Vanilla's internal local-function calls to setBestRoute bypass our M.setBestRoute patch,
@@ -4753,8 +4992,10 @@ initModule = function()
  local bestIdx = nil
  local bestDist = math.huge
 
+ -- Skip depot return stop in nearest search — depot is always last (pinned).
+ -- Only fall back to depot if it's the only pending stop.
  for _, entry in ipairs(pendingStops) do
- if not laterPinned[entry.idx] and entry.stop.pos and playerPos then
+ if not laterPinned[entry.idx] and not entry.stop.isDepotStop and entry.stop.pos and playerPos then
  local d = distanceBetween(playerPos, entry.stop.pos)
  if d < bestDist then
  bestDist = d
@@ -4762,6 +5003,7 @@ initModule = function()
  end
  end
  end
+ -- If no non-depot stop found, fall back to first pending (which may be depot)
  nextStopIdx = bestIdx or pendingStops[1].idx
  end
 
@@ -5348,6 +5590,25 @@ end
 M.onUpdate = function(dtReal, dtSim, dtRaw)
  if not isInitialized then return end
 
+ -- D-22: Paused route popup timer countdown (use dtRaw — dtReal is 0 while game is paused during load)
+ if planexState._showPausedPopupTimer then
+ planexState._showPausedPopupTimer = planexState._showPausedPopupTimer - dtRaw
+ if planexState._showPausedPopupTimer <= 0 then
+ planexState._showPausedPopupTimer = nil
+ local pack = planexState.activePack
+ if pack then
+ guihooks.trigger('BCMPlanexPausedRoutePopup', {
+ packId = pack.id,
+ routeCode = pack.routeCode,
+ routeState = planexState.routeState,
+ stopsDelivered = pack.stopsDelivered or 0,
+ totalStops = pack.stopCount or #pack.stops,
+ accumulatedPay = planexState.accumulatedPay or 0,
+ })
+ end
+ end
+ end
+
  -- Restore PlanEx waypoints after vanilla cargo screen closes (it clears all POIs)
  if cargoScreenWasOpen then
  local stillOpen = career_modules_delivery_cargoScreen and career_modules_delivery_cargoScreen.isCargoScreenOpen and career_modules_delivery_cargoScreen.isCargoScreenOpen()
@@ -5394,7 +5655,10 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
  ui_message("PlanEx loaner returned.", 5, "planexLoanerIdle")
  despawnLoaner()
  planexState.loanerIdleTimer = nil
+ -- preserve tier while route is active — resumeRoute will respawn at depot
+ if planexState.routeState == 'idle' then
  planexState.loanerSelectedTier = nil
+ end
  loanerIdleWarningShown = false
  guihooks.trigger('BCMPlanexLoanerIdleTimer', { remaining = 0, total = LOANER_IDLE_TIMEOUT })
  broadcastState()
@@ -5417,7 +5681,10 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
  ui_message("PlanEx loaner returned (too far).", 5, "planexLoanerFar")
  despawnLoaner()
  planexState.loanerIdleTimer = nil
+ -- preserve tier while route is active
+ if planexState.routeState == 'idle' then
  planexState.loanerSelectedTier = nil
+ end
  loanerIdleWarningShown = false
  broadcastState()
  end
@@ -5465,12 +5732,7 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
  end
  end
 
- -- 30-second rotation check
- updateTimer = updateTimer + dtReal
- if updateTimer >= 30 then
- updateTimer = 0
- checkRotation()
- end
+ -- checkRotation removed from onUpdate — now on-demand in requestPoolData (D-13)
 end
 
 -- Hook from bcm_timeSystem: new game day
@@ -5539,8 +5801,9 @@ M.onVehicleRemoved = function(inventoryId)
  planexState.loanerVehId = nil
  planexState.loanerIdleTimer = nil
  loanerIdleWarningShown = false
- -- If there's an active route, force abandon it (player lost their loaner)
- if planexState.routeState ~= 'idle' and planexState.activePack then
+ -- If there's an active route (not paused), force abandon it (player lost their loaner)
+ -- Don't abandon paused routes — loaner will respawn on resume
+ if planexState.routeState ~= 'idle' and planexState.routeState ~= 'paused' and planexState.activePack then
  log('I', logTag, 'onVehicleRemoved: active route detected — forcing abandon')
  abandonPack()
  else
@@ -5735,6 +5998,10 @@ M.getDeliveryVehicleInventoryId = getDeliveryVehicleInventoryId
 -- Pack's totalPay (cargo-based) replaces the old flat estimate.
 M.generateCargoForPack = function(packId, totalSlots)
  local pack = M.getPackById(packId)
+ -- also check activePack (paused route may not be in the pool)
+ if not pack and planexState.activePack and planexState.activePack.id == packId then
+ pack = planexState.activePack
+ end
  if not pack or not pack.stops then return nil end
  if not totalSlots or totalSlots <= 0 then return nil end
 
@@ -5954,9 +6221,9 @@ M.generateCargoForPack = function(packId, totalSlots)
  end
  end
 
- -- Stop-count bonus: more stops = more work = more pay
- -- 3 stops = ×1.0, 8 stops = ×1.30, 12 stops = ×1.54, 16 stops = ×1.78
- local stopBonus = 1 + math.max(0, numStops - 3) * 0.03
+ -- Stop-count bonus: more stops = more work = more pay — Phase 96.1: 7% per extra stop
+ -- 3 stops = x1.0, 8 stops = x1.35, 12 stops = x1.63, 16 stops = x1.91
+ local stopBonus = 1 + math.max(0, numStops - 3) * 0.07
  -- Pack type pay multiplier (e.g. "Billionaire's Whim" = ×2.0 for harder mechanics)
  local packTypeMult = pack.payMultiplier or 1.0
  totalCargoPay = math.floor(totalCargoPay * stopBonus * packTypeMult)
@@ -5975,6 +6242,11 @@ M.generateCargoForPack = function(packId, totalSlots)
 
  return cargoManifest
 end
+
+-- pause/resume route exports + on-demand rotation
+M.pauseRoute = function() return pauseRoute() end
+M.resumeRoute = function() return resumeRoute() end
+M.checkRotation = function() return checkRotation() end
 
 -- Phase 81.2-02: stop reorder + route optimization API
 M.setStopOrder = setStopOrder

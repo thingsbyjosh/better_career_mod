@@ -1,0 +1,2 @@
+{"continent":"","worldMapPos":[0,0],"country":"usa","fuelPriceMultiplier":1,"type":"mapInfo","localPartsDepot":"","importPartsDepot":"","displayName":""}
+{"name":"West Coast Port","rotation":[0,0,0.019896232313754,0.99980205037783],"center":[673.26287841797,1685.8076171875,74.665078103542],"type":"travelNode","triggerSize":[8,8,4],"id":"wc_port","connections":[{"toll":0,"targetNode":"it_port1","minDistanceLevel":1,"connectionType":"ship","targetMap":"italy"}]}

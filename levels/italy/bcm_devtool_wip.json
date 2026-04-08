@@ -37,7 +37,7 @@
  ],
  "deliveryTemplates":{},
  "deliveryWizardStep":5,
- "devtoolMode":"garages",
+ "devtoolMode":"travelNodes",
  "garages":[
  {
  "baseCapacity":2,
@@ -2292,10 +2292,58 @@
  ]
  }
  ],
- "lastSaved":1775492992,
+ "gasStationWizardStep":0,
+ "gasStations":{},
+ "lastSaved":1775648246,
  "levelName":"italy",
+ "mapInfo":{
+ "continent":"",
+ "country":"italy",
+ "displayName":"",
+ "fuelPriceMultiplier":1,
+ "importPartsDepot":"",
+ "localPartsDepot":"",
+ "worldMapPos":[
+ 0,
+ 0
+ ]
+ },
  "radarSpots":{},
  "selectedDeliveryIdx":1,
  "selectedIdx":3,
+ "selectedTravelNodeIdx":1,
+ "travelNodeWizardStep":1,
+ "travelNodes":[
+ {
+ "center":[
+ 487.19583129883,
+ 1593.4371337891,
+ 139.74006652832
+ ],
+ "connections":[
+ {
+ "connectionType":"ship",
+ "minDistanceLevel":1,
+ "targetMap":"west_coast_usa",
+ "targetNode":"wc_port",
+ "toll":0
+ }
+ ],
+ "id":"it_port1",
+ "name":"Italy port",
+ "rotation":[
+ 0,
+ 0,
+ 0.097167404279527,
+ 0.99526805210736
+ ],
+ "triggerSize":[
+ 8,
+ 8,
+ 4
+ ],
+ "type":"port"
+ }
+ ],
  "wizardStep":6
 }

@@ -126,6 +126,35 @@ local exportAllRadarSpots
 local drawAllRadarSpotMarkers
 
 -- ============================================================================
+-- Travel node mode forward declarations
+-- ============================================================================
+local addNewTravelNode, selectTravelNode, placeTravelNodeMarkerFromUI
+local deleteTravelNode, updateTravelNodeField
+local advanceTravelNodeWizard, retreatTravelNodeWizard, goToTravelNodeStep
+local addTravelNodeConnection, updateTravelNodeConnection, deleteTravelNodeConnection
+local exportAllTravelNodes, validateTravelNode, drawAllTravelNodeMarkers
+local moveTravelNodeToCurrentPos
+local updateMapInfoField, getAvailableFacilities, loadAvailableFacilities
+local loadKnownTravelNodes
+
+-- ============================================================================
+-- Gas station mode forward declarations
+-- ============================================================================
+local addNewGasStation, selectGasStation
+local placeGasStationCenter, placeGasStationPump
+local deleteGasStation, deleteGasStationPump
+local updateGasStationField, toggleGasStationEnergyType
+local updateGasStationPrice
+local advanceGasStationWizard, retreatGasStationWizard, goToGasStationStep
+local moveGasStationPump, adjustGasStationPumpZ
+local exportAllGasStations, validateGasStation, drawAllGasStationMarkers
+local loadVanillaGasStations, importVanillaStation, updateVanillaOverrideField
+
+-- Share/Import forward declarations
+local createShareZip
+local importShareZip
+
+-- ============================================================================
 -- Wall Props Template
 -- ============================================================================
 -- Extracted from bcmGarage_23 prefab (tent excluded).
@@ -216,7 +245,7 @@ local MOD_MOUNT = "/mods/unpacked/better_career_mod"
 -- Delivery facility mode state
 -- ============================================================================
 
-local devtoolMode = "garages" -- "garages" | "delivery" | "cameras" | "radarSpots"
+local devtoolMode = "garages" -- "garages" | "delivery" | "cameras" | "radarSpots" | "travelNodes"
 local deliveryFacilities = {} -- array of delivery facility WIP objects
 local selectedDeliveryIdx = nil -- 1-based index into deliveryFacilities
 local deliveryWizardStep = 0 -- current wizard step (1=name, 2=center, 3=parking, 4=config, 5=review)
@@ -235,6 +264,24 @@ local cameraWizardStep = 0 -- 0=idle, 1=type, 2=position, 3=speedLimit, 4=review
 -- ============================================================================
 local radarSpots = {} -- array of radar spot WIP objects
 local selectedRadarSpotIdx = nil
+
+-- ============================================================================
+-- Travel node mode state
+-- ============================================================================
+local travelNodes = {} -- array of travel node WIP objects
+local selectedTravelNodeIdx = nil -- 1-based index into travelNodes
+local travelNodeWizardStep = 0 -- current wizard step for selected travel node
+local mapInfo = nil -- single object (not array), nil until first edit
+local availableFacilities = {} -- populated from facilities.facilities.json
+local knownTravelNodes = {} -- {nodeId = mapName} from all maps' bcm_travelNodes.json
+
+-- ============================================================================
+-- Gas station mode state
+-- ============================================================================
+local gasStations = {}
+local selectedGasStationIdx = nil
+local gasStationWizardStep = 0
+local vanillaGasStations = {} -- loaded from facilities.facilities.json for D-13(a)
 
 -- Known logistic types (for validation and UI dropdowns)
 local ALL_LOGISTIC_TYPES = {
@@ -361,8 +408,21 @@ start = function()
  selectedCameraIdx = selectedCameraIdx,
  cameraWizardStep = cameraWizardStep,
  radarSpots = radarSpots,
- selectedRadarSpotIdx = selectedRadarSpotIdx
+ selectedRadarSpotIdx = selectedRadarSpotIdx,
+ travelNodes = travelNodes,
+ selectedTravelNodeIdx = selectedTravelNodeIdx,
+ travelNodeWizardStep = travelNodeWizardStep,
+ mapInfo = mapInfo,
+ availableFacilities = availableFacilities,
+ gasStations = gasStations,
+ selectedGasStationIdx = selectedGasStationIdx,
+ gasStationWizardStep = gasStationWizardStep,
+ vanillaGasStations = vanillaGasStations
  })
+
+ loadAvailableFacilities()
+ loadKnownTravelNodes()
+ loadVanillaGasStations()
 
  local exportTarget = customExportPath or MOD_MOUNT
  log('I', logTag, 'Dev tool started. WIP: ' .. wipFilePath .. ' | Export to: ' .. exportTarget .. ' | Garages: ' .. #garages)
@@ -390,6 +450,12 @@ onUpdate = function(dtReal, dtSim, dtRaw)
  end
  if devtoolMode == "radarSpots" and #radarSpots > 0 then
  drawAllRadarSpotMarkers()
+ end
+ if devtoolMode == "travelNodes" and #travelNodes > 0 then
+ drawAllTravelNodeMarkers()
+ end
+ if devtoolMode == "gasStations" and #gasStations > 0 then
+ drawAllGasStationMarkers()
  end
 end
 
@@ -890,7 +956,16 @@ loadWip = function()
  -- Restore delivery templates
  deliveryTemplates = data.deliveryTemplates or {}
  selectedTemplateName = data.selectedTemplateName or nil
- log('I', logTag, 'Restored WIP: ' .. #garages .. ' garages, ' .. #deliveryFacilities .. ' delivery facilities, ' .. #cameras .. ' cameras, ' .. #radarSpots .. ' radar spots from ' .. wipFilePath)
+ -- Restore travel node state
+ travelNodes = data.travelNodes or {}
+ selectedTravelNodeIdx = data.selectedTravelNodeIdx or nil
+ travelNodeWizardStep = data.travelNodeWizardStep or 0
+ mapInfo = data.mapInfo or nil
+ -- Restore gas station state
+ gasStations = data.gasStations or {}
+ selectedGasStationIdx = data.selectedGasStationIdx or nil
+ gasStationWizardStep = data.gasStationWizardStep or 0
+ log('I', logTag, 'Restored WIP: ' .. #garages .. ' garages, ' .. #deliveryFacilities .. ' delivery facilities, ' .. #cameras .. ' cameras, ' .. #radarSpots .. ' radar spots, ' .. #travelNodes .. ' travel nodes, ' .. #gasStations .. ' gas stations from ' .. wipFilePath)
  else
  garages = {}
  selectedGarageIdx = nil
@@ -905,6 +980,13 @@ loadWip = function()
  cameraWizardStep = 0
  radarSpots = {}
  selectedRadarSpotIdx = nil
+ travelNodes = {}
+ selectedTravelNodeIdx = nil
+ travelNodeWizardStep = 0
+ mapInfo = nil
+ gasStations = {}
+ selectedGasStationIdx = nil
+ gasStationWizardStep = 0
  end
 end
 
@@ -934,11 +1016,18 @@ saveWip = function()
  radarSpots = radarSpots,
  selectedRadarSpotIdx = selectedRadarSpotIdx,
  deliveryTemplates = deliveryTemplates,
- selectedTemplateName = selectedTemplateName
+ selectedTemplateName = selectedTemplateName,
+ travelNodes = travelNodes,
+ selectedTravelNodeIdx = selectedTravelNodeIdx,
+ travelNodeWizardStep = travelNodeWizardStep,
+ mapInfo = mapInfo,
+ gasStations = gasStations,
+ selectedGasStationIdx = selectedGasStationIdx,
+ gasStationWizardStep = gasStationWizardStep
  }
 
  jsonWriteFile(wipFilePath, data, true)
- log('D', logTag, 'Saved WIP: ' .. #garages .. ' garages, ' .. #deliveryFacilities .. ' delivery, ' .. #cameras .. ' cameras, ' .. #radarSpots .. ' radar spots to ' .. wipFilePath)
+ log('D', logTag, 'Saved WIP: ' .. #garages .. ' garages, ' .. #deliveryFacilities .. ' delivery, ' .. #cameras .. ' cameras, ' .. #radarSpots .. ' radar spots, ' .. #travelNodes .. ' travel nodes, ' .. #gasStations .. ' gas stations to ' .. wipFilePath)
 end
 
 -- ============================================================================
@@ -1083,7 +1172,17 @@ triggerUIUpdate = function()
  radarSpots = radarSpots,
  selectedRadarSpotIdx = selectedRadarSpotIdx,
  deliveryTemplates = deliveryTemplates,
- selectedTemplateName = selectedTemplateName
+ selectedTemplateName = selectedTemplateName,
+ travelNodes = travelNodes,
+ selectedTravelNodeIdx = selectedTravelNodeIdx,
+ travelNodeWizardStep = travelNodeWizardStep,
+ mapInfo = mapInfo,
+ availableFacilities = availableFacilities,
+ knownTravelNodes = knownTravelNodes,
+ gasStations = gasStations,
+ selectedGasStationIdx = selectedGasStationIdx,
+ gasStationWizardStep = gasStationWizardStep,
+ vanillaGasStations = vanillaGasStations
  })
  end
 end
@@ -1753,7 +1852,7 @@ end
 -- ============================================================================
 
 setDevtoolMode = function(mode)
- if mode ~= "garages" and mode ~= "delivery" and mode ~= "cameras" and mode ~= "radarSpots" then
+ if mode ~= "garages" and mode ~= "delivery" and mode ~= "cameras" and mode ~= "radarSpots" and mode ~= "travelNodes" and mode ~= "gasStations" then
  log('W', logTag, 'setDevtoolMode: invalid mode "' .. tostring(mode) .. '"')
  return
  end
@@ -3635,6 +3734,1141 @@ exportAllRadarSpots = function()
 end
 
 -- ============================================================================
+-- Travel node mode: CRUD, connections, mapInfo, visualization, export
+-- Travel node mode validated
+-- ============================================================================
+
+loadAvailableFacilities = function()
+ local levelName = getCurrentLevelIdentifier()
+ if not levelName then return end
+ local result = {}
+ local seen = {}
+
+ -- 1. Load from main facilities.facilities.json (garages, gasStations, dealerships, etc.)
+ local mainPath = "/levels/" .. levelName .. "/facilities/facilities.facilities.json"
+ local mainData = jsonReadFile(mainPath)
+ if mainData then
+ for _, listKey in pairs({"garages", "gasStations", "dealerships", "computers"}) do
+ for _, f in ipairs(mainData[listKey] or {}) do
+ if f.id and not seen[f.id] then
+ seen[f.id] = true
+ table.insert(result, { id = f.id, name = f.name or f.id, type = listKey })
+ end
+ end
+ end
+ end
+
+ -- 2. Scan all *.facilities.json in delivery/ dir (warehouses, mechanics, offices, etc.)
+ local deliveryDir = "/levels/" .. levelName .. "/facilities/delivery/"
+ local facilityFiles = FS:findFiles(deliveryDir, "*.facilities.json", 0, false, false) or {}
+ for _, filePath in ipairs(facilityFiles) do
+ local data = jsonReadFile(filePath)
+ if data and data.deliveryProviders then
+ local fileName = filePath:match("([^/]+)%.facilities%.json$") or "delivery"
+ for _, provider in ipairs(data.deliveryProviders) do
+ if provider.id and not seen[provider.id] then
+ seen[provider.id] = true
+ table.insert(result, { id = provider.id, name = provider.name or provider.id, type = fileName })
+ end
+ end
+ end
+ end
+
+ availableFacilities = result
+ log('I', logTag, 'Loaded ' .. #result .. ' available facilities for travel node depot selectors')
+end
+
+getAvailableFacilities = function()
+ return availableFacilities
+end
+
+loadKnownTravelNodes = function()
+ -- Scan all maps' bcm_travelNodes.json to build {nodeId -> mapName} lookup
+ -- This powers the connections dropdown so user picks a node and map is auto-resolved
+ knownTravelNodes = {}
+
+ -- Use FS:findFiles to locate all bcm_travelNodes.json across all levels
+ local found = FS:findFiles("/levels/", "bcm_travelNodes.json", -1, false, true) or {}
+ for _, filePath in ipairs(found) do
+ -- Extract map name from path: /levels/{mapName}/facilities/bcm_travelNodes.json
+ local mapName = filePath:match("/levels/([^/]+)/")
+ if mapName then
+ local lines = readNdjsonFile(filePath)
+ if lines then
+ for _, entry in ipairs(lines) do
+ if entry.type == "travelNode" and entry.id then
+ knownTravelNodes[entry.id] = {
+ map = mapName,
+ name = entry.name or entry.id,
+ nodeType = entry.nodeType or "road"
+ }
+ end
+ end
+ end
+ end
+ end
+
+ -- Also add current WIP nodes (not yet exported)
+ local currentMap = getCurrentLevelIdentifier()
+ if currentMap then
+ for _, node in ipairs(travelNodes) do
+ if node.id and node.id ~= "" then
+ knownTravelNodes[node.id] = {
+ map = currentMap,
+ name = node.name or node.id,
+ nodeType = node.type or "road"
+ }
+ end
+ end
+ end
+ log('I', logTag, 'Loaded ' .. tableSize(knownTravelNodes) .. ' known travel nodes across all maps')
+end
+
+addNewTravelNode = function()
+ local node = {
+ id = "tn_" .. tostring(#travelNodes + 1),
+ name = "",
+ center = nil,
+ rotation = nil,
+ type = "road",
+ triggerSize = {8, 8, 4},
+ connections = {}
+ }
+ table.insert(travelNodes, node)
+ selectedTravelNodeIdx = #travelNodes
+ travelNodeWizardStep = 1
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Added new travel node: ' .. node.id)
+end
+
+selectTravelNode = function(idx)
+ idx = tonumber(idx) or nil
+ if idx and idx >= 1 and idx <= #travelNodes then
+ selectedTravelNodeIdx = idx
+ else
+ selectedTravelNodeIdx = nil
+ end
+ triggerUIUpdate()
+end
+
+placeTravelNodeMarkerFromUI = function()
+ if not selectedTravelNodeIdx then
+ log('W', logTag, 'placeTravelNodeMarkerFromUI: No travel node selected')
+ return
+ end
+ local node = travelNodes[selectedTravelNodeIdx]
+ if not node then return end
+
+ local pos = getPlacementPosition()
+ node.center = {pos[1], pos[2], pos[3]}
+
+ local dir = getPlacementDirection()
+ local dir3 = vec3(dir[1], dir[2], 0):normalized()
+ local q = quatFromDir(dir3)
+ node.rotation = {q.x, q.y, q.z, q.w}
+
+ log('I', logTag, 'Placed travel node marker for ' .. (node.name ~= "" and node.name or node.id))
+ saveWip()
+ triggerUIUpdate()
+end
+
+moveTravelNodeToCurrentPos = function()
+ placeTravelNodeMarkerFromUI()
+end
+
+deleteTravelNode = function()
+ if not selectedTravelNodeIdx then return end
+ local node = travelNodes[selectedTravelNodeIdx]
+ local name = (node and (node.name ~= "" and node.name or node.id)) or ("travel node #" .. tostring(selectedTravelNodeIdx))
+
+ table.remove(travelNodes, selectedTravelNodeIdx)
+ selectedTravelNodeIdx = nil
+ travelNodeWizardStep = 0
+
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Deleted travel node: ' .. name)
+end
+
+updateTravelNodeField = function(field, value)
+ if not selectedTravelNodeIdx then return end
+ local node = travelNodes[selectedTravelNodeIdx]
+ if not node then return end
+
+ node[field] = value
+ saveWip()
+ triggerUIUpdate()
+end
+
+advanceTravelNodeWizard = function()
+ if travelNodeWizardStep < 5 then
+ travelNodeWizardStep = travelNodeWizardStep + 1
+ end
+ triggerUIUpdate()
+end
+
+retreatTravelNodeWizard = function()
+ if travelNodeWizardStep > 1 then
+ travelNodeWizardStep = travelNodeWizardStep - 1
+ end
+ triggerUIUpdate()
+end
+
+goToTravelNodeStep = function(step)
+ step = tonumber(step) or 0
+ if step >= 1 and step <= 5 then
+ travelNodeWizardStep = step
+ end
+ triggerUIUpdate()
+end
+
+addTravelNodeConnection = function(targetNodeId)
+ if not selectedTravelNodeIdx then return end
+ local node = travelNodes[selectedTravelNodeIdx]
+ if not node then return end
+
+ node.connections = node.connections or {}
+
+ -- Auto-resolve targetMap from knownTravelNodes lookup
+ local targetMap = ""
+ local resolvedName = targetNodeId or ""
+ if targetNodeId and knownTravelNodes[targetNodeId] then
+ targetMap = knownTravelNodes[targetNodeId].map or ""
+ resolvedName = knownTravelNodes[targetNodeId].name or targetNodeId
+ end
+
+ -- Prevent duplicate connections to the same node
+ for _, existing in ipairs(node.connections) do
+ if existing.targetNode == targetNodeId then
+ log('W', logTag, 'Connection to ' .. tostring(targetNodeId) .. ' already exists')
+ return
+ end
+ end
+
+ table.insert(node.connections, {
+ targetMap = targetMap,
+ targetNode = targetNodeId or "",
+ toll = 0,
+ connectionType = "road",
+ minDistanceLevel = 1
+ })
+
+ -- Auto-create inverse connection (bidirectional)
+ if targetNodeId then
+ local currentMap = getCurrentLevelIdentifier()
+ local inverseConn = {
+ targetMap = currentMap or "",
+ targetNode = node.id,
+ toll = 0,
+ connectionType = "road",
+ minDistanceLevel = 1
+ }
+
+ -- Check if target is in current WIP (same map)
+ local foundInWip = false
+ for _, otherNode in ipairs(travelNodes) do
+ if otherNode.id == targetNodeId then
+ foundInWip = true
+ otherNode.connections = otherNode.connections or {}
+ local alreadyLinked = false
+ for _, c in ipairs(otherNode.connections) do
+ if c.targetNode == node.id then alreadyLinked = true break end
+ end
+ if not alreadyLinked then
+ table.insert(otherNode.connections, inverseConn)
+ log('I', logTag, 'Auto-created inverse connection (same map): ' .. targetNodeId .. ' -> ' .. node.id)
+ end
+ break
+ end
+ end
+
+ -- If target is on another map, modify its exported bcm_travelNodes.json
+ if not foundInWip and targetMap ~= "" and targetMap ~= currentMap then
+ local otherPath = (customExportPath or MOD_MOUNT) .. "/levels/" .. targetMap .. "/facilities/bcm_travelNodes.json"
+ local entries = readNdjsonFile(otherPath)
+ if entries and #entries > 0 then
+ local modified = false
+ for _, entry in ipairs(entries) do
+ if entry.type == "travelNode" and entry.id == targetNodeId then
+ entry.connections = entry.connections or {}
+ local alreadyLinked = false
+ for _, c in ipairs(entry.connections) do
+ if c.targetNode == node.id then alreadyLinked = true break end
+ end
+ if not alreadyLinked then
+ table.insert(entry.connections, inverseConn)
+ modified = true
+ log('I', logTag, 'Auto-created inverse connection (cross-map ' .. targetMap .. '): ' .. targetNodeId .. ' -> ' .. node.id)
+ end
+ break
+ end
+ end
+ if modified then
+ writeNdjson(otherPath, entries)
+ end
+ end
+ end
+ end
+
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Added connection to ' .. resolvedName .. ' (' .. targetMap .. ') from travel node ' .. (node.name ~= "" and node.name or node.id))
+end
+
+updateTravelNodeConnection = function(connIdx, field, value)
+ if not selectedTravelNodeIdx then return end
+ local node = travelNodes[selectedTravelNodeIdx]
+ if not node or not node.connections then return end
+
+ connIdx = tonumber(connIdx) or 0
+ local conn = node.connections[connIdx]
+ if not conn then return end
+
+ if field == "toll" or field == "minDistanceLevel" then
+ value = tonumber(value) or 0
+ end
+ conn[field] = value
+
+ -- Bidirectional sync: propagate change to the inverse connection
+ local targetNodeId = conn.targetNode
+ local targetMap = conn.targetMap or ""
+ if targetNodeId and targetNodeId ~= "" then
+ local currentMap = getCurrentLevelIdentifier()
+
+ -- Check WIP first (same map)
+ local foundInWip = false
+ for _, otherNode in ipairs(travelNodes) do
+ if otherNode.id == targetNodeId and otherNode.connections then
+ foundInWip = true
+ for _, c in ipairs(otherNode.connections) do
+ if c.targetNode == node.id then
+ c[field] = value
+ log('I', logTag, 'Bidirectional sync (same map): ' .. targetNodeId .. '.' .. field .. ' = ' .. tostring(value))
+ break
+ end
+ end
+ break
+ end
+ end
+
+ -- Cross-map: update the other map's exported JSON
+ if not foundInWip and targetMap ~= "" and targetMap ~= currentMap then
+ local otherPath = (customExportPath or MOD_MOUNT) .. "/levels/" .. targetMap .. "/facilities/bcm_travelNodes.json"
+ local entries = readNdjsonFile(otherPath)
+ if entries and #entries > 0 then
+ local modified = false
+ for _, entry in ipairs(entries) do
+ if entry.type == "travelNode" and entry.id == targetNodeId and entry.connections then
+ for _, c in ipairs(entry.connections) do
+ if c.targetNode == node.id then
+ c[field] = value
+ modified = true
+ log('I', logTag, 'Bidirectional sync (cross-map ' .. targetMap .. '): ' .. targetNodeId .. '.' .. field .. ' = ' .. tostring(value))
+ break
+ end
+ end
+ break
+ end
+ end
+ if modified then
+ writeNdjson(otherPath, entries)
+ end
+ end
+ end
+ end
+
+ saveWip()
+ triggerUIUpdate()
+end
+
+deleteTravelNodeConnection = function(connIdx)
+ if not selectedTravelNodeIdx then return end
+ local node = travelNodes[selectedTravelNodeIdx]
+ if not node or not node.connections then return end
+
+ connIdx = tonumber(connIdx) or 0
+ if connIdx >= 1 and connIdx <= #node.connections then
+ local conn = node.connections[connIdx]
+ local targetNodeId = conn and conn.targetNode
+
+ table.remove(node.connections, connIdx)
+
+ -- Auto-remove inverse connection (bidirectional)
+ if targetNodeId then
+ local currentMap = getCurrentLevelIdentifier()
+ local targetMap = conn and conn.targetMap or ""
+
+ -- Check WIP first (same map)
+ local foundInWip = false
+ for _, otherNode in ipairs(travelNodes) do
+ if otherNode.id == targetNodeId and otherNode.connections then
+ foundInWip = true
+ for i = #otherNode.connections, 1, -1 do
+ if otherNode.connections[i].targetNode == node.id then
+ table.remove(otherNode.connections, i)
+ log('I', logTag, 'Auto-removed inverse connection (same map): ' .. targetNodeId .. ' -> ' .. node.id)
+ break
+ end
+ end
+ break
+ end
+ end
+
+ -- If target is on another map, modify its exported JSON
+ if not foundInWip and targetMap ~= "" and targetMap ~= currentMap then
+ local otherPath = (customExportPath or MOD_MOUNT) .. "/levels/" .. targetMap .. "/facilities/bcm_travelNodes.json"
+ local entries = readNdjsonFile(otherPath)
+ if entries and #entries > 0 then
+ local modified = false
+ for _, entry in ipairs(entries) do
+ if entry.type == "travelNode" and entry.id == targetNodeId and entry.connections then
+ for i = #entry.connections, 1, -1 do
+ if entry.connections[i].targetNode == node.id then
+ table.remove(entry.connections, i)
+ modified = true
+ log('I', logTag, 'Auto-removed inverse connection (cross-map ' .. targetMap .. '): ' .. targetNodeId .. ' -> ' .. node.id)
+ break
+ end
+ end
+ break
+ end
+ end
+ if modified then
+ writeNdjson(otherPath, entries)
+ end
+ end
+ end
+ end
+
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Deleted connection #' .. connIdx .. ' from travel node ' .. (node.name ~= "" and node.name or node.id))
+ end
+end
+
+updateMapInfoField = function(field, value)
+ if mapInfo == nil then
+ mapInfo = {
+ country = "",
+ continent = "",
+ displayName = "",
+ fuelPriceMultiplier = 1.0,
+ worldMapPos = {0, 0},
+ importPartsDepot = "",
+ localPartsDepot = ""
+ }
+ end
+
+ if field == "fuelPriceMultiplier" then
+ value = tonumber(value) or 1.0
+ elseif field == "worldMapPosX" then
+ mapInfo.worldMapPos[1] = tonumber(value) or 0
+ saveWip()
+ triggerUIUpdate()
+ return
+ elseif field == "worldMapPosY" then
+ mapInfo.worldMapPos[2] = tonumber(value) or 0
+ saveWip()
+ triggerUIUpdate()
+ return
+ end
+
+ mapInfo[field] = value
+ saveWip()
+ triggerUIUpdate()
+end
+
+validateTravelNode = function(node)
+ local errors = {}
+ if not node.id or node.id == "" then
+ table.insert(errors, "Missing id")
+ end
+ if not node.name or node.name == "" then
+ table.insert(errors, "Missing name")
+ end
+ if not node.center then
+ table.insert(errors, "Missing center position")
+ end
+ if not node.triggerSize then
+ table.insert(errors, "Missing triggerSize")
+ end
+ local validTypes = {road = true, port = true, airport = true, border = true, restStop = true}
+ if node.type and not validTypes[node.type] then
+ table.insert(errors, "Invalid type: " .. tostring(node.type) .. " (valid: road, port, airport, border, restStop)")
+ end
+ return #errors == 0, errors
+end
+
+exportAllTravelNodes = function()
+ local levelName = getCurrentLevelIdentifier()
+ if not levelName then
+ log('E', logTag, 'exportAllTravelNodes: No level loaded')
+ return
+ end
+
+ if not mapInfo and #travelNodes == 0 then
+ log('W', logTag, 'exportAllTravelNodes: Nothing to export (no mapInfo and no travel nodes)')
+ return
+ end
+
+ -- Validate all nodes
+ local allErrors = {}
+ for i, node in ipairs(travelNodes) do
+ local isValid, errors = validateTravelNode(node)
+ if not isValid then
+ for _, e in ipairs(errors) do
+ table.insert(allErrors, (node.name ~= "" and node.name or node.id or ("node #" .. i)) .. ": " .. e)
+ end
+ end
+ end
+ if #allErrors > 0 then
+ for _, e in ipairs(allErrors) do
+ log('W', logTag, 'Travel node validation: ' .. e)
+ end
+ end
+
+ -- Warn about incomplete mapInfo
+ if mapInfo and (not mapInfo.displayName or mapInfo.displayName == "" or not mapInfo.country or mapInfo.country == "") then
+ log('W', logTag, 'exportAllTravelNodes: mapInfo is missing displayName or country — exporting anyway')
+ end
+
+ -- Build objects array: mapInfo first, then travel nodes
+ local objects = {}
+ if mapInfo then
+ local mi = deepcopy(mapInfo)
+ mi.type = "mapInfo"
+ table.insert(objects, mi)
+ end
+ for _, node in ipairs(travelNodes) do
+ local obj = deepcopy(node)
+ obj.type = "travelNode"
+ table.insert(objects, obj)
+ end
+
+ local path = getModLevelsPath(levelName) .. "/facilities/bcm_travelNodes.json"
+ writeNdjsonToMod(path, objects)
+ log('I', logTag, 'Exported ' .. #travelNodes .. ' travel nodes' .. (mapInfo and ' + mapInfo' or '') .. ' to ' .. path)
+end
+
+drawAllTravelNodeMarkers = function()
+ local pulseAlpha = 0.5 + 0.5 * math.sin(os.clock() * 4)
+
+ for i, node in ipairs(travelNodes) do
+ if node.center then
+ local isSelected = (i == selectedTravelNodeIdx)
+ local a = isSelected and pulseAlpha or 0.8
+ local pos = vec3(node.center[1], node.center[2], node.center[3])
+
+ -- Blue sphere for travel node
+ debugDrawer:drawSphere(pos, 2.0, ColorF(0.2, 0.6, 1.0, a))
+
+ -- Label
+ local label = (node.name ~= "" and node.name or node.id or "Node") .. " [" .. (node.type or "?") .. "]"
+ debugDrawer:drawTextAdvanced(pos + vec3(0, 0, 3), label,
+ ColorF(0.2, 0.6, 1.0, 1), true, false, ColorI(0, 0, 0, 180))
+
+ -- Trigger box wireframe
+ if node.triggerSize then
+ local sz = node.triggerSize
+ local half = vec3(sz[1]/2, sz[2]/2, sz[3]/2)
+ local c1 = pos - half
+ local c2 = pos + half
+ local boxColor = ColorF(0.2, 0.6, 1.0, isSelected and 0.4 or 0.2)
+ -- 8 corners
+ local corners = {
+ vec3(c1.x, c1.y, c1.z),
+ vec3(c2.x, c1.y, c1.z),
+ vec3(c2.x, c2.y, c1.z),
+ vec3(c1.x, c2.y, c1.z),
+ vec3(c1.x, c1.y, c2.z),
+ vec3(c2.x, c1.y, c2.z),
+ vec3(c2.x, c2.y, c2.z),
+ vec3(c1.x, c2.y, c2.z),
+ }
+ -- 12 edges (wireframe)
+ local edges = {
+ {1,2},{2,3},{3,4},{4,1}, -- bottom
+ {5,6},{6,7},{7,8},{8,5}, -- top
+ {1,5},{2,6},{3,7},{4,8}, -- verticals
+ }
+ for _, e in ipairs(edges) do
+ debugDrawer:drawLine(corners[e[1]], corners[e[2]], boxColor)
+ end
+ end
+
+ -- Direction arrow from quaternion rotation
+ if node.rotation then
+ local qx, qy, qz, qw = node.rotation[1], node.rotation[2], node.rotation[3], node.rotation[4]
+ -- BeamNG Y-forward convention: extract forward direction from quaternion
+ local fwd = vec3(
+ 2 * (qx*qz + qw*qy),
+ 1 - 2 * (qx*qx + qz*qz),
+ 2 * (qy*qz - qw*qx)
+ )
+ debugDrawer:drawLine(pos, pos + fwd * 3, ColorF(0.2, 0.6, 1.0, 0.6))
+ end
+ end
+ end
+end
+
+-- ============================================================================
+-- Gas station mode: CRUD, pump placement, energy/pricing, vanilla overrides,
+-- visualization, export, WIP persistence
+-- ============================================================================
+
+loadVanillaGasStations = function()
+ local levelName = getCurrentLevelIdentifier()
+ if not levelName then return end
+ local facilitiesPath = "/levels/" .. levelName .. "/facilities/facilities.facilities.json"
+ local data = jsonReadFile(facilitiesPath)
+ if not data or not data.gasStations then
+ vanillaGasStations = {}
+ return
+ end
+ vanillaGasStations = data.gasStations
+ log('I', logTag, 'Loaded ' .. #vanillaGasStations .. ' vanilla gas stations for override import')
+end
+
+addNewGasStation = function()
+ local station = {
+ id = "bcm_gas_" .. tostring(#gasStations + 1),
+ name = "",
+ center = nil,
+ energyTypes = {},
+ prices = {},
+ pumps = {},
+ vanillaOverride = false
+ }
+ table.insert(gasStations, station)
+ selectedGasStationIdx = #gasStations
+ gasStationWizardStep = 1
+ saveWip()
+ triggerUIUpdate()
+end
+
+selectGasStation = function(idx)
+ idx = tonumber(idx)
+ if idx and idx >= 1 and idx <= #gasStations then
+ selectedGasStationIdx = idx
+ else
+ selectedGasStationIdx = nil
+ end
+ triggerUIUpdate()
+end
+
+placeGasStationCenter = function()
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ local pos = getPlacementPosition()
+ station.center = {pos[1], pos[2], pos[3]}
+
+ log('I', logTag, 'Placed gas station center for ' .. (station.name ~= "" and station.name or station.id))
+ saveWip()
+ triggerUIUpdate()
+end
+
+placeGasStationPump = function()
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ local pos = getPlacementPosition()
+ local dir = getPlacementDirection()
+ local dir3 = vec3(dir[1], dir[2], 0):normalized()
+ local q = quatFromDir(dir3)
+
+ table.insert(station.pumps, {
+ pos = {pos[1], pos[2], pos[3]},
+ rot = {q.x, q.y, q.z, q.w}
+ })
+
+ log('I', logTag, 'Placed pump #' .. #station.pumps .. ' for ' .. (station.name ~= "" and station.name or station.id))
+ saveWip()
+ triggerUIUpdate()
+end
+
+deleteGasStationPump = function(pumpIdx)
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ pumpIdx = tonumber(pumpIdx)
+ if pumpIdx and pumpIdx >= 1 and pumpIdx <= #station.pumps then
+ table.remove(station.pumps, pumpIdx)
+ saveWip()
+ triggerUIUpdate()
+ end
+end
+
+moveGasStationPump = function(pumpIdx)
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ pumpIdx = tonumber(pumpIdx)
+ if not pumpIdx or pumpIdx < 1 or pumpIdx > #station.pumps then return end
+
+ local pos = getPlacementPosition()
+ local dir = getPlacementDirection()
+ local dir3 = vec3(dir[1], dir[2], 0):normalized()
+ local q = quatFromDir(dir3)
+
+ station.pumps[pumpIdx].pos = {pos[1], pos[2], pos[3]}
+ station.pumps[pumpIdx].rot = {q.x, q.y, q.z, q.w}
+
+ saveWip()
+ triggerUIUpdate()
+end
+
+adjustGasStationPumpZ = function(pumpIdx, delta)
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ pumpIdx = tonumber(pumpIdx)
+ delta = tonumber(delta) or 0
+ if not pumpIdx or pumpIdx < 1 or pumpIdx > #station.pumps then return end
+
+ station.pumps[pumpIdx].pos[3] = station.pumps[pumpIdx].pos[3] + delta
+ saveWip()
+ triggerUIUpdate()
+end
+
+deleteGasStation = function()
+ if not selectedGasStationIdx then return end
+ table.remove(gasStations, selectedGasStationIdx)
+ selectedGasStationIdx = nil
+ gasStationWizardStep = 0
+ saveWip()
+ triggerUIUpdate()
+end
+
+updateGasStationField = function(field, value)
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ station[field] = value
+ saveWip()
+ triggerUIUpdate()
+end
+
+toggleGasStationEnergyType = function(energyType)
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ -- Find if energyType already exists
+ local foundIdx = nil
+ for i, et in ipairs(station.energyTypes) do
+ if et == energyType then
+ foundIdx = i
+ break
+ end
+ end
+
+ if foundIdx then
+ -- Remove energyType and its prices
+ table.remove(station.energyTypes, foundIdx)
+ station.prices[energyType] = nil
+ else
+ -- Add energyType with default prices
+ table.insert(station.energyTypes, energyType)
+ station.prices[energyType] = {
+ priceBaseline = 1.50,
+ priceRandomnessBias = 0.2,
+ priceRandomnessGain = 0.1
+ }
+ end
+
+ saveWip()
+ triggerUIUpdate()
+end
+
+updateGasStationPrice = function(energyType, field, value)
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station or not station.prices[energyType] then return end
+
+ station.prices[energyType][field] = tonumber(value) or 0
+ saveWip()
+ triggerUIUpdate()
+end
+
+-- Wizard navigation
+advanceGasStationWizard = function()
+ if gasStationWizardStep < 6 then
+ gasStationWizardStep = gasStationWizardStep + 1
+ triggerUIUpdate()
+ end
+end
+
+retreatGasStationWizard = function()
+ if gasStationWizardStep > 1 then
+ gasStationWizardStep = gasStationWizardStep - 1
+ triggerUIUpdate()
+ end
+end
+
+goToGasStationStep = function(step)
+ step = tonumber(step) or 0
+ if step >= 1 and step <= 6 then
+ gasStationWizardStep = step
+ triggerUIUpdate()
+ end
+end
+
+-- Validation
+validateGasStation = function(station)
+ local errors = {}
+
+ if station.vanillaOverride then
+ -- Vanilla override: just need id and at least 1 price
+ if not station.id or station.id == "" then
+ table.insert(errors, "Missing id")
+ end
+ local hasPrices = false
+ if station.prices then
+ for _ in pairs(station.prices) do
+ hasPrices = true
+ break
+ end
+ end
+ if not hasPrices then
+ table.insert(errors, "Need at least 1 price configured")
+ end
+ else
+ -- New BCM station: full validation
+ if not station.id or station.id == "" then
+ table.insert(errors, "Missing id")
+ end
+ if not station.name or station.name == "" then
+ table.insert(errors, "Missing name")
+ end
+ if not station.center then
+ table.insert(errors, "Missing center position")
+ end
+ if not station.energyTypes or #station.energyTypes < 1 then
+ table.insert(errors, "Need at least 1 energy type")
+ end
+ if not station.pumps or #station.pumps < 1 then
+ table.insert(errors, "Need at least 1 pump")
+ end
+ end
+
+ return #errors == 0, errors
+end
+
+-- Export
+exportAllGasStations = function()
+ local levelName = getCurrentLevelIdentifier()
+ if not levelName then
+ log('W', logTag, 'exportAllGasStations: no level loaded')
+ return
+ end
+
+ -- Validate all stations
+ local allValid = true
+ for i, station in ipairs(gasStations) do
+ local isValid, errors = validateGasStation(station)
+ if not isValid then
+ allValid = false
+ log('W', logTag, 'Gas station ' .. i .. ' (' .. (station.id or '?') .. ') has errors: ' .. table.concat(errors, ', '))
+ end
+ end
+
+ if not allValid then
+ log('E', logTag, 'Fix validation errors before exporting gas stations')
+ return
+ end
+
+ -- Build stations array (both vanilla overrides and new BCM stations)
+ local stationsArray = {}
+ for _, station in ipairs(gasStations) do
+ local obj = deepcopy(station)
+ table.insert(stationsArray, obj)
+ end
+
+ local path = getModLevelsPath(levelName) .. "/facilities/bcm_gasStations.json"
+ writeJsonToMod(path, stationsArray)
+ log('I', logTag, 'Exported ' .. #gasStations .. ' gas stations to ' .. path)
+end
+
+-- D-13(a): Vanilla gas station override functions
+importVanillaStation = function(vanillaId)
+ -- Find vanilla station by id
+ local vanilla = nil
+ for _, vs in ipairs(vanillaGasStations) do
+ if vs.id == vanillaId then
+ vanilla = vs
+ break
+ end
+ end
+
+ if not vanilla then
+ log('W', logTag, 'importVanillaStation: vanilla station "' .. tostring(vanillaId) .. '" not found')
+ return
+ end
+
+ -- Check if already imported
+ for _, gs in ipairs(gasStations) do
+ if gs.id == vanillaId then
+ log('W', logTag, 'importVanillaStation: station "' .. vanillaId .. '" already imported')
+ return
+ end
+ end
+
+ local station = {
+ id = vanilla.id,
+ name = vanilla.name or vanilla.id,
+ vanillaOverride = true,
+ energyTypes = deepcopy(vanilla.energyTypes or {}),
+ prices = deepcopy(vanilla.prices or {}),
+ pumps = {},
+ center = nil,
+ fuelPriceMultiplier = 1.0
+ }
+
+ table.insert(gasStations, station)
+ selectedGasStationIdx = #gasStations
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Imported vanilla station "' .. vanillaId .. '" for BCM override')
+end
+
+updateVanillaOverrideField = function(field, value)
+ if not selectedGasStationIdx then return end
+ local station = gasStations[selectedGasStationIdx]
+ if not station then return end
+
+ if field == "fuelPriceMultiplier" then
+ station[field] = tonumber(value) or 1.0
+ else
+ station[field] = value
+ end
+
+ saveWip()
+ triggerUIUpdate()
+end
+
+-- Visualization
+drawAllGasStationMarkers = function()
+ local pulseAlpha = 0.5 + 0.5 * math.sin(os.clock() * 4)
+
+ for i, station in ipairs(gasStations) do
+ -- Vanilla override stations have no center/pumps to draw
+ if not station.vanillaOverride and station.center then
+ local isSelected = (i == selectedGasStationIdx)
+ local a = isSelected and pulseAlpha or 0.8
+ local centerPos = vec3(station.center[1], station.center[2], station.center[3])
+
+ -- Station center: cyan sphere
+ debugDrawer:drawSphere(centerPos, 2.5, ColorF(0.25, 0.78, 0.82, a))
+
+ -- Station label
+ local label = station.name ~= "" and station.name or station.id or "Gas Station"
+ debugDrawer:drawTextAdvanced(centerPos + vec3(0, 0, 3.5), label,
+ ColorF(0.25, 0.78, 0.82, 1), true, false, ColorI(0, 0, 0, 180))
+
+ -- Pumps
+ for j, pump in ipairs(station.pumps) do
+ local pumpPos = vec3(pump.pos[1], pump.pos[2], pump.pos[3])
+
+ -- Pump sphere (smaller)
+ debugDrawer:drawSphere(pumpPos, 0.8, ColorF(0.25, 0.78, 0.82, 0.7))
+
+ -- Pump direction arrow from quaternion
+ if pump.rot then
+ local qx, qy, qz, qw = pump.rot[1], pump.rot[2], pump.rot[3], pump.rot[4]
+ local fwd = vec3(
+ 2 * (qx*qz + qw*qy),
+ 1 - 2 * (qx*qx + qz*qz),
+ 2 * (qy*qz - qw*qx)
+ )
+ debugDrawer:drawLine(pumpPos, pumpPos + fwd * 1.5, ColorF(0.25, 0.78, 0.82, 0.6))
+ end
+
+ -- Pump label
+ debugDrawer:drawTextAdvanced(pumpPos + vec3(0, 0, 1.5), "P" .. j,
+ ColorF(0.25, 0.78, 0.82, 1), true, false, ColorI(0, 0, 0, 180))
+ end
+ end
+ end
+end
+
+-- ============================================================================
+-- Share / Import ZIP
+-- ============================================================================
+
+createShareZip = function(configJson)
+ local ok, config = pcall(jsonDecode, configJson)
+ if not ok or not config then
+ log('E', logTag, 'createShareZip: invalid config JSON')
+ return
+ end
+
+ local modes = config.modes or {}
+ local selectedOnly = config.selectedOnly or false
+ local items = {}
+
+ -- Collect items from requested modes
+ for _, mode in ipairs(modes) do
+ if mode == "garages" then
+ if selectedOnly and selectedGarageIdx then
+ table.insert(items, {type = "garage", data = garages[selectedGarageIdx]})
+ else
+ for _, g in ipairs(garages) do table.insert(items, {type = "garage", data = g}) end
+ end
+ elseif mode == "delivery" then
+ if selectedOnly and selectedDeliveryIdx then
+ table.insert(items, {type = "delivery", data = deliveryFacilities[selectedDeliveryIdx]})
+ else
+ for _, d in ipairs(deliveryFacilities) do table.insert(items, {type = "delivery", data = d}) end
+ end
+ elseif mode == "cameras" then
+ if selectedOnly and selectedCameraIdx then
+ table.insert(items, {type = "camera", data = cameras[selectedCameraIdx]})
+ else
+ for _, c in ipairs(cameras) do table.insert(items, {type = "camera", data = c}) end
+ end
+ elseif mode == "radarSpots" then
+ if selectedOnly and selectedRadarSpotIdx then
+ table.insert(items, {type = "radarSpot", data = radarSpots[selectedRadarSpotIdx]})
+ else
+ for _, r in ipairs(radarSpots) do table.insert(items, {type = "radarSpot", data = r}) end
+ end
+ elseif mode == "travelNodes" then
+ if selectedOnly and selectedTravelNodeIdx then
+ table.insert(items, {type = "travelNode", data = travelNodes[selectedTravelNodeIdx]})
+ else
+ for _, tn in ipairs(travelNodes) do table.insert(items, {type = "travelNode", data = tn}) end
+ end
+ elseif mode == "gasStations" then
+ if selectedOnly and selectedGasStationIdx then
+ table.insert(items, {type = "gasStation", data = gasStations[selectedGasStationIdx]})
+ else
+ for _, gs in ipairs(gasStations) do table.insert(items, {type = "gasStation", data = gs}) end
+ end
+ end
+ end
+
+ if #items == 0 then
+ log('W', logTag, 'createShareZip: no items to share')
+ guihooks.trigger('toastrMsg', {type = "warning", title = "Share", msg = "No items to share."})
+ return
+ end
+
+ -- Build manifest
+ local manifest = {
+ version = "1.0",
+ bcmVersion = "0.4.0",
+ mapName = levelName or "unknown",
+ created = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+ itemCount = #items,
+ itemTypes = {}
+ }
+ local typeCounts = {}
+ for _, item in ipairs(items) do
+ typeCounts[item.type] = (typeCounts[item.type] or 0) + 1
+ end
+ manifest.itemTypes = typeCounts
+
+ -- Fallback: write to folder structure (ZIP API uncertain per A1)
+ local sharePath = getModLevelsPath(levelName) .. "/bcm_share/"
+ FS:directoryCreate(sharePath, true)
+
+ -- Write manifest
+ local manifestJson = jsonEncode(manifest, true)
+ local mf = io.open(sharePath .. "manifest.json", "w")
+ if mf then mf:write(manifestJson) mf:close() end
+
+ -- Write items
+ for i, item in ipairs(items) do
+ local itemJson = jsonEncode(item, true)
+ local itemFile = io.open(sharePath .. "item_" .. i .. ".json", "w")
+ if itemFile then itemFile:write(itemJson) itemFile:close() end
+ end
+
+ log('I', logTag, 'createShareZip: wrote ' .. #items .. ' items to ' .. sharePath)
+ guihooks.trigger('toastrMsg', {type = "info", title = "Share", msg = "Exported " .. #items .. " items to bcm_share/ folder. (ZIP API not available -- folder fallback used)"})
+end
+
+importShareZip = function()
+ -- Read from bcm_share/ folder (fallback path since ZIP API uncertain)
+ local sharePath = getModLevelsPath(levelName) .. "/bcm_share/"
+
+ -- Check if manifest exists
+ local mfPath = sharePath .. "manifest.json"
+ local mfContent = readFile(mfPath)
+ if not mfContent then
+ log('W', logTag, 'importShareZip: no manifest.json found at ' .. mfPath)
+ guihooks.trigger('toastrMsg', {type = "warning", title = "Import", msg = "No share data found. Place a bcm_share/ folder with manifest.json in the map's mod levels path."})
+ return
+ end
+
+ local manifest = jsonDecode(mfContent)
+ if not manifest then
+ log('E', logTag, 'importShareZip: invalid manifest JSON')
+ return
+ end
+
+ local added = 0
+ local skipped = 0
+
+ -- Read item files
+ for i = 1, (manifest.itemCount or 0) do
+ local itemContent = readFile(sharePath .. "item_" .. i .. ".json")
+ if itemContent then
+ local item = jsonDecode(itemContent)
+ if item and item.type and item.data then
+ local id = item.data.id
+ local itemType = item.type
+ local exists = false
+
+ -- Check if ID already exists in WIP data
+ if itemType == "garage" then
+ for _, g in ipairs(garages) do if g.id == id then exists = true break end end
+ if not exists then table.insert(garages, item.data) added = added + 1
+ else skipped = skipped + 1 log('I', logTag, 'importShareZip: garage "' .. tostring(id) .. '" already exists. Skipped.') end
+ elseif itemType == "delivery" then
+ for _, d in ipairs(deliveryFacilities) do if d.id == id then exists = true break end end
+ if not exists then table.insert(deliveryFacilities, item.data) added = added + 1
+ else skipped = skipped + 1 log('I', logTag, 'importShareZip: delivery "' .. tostring(id) .. '" already exists. Skipped.') end
+ elseif itemType == "camera" then
+ for _, c in ipairs(cameras) do if c.id == id then exists = true break end end
+ if not exists then table.insert(cameras, item.data) added = added + 1
+ else skipped = skipped + 1 log('I', logTag, 'importShareZip: camera "' .. tostring(id) .. '" already exists. Skipped.') end
+ elseif itemType == "radarSpot" then
+ for _, r in ipairs(radarSpots) do if r.id == id then exists = true break end end
+ if not exists then table.insert(radarSpots, item.data) added = added + 1
+ else skipped = skipped + 1 log('I', logTag, 'importShareZip: radarSpot "' .. tostring(id) .. '" already exists. Skipped.') end
+ elseif itemType == "travelNode" then
+ for _, tn in ipairs(travelNodes) do if tn.id == id then exists = true break end end
+ if not exists then table.insert(travelNodes, item.data) added = added + 1
+ else skipped = skipped + 1 log('I', logTag, 'importShareZip: travelNode "' .. tostring(id) .. '" already exists. Skipped.') end
+ elseif itemType == "gasStation" then
+ for _, gs in ipairs(gasStations) do if gs.id == id then exists = true break end end
+ if not exists then table.insert(gasStations, item.data) added = added + 1
+ else skipped = skipped + 1 log('I', logTag, 'importShareZip: gasStation "' .. tostring(id) .. '" already exists. Skipped.') end
+ end
+ end
+ end
+ end
+
+ -- Save WIP and trigger UI update
+ saveWip()
+ triggerUIUpdate()
+
+ local resultMsg = "Imported " .. added .. " new items. " .. skipped .. " skipped (already exist)."
+ log('I', logTag, 'importShareZip: ' .. resultMsg)
+ guihooks.trigger('toastrMsg', {type = "info", title = "Import", msg = resultMsg})
+ guihooks.trigger('BCMDevToolImportResult', {added = added, skipped = skipped})
+end
+
+-- ============================================================================
 -- Public API (M table exports)
 -- ============================================================================
 
@@ -3886,6 +5120,46 @@ M.placeRadarLineEnd = placeRadarLineEnd
 M.deleteRadarSpot = deleteRadarSpot
 M.updateRadarSpotField = updateRadarSpotField
 M.exportAllRadarSpots = exportAllRadarSpots
+
+-- Travel node mode exports
+M.addNewTravelNode = addNewTravelNode
+M.selectTravelNode = selectTravelNode
+M.placeTravelNodeMarkerFromUI = placeTravelNodeMarkerFromUI
+M.moveTravelNodeToCurrentPos = moveTravelNodeToCurrentPos
+M.deleteTravelNode = deleteTravelNode
+M.updateTravelNodeField = updateTravelNodeField
+M.advanceTravelNodeWizard = advanceTravelNodeWizard
+M.retreatTravelNodeWizard = retreatTravelNodeWizard
+M.goToTravelNodeStep = goToTravelNodeStep
+M.addTravelNodeConnection = addTravelNodeConnection
+M.updateTravelNodeConnection = updateTravelNodeConnection
+M.deleteTravelNodeConnection = deleteTravelNodeConnection
+M.updateMapInfoField = updateMapInfoField
+M.exportAllTravelNodes = exportAllTravelNodes
+M.loadKnownTravelNodes = loadKnownTravelNodes
+
+-- Gas station mode exports
+M.addNewGasStation = addNewGasStation
+M.selectGasStation = selectGasStation
+M.placeGasStationCenter = placeGasStationCenter
+M.placeGasStationPump = placeGasStationPump
+M.deleteGasStation = deleteGasStation
+M.deleteGasStationPump = deleteGasStationPump
+M.moveGasStationPump = moveGasStationPump
+M.adjustGasStationPumpZ = adjustGasStationPumpZ
+M.updateGasStationField = updateGasStationField
+M.toggleGasStationEnergyType = toggleGasStationEnergyType
+M.updateGasStationPrice = updateGasStationPrice
+M.advanceGasStationWizard = advanceGasStationWizard
+M.retreatGasStationWizard = retreatGasStationWizard
+M.goToGasStationStep = goToGasStationStep
+M.exportAllGasStations = exportAllGasStations
+M.importVanillaStation = importVanillaStation
+M.updateVanillaOverrideField = updateVanillaOverrideField
+
+-- Share/Import
+M.createShareZip = createShareZip
+M.importShareZip = importShareZip
 
 -- Adjust a specific marker's Z position by delta
 -- type: "center", "zone", "parking", "dropoff", "computer", "props"
