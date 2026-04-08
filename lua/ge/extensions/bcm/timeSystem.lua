@@ -39,7 +39,7 @@ local calcRealDateGameDays
 local logTag = 'bcm_timeSystem'
 
 local START_EPOCH = {year = 2026, month = 5, day = 15} -- Fallback start date when OS date unavailable (May 15)
-local START_TOD = 0.2083 -- 17:00 (5 PM) as tod.time: ((17-12)%24)/24
+local START_TOD = 0.0 -- 12:00 (noon) as tod.time: 0 = noon in BeamNG tod system
 
 local SEASONS = {"spring", "summer", "autumn", "winter"}
 
@@ -509,6 +509,11 @@ initModule = function(newSave)
  -- Ensure day/night cycle is running
  if scenetree.tod then
  scenetree.tod.play = true
+ -- Safety net: if loadTimeData couldn't set tod (scenetree.tod was nil at that point),
+ -- ensure new saves start at noon instead of whatever BeamNG defaulted to
+ if newSave and timeState.lastTodTime == nil then
+ scenetree.tod.time = START_TOD
+ end
  end
 
  -- Immediately broadcast current time

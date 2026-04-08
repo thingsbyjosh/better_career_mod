@@ -38,6 +38,15 @@
  "max":2,
  "min":-0.5,
  "type":"parcelProvider"
+ },
+ {
+ "interval":90,
+ "logisticTypes":[
+ "parcel"
+ ],
+ "max":2,
+ "min":-0.5,
+ "type":"parcelReceiver"
  }
  ],
  "logisticMaxItems":8,
@@ -51,14 +60,17 @@
  ],
  "logisticTypesProvided":[
  "parcel",
+ "shopSupplies",
  "officeSupplies",
- "food"
+ "mechanicalParts",
+ "industrial"
  ],
  "logisticTypesReceived":[
+ "parcel",
  "shopSupplies",
- "foodSupplies",
  "officeSupplies",
- "food"
+ "mechanicalParts",
+ "industrial"
  ],
  "normal":[
  0.10804808304155,
@@ -72,7 +84,7 @@
  ]
  }
  ],
- "preset":"custom"
+ "preset":"warehouse"
  },
  {
  "associatedOrganization":"",
@@ -106,6 +118,7 @@
  0.27198024572281,
  -0.96221799352929
  ],
+ "isInspectSpot":false,
  "logisticTypesProvided":[
  "foodSupplies"
  ],
@@ -2956,7 +2969,7 @@
  }
  },
  "deliveryWizardStep":4,
- "devtoolMode":"travelNodes",
+ "devtoolMode":"delivery",
  "garages":[
  {
  "baseCapacity":2,
@@ -6197,7 +6210,7 @@
  ],
  "gasStationWizardStep":0,
  "gasStations":{},
- "lastSaved":1775651228,
+ "lastSaved":1775661057,
  "levelName":"west_coast_usa",
  "mapInfo":{
  "continent":"",
@@ -6297,7 +6310,7 @@
  "speedLimit":50
  }
  ],
- "selectedDeliveryIdx":2,
+ "selectedDeliveryIdx":1,
  "selectedIdx":1,
  "selectedRadarSpotIdx":1,
  "selectedTemplateName":"residential_v1",

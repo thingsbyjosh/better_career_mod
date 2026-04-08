@@ -1217,6 +1217,11 @@ skipTutorial = function()
  tutorialData.tutorialSkipped = true
  tutorialData.currentStep = 999
  saveTutorialData()
+ -- Ensure PlanEx pool is ready so the player isn't left with zero packs.
+ -- Force rotation check on next PlanEx open by resetting lastRotationId.
+ if bcm_planex and bcm_planex.forcePoolReady then
+ bcm_planex.forcePoolReady()
+ end
  log('I', logTag, 'Tutorial skipped')
 end
 

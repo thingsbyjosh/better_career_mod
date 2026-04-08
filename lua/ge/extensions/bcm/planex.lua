@@ -3312,6 +3312,21 @@ generatePool = function(rotationId)
  end
  end
 
+ -- Preserve tutorial pack across rotation: if a tutorial pack existed in the old pool
+ -- but isn't in the new generated pool, re-inject it so tutorial flow isn't broken
+ if tutorialPackInjected then
+ local found = false
+ for _, p in ipairs(planexState.pool) do
+ if p.isTutorialPack then found = true; break end
+ end
+ if not found then
+ -- Tutorial was injected but got wiped by rotation — re-inject
+ tutorialPackInjected = false
+ injectTutorialPack()
+ log('I', logTag, 'Tutorial pack re-injected after pool rotation')
+ end
+ end
+
  -- Log generation summary
  local tierSummary = ""
  for t = 1, 5 do
@@ -4888,7 +4903,21 @@ initModule = function()
  -- Only clear caches here; generatePool runs when player opens PlanEx.
  cachedStopCandidates = {}
  distanceCache = {}
+ -- Preserve tutorial pack if it was injected before initModule ran (tutorial step 4 injects early).
+ -- All other packs are regenerated on-demand via requestPoolData.
+ local preservedTutorialPack = nil
+ for _, p in ipairs(planexState.pool or {}) do
+ if p.isTutorialPack then
+ preservedTutorialPack = p
+ break
+ end
+ end
  planexState.pool = {}
+ if preservedTutorialPack then
+ table.insert(planexState.pool, preservedTutorialPack)
+ tutorialPackInjected = true
+ log('I', logTag, 'Tutorial pack preserved across initModule pool wipe')
+ end
  planexState.lastRotationId = 0 -- Force rotation check on first requestPoolData
 
  -- Monkey-patch core_groundMarkers.setPath: when PlanEx en_route, intercept ALL setPath calls.
@@ -6247,6 +6276,12 @@ end
 M.pauseRoute = function() return pauseRoute() end
 M.resumeRoute = function() return resumeRoute() end
 M.checkRotation = function() return checkRotation() end
+M.forcePoolReady = function()
+ -- Called by tutorial skip to ensure pool generates on next PlanEx open
+ planexState.lastRotationId = 0
+ tutorialPackInjected = false
+ log('I', logTag, 'forcePoolReady: rotation reset — pool will generate on next requestPoolData')
+end
 
 -- Phase 81.2-02: stop reorder + route optimization API
 M.setStopOrder = setStopOrder

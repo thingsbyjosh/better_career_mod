@@ -47,6 +47,7 @@ local writeNdjsonToMod
 local ensureModDir
 local syncPropsFromUserdata
 local placeWallProps
+local rotateWallProps
 local spawnLiveProps
 local despawnLiveProps
 local adjustPropPos
@@ -136,6 +137,11 @@ local exportAllTravelNodes, validateTravelNode, drawAllTravelNodeMarkers
 local moveTravelNodeToCurrentPos
 local updateMapInfoField, getAvailableFacilities, loadAvailableFacilities
 local loadKnownTravelNodes
+
+-- ============================================================================
+-- DAE Packs forward declarations
+-- ============================================================================
+local saveDaePack, applyDaePack, deleteDaePack
 
 -- ============================================================================
 -- Gas station mode forward declarations
@@ -283,18 +289,31 @@ local selectedGasStationIdx = nil
 local gasStationWizardStep = 0
 local vanillaGasStations = {} -- loaded from facilities.facilities.json for D-13(a)
 
--- Known logistic types (for validation and UI dropdowns)
-local ALL_LOGISTIC_TYPES = {
- "parcel", "shopSupplies", "officeSupplies", "mechanicalParts", "foodSupplies",
- "industrial", "trailerDeliveryResidential", "trailerDeliveryConstructionMaterials",
- "vehLargeTruck", "vehLargeTruckNeedsRepair", "vehNeedsRepair", "vehForPrivate",
- "vehRepairFinished", "fertilizer", "soil", "ash", "lime", "food"
+-- Organization cache (loaded once from vanilla files)
+local cachedOrganizations
+local loadOrganizations
+
+-- Known logistic types grouped by category (for validation and UI dropdowns)
+local LOGISTIC_TYPE_GROUPS = {
+ { label = "Parcels & Supplies", types = {"parcel", "shopSupplies", "officeSupplies", "mechanicalParts", "foodSupplies", "industrial"} },
+ { label = "Vehicles", types = {"vehLargeTruck", "vehLargeTruckNeedsRepair", "vehNeedsRepair", "vehForPrivate", "vehRepairFinished"} },
+ { label = "Trailers", types = {"trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"} },
+ { label = "Bulk Materials", types = {"fertilizer", "soil", "ash", "lime", "food"} }
 }
+
+-- Flat list for backwards compat
+local ALL_LOGISTIC_TYPES = {}
+for _, group in ipairs(LOGISTIC_TYPE_GROUPS) do
+ for _, t in ipairs(group.types) do
+ table.insert(ALL_LOGISTIC_TYPES, t)
+ end
+end
 
 -- Preset templates for quick facility configuration
 local DELIVERY_PRESETS = {
  warehouse = {
  name = "Warehouse",
+ desc = "parcelProvider + parcelReceiver, 5 logistic types, 2 items max, 90s interval",
  provides = {"parcel", "shopSupplies", "officeSupplies", "mechanicalParts", "industrial"},
  receives = {"parcel", "shopSupplies", "officeSupplies", "mechanicalParts", "industrial"},
  generators = {
@@ -304,6 +323,7 @@ local DELIVERY_PRESETS = {
  },
  restaurant = {
  name = "Restaurant",
+ desc = "parcelReceiver only, foodSupplies, 2 items max, 90s interval",
  provides = {"foodSupplies"},
  receives = {"foodSupplies"},
  generators = {
@@ -312,6 +332,7 @@ local DELIVERY_PRESETS = {
  },
  mechanic = {
  name = "Mechanic",
+ desc = "parcelProvider + parcelReceiver, mechanicalParts + vehicle repair, 90s interval",
  provides = {"mechanicalParts", "vehNeedsRepair", "vehRepairFinished"},
  receives = {"mechanicalParts", "vehNeedsRepair"},
  generators = {
@@ -321,6 +342,7 @@ local DELIVERY_PRESETS = {
  },
  truckDepot = {
  name = "Truck Depot",
+ desc = "vehOfferProvider + trailerOfferProvider, trucks + trailers, 210-300s interval",
  provides = {"vehLargeTruck", "trailerDeliveryResidential", "trailerDeliveryConstructionMaterials"},
  receives = {"vehLargeTruck"},
  generators = {
@@ -330,6 +352,7 @@ local DELIVERY_PRESETS = {
  },
  mixed = {
  name = "Mixed",
+ desc = "parcelProvider + parcelReceiver, 4 logistic types, 2 items max, 90s interval",
  provides = {"parcel", "shopSupplies", "mechanicalParts", "foodSupplies"},
  receives = {"parcel", "shopSupplies", "mechanicalParts", "foodSupplies"},
  generators = {
@@ -339,6 +362,7 @@ local DELIVERY_PRESETS = {
  },
  custom = {
  name = "Custom",
+ desc = "Empty configuration, set up everything manually",
  provides = {},
  receives = {},
  generators = {}
@@ -404,6 +428,7 @@ start = function()
  deliveryWizardStep = deliveryWizardStep,
  presets = presetSummary,
  allLogisticTypes = ALL_LOGISTIC_TYPES,
+ logisticTypeGroups = LOGISTIC_TYPE_GROUPS,
  cameras = cameras,
  selectedCameraIdx = selectedCameraIdx,
  cameraWizardStep = cameraWizardStep,
@@ -417,7 +442,11 @@ start = function()
  gasStations = gasStations,
  selectedGasStationIdx = selectedGasStationIdx,
  gasStationWizardStep = gasStationWizardStep,
- vanillaGasStations = vanillaGasStations
+ vanillaGasStations = vanillaGasStations,
+ deliveryTemplates = deliveryTemplates,
+ selectedTemplateName = selectedTemplateName,
+ organizations = loadOrganizations(),
+ knownTravelNodes = knownTravelNodes
  })
 
  loadAvailableFacilities()
@@ -1145,6 +1174,31 @@ loadExistingGarages = function()
 end
 
 -- ============================================================================
+-- Organization loading (cached, for delivery wizard dropdown)
+-- ============================================================================
+
+loadOrganizations = function()
+ if cachedOrganizations then return cachedOrganizations end
+ cachedOrganizations = {}
+ local orgFiles = FS:findFiles("/gameplay/organizations/", "*.json", -1, true, false)
+ for _, filePath in ipairs(orgFiles or {}) do
+ local data = jsonReadFile(filePath)
+ if data then
+ for orgId, orgData in pairs(data) do
+ if type(orgData) == "table" and orgData.name then
+ table.insert(cachedOrganizations, {
+ id = orgId,
+ name = orgData.name or orgId
+ })
+ end
+ end
+ end
+ end
+ table.sort(cachedOrganizations, function(a, b) return a.name < b.name end)
+ return cachedOrganizations
+end
+
+-- ============================================================================
 -- UI update trigger
 -- ============================================================================
 
@@ -1154,7 +1208,7 @@ triggerUIUpdate = function()
  -- Build preset summary for UI (name + id, no full data)
  local presetSummary = {}
  for k, v in pairs(DELIVERY_PRESETS) do
- presetSummary[k] = {name = v.name}
+ presetSummary[k] = {name = v.name, desc = v.desc}
  end
  guihooks.trigger('BCMDevToolUpdate', {
  garages = garages,
@@ -1166,6 +1220,8 @@ triggerUIUpdate = function()
  deliveryWizardStep = deliveryWizardStep,
  presets = presetSummary,
  allLogisticTypes = ALL_LOGISTIC_TYPES,
+ logisticTypeGroups = LOGISTIC_TYPE_GROUPS,
+ organizations = loadOrganizations(),
  cameras = cameras,
  selectedCameraIdx = selectedCameraIdx,
  cameraWizardStep = cameraWizardStep,
@@ -1879,7 +1935,7 @@ addNewDeliveryFacility = function()
  deliveryWizardStep = 1
  saveWip()
  triggerUIUpdate()
- log('I', logTag, 'Added new delivery facility: ' .. newFacility.id)
+ log('I', logTag, 'addNewDeliveryFacility: ' .. newFacility.id .. ' | templates count = ' .. tableSize(deliveryTemplates))
 end
 
 selectDeliveryFacility = function(idx)
@@ -2242,9 +2298,7 @@ getCloneSourceList = function()
  -- 2. Exported facilities from all maps
  local mapDirs = FS:findFiles("/levels/", "*.facilities.json", -1, false, true) or {}
  for _, path in ipairs(mapDirs) do
- local ok, content = pcall(function() return readFile(path) end)
- if ok and content then
- local data = jsonDecode(content)
+ local data = jsonReadFile(path)
  if data and data.deliveryProviders then
  local mapName = path:match("/levels/([^/]+)/")
  for _, prov in ipairs(data.deliveryProviders) do
@@ -2254,7 +2308,6 @@ getCloneSourceList = function()
  generatorCount = #(prov.logisticGenerators or {}),
  spotCount = #(prov.manualAccessPoints or {})
  })
- end
  end
  end
  end
@@ -2277,13 +2330,10 @@ cloneDeliveryFacilityConfig = function(sourceId, sourceMap)
  -- Load from exported JSON
  local mapDirs = FS:findFiles("/levels/" .. sourceMap .. "/", "*.facilities.json", -1, false, true) or {}
  for _, path in ipairs(mapDirs) do
- local ok, content = pcall(function() return readFile(path) end)
- if ok and content then
- local data = jsonDecode(content)
+ local data = jsonReadFile(path)
  if data and data.deliveryProviders then
  for _, prov in ipairs(data.deliveryProviders) do
  if prov.id == sourceId then source = prov; break end
- end
  end
  end
  if source then break end
@@ -2895,7 +2945,7 @@ placeWallProps = function()
 end
 
 -- Rotate existing wall props to a new angle (called from slider)
-local function rotateWallProps(angleDeg)
+rotateWallProps = function(angleDeg)
  if not selectedGarageIdx then return end
  local garage = garages[selectedGarageIdx]
  if not garage or not garage.propsAnchor then
@@ -2909,6 +2959,151 @@ local function rotateWallProps(angleDeg)
  spawnLiveProps(garage.props)
  saveWip()
  triggerUIUpdate()
+end
+
+-- ============================================================================
+-- DAE Packs (user-defined reusable prop packs for garages)
+-- Cloned from wall props pattern — original wall props code is NOT modified
+-- ============================================================================
+
+saveDaePack = function(packName)
+ if not packName or packName == "" then return end
+ if not selectedGarageIdx then return end
+ local garage = garages[selectedGarageIdx]
+ if not garage or not garage.center then
+ log('W', logTag, 'saveDaePack: No garage or center')
+ return
+ end
+
+ local center = garage.center
+ garage.daePacks = garage.daePacks or {}
+
+ -- Check for duplicate pack name
+ for _, pack in ipairs(garage.daePacks) do
+ if pack.name == packName then
+ log('W', logTag, 'saveDaePack: Pack "' .. packName .. '" already exists')
+ return
+ end
+ end
+
+ -- Collect existing pack positions for deduplication (D-15)
+ local existingPositions = {}
+ for _, pack in ipairs(garage.daePacks) do
+ for _, asset in ipairs(pack.assets or {}) do
+ table.insert(existingPositions, asset.offsetPos)
+ end
+ end
+
+ -- Also collect wall props positions to exclude them
+ -- Wall props have their own management — don't include in user packs
+ local wallPropsPositions = {}
+ if garage.propsAnchor and WALL_PROPS_TEMPLATE then
+ local wallProps = computeWallProps(garage, garage.propsAnchor, garage.propsAngle or 0)
+ for _, wp in ipairs(wallProps) do
+ table.insert(wallPropsPositions, wp.position)
+ end
+ end
+
+ -- Filter current scene props, exclude existing pack objects and wall props
+ local assets = {}
+ for _, prop in ipairs(garage.props or {}) do
+ local dominated = false
+
+ -- Check against existing pack positions (relative offsets)
+ for _, ep in ipairs(existingPositions) do
+ local dx = math.abs((prop.position[1] - center[1]) - ep[1])
+ local dy = math.abs((prop.position[2] - center[2]) - ep[2])
+ local dz = math.abs((prop.position[3] - center[3]) - ep[3])
+ if dx < 0.01 and dy < 0.01 and dz < 0.01 then
+ dominated = true
+ break
+ end
+ end
+
+ -- Check against wall props positions (absolute)
+ if not dominated then
+ for _, wp in ipairs(wallPropsPositions) do
+ local dx = math.abs(prop.position[1] - wp[1])
+ local dy = math.abs(prop.position[2] - wp[2])
+ local dz = math.abs(prop.position[3] - wp[3])
+ if dx < 0.01 and dy < 0.01 and dz < 0.01 then
+ dominated = true
+ break
+ end
+ end
+ end
+
+ if not dominated then
+ table.insert(assets, {
+ daeFile = prop.shapeName,
+ offsetPos = {
+ prop.position[1] - center[1],
+ prop.position[2] - center[2],
+ prop.position[3] - center[3]
+ },
+ offsetRot = prop.rotationMatrix
+ })
+ end
+ end
+
+ if #assets == 0 then
+ log('W', logTag, 'saveDaePack: No new assets to save (all belong to existing packs or wall props)')
+ return
+ end
+
+ table.insert(garage.daePacks, { name = packName, assets = assets })
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Saved DAE pack "' .. packName .. '" with ' .. #assets .. ' assets for garage ' .. (garage.name or garage.id))
+end
+
+applyDaePack = function(packIdx)
+ if not selectedGarageIdx then return end
+ local garage = garages[selectedGarageIdx]
+ if not garage or not garage.center then return end
+ garage.daePacks = garage.daePacks or {}
+
+ local pack = garage.daePacks[packIdx]
+ if not pack then return end
+
+ local center = garage.center
+ garage.props = garage.props or {}
+
+ for _, asset in ipairs(pack.assets or {}) do
+ local prop = {
+ class = "TSStatic",
+ shapeName = asset.daeFile,
+ position = {
+ center[1] + asset.offsetPos[1],
+ center[2] + asset.offsetPos[2],
+ center[3] + asset.offsetPos[3]
+ },
+ useInstanceRenderData = true,
+ rotationMatrix = asset.offsetRot or {1, 0, 0, 0, 1, 0, 0, 0, 1}
+ }
+ table.insert(garage.props, prop)
+ end
+
+ spawnLiveProps(garage.props)
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Applied DAE pack "' .. pack.name .. '" (' .. #(pack.assets or {}) .. ' assets)')
+end
+
+deleteDaePack = function(packIdx)
+ if not selectedGarageIdx then return end
+ local garage = garages[selectedGarageIdx]
+ if not garage then return end
+ garage.daePacks = garage.daePacks or {}
+
+ local pack = garage.daePacks[packIdx]
+ if not pack then return end
+
+ local name = pack.name
+ table.remove(garage.daePacks, packIdx)
+ saveWip()
+ triggerUIUpdate()
+ log('I', logTag, 'Deleted DAE pack "' .. name .. '"')
 end
 
 -- ============================================================================
@@ -5156,6 +5351,11 @@ M.goToGasStationStep = goToGasStationStep
 M.exportAllGasStations = exportAllGasStations
 M.importVanillaStation = importVanillaStation
 M.updateVanillaOverrideField = updateVanillaOverrideField
+
+-- DAE Pack exports
+M.saveDaePack = saveDaePack
+M.applyDaePack = applyDaePack
+M.deleteDaePack = deleteDaePack
 
 -- Share/Import
 M.createShareZip = createShareZip
