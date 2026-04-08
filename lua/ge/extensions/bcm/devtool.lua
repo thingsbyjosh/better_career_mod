@@ -83,6 +83,7 @@ local deleteDeliveryFacility
 local updateDeliveryField
 local updateDeliverySpotLogisticType
 local updateDeliverySpotInspect
+local updateDeliverySpotSize
 local updateDeliveryGenerator
 local addDeliveryGenerator
 local removeDeliveryGenerator
@@ -1600,7 +1601,7 @@ exportSitesJson = function(levelName, garageList)
  oldId = nextOldId,
  pos = spot.pos,
  rot = {quat.x, quat.y, quat.z, quat.w},
- scl = {2.5, 6, 3},
+ scl = spot.scl or {2.5, 6, 3},
  spotAmount = 1,
  spotDirection = "Left",
  spotOffset = 0,
@@ -1983,6 +1984,8 @@ placeDeliveryMarkerFromUI = function()
  pos = sPos,
  dir = getPlacementDirection(),
  normal = sNormal,
+ scl = {3.25, 8, 4},
+ spotSize = "truck",
  logisticTypesProvided = setmetatable({}, {__jsontype = "array"}),
  logisticTypesReceived = setmetatable({}, {__jsontype = "array"}),
  isInspectSpot = true
@@ -2133,6 +2136,28 @@ updateDeliverySpotInspect = function(spotIdx, enabled)
  triggerUIUpdate()
 end
 
+local SPOT_SIZES = {
+ car = {2.5, 6, 3},
+ truck = {3.25, 8, 4}
+}
+
+updateDeliverySpotSize = function(spotIdx, sizeKey)
+ if not selectedDeliveryIdx then return end
+ local facility = deliveryFacilities[selectedDeliveryIdx]
+ if not facility then return end
+
+ spotIdx = tonumber(spotIdx)
+ if not spotIdx or spotIdx < 1 or spotIdx > #(facility.parkingSpots or {}) then return end
+
+ local scl = SPOT_SIZES[sizeKey]
+ if not scl then return end
+
+ facility.parkingSpots[spotIdx].scl = {scl[1], scl[2], scl[3]}
+ facility.parkingSpots[spotIdx].spotSize = sizeKey
+ saveWip()
+ triggerUIUpdate()
+end
+
 applyDeliveryPreset = function(presetId)
  if not selectedDeliveryIdx then return end
  local facility = deliveryFacilities[selectedDeliveryIdx]
@@ -2210,7 +2235,7 @@ addDeliveryGenerator = function()
  local newGen = {
  type = "parcelProvider",
  logisticTypes = {"parcel"},
- min = -0.5,
+ min = 1,
  max = 2,
  interval = 90
  }
@@ -2268,6 +2293,93 @@ validateDeliveryFacility = function(facility)
  end
  end
  end
+ -- Generator validations
+ local gens = facility.logisticGenerators
+ if not gens or (type(gens) == "table" and next(gens) == nil) then
+ table.insert(warnings, "No generators — vanilla delivery won't create any cargo here")
+ else
+ if type(gens) == "table" then
+ -- Check for decimal min/max
+ for i, gen in ipairs(gens) do
+ if gen.min and gen.min ~= math.floor(gen.min) then
+ table.insert(warnings, "Generator #" .. i .. ": min=" .. gen.min .. " is decimal — Lua truncates to " .. math.floor(gen.min))
+ end
+ if gen.max and gen.max ~= math.floor(gen.max) then
+ table.insert(warnings, "Generator #" .. i .. ": max=" .. gen.max .. " is decimal — Lua truncates to " .. math.floor(gen.max))
+ end
+ if gen.min and gen.max and gen.min > gen.max then
+ table.insert(warnings, "Generator #" .. i .. ": min (" .. gen.min .. ") > max (" .. gen.max .. ")")
+ end
+ end
+
+ -- Check: logistic types that need specific generator types
+ local VEH_TYPES = {vehLargeTruck=true, vehLargeTruckNeedsRepair=true, vehNeedsRepair=true, vehForPrivate=true, vehRepairFinished=true}
+ local TRAILER_TYPES = {trailerDeliveryResidential=true, trailerDeliveryConstructionMaterials=true}
+ for i, gen in ipairs(gens) do
+ for _, lt in ipairs(gen.logisticTypes or {}) do
+ if VEH_TYPES[lt] and gen.type ~= "vehOfferProvider" then
+ table.insert(warnings, "Generator #" .. i .. ": has vehicle type '" .. lt .. "' but generator is '" .. gen.type .. "' — vehicle types need a vehOfferProvider generator")
+ end
+ if TRAILER_TYPES[lt] and gen.type ~= "trailerOfferProvider" then
+ table.insert(warnings, "Generator #" .. i .. ": has trailer type '" .. lt .. "' but generator is '" .. gen.type .. "' — trailer types need a trailerOfferProvider generator")
+ end
+ end
+ end
+
+ -- Collect generator logistic types
+ local genTypes = {}
+ for _, gen in ipairs(gens) do
+ for _, lt in ipairs(gen.logisticTypes or {}) do
+ genTypes[lt] = true
+ end
+ end
+
+ -- Check: spot types not covered by any generator
+ local spotProvides = {}
+ local spotReceives = {}
+ for _, spot in ipairs(facility.parkingSpots or {}) do
+ for _, lt in ipairs(spot.logisticTypesProvided or {}) do spotProvides[lt] = true end
+ for _, lt in ipairs(spot.logisticTypesReceived or {}) do spotReceives[lt] = true end
+ end
+
+ for lt, _ in pairs(spotProvides) do
+ if not genTypes[lt] then
+ table.insert(warnings, "Spot provides '" .. lt .. "' but no generator handles it — cargo won't be created")
+ end
+ end
+ for lt, _ in pairs(spotReceives) do
+ if not genTypes[lt] then
+ table.insert(warnings, "Spot receives '" .. lt .. "' but no generator handles it — no demand will be created")
+ end
+ end
+
+ -- Check: generator types not in any spot
+ for lt, _ in pairs(genTypes) do
+ if not spotProvides[lt] and not spotReceives[lt] then
+ table.insert(warnings, "Generator creates '" .. lt .. "' but no spot provides or receives it — cargo has no pickup/dropoff")
+ end
+ end
+
+ -- Check: has provider but no receiver (or vice versa)
+ local hasProvider = false
+ local hasReceiver = false
+ for _, gen in ipairs(gens) do
+ if gen.type == "parcelProvider" or gen.type == "vehOfferProvider" or gen.type == "trailerOfferProvider" then
+ hasProvider = true
+ end
+ if gen.type == "parcelReceiver" then
+ hasReceiver = true
+ end
+ end
+ if hasProvider and not hasReceiver then
+ table.insert(warnings, "Has provider but no receiver — this facility creates cargo but never requests deliveries")
+ end
+ if hasReceiver and not hasProvider then
+ table.insert(warnings, "Has receiver but no provider — this facility requests deliveries but never creates cargo to send")
+ end
+ end
+ end
+
  local valid = #warnings == 0
  for _, w in ipairs(warnings) do
  log('W', logTag, 'Delivery validation: ' .. (facility.name or facility.id or '?') .. ': ' .. w)
@@ -2434,10 +2546,11 @@ drawAllDeliveryMarkers = function()
  if fwd:length() > 0.001 then fwd = fwd:normalized() else fwd = rawDir end
  local right = fwd:cross(up):normalized()
 
- -- Box dimensions (approx vehicle footprint)
- local halfLen = 2.5 -- 5m long
- local halfWid = 1.25 -- 2.5m wide
- local height = 1.8 -- 1.8m tall
+ -- Box dimensions from scl [width, length, height] or defaults
+ local scl = spot.scl or {3.25, 8, 4}
+ local halfWid = scl[1] / 2
+ local halfLen = scl[2] / 2
+ local height = scl[3]
 
  -- 4 corners on ground plane
  local fl = p + fwd * halfLen - right * halfWid -- front-left
@@ -2735,7 +2848,7 @@ exportDeliverySitesJson = function(levelName, facilityList)
  oldId = nextOldId,
  pos = spot.pos,
  rot = {quat.x, quat.y, quat.z, quat.w},
- scl = {2.5, 6, 3},
+ scl = spot.scl or {2.5, 6, 3},
  spotAmount = 1,
  spotDirection = "Left",
  spotOffset = 0,
@@ -5281,6 +5394,7 @@ M.deleteDeliveryFacility = deleteDeliveryFacility
 M.updateDeliveryField = updateDeliveryField
 M.updateDeliverySpotLogisticType = updateDeliverySpotLogisticType
 M.updateDeliverySpotInspect = updateDeliverySpotInspect
+M.updateDeliverySpotSize = updateDeliverySpotSize
 M.updateDeliveryGenerator = updateDeliveryGenerator
 M.addDeliveryGenerator = addDeliveryGenerator
 M.removeDeliveryGenerator = removeDeliveryGenerator

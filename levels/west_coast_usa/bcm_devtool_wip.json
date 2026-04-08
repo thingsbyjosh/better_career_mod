@@ -18,7 +18,7 @@
  ],
  "deliveryFacilities":[
  {
- "associatedOrganization":"",
+ "associatedOrganization":"planex",
  "center":[
  -844.56842041016,
  297.74069213867,
@@ -38,15 +38,6 @@
  "max":2,
  "min":-0.5,
  "type":"parcelProvider"
- },
- {
- "interval":90,
- "logisticTypes":[
- "parcel"
- ],
- "max":2,
- "min":-0.5,
- "type":"parcelReceiver"
  }
  ],
  "logisticMaxItems":8,
@@ -58,20 +49,8 @@
  -0.6824397784894,
  -0.16217792310556
  ],
- "logisticTypesProvided":[
- "parcel",
- "shopSupplies",
- "officeSupplies",
- "mechanicalParts",
- "industrial"
- ],
- "logisticTypesReceived":[
- "parcel",
- "shopSupplies",
- "officeSupplies",
- "mechanicalParts",
- "industrial"
- ],
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":{},
  "normal":[
  0.10804808304155,
  0.10061548566772,
@@ -84,7 +63,7 @@
  ]
  }
  ],
- "preset":"warehouse"
+ "preset":"custom"
  },
  {
  "associatedOrganization":"",
@@ -2913,6 +2892,115 @@
  }
  ],
  "preset":"custom"
+ },
+ {
+ "associatedOrganization":"",
+ "center":[
+ -601.15966796875,
+ -627.76391601563,
+ 186.79809343815
+ ],
+ "description":"",
+ "facilityType":"custom",
+ "id":"bcmFacility_67",
+ "logisticGenerators":[
+ {
+ "interval":90,
+ "logisticTypes":[
+ "parcel",
+ "ash",
+ "lime",
+ "foodSupplies",
+ "shopSupplies",
+ "mechanicalParts",
+ "officeSupplies",
+ "industrial",
+ "trailerDeliveryResidential",
+ "trailerDeliveryConstructionMaterials"
+ ],
+ "max":8,
+ "min":0,
+ "type":"parcelReceiver"
+ },
+ {
+ "interval":90,
+ "logisticTypes":[
+ "parcel",
+ "lime",
+ "ash",
+ "foodSupplies",
+ "shopSupplies",
+ "mechanicalParts",
+ "officeSupplies",
+ "industrial"
+ ],
+ "max":7,
+ "min":1,
+ "type":"parcelProvider"
+ },
+ {
+ "interval":90,
+ "logisticTypes":[
+ "trailerDeliveryResidential",
+ "trailerDeliveryConstructionMaterials"
+ ],
+ "max":2,
+ "min":1,
+ "type":"trailerOfferProvider"
+ }
+ ],
+ "logisticMaxItems":8,
+ "name":"Signal Peak Tower",
+ "parkingSpots":[
+ {
+ "dir":[
+ 0.93514351683159,
+ 0.34911070057289,
+ 0.060235551573419
+ ],
+ "isInspectSpot":true,
+ "logisticTypesProvided":[
+ "parcel",
+ "shopSupplies",
+ "officeSupplies",
+ "mechanicalParts",
+ "foodSupplies",
+ "industrial",
+ "ash",
+ "lime",
+ "trailerDeliveryConstructionMaterials",
+ "trailerDeliveryResidential"
+ ],
+ "logisticTypesReceived":[
+ "parcel",
+ "shopSupplies",
+ "officeSupplies",
+ "mechanicalParts",
+ "foodSupplies",
+ "industrial",
+ "trailerDeliveryConstructionMaterials",
+ "ash",
+ "lime",
+ "trailerDeliveryResidential"
+ ],
+ "normal":[
+ 0.0073924400134357,
+ 0.0080790443490489,
+ 0.99994003863884
+ ],
+ "pos":[
+ -601.15966796875,
+ -627.76391601563,
+ 186.79809343815
+ ],
+ "scl":[
+ 3.25,
+ 8,
+ 4
+ ],
+ "spotSize":"truck"
+ }
+ ]
  }
  ],
  "deliveryTemplates":{
@@ -6210,7 +6298,7 @@
  ],
  "gasStationWizardStep":0,
  "gasStations":{},
- "lastSaved":1775661057,
+ "lastSaved":1775670538,
  "levelName":"west_coast_usa",
  "mapInfo":{
  "continent":"",
@@ -6310,7 +6398,7 @@
  "speedLimit":50
  }
  ],
- "selectedDeliveryIdx":1,
+ "selectedDeliveryIdx":67,
  "selectedIdx":1,
  "selectedRadarSpotIdx":1,
  "selectedTemplateName":"residential_v1",

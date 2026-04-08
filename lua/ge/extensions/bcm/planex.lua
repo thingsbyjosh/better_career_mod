@@ -424,9 +424,19 @@ enumerateStopCandidates = function()
  -- Primary source: career_modules_delivery_generator.getFacilities()
  -- These are PROCESSED facilities with resolved accessPointsByName and parking spot objects.
  -- Same data used by spawnPlanexCargoAtDepot, setGPSToDepot, and vanilla delivery.
+ -- Build garage ID set to exclude BCM garages from delivery stops
+ local garageIds = {}
+ if bcm_garages and bcm_garages.getAllDefinitions then
+ for gId, _ in pairs(bcm_garages.getAllDefinitions()) do
+ garageIds[gId] = true
+ end
+ end
+
  local generatorFacilities = career_modules_delivery_generator and career_modules_delivery_generator.getFacilities and career_modules_delivery_generator.getFacilities()
  if generatorFacilities and #generatorFacilities > 0 then
  for _, fac in ipairs(generatorFacilities) do
+ -- Skip BCM garages — they are vehicle storage, not delivery destinations
+ if garageIds[fac.id] then goto continueCandidate end
  if fac.accessPointsByName and next(fac.accessPointsByName) then
  local entry = {
  facId = fac.id,
@@ -482,6 +492,7 @@ enumerateStopCandidates = function()
  table.insert(candidates, entry)
  end
  end
+ ::continueCandidate::
  end
  local providerCount = 0
  for _, c in ipairs(candidates) do
@@ -499,6 +510,7 @@ enumerateStopCandidates = function()
  local deliveryFacilities = freeroam_facilities.getFacilitiesByType("deliveryProvider")
  if deliveryFacilities then
  for _, facData in ipairs(deliveryFacilities) do
+ if garageIds[facData.id] then goto continueFallback end
  local entry = {
  facId = facData.id,
  displayName = facData.name or facData.id,
@@ -520,6 +532,7 @@ enumerateStopCandidates = function()
  if entry.pos then
  table.insert(candidates, entry)
  end
+ ::continueFallback::
  end
  end
  log('I', logTag, string.format('Enumerated %d delivery facilities from freeroam_facilities fallback', #candidates))
@@ -4310,13 +4323,20 @@ end
 -- Treats resume as a fresh route start: strips delivered stops, regenerates cargo,
 -- spawns loaner, and enters the normal acceptPack flow (traveling_to_depot → pickup → deliver).
 -- Accumulated stats (pay, XP, damage, stopHistory) are preserved from the original route.
-resumeRoute = function()
+resumeRoute = function(inventoryId)
  if planexState.routeState ~= 'paused' then
  log('W', logTag, 'resumeRoute: invalid state ' .. tostring(planexState.routeState))
  return false
  end
  local pack = planexState.activePack
  if not pack then return false end
+
+ -- Track delivery vehicle BEFORE transitioning (fixes onTeleportedToGarage abandon bug)
+ local loanerTierCheck = pack.loanerTier or planexState.loanerSelectedTier
+ if not loanerTierCheck and inventoryId then
+ setDeliveryVehicle(tonumber(inventoryId))
+ log('I', logTag, 'resumeRoute: delivery vehicle set to invId=' .. tostring(inventoryId))
+ end
 
  -- Track original totals for final summary (pre-pause + post-resume combined)
  local deliveredPrePause = pack.stopsDelivered or 0
@@ -5980,6 +6000,14 @@ M.getVehicleLargestContainer = function(inventoryId)
  return entry and entry.largest or nil
 end
 
+-- Returns {capacity, largest} for a vehicle from the in-memory cache, or nil if not yet queried
+M.getVehicleCapacityEntry = function(inventoryId)
+ local entry = planexState.vehicleCapacityCache[tostring(inventoryId)]
+ if not entry then return nil end
+ if type(entry) == 'number' then return { capacity = entry, largest = entry } end
+ return { capacity = entry.total or 0, largest = entry.largest or 0 }
+end
+
 -- Stores {total, largest} in memory so acceptPack can validate minContainerSize
 -- Called from planexApp.queryCargoContainers callback — NOT persisted to save
 M.setVehicleCapacity = function(inventoryId, totalSlots, largestContainer)
@@ -6274,13 +6302,29 @@ end
 
 -- pause/resume route exports + on-demand rotation
 M.pauseRoute = function() return pauseRoute() end
-M.resumeRoute = function() return resumeRoute() end
+M.resumeRoute = function(inventoryId) return resumeRoute(inventoryId) end
 M.checkRotation = function() return checkRotation() end
 M.forcePoolReady = function()
  -- Called by tutorial skip to ensure pool generates on next PlanEx open
  planexState.lastRotationId = 0
  tutorialPackInjected = false
  log('I', logTag, 'forcePoolReady: rotation reset — pool will generate on next requestPoolData')
+end
+
+-- Resume requirements: returns what the UI needs to validate before allowing resume
+M.getResumeRequirements = function()
+ if planexState.routeState ~= 'paused' or not planexState.activePack then
+ return nil
+ end
+ local pack = planexState.activePack
+ local loanerTier = pack.loanerTier or planexState.loanerSelectedTier
+ local isLoaner = loanerTier ~= nil and LOANER_TIERS[loanerTier] ~= nil
+ return {
+ packId = pack.id,
+ isLoaner = isLoaner,
+ loanerTier = loanerTier,
+ requiredCapacity = pack.vehicleCapacity or DEFAULT_ESTIMATE_CAPACITY,
+ }
 end
 
 -- Phase 81.2-02: stop reorder + route optimization API
@@ -6307,7 +6351,7 @@ M.debugComputePay = debugComputePay
 
 -- When a vehicle is towed/teleported to garage, abandon active delivery if it's the delivery vehicle
 M.onTeleportedToGarage = function(garageId, veh)
- if planexState.routeState == 'idle' or not planexState.activePack then return end
+ if planexState.routeState == 'idle' or planexState.routeState == 'paused' or not planexState.activePack then return end
 
  -- Check both player's delivery vehicle AND loaner vehicle
  local deliveryInvId = planexState.deliveryVehicleInventoryId

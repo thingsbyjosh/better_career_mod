@@ -37,6 +37,9 @@ local getVehicleNiceName
 -- pause/resume bridge
 local pauseRoute
 local resumeRoute
+local resumeRouteWithVehicle
+local resumeRouteFromPhone
+local requestResumeVehicles
 
 local logTag = 'bcm_planexApp'
 
@@ -162,12 +165,169 @@ pauseRoute = function()
  end
 end
 
-resumeRoute = function()
+resumeRoute = function(inventoryId)
  if not bcm_planex then return end
- local ok = bcm_planex.resumeRoute()
+ local ok = bcm_planex.resumeRoute(inventoryId)
  if ok then
  bcm_planex.broadcastState()
  requestPoolData()
+ end
+end
+
+-- Resume from web: vehicle explicitly selected by player from the qualifying list
+resumeRouteWithVehicle = function(inventoryId)
+ if not bcm_planex then return end
+ local reqs = bcm_planex.getResumeRequirements()
+ if not reqs then
+ guihooks.trigger('BCMPlanexResumeError', { reason = 'no_paused_route' })
+ return
+ end
+ -- Loaner routes don't need a vehicle
+ if reqs.isLoaner then
+ resumeRoute(nil)
+ return
+ end
+ if not inventoryId then
+ guihooks.trigger('BCMPlanexResumeError', { reason = 'no_vehicle_selected' })
+ return
+ end
+ -- Validate the vehicle is still spawned and has enough capacity
+ local invId = tonumber(inventoryId)
+ local capEntry = bcm_planex.getVehicleCapacityEntry(invId)
+ if not capEntry then
+ guihooks.trigger('BCMPlanexResumeError', { reason = 'vehicle_not_ready', requiredCapacity = reqs.requiredCapacity })
+ return
+ end
+ if capEntry.capacity < reqs.requiredCapacity then
+ guihooks.trigger('BCMPlanexResumeError', {
+ reason = 'insufficient_capacity',
+ requiredCapacity = reqs.requiredCapacity,
+ vehicleCapacity = capEntry.capacity,
+ })
+ return
+ end
+ resumeRoute(invId)
+end
+
+-- Resume from phone: player must be mounted in a vehicle with enough capacity
+resumeRouteFromPhone = function()
+ if not bcm_planex then return end
+ local reqs = bcm_planex.getResumeRequirements()
+ if not reqs then
+ guihooks.trigger('BCMPlanexResumeError', { reason = 'no_paused_route' })
+ return
+ end
+ -- Loaner routes don't need a vehicle
+ if reqs.isLoaner then
+ resumeRoute(nil)
+ return
+ end
+ -- Check player is in a vehicle
+ local veh = getPlayerVehicle(0)
+ if not veh then
+ guihooks.trigger('BCMPlanexResumeError', { reason = 'not_in_vehicle', requiredCapacity = reqs.requiredCapacity })
+ return
+ end
+ -- Resolve inventory ID
+ local vehId = veh:getID()
+ local idMap = career_modules_inventory and career_modules_inventory.getMapInventoryIdToVehId()
+ local foundInvId = nil
+ if idMap then
+ for invId, objId in pairs(idMap) do
+ if objId == vehId then foundInvId = invId; break end
+ end
+ end
+ if not foundInvId then
+ guihooks.trigger('BCMPlanexResumeError', { reason = 'not_owned_vehicle', requiredCapacity = reqs.requiredCapacity })
+ return
+ end
+ -- Query capacity synchronously from cache (should be populated by requestCurrentVehicle)
+ local capEntry = bcm_planex.getVehicleCapacityEntry(foundInvId)
+ if not capEntry then
+ -- Capacity not yet queried — trigger async query and tell Vue to retry
+ queryCargoContainers(veh, foundInvId)
+ guihooks.trigger('BCMPlanexResumeError', { reason = 'capacity_loading', requiredCapacity = reqs.requiredCapacity })
+ return
+ end
+ if capEntry.capacity < reqs.requiredCapacity then
+ guihooks.trigger('BCMPlanexResumeError', {
+ reason = 'insufficient_capacity',
+ requiredCapacity = reqs.requiredCapacity,
+ vehicleCapacity = capEntry.capacity,
+ })
+ return
+ end
+ resumeRoute(foundInvId)
+end
+
+-- Query spawned vehicles that qualify for resuming a paused route (for web selector)
+requestResumeVehicles = function()
+ if not bcm_planex or not career_modules_inventory then
+ guihooks.trigger('BCMPlanexResumeVehicles', { vehicles = {}, requirements = nil })
+ return
+ end
+ local reqs = bcm_planex.getResumeRequirements()
+ if not reqs then
+ guihooks.trigger('BCMPlanexResumeVehicles', { vehicles = {}, requirements = nil })
+ return
+ end
+ -- Loaner routes don't need vehicle selection
+ if reqs.isLoaner then
+ guihooks.trigger('BCMPlanexResumeVehicles', { vehicles = {}, requirements = reqs })
+ return
+ end
+
+ local allVehicles = career_modules_inventory.getVehicles() or {}
+ local idMap = career_modules_inventory.getMapInventoryIdToVehId() or {}
+ local loanerInvId = bcm_planex.getLoanerInventoryId and bcm_planex.getLoanerInventoryId()
+ local list = {}
+ local pendingQueries = 0
+ local totalVehicles = 0
+
+ for invId, vehData in pairs(allVehicles) do
+ if invId == loanerInvId then goto skipVeh end
+ if vehData.owned == false then goto skipVeh end
+ local vehObjId = idMap[invId]
+ local vehObj = vehObjId and be:getObjectByID(vehObjId)
+ if not vehObj then goto skipVeh end
+
+ totalVehicles = totalVehicles + 1
+ local niceName = vehData.niceName
+ if not niceName and vehData.model then
+ local modelInfo = core_vehicles and core_vehicles.getModel(vehData.model)
+ niceName = modelInfo and modelInfo.Brand and modelInfo.Name
+ and (modelInfo.Brand .. ' ' .. modelInfo.Name) or vehData.model
+ end
+
+ -- Check capacity from cache first
+ local capEntry = bcm_planex.getVehicleCapacityEntry(invId)
+ if capEntry then
+ if capEntry.capacity >= reqs.requiredCapacity then
+ local trailerObj = getTrailerForVehicle(vehObjId)
+ table.insert(list, {
+ inventoryId = invId,
+ niceName = niceName or 'Vehicle #' .. tostring(invId),
+ model = vehData.model or '',
+ capacity = capEntry.capacity,
+ trailerName = trailerObj and getVehicleNiceName(trailerObj:getID()) or nil,
+ })
+ end
+ else
+ -- Need async query — trigger it
+ pendingQueries = pendingQueries + 1
+ queryCargoContainers(vehObj, invId)
+ end
+ ::skipVeh::
+ end
+
+ if pendingQueries > 0 then
+ -- Some vehicles still being queried — tell Vue to retry in a moment
+ log('I', logTag, string.format('requestResumeVehicles: %d vehicles pending capacity query, %d ready', pendingQueries, #list))
+ guihooks.trigger('BCMPlanexResumeVehicles', { vehicles = list, requirements = reqs, pending = pendingQueries })
+ else
+ log('I', logTag, string.format('requestResumeVehicles: %d qualifying of %d spawned (required capacity=%d)',
+ #list, totalVehicles, reqs.requiredCapacity))
+ guihooks.trigger('BCMPlanexResumeVehicles', { vehicles = list, requirements = reqs, pending = 0 })
  end
 end
 
@@ -583,6 +743,9 @@ M.acceptPack = acceptPack
 M.abandonPack = abandonPack
 M.pauseRoute = pauseRoute
 M.resumeRoute = resumeRoute
+M.resumeRouteWithVehicle = resumeRouteWithVehicle
+M.resumeRouteFromPhone = resumeRouteFromPhone
+M.requestResumeVehicles = requestResumeVehicles
 M.requestHistory = requestHistory
 M.requestDriverStats = requestDriverStats
 M.selectVehicle = selectVehicle

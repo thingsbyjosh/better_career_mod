@@ -1,7 +1,7 @@
 {
  "deliveryProviders":[
  {
- "associatedOrganization":"bcm_church",
+ "associatedOrganization":"planex",
  "description":"",
  "facilityType":"custom",
  "id":"bcm_church",
@@ -17,31 +17,13 @@
  }
  ],
  "logisticMaxItems":8,
- "logisticTypesProvided":[
- "officeSupplies",
- "food",
- "parcel"
- ],
- "logisticTypesReceived":[
- "shopSupplies",
- "foodSupplies",
- "officeSupplies",
- "food"
- ],
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":{},
  "manualAccessPoints":[
  {
  "isInspectSpot":true,
- "logisticTypesProvided":[
- "parcel",
- "officeSupplies",
- "food"
- ],
- "logisticTypesReceived":[
- "shopSupplies",
- "foodSupplies",
- "officeSupplies",
- "food"
- ],
+ "logisticTypesProvided":{},
+ "logisticTypesReceived":{},
  "psName":"bcm_church_parking1"
  }
  ],
@@ -74,7 +56,7 @@
  ],
  "manualAccessPoints":[
  {
- "isInspectSpot":true,
+ "isInspectSpot":false,
  "logisticTypesProvided":[
  "foodSupplies"
  ],
@@ -2224,6 +2206,116 @@
  }
  ],
  "name":"Gamusino Lane 129",
+ "preview":"",
+ "sitesFile":"bcm_depots.sites.json"
+ },
+ {
+ "associatedOrganization":"bcmFacility_67",
+ "description":"",
+ "facilityType":"custom",
+ "id":"bcmFacility_67",
+ "logisticGenerators":[
+ {
+ "interval":90,
+ "logisticTypes":[
+ "parcel",
+ "ash",
+ "lime",
+ "foodSupplies",
+ "shopSupplies",
+ "mechanicalParts",
+ "officeSupplies",
+ "industrial",
+ "trailerDeliveryResidential",
+ "trailerDeliveryConstructionMaterials"
+ ],
+ "max":8,
+ "min":0,
+ "type":"parcelReceiver"
+ },
+ {
+ "interval":90,
+ "logisticTypes":[
+ "parcel",
+ "lime",
+ "ash",
+ "foodSupplies",
+ "shopSupplies",
+ "mechanicalParts",
+ "officeSupplies",
+ "industrial"
+ ],
+ "max":7,
+ "min":1,
+ "type":"parcelProvider"
+ },
+ {
+ "interval":90,
+ "logisticTypes":[
+ "trailerDeliveryResidential",
+ "trailerDeliveryConstructionMaterials"
+ ],
+ "max":2,
+ "min":1,
+ "type":"trailerOfferProvider"
+ }
+ ],
+ "logisticMaxItems":8,
+ "logisticTypesProvided":[
+ "ash",
+ "lime",
+ "foodSupplies",
+ "trailerDeliveryConstructionMaterials",
+ "parcel",
+ "shopSupplies",
+ "mechanicalParts",
+ "officeSupplies",
+ "trailerDeliveryResidential",
+ "industrial"
+ ],
+ "logisticTypesReceived":[
+ "ash",
+ "lime",
+ "foodSupplies",
+ "trailerDeliveryConstructionMaterials",
+ "parcel",
+ "shopSupplies",
+ "mechanicalParts",
+ "officeSupplies",
+ "trailerDeliveryResidential",
+ "industrial"
+ ],
+ "manualAccessPoints":[
+ {
+ "isInspectSpot":true,
+ "logisticTypesProvided":[
+ "parcel",
+ "shopSupplies",
+ "officeSupplies",
+ "mechanicalParts",
+ "foodSupplies",
+ "industrial",
+ "ash",
+ "lime",
+ "trailerDeliveryConstructionMaterials",
+ "trailerDeliveryResidential"
+ ],
+ "logisticTypesReceived":[
+ "parcel",
+ "shopSupplies",
+ "officeSupplies",
+ "mechanicalParts",
+ "foodSupplies",
+ "industrial",
+ "trailerDeliveryConstructionMaterials",
+ "ash",
+ "lime",
+ "trailerDeliveryResidential"
+ ],
+ "psName":"bcmFacility_67_parking1"
+ }
+ ],
+ "name":"Signal Peak Tower",
  "preview":"",
  "sitesFile":"bcm_depots.sites.json"
  }
