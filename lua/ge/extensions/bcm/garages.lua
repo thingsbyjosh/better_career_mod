@@ -360,7 +360,7 @@ end
 -- ============================================================================
 
 -- Called when BCM career modules are fully activated (career loaded).
--- Only loads config and marks RLS names here. Sync and grant are called by
+-- Only loads config and marks garage names here. Sync and grant are called by
 -- garageManager.onCareerModulesActivated AFTER it loads purchasedGarages from disk,
 -- to avoid the race condition where loadPurchasedGarages() overwrites BCM additions.
 onCareerModulesActivated = function()

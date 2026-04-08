@@ -1,6 +1,6 @@
 -- BCM Phone Extension
 -- Handles phone toggle, speed monitoring, and auto-close behavior.
--- Follows RLS gameplay/phone.lua pattern with improved responsiveness.
+-- BCM phone toggle, speed monitoring, and auto-close behavior.
 
 local M = {}
 
@@ -16,7 +16,7 @@ local isPhoneOpen = false
 -- Speed monitoring config
 local speedUnit = 2.2369362921 -- m/s to MPH conversion
 local updateTimer = 0
-local updateInterval = 0.5 -- Check every 500ms (more responsive than RLS's 2.5s)
+local updateInterval = 0.5 -- Check every 500ms
 local SPEED_THRESHOLD_MPH = 5
 
 -- Helper: Get current vehicle speed in MPH

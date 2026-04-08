@@ -4,17 +4,17 @@
  "deletedGarageIds":[
  "bcmGarage_rural",
  "bcmGarage_suburban",
- "bcmGarage_industrial",
- "bcmGarage_estate",
+ "bcmGarage_starter",
  "bcmGarage_highway",
- "bcmGarage_23",
+ "bcmGarage_estate",
+ "bcmGarage_commercial",
  "bcmGarage_executive",
  "bcmGarage_downtown",
  "bcmGarage_hillside",
  "bcmGarage_penthouse",
- "bcmGarage_commercial",
+ "bcmGarage_23",
  "bcmGarage_beachfront",
- "bcmGarage_starter"
+ "bcmGarage_industrial"
  ],
  "deliveryFacilities":[
  {
@@ -50,7 +50,9 @@
  -0.16217792310556
  ],
  "logisticTypesProvided":{},
- "logisticTypesReceived":{},
+ "logisticTypesReceived":[
+ "parcel"
+ ],
  "normal":[
  0.10804808304155,
  0.10061548566772,
@@ -2907,46 +2909,40 @@
  {
  "interval":90,
  "logisticTypes":[
- "parcel",
- "ash",
- "lime",
- "foodSupplies",
- "shopSupplies",
- "mechanicalParts",
- "officeSupplies",
- "industrial",
- "trailerDeliveryResidential",
- "trailerDeliveryConstructionMaterials"
- ],
- "max":8,
- "min":0,
- "type":"parcelReceiver"
- },
- {
- "interval":90,
- "logisticTypes":[
- "parcel",
- "lime",
- "ash",
- "foodSupplies",
- "shopSupplies",
- "mechanicalParts",
- "officeSupplies",
- "industrial"
- ],
- "max":7,
- "min":1,
- "type":"parcelProvider"
- },
- {
- "interval":90,
- "logisticTypes":[
  "trailerDeliveryResidential",
  "trailerDeliveryConstructionMaterials"
  ],
  "max":2,
  "min":1,
  "type":"trailerOfferProvider"
+ },
+ {
+ "interval":90,
+ "logisticTypes":[
+ "parcel",
+ "shopSupplies",
+ "officeSupplies",
+ "mechanicalParts",
+ "foodSupplies",
+ "industrial"
+ ],
+ "max":2,
+ "min":1,
+ "type":"parcelProvider"
+ },
+ {
+ "interval":90,
+ "logisticTypes":[
+ "parcel",
+ "shopSupplies",
+ "mechanicalParts",
+ "officeSupplies",
+ "foodSupplies",
+ "industrial"
+ ],
+ "max":2,
+ "min":1,
+ "type":"parcelProvider"
  }
  ],
  "logisticMaxItems":8,
@@ -6298,7 +6294,7 @@
  ],
  "gasStationWizardStep":0,
  "gasStations":{},
- "lastSaved":1775670538,
+ "lastSaved":1775672605,
  "levelName":"west_coast_usa",
  "mapInfo":{
  "continent":"",

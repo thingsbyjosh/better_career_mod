@@ -52,7 +52,6 @@ local function updateNodegrabberBlocking()
 end
 
 -- BCM: Editor always allowed during career (user decision - modding-friendly)
--- Unlike RLS which blocks editor during career
 local function updateEditorBlocking()
  core_input_actionFilter.setGroup("BCM_EDITOR", editorActions)
  core_input_actionFilter.addAction(0, "BCM_EDITOR", false) -- false = allow

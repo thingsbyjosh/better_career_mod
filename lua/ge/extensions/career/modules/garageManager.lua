@@ -1,5 +1,5 @@
 -- BCM Garage Manager
--- Adapted from RLS garageManager for BCM namespace
+-- BCM garage system with purchase-based ownership
 -- Replaces vanilla garageManager with purchase-based garage system
 -- Save path: /career/bcm/purchasedGarages.json
 -- BCM does NOT have hardcore mode — all hardcore references removed

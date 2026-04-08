@@ -18,12 +18,16 @@
  ],
  "logisticMaxItems":8,
  "logisticTypesProvided":{},
- "logisticTypesReceived":{},
+ "logisticTypesReceived":[
+ "parcel"
+ ],
  "manualAccessPoints":[
  {
  "isInspectSpot":true,
  "logisticTypesProvided":{},
- "logisticTypesReceived":{},
+ "logisticTypesReceived":[
+ "parcel"
+ ],
  "psName":"bcm_church_parking1"
  }
  ],

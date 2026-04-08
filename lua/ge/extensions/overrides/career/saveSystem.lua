@@ -307,7 +307,7 @@ end
 
 -- Update handler for queued saves and timer autosave
 onUpdate = function(dtReal, dtSim, dtRaw)
- -- Handle queued saves (from RLS)
+ -- Handle queued saves
  if queueSave then
  local playerVehId = be:getPlayerVehicleID(0)
  local canSave = true

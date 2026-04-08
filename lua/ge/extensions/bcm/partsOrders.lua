@@ -566,8 +566,7 @@ createOrder = function(partData, deliveryType, bcmMeta, orderData)
  local facId = getPickupFacilityForVehicle(vehicleModel)
  order.pickupFacId = facId
  order.transitState = "in_transit"
- -- Delivery time: 15 game minutes (900 dtSim seconds). Reasonable: not instant, not hours.
- -- Claude's discretion per D-40.
+ -- Delivery time: 15 game minutes (900 dtSim seconds)
  local deliveryDuration = 900
  order.deliveryETA = deliveryDuration -- seconds of game time remaining
  order.deliveryDuration = deliveryDuration -- total for progress calc

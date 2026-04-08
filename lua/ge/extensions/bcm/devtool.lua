@@ -2315,13 +2315,21 @@ validateDeliveryFacility = function(facility)
  -- Check: logistic types that need specific generator types
  local VEH_TYPES = {vehLargeTruck=true, vehLargeTruckNeedsRepair=true, vehNeedsRepair=true, vehForPrivate=true, vehRepairFinished=true}
  local TRAILER_TYPES = {trailerDeliveryResidential=true, trailerDeliveryConstructionMaterials=true}
+ local MATERIAL_TYPES = {fertilizer=true, soil=true, ash=true, lime=true, food=true}
+ local PARCEL_TYPES = {parcel=true, shopSupplies=true, officeSupplies=true, mechanicalParts=true, foodSupplies=true, industrial=true}
  for i, gen in ipairs(gens) do
  for _, lt in ipairs(gen.logisticTypes or {}) do
  if VEH_TYPES[lt] and gen.type ~= "vehOfferProvider" then
- table.insert(warnings, "Generator #" .. i .. ": has vehicle type '" .. lt .. "' but generator is '" .. gen.type .. "' — vehicle types need a vehOfferProvider generator")
+ table.insert(warnings, "Generator #" .. i .. ": '" .. lt .. "' needs a vehOfferProvider (current: " .. gen.type .. ")")
  end
  if TRAILER_TYPES[lt] and gen.type ~= "trailerOfferProvider" then
- table.insert(warnings, "Generator #" .. i .. ": has trailer type '" .. lt .. "' but generator is '" .. gen.type .. "' — trailer types need a trailerOfferProvider generator")
+ table.insert(warnings, "Generator #" .. i .. ": '" .. lt .. "' needs a trailerOfferProvider (current: " .. gen.type .. ")")
+ end
+ if MATERIAL_TYPES[lt] and gen.type ~= "materialProvider" and gen.type ~= "materialReceiver" then
+ table.insert(warnings, "Generator #" .. i .. ": '" .. lt .. "' needs a materialProvider/Receiver (current: " .. gen.type .. ")")
+ end
+ if PARCEL_TYPES[lt] and gen.type ~= "parcelProvider" and gen.type ~= "parcelReceiver" then
+ table.insert(warnings, "Generator #" .. i .. ": '" .. lt .. "' needs a parcelProvider/Receiver (current: " .. gen.type .. ")")
  end
  end
  end
@@ -2364,10 +2372,10 @@ validateDeliveryFacility = function(facility)
  local hasProvider = false
  local hasReceiver = false
  for _, gen in ipairs(gens) do
- if gen.type == "parcelProvider" or gen.type == "vehOfferProvider" or gen.type == "trailerOfferProvider" then
+ if gen.type == "parcelProvider" or gen.type == "vehOfferProvider" or gen.type == "trailerOfferProvider" or gen.type == "materialProvider" then
  hasProvider = true
  end
- if gen.type == "parcelReceiver" then
+ if gen.type == "parcelReceiver" or gen.type == "materialReceiver" then
  hasReceiver = true
  end
  end
@@ -2947,7 +2955,7 @@ spawnLiveProps = function(props)
  end
  local q = quatFromEuler(0, 0, -theta)
 
- -- setPosRot(x, y, z, qx, qy, qz, qw) — proven API from RLS
+ -- setPosRot(x, y, z, qx, qy, qz, qw)
  local p = prop.position
  obj:setPosRot(p[1], p[2], p[3], q.x, q.y, q.z, q.w)
 

@@ -1,6 +1,6 @@
 -- BCM Override: career/modules/valueCalculator
 -- Fixes vanilla crash: getPartValue uses part.year which doesn't exist on inventory parts.
--- Based on RLS Career Overhaul valueCalculator with nil-safety guards.
+-- Vanilla valueCalculator with nil-safety guards.
 
 local M = {}
 

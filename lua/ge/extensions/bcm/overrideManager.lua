@@ -110,7 +110,7 @@ clearOverride = function(originalPath)
  return true
 end
 
--- Replacement for extensions.load() — substitutes override paths (like RLS)
+-- Replacement for extensions.load() — substitutes override paths
 -- When an override is registered for an extension, the override file path
 -- is passed to the original load instead of the vanilla path.
 overrideLoad = function(...)

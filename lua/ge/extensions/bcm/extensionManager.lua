@@ -101,7 +101,7 @@ unloadAllExtensions = function()
 end
 
 -- Remove stale user-space level overrides that persist from World Editor saves.
--- When a player (or another mod like RLS) saves the map via World Editor, BeamNG writes
+-- When a player (or another mod) saves the map via World Editor, BeamNG writes
 -- items.level.json to the user directory. This overrides mod files in the VFS because
 -- user-space files take priority. Clearing these ensures BCM's prefabs/facilities load.
 local function cleanUserLevelOverrides()
