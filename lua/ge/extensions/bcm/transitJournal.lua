@@ -699,7 +699,7 @@ end
 executeRecovery = function(recoveryData)
   if not recoveryData then return end
 
-  -- Refund toll if any was paid
+  -- Refund toll if any was paid (player-friendly)
   if recoveryData.tollPaid and recoveryData.tollPaid > 0 then
     if bcm_banking and bcm_banking.addFunds then
       bcm_banking.addFunds("checking", recoveryData.tollPaid, "toll_refund", "Transit interrupted - toll refunded")
