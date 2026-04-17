@@ -9,19 +9,19 @@ local onCareerModulesActivated
 
 -- Register contacts app when career modules are ready
 onCareerModulesActivated = function()
- if bcm_appRegistry then
- bcm_appRegistry.register({
- id = "contacts",
- name = "Contacts",
- component = "PhoneContactsApp",
- iconName = "people",
- color = "#8e8e93",
- visible = true,
- order = 45
- })
- end
+  if bcm_appRegistry then
+    bcm_appRegistry.register({
+      id = "contacts",
+      name = "Contacts",
+      component = "PhoneContactsApp",
+      iconName = "people",
+      color = "#8e8e93",
+      visible = true,
+      order = 45
+    })
+  end
 
- log('I', 'bcm_contactsApp', 'Contacts app activated')
+  log('I', 'bcm_contactsApp', 'Contacts app activated')
 end
 
 -- Public API

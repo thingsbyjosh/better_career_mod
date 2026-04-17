@@ -1,0 +1,2 @@
+{"position":[-1770.9979248047,-96.223342895508,153.34362338781],"name":"bcm_Mountain_View_icon","__parent":"bcm_Mountain_View","class":"BeamNGPointOfInterest"}
+{"name":"bcm_Mountain_View_area","__parent":"bcm_Mountain_View","position":[-1771.1688232422,-96.296195983887,153.44196864367],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

@@ -1,0 +1,2 @@
+{"position":[-109.28437805176,861.50006103516,211.4499358654],"name":"bcm_Farm_with_a_view_icon","__parent":"bcm_Farm_with_a_view","class":"BeamNGPointOfInterest"}
+{"name":"bcm_Farm_with_a_view_area","__parent":"bcm_Farm_with_a_view","position":[-109.17871856689,861.44750976563,211.44953997135],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

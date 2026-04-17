@@ -1,0 +1,4 @@
+{"position":[733.89318847656,-513.52209472656,58.75813293457],"name":"bcm_uMansion_1_icon","__parent":"bcm_uMansion_1","class":"BeamNGPointOfInterest"}
+{"name":"bcm_uMansion_1_area","__parent":"bcm_uMansion_1","position":[733.91339111328,-513.52209472656,58.75813293457],"scale":[2,2,2],"class":"BeamNGGameplayArea"}
+{"rotationMatrix":[0,-1,0,1,0,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop_ON.dae","position":[734.326953125,-513.47293701172,58.85813293457],"useInstanceRenderData":true,"__parent":"bcm_uMansion_1"}
+{"rotationMatrix":[1,0,0,0,1,0,0,0,1],"class":"TSStatic","shapeName":"/levels/east_coast_usa/art/shapes/clutter/clutter_city_wood_table_small.dae","position":[734.50762939453,-513.40142822266,57.75813293457],"useInstanceRenderData":true,"__parent":"bcm_uMansion_1"}

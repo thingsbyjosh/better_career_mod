@@ -1,52 +1,164 @@
 {
- "deliveryProviders":[
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_it_villa",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_it_villa"
- }
- ],
- "name":"Villa Officina"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_it_portino",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_it_portino"
- }
- ],
- "name":"Portino Auto Service"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_it_fbx",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_it_fbx"
- }
- ],
- "name":"FBX Garage"
- }
- ]
+  "deliveryProviders": [
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_it_villa",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_it_villa"
+        }
+      ],
+      "name": "Villa Officina"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_it_portino",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_it_portino"
+        }
+      ],
+      "name": "Portino Auto Service"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_it_fbx",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_it_fbx"
+        }
+      ],
+      "name": "FBX Garage"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_Seaview",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_Seaview"
+        }
+      ],
+      "name": "Seaview"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_Farm_with_a_view",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_Farm_with_a_view"
+        }
+      ],
+      "name": "Farm House"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_one_bed_Harbour_View",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_one_bed_Harbour_View"
+        }
+      ],
+      "name": "Harbour View"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_Mariner_View",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_Mariner_View"
+        }
+      ],
+      "name": "Mariner View"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_Island_View",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_Island_View"
+        }
+      ],
+      "name": "Island View"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_Mountain_View",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_Mountain_View"
+        }
+      ],
+      "name": "Mountain View"
+    },
+    {
+      "description": "BCM Garage - Parts receiver",
+      "id": "bcm_Mansion",
+      "logisticGenerators": {},
+      "logisticTypesProvided": {},
+      "logisticTypesReceived": [
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter": [
+        {
+          "type": "byZone",
+          "zoneName": "bcm_Mansion"
+        }
+      ],
+      "name": "Mansion"
+    }
+  ]
 }

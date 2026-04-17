@@ -1,0 +1,2 @@
+{"position":[585.31958007813,1381.0125732422,148.70414758921],"name":"bcm_one_bed_Harbour_View_icon","__parent":"bcm_one_bed_Harbour_View","class":"BeamNGPointOfInterest"}
+{"name":"bcm_one_bed_Harbour_View_area","__parent":"bcm_one_bed_Harbour_View","position":[585.19647216797,1381.0701904297,148.70414842367],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

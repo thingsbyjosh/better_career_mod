@@ -1,4 +1,4 @@
-{"position":[-722.40026855469,-48.432907104492,103.07201242447],"name":"bcm_bungalow_icon","__parent":"bcm_bungalow","class":"BeamNGPointOfInterest"}
+{"position":[-722.40057373047,-48.433055877686,102.97200407982],"name":"bcm_bungalow_icon","__parent":"bcm_bungalow","class":"BeamNGPointOfInterest"}
 {"name":"bcm_bungalow_area","__parent":"bcm_bungalow","position":[-722.40057373047,-48.433055877686,102.97200407982],"scale":[2,2,2],"class":"BeamNGGameplayArea"}
 {"rotationMatrix":[-0.66693388398627,0.74511689981572,0,-0.74511689981572,-0.66693388398627,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae","position":[-721.70538330078,-48.874366760254,102.09430706501],"useInstanceRenderData":true,"__parent":"bcm_bungalow"}
 {"rotationMatrix":[-0.9973665611918,-0.072039104772622,0,0.072039104772622,-0.9973665611918,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae","position":[-721.98921843909,-48.999581033648,102.86630706501],"useInstanceRenderData":true,"__parent":"bcm_bungalow"}

@@ -1,0 +1,17 @@
+{
+  "country": "usa",
+  "version": 1,
+  "note": "Migrated verbatim from police.lua POLICE_CONFIGS (Phase 100.5-06). Curated west coast USA police vehicle pool.",
+  "configs": [
+    "fullsize/police",
+    "bastion/police_v8_awd_A",
+    "bastion/police_unmarked_v8_awd_A",
+    "roamer/police",
+    "van/police",
+    "van/police_passenger",
+    "midtruck/4x4_police_petrol",
+    "sunburst2/interceptor",
+    "md_series/md_60_armored_police",
+    "bastion/police_v8_awd_A_interceptor"
+  ]
+}

@@ -1,132 +1,132 @@
 {
- "deliveryProviders":[
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_chinatown",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_chinatown"
- }
- ],
- "name":"The chinatown"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_trackside",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_trackside"
- }
- ],
- "name":"Trackside Private Workshop"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_dragstrip",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_dragstrip"
- }
- ],
- "name":"Drag Strip Performance Shed"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_depot",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_depot"
- }
- ],
- "name":"Industrial Vehicle Depot"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_culdesac",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_culdesac"
- }
- ],
- "name":"Cul-de-Sac Executive Garage"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_belasco",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_belasco"
- }
- ],
- "name":"Belasco City Garage"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_motel",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_motel"
- }
- ],
- "name":"Motel"
- },
- {
- "description":"BCM Garage - Parts receiver",
- "id":"bcm_bungalow",
- "logisticGenerators":{},
- "logisticTypesProvided":{},
- "logisticTypesReceived":[
- "bcm_parts"
- ],
- "multiDropOffSpotFilter":[
- {
- "type":"byZone",
- "zoneName":"bcm_bungalow"
- }
- ],
- "name":"Bungalow"
- }
- ]
+  "deliveryProviders":[
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_chinatown",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_chinatown"
+        }
+      ],
+      "name":"The chinatown"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_trackside",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_trackside"
+        }
+      ],
+      "name":"Trackside Private Workshop"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_dragstrip",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_dragstrip"
+        }
+      ],
+      "name":"Drag Strip Performance Shed"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_depot",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_depot"
+        }
+      ],
+      "name":"Industrial Vehicle Depot"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_culdesac",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_culdesac"
+        }
+      ],
+      "name":"Cul-de-Sac Executive Garage"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_belasco",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_belasco"
+        }
+      ],
+      "name":"Belasco City Garage"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_motel",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_motel"
+        }
+      ],
+      "name":"Motel"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_bungalow",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_bungalow"
+        }
+      ],
+      "name":"Bungalow"
+    }
+  ]
 }

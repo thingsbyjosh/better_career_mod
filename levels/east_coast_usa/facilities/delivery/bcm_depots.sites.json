@@ -1,0 +1,46 @@
+{
+  "description":"BCM delivery facility parking spots.",
+  "dir":"/levels/east_coast_usa/facilities/delivery/",
+  "filename":"bcm_depots.sites.json",
+  "locations":{},
+  "name":"bcm_depots.sites.json",
+  "parkingSpots":[
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"bcm_SmithsAutoServices_1_parking1",
+      "oldId":9003,
+      "pos":[
+        -799.93218994141,
+        489.14233398438,
+        23.461301624775
+      ],
+      "rot":[
+        0,
+        0,
+        0.32927881973075,
+        0.94423273554602
+      ],
+      "scl":[
+        2.5,
+        6,
+        3
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    }
+  ],
+  "zones":{}
+}

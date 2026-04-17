@@ -1,0 +1,2 @@
+{"position":[784.43646240234,-648.65502929688,184.95139951706],"name":"bcm_Island_View_icon","__parent":"bcm_Island_View","class":"BeamNGPointOfInterest"}
+{"name":"bcm_Island_View_area","__parent":"bcm_Island_View","position":[784.39239501953,-648.66876220703,184.95140327215],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

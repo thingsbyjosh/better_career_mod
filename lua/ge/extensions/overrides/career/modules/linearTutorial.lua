@@ -15,38 +15,38 @@ local logTag = 'bcm_linearTutorial'
 
 -- Always return "tutorial not active"
 local function isLinearTutorialActive()
- return false
+  return false
 end
 
 -- Return high step number (tutorial completed long ago)
 local function getLinearStep()
- return 999 -- Well beyond any tutorial step
+  return 999  -- Well beyond any tutorial step
 end
 
 -- All tutorial flags return true (all milestones completed)
 -- Known flags: purchasedFirstCar, quickTravelEnabled, partShoppingComplete, tuningComplete
 local function getTutorialFlag(flagName)
- return true
+  return true
 end
 
 -- No-op intro popups
 -- Called by: delivery/progress.lua, delivery/cargoScreen.lua
 local function introPopup(name, force)
- -- Do nothing - suppress popup
+  -- Do nothing - suppress popup
 end
 
 -- Suppress welcome screen
 local function showNonTutorialWelcomeSplashscreen()
- -- Do nothing
+  -- Do nothing
 end
 
 -- Lifecycle hooks (no-ops for stub)
 local function onCareerActivated()
- log("I", logTag, "Tutorial system neutralized by BCM stub")
+  log("I", logTag, "Tutorial system neutralized by BCM stub")
 end
 
 local function onCareerActive(active)
- -- Nothing to clean up in a stub
+  -- Nothing to clean up in a stub
 end
 
 -- Public API
@@ -59,3 +59,4 @@ M.onCareerActivated = onCareerActivated
 M.onCareerActive = onCareerActive
 
 return M
+

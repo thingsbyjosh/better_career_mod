@@ -1,0 +1,52 @@
+{
+  "deliveryProviders":[
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_uMansion_1",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_uMansion_1"
+        }
+      ],
+      "name":"Mansion"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_Hendersons_2",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_Hendersons_2"
+        }
+      ],
+      "name":"Hendersons"
+    },
+    {
+      "description":"BCM Garage - Parts receiver",
+      "id":"bcm_LonelyCottage_3",
+      "logisticGenerators":{},
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "bcm_parts"
+      ],
+      "multiDropOffSpotFilter":[
+        {
+          "type":"byZone",
+          "zoneName":"bcm_LonelyCottage_3"
+        }
+      ],
+      "name":"Lonely Cottage"
+    }
+  ]
+}

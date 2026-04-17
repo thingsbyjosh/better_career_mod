@@ -1,0 +1,4 @@
+{"position":[478.24615478516,1548.9268798828,139.02307420969],"name":"it_garage_1_icon","__parent":"it_garage_1","class":"BeamNGPointOfInterest"}
+{"name":"it_garage_1_area","__parent":"it_garage_1","position":[478.31756591797,1548.9733886719,139.02307468653],"scale":[2,2,2],"class":"BeamNGGameplayArea"}
+{"rotationMatrix":[1,0,0,0,1,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae","position":[478.30633544922,1548.7293701172,139.02307462692],"useInstanceRenderData":true,"__parent":"it_garage_1"}
+{"rotationMatrix":[0.64278760968654,0.76604444311898,0,-0.76604444311898,0.64278760968654,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae","position":[478.2754699707,1548.8499755859,139.8230730772],"useInstanceRenderData":true,"__parent":"it_garage_1"}

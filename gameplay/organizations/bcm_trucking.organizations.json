@@ -1,146 +1,146 @@
 {
- "planetExpressLogistics": {
- "name": "Planet Express Logistics",
- "description": "Good news, everyone. We're hiring. No experience required. Some deaths expected.",
- "icon": "cardboardBox",
- "loanableVehicles": [],
- "reputationLevels": [
- {
- "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
- "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
- "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
- "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
- "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
- }
- ]
- },
- "crazyDavesAutoTransport": {
- "name": "Crazy Dave's Auto Transport",
- "description": "No lowballers. I know what I have. Cash only. Will not ship internationally.",
- "icon": "carDealer",
- "loanableVehicles": [],
- "reputationLevels": [
- {
- "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
- "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
- "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
- "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
- "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
- }
- ]
- },
- "weylandYutaniFreight": {
- "name": "Weyland-Yutani Freight",
- "description": "Building better worlds, one pallet at a time. Heavy haul specialists. The company is not responsible for unknown biological incidents during transit.",
- "icon": "garage02",
- "loanableVehicles": [],
- "reputationLevels": [
- {
- "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
- "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
- "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
- "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
- "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
- }
- ]
- },
- "acmeChemicalSupply": {
- "name": "Acme Chemical Supply",
- "description": "Satisfaction guaranteed. Side effects may vary. Hazmat specialists since 1949. Do not smell, lick, or discuss the contents.",
- "icon": "droplet",
- "loanableVehicles": [],
- "reputationLevels": [
- {
- "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
- "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
- "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
- "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
- "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
- }
- ]
- },
- "losPollosLogistics": {
- "name": "Los Pollos Logistics",
- "description": "All deliveries made fresh. No questions asked. We value punctuality above all else, Mr. White.",
- "icon": "cardboardBox",
- "loanableVehicles": [],
- "reputationLevels": [
- {
- "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
- "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
- "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
- "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
- "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
- }
- ]
- },
- "starkIndustriesShipping": {
- "name": "Stark Industries Shipping",
- "description": "Proof that Tony Stark has a logistics department. Premium cargo, premium rates, premium attitude from dispatch.",
- "icon": "cardboardBox",
- "loanableVehicles": [],
- "reputationLevels": [
- {
- "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
- "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
- "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
- "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
- },
- {
- "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
- "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
- }
- ]
- }
+  "planetExpressLogistics": {
+    "name": "Planet Express Logistics",
+    "description": "Good news, everyone. We're hiring. No experience required. Some deaths expected.",
+    "icon": "cardboardBox",
+    "loanableVehicles": [],
+    "reputationLevels": [
+      {
+        "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
+        "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
+        "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
+        "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
+        "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
+      }
+    ]
+  },
+  "crazyDavesAutoTransport": {
+    "name": "Crazy Dave's Auto Transport",
+    "description": "No lowballers. I know what I have. Cash only. Will not ship internationally.",
+    "icon": "carDealer",
+    "loanableVehicles": [],
+    "reputationLevels": [
+      {
+        "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
+        "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
+        "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
+        "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
+        "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
+      }
+    ]
+  },
+  "weylandYutaniFreight": {
+    "name": "Weyland-Yutani Freight",
+    "description": "Building better worlds, one pallet at a time. Heavy haul specialists. The company is not responsible for unknown biological incidents during transit.",
+    "icon": "garage02",
+    "loanableVehicles": [],
+    "reputationLevels": [
+      {
+        "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
+        "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
+        "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
+        "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
+        "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
+      }
+    ]
+  },
+  "acmeChemicalSupply": {
+    "name": "Acme Chemical Supply",
+    "description": "Satisfaction guaranteed. Side effects may vary. Hazmat specialists since 1949. Do not smell, lick, or discuss the contents.",
+    "icon": "droplet",
+    "loanableVehicles": [],
+    "reputationLevels": [
+      {
+        "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
+        "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
+        "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
+        "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
+        "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
+      }
+    ]
+  },
+  "losPollosLogistics": {
+    "name": "Los Pollos Logistics",
+    "description": "All deliveries made fresh. No questions asked. We value punctuality above all else, Mr. White.",
+    "icon": "cardboardBox",
+    "loanableVehicles": [],
+    "reputationLevels": [
+      {
+        "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
+        "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
+        "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
+        "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
+        "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
+      }
+    ]
+  },
+  "starkIndustriesShipping": {
+    "name": "Stark Industries Shipping",
+    "description": "Proof that Tony Stark has a logistics department. Premium cargo, premium rates, premium attitude from dispatch.",
+    "icon": "cardboardBox",
+    "loanableVehicles": [],
+    "reputationLevels": [
+      {
+        "unlocks": [{"icon": "boxPickUp03", "label": "New Hire"}],
+        "loanerCut": {"value": 0.60, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Trusted"}],
+        "loanerCut": {"value": 0.35, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Veteran"}],
+        "loanerCut": {"value": 0.15, "icon": "boxPickUp03"}
+      },
+      {
+        "unlocks": [{"icon": "smallTrailer", "label": "Elite"}],
+        "loanerCut": {"value": 0.05, "icon": "boxPickUp03"}
+      }
+    ]
+  }
 }

@@ -1,0 +1,2 @@
+{"position":[1482.5048828125,1592.5675048828,139.40341117382],"name":"bcm_Mariner_View_icon","__parent":"bcm_Mariner_View","class":"BeamNGPointOfInterest"}
+{"name":"bcm_Mariner_View_area","__parent":"bcm_Mariner_View","position":[1482.4361572266,1592.6778564453,139.40263434649],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

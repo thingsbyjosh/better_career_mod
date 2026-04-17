@@ -1,0 +1,2 @@
+{"position":[324.42086791992,243.0464630127,185.3321803689],"name":"bcm_Mansion_icon","__parent":"bcm_Mansion","class":"BeamNGPointOfInterest"}
+{"name":"bcm_Mansion_area","__parent":"bcm_Mansion","position":[324.5221862793,243.1625213623,185.33273528814],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

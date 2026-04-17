@@ -1,0 +1,2 @@
+{"position":[1828.3875732422,-812.53771972656,154.07742618322],"name":"bcm_Seaview_icon","__parent":"bcm_Seaview","class":"BeamNGPointOfInterest"}
+{"name":"bcm_Seaview_area","__parent":"bcm_Seaview","position":[1828.3486328125,-812.53149414063,154.07730709314],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

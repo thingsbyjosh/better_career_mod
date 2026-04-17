@@ -9,20 +9,20 @@ local onCareerModulesActivated
 
 -- Register calendar app when career modules are ready
 onCareerModulesActivated = function()
- -- Register calendar app on phone
- if bcm_appRegistry then
- bcm_appRegistry.register({
- id = "calendar",
- name = "Calendar",
- component = "PhoneCalendarApp",
- iconName = "calendar",
- color = "#FF3B30",
- visible = true,
- order = 3
- })
- end
+  -- Register calendar app on phone
+  if bcm_appRegistry then
+    bcm_appRegistry.register({
+      id = "calendar",
+      name = "Calendar",
+      component = "PhoneCalendarApp",
+      iconName = "calendar",
+      color = "#FF3B30",
+      visible = true,
+      order = 3
+    })
+  end
 
- log('I', 'bcm_calendarApp', 'Calendar app registered')
+  log('I', 'bcm_calendarApp', 'Calendar app registered')
 end
 
 -- Public API

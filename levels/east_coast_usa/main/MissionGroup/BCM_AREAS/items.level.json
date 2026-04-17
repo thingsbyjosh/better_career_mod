@@ -1,0 +1,4 @@
+{"name":"bcm_uMansion_1","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_Hendersons_2","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_LonelyCottage_3","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"ec_garage_1","__parent":"BCM_AREAS","class":"SimGroup"}

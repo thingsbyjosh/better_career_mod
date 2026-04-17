@@ -1,0 +1,2 @@
+{"position":[-790.62976074219,-76.059135437012,296.62423753738],"name":"ut_garage_2_icon","__parent":"ut_garage_2","class":"BeamNGPointOfInterest"}
+{"name":"ut_garage_2_area","__parent":"ut_garage_2","position":[-790.62957763672,-76.059181213379,296.6242389679],"scale":[2,2,2],"class":"BeamNGGameplayArea"}

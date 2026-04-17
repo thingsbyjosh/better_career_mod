@@ -1,0 +1,4 @@
+{"position":[-84.274337768555,-792.78131103516,17.861060714722],"name":"bcm_Hendersons_2_icon","__parent":"bcm_Hendersons_2","class":"BeamNGPointOfInterest"}
+{"name":"bcm_Hendersons_2_area","__parent":"bcm_Hendersons_2","position":[-84.448638916016,-792.75494384766,17.861060714722],"scale":[2,2,2],"class":"BeamNGGameplayArea"}
+{"rotationMatrix":[0.98480775301221,-0.17364817766693,0,0.17364817766693,0.98480775301221,0,0,0,1],"class":"TSStatic","shapeName":"/levels/east_coast_usa/art/shapes/clutter/clutter_city_wood_table_small.dae","position":[-85.026077270508,-792.78009033203,16.761060714722],"useInstanceRenderData":true,"__parent":"bcm_Hendersons_2"}
+{"rotationMatrix":[0.17364817766693,0.98480775301221,0,-0.98480775301221,0.17364817766693,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop_ON.dae","position":[-84.797201538086,-792.79644775391,17.861060714722],"useInstanceRenderData":true,"__parent":"bcm_Hendersons_2"}

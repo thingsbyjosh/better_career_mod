@@ -1,0 +1,3 @@
+{"name":"ut_garage_1","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"bcm_radarzones","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"ut_garage_2","class":"SimGroup","__parent":"BCM_AREAS"}

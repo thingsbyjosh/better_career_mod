@@ -1,0 +1,13 @@
+{
+  "country": "italy",
+  "version": 1,
+  "note": "Initial curated Italian police pool — Carabinieri (Autobello) plus European patrol configs from vanilla BeamNG. Expand as more Italian-flavor configs become available.",
+  "configs": [
+    "autobello/carabinieri",
+    "etki/police",
+    "etkc/kc6x_340_police_highway_A",
+    "etk800/854_police_A",
+    "etk800/844_police_A",
+    "bx/police_A"
+  ]
+}

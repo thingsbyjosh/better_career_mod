@@ -8,7 +8,7 @@
 local M = {}
 
 M.debugName = "BCM Time System"
-M.debugOrder = 10 -- High priority (foundation module)
+M.debugOrder = 10  -- High priority (foundation module)
 M.dependencies = {'career_career', 'career_saveSystem'}
 
 -- ============================================================================
@@ -38,56 +38,56 @@ local calcRealDateGameDays
 -- ============================================================================
 local logTag = 'bcm_timeSystem'
 
-local START_EPOCH = {year = 2026, month = 5, day = 15} -- Fallback start date when OS date unavailable (May 15)
-local START_TOD = 0.0 -- 12:00 (noon) as tod.time: 0 = noon in BeamNG tod system
+local START_EPOCH = {year = 2026, month = 5, day = 15}  -- Fallback start date when OS date unavailable (May 15)
+local START_TOD = 0.0  -- 12:00 (noon) as tod.time: 0 = noon in BeamNG tod system
 
 local SEASONS = {"spring", "summer", "autumn", "winter"}
 
 -- Leap year check
 local function isLeapYear(y)
- return (y % 4 == 0 and y % 100 ~= 0) or (y % 400 == 0)
+  return (y % 4 == 0 and y % 100 ~= 0) or (y % 400 == 0)
 end
 
 -- Calculate game days offset for a real-world date (days since Jan 1 of START_EPOCH.year)
 -- Returns nil on failure (os.date may not be available in all contexts)
 calcRealDateGameDays = function()
- local ok, now = pcall(os.date, "*t")
- if not ok or type(now) ~= "table" then
- log('W', logTag, 'os.date("*t") failed: ' .. tostring(now))
- -- Fallback: try os.time() to build date manually
- local ok2, epoch = pcall(os.time)
- if ok2 and epoch then
- local ok3, dateStr = pcall(os.date, "%Y-%m-%d", epoch)
- if ok3 and dateStr then
- local y, m, d = dateStr:match("(%d+)-(%d+)-(%d+)")
- if y then
- now = {year = tonumber(y), month = tonumber(m), day = tonumber(d)}
- log('I', logTag, 'Used os.date fallback: ' .. dateStr)
- end
- end
- end
- if type(now) ~= "table" then
- log('W', logTag, 'All date methods failed, cannot determine real date')
- return nil
- end
- end
+  local ok, now = pcall(os.date, "*t")
+  if not ok or type(now) ~= "table" then
+    log('W', logTag, 'os.date("*t") failed: ' .. tostring(now))
+    -- Fallback: try os.time() to build date manually
+    local ok2, epoch = pcall(os.time)
+    if ok2 and epoch then
+      local ok3, dateStr = pcall(os.date, "%Y-%m-%d", epoch)
+      if ok3 and dateStr then
+        local y, m, d = dateStr:match("(%d+)-(%d+)-(%d+)")
+        if y then
+          now = {year = tonumber(y), month = tonumber(m), day = tonumber(d)}
+          log('I', logTag, 'Used os.date fallback: ' .. dateStr)
+        end
+      end
+    end
+    if type(now) ~= "table" then
+      log('W', logTag, 'All date methods failed, cannot determine real date')
+      return nil
+    end
+  end
 
- log('I', logTag, string.format('Real OS date detected: %04d-%02d-%02d', now.year, now.month, now.day))
+  log('I', logTag, string.format('Real OS date detected: %04d-%02d-%02d', now.year, now.month, now.day))
 
- local epochYear = START_EPOCH.year
- local totalDays = 0
- -- Add full years from epochYear to now.year
- for y = epochYear, now.year - 1 do
- totalDays = totalDays + (isLeapYear(y) and 366 or 365)
- end
- -- Add days in current year up to current date
- local leap = isLeapYear(now.year)
- local daysInMonth = {31, leap and 29 or 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
- for m = 1, now.month - 1 do
- totalDays = totalDays + daysInMonth[m]
- end
- totalDays = totalDays + (now.day - 1) -- 0-based: Jan 1 = day 0
- return totalDays
+  local epochYear = START_EPOCH.year
+  local totalDays = 0
+  -- Add full years from epochYear to now.year
+  for y = epochYear, now.year - 1 do
+    totalDays = totalDays + (isLeapYear(y) and 366 or 365)
+  end
+  -- Add days in current year up to current date
+  local leap = isLeapYear(now.year)
+  local daysInMonth = {31, leap and 29 or 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+  for m = 1, now.month - 1 do
+    totalDays = totalDays + daysInMonth[m]
+  end
+  totalDays = totalDays + (now.day - 1)  -- 0-based: Jan 1 = day 0
+  return totalDays
 end
 
 -- Base day length: 1 real minute = 15 game minutes at 1x speed
@@ -107,34 +107,34 @@ local MAX_BROADCAST_INTERVAL = 0.5
 
 -- Day name keys (Monday=1 through Sunday=7) — translated in Vue
 local DAY_KEYS = {
- "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+  "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
 }
 
 -- ============================================================================
 -- Private state
 -- ============================================================================
 local timeState = {
- gameTimeDays = 0, -- Accumulated game days since career start (float)
- realTimeAccumSecs = 0, -- Real-time seconds accumulator (for loan system)
- speedMultiplier = 1.0, -- User speed setting (0.25 to 8.0)
- nightRatio = 10/48, -- Night duration as fraction of day (~10 real min night, ~48 min day)
- skipNights = false, -- Whether to fast-forward through nights
- timeFormat24h = true, -- 24h vs 12h display format
- lastTodTime = nil, -- For detecting day boundary crossings
- isNightSkipping = false, -- Currently in night skip mode
+  gameTimeDays = 0,           -- Accumulated game days since career start (float)
+  realTimeAccumSecs = 0,      -- Real-time seconds accumulator (for loan system)
+  speedMultiplier = 1.0,      -- User speed setting (0.25 to 8.0)
+  nightRatio = 10/48,          -- Night duration as fraction of day (~10 real min night, ~48 min day)
+  skipNights = false,         -- Whether to fast-forward through nights
+  timeFormat24h = true,       -- 24h vs 12h display format
+  lastTodTime = nil,          -- For detecting day boundary crossings
+  isNightSkipping = false,    -- Currently in night skip mode
 }
 
 local activated = false
 local isInitialized = false
-local todSnapshot = nil -- Captures TOD state before radial menu opens (Phase 31 — FIX-02)
+local todSnapshot = nil  -- Captures TOD state before radial menu opens (Phase 31 — FIX-02)
 local lastBroadcastMinute = -1
-local lastBroadcastTime = 0 -- os.clock() of last broadcast (for high-speed throttle)
+local lastBroadcastTime = 0  -- os.clock() of last broadcast (for high-speed throttle)
 
 -- Night skip: stores the user's speedMultiplier before skip engaged
 local nightSkipSavedSpeed = nil
 
 -- Debug fast-forward state
-local fastForward = nil -- { targetDays, daysRemaining, originalSpeed, originalNightRatio, originalSkipNights }
+local fastForward = nil  -- { targetDays, daysRemaining, originalSpeed, originalNightRatio, originalSkipNights }
 
 -- ============================================================================
 -- Date calculation
@@ -143,46 +143,46 @@ local fastForward = nil -- { targetDays, daysRemaining, originalSpeed, originalN
 -- Convert game-time days elapsed to a calendar date
 -- 1 game-day = 1 calendar day, starting from January 1st of START_EPOCH.year
 gameTimeToDate = function(gameDays)
- local totalDays = math.floor(gameDays)
+  local totalDays = math.floor(gameDays)
 
- -- Find year, accounting for leap years
- local year = START_EPOCH.year
- local remaining = totalDays
- while true do
- local daysThisYear = isLeapYear(year) and 366 or 365
- if remaining < daysThisYear then break end
- remaining = remaining - daysThisYear
- year = year + 1
- end
+  -- Find year, accounting for leap years
+  local year = START_EPOCH.year
+  local remaining = totalDays
+  while true do
+    local daysThisYear = isLeapYear(year) and 366 or 365
+    if remaining < daysThisYear then break end
+    remaining = remaining - daysThisYear
+    year = year + 1
+  end
 
- -- Find month from remaining days (0-based day-of-year)
- local leap = isLeapYear(year)
- local daysInMonth = {31, leap and 29 or 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
- local month = 1
- for m = 1, 12 do
- if remaining < daysInMonth[m] then
- month = m
- break
- end
- remaining = remaining - daysInMonth[m]
- end
- local day = remaining + 1 -- 1-based
+  -- Find month from remaining days (0-based day-of-year)
+  local leap = isLeapYear(year)
+  local daysInMonth = {31, leap and 29 or 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+  local month = 1
+  for m = 1, 12 do
+    if remaining < daysInMonth[m] then
+      month = m
+      break
+    end
+    remaining = remaining - daysInMonth[m]
+  end
+  local day = remaining + 1  -- 1-based
 
- -- Season from month
- local seasonIndex
- if month >= 3 and month <= 5 then seasonIndex = 0 -- spring
- elseif month >= 6 and month <= 8 then seasonIndex = 1 -- summer
- elseif month >= 9 and month <= 11 then seasonIndex = 2 -- autumn
- else seasonIndex = 3 end -- winter
+  -- Season from month
+  local seasonIndex
+  if month >= 3 and month <= 5 then seasonIndex = 0      -- spring
+  elseif month >= 6 and month <= 8 then seasonIndex = 1   -- summer
+  elseif month >= 9 and month <= 11 then seasonIndex = 2  -- autumn
+  else seasonIndex = 3 end                                -- winter
 
- return {
- year = year,
- month = month,
- day = day,
- season = SEASONS[seasonIndex + 1],
- totalGameDays = totalDays,
- dayOfWeek = (totalDays % 7) + 1 -- 1=lunes, 7=domingo
- }
+  return {
+    year = year,
+    month = month,
+    day = day,
+    season = SEASONS[seasonIndex + 1],
+    totalGameDays = totalDays,
+    dayOfWeek = (totalDays % 7) + 1  -- 1=lunes, 7=domingo
+  }
 end
 
 -- formatFullDate removed — Vue handles localized formatting via bcmI18n
@@ -193,17 +193,17 @@ end
 
 -- Convert tod.time (0-1, noon-based) to visual hours (0-23, midnight-based)
 todToVisualHours = function(todTime)
- return (todTime * 24 + 12) % 24
+  return (todTime * 24 + 12) % 24
 end
 
 -- Convert visual hours (0-23) back to tod.time (0-1)
 visualHoursToTod = function(hours)
- return ((hours - 12) % 24) / 24
+  return ((hours - 12) % 24) / 24
 end
 
 -- Check if a tod.time value is in the night range
 isInNightRange = function(todTime)
- return todTime >= NIGHT_THRESHOLD_START and todTime <= NIGHT_THRESHOLD_END
+  return todTime >= NIGHT_THRESHOLD_START and todTime <= NIGHT_THRESHOLD_END
 end
 
 -- ============================================================================
@@ -213,50 +213,50 @@ end
 -- Broadcast time update to Vue via guihooks
 -- Throttled: only fires on minute change or every MAX_BROADCAST_INTERVAL seconds
 broadcastTimeUpdate = function(todTime)
- if not todTime then return end
+  if not todTime then return end
 
- local visualHours = todToVisualHours(todTime)
- local hours = math.floor(visualHours)
- local minutes = math.floor((visualHours - hours) * 60)
- local currentMinute = hours * 60 + minutes
+  local visualHours = todToVisualHours(todTime)
+  local hours = math.floor(visualHours)
+  local minutes = math.floor((visualHours - hours) * 60)
+  local currentMinute = hours * 60 + minutes
 
- -- Throttle: only broadcast on minute change or time interval
- local now = os.clock()
- if currentMinute == lastBroadcastMinute and (now - lastBroadcastTime) < MAX_BROADCAST_INTERVAL then
- return
- end
- lastBroadcastMinute = currentMinute
- lastBroadcastTime = now
+  -- Throttle: only broadcast on minute change or time interval
+  local now = os.clock()
+  if currentMinute == lastBroadcastMinute and (now - lastBroadcastTime) < MAX_BROADCAST_INTERVAL then
+    return
+  end
+  lastBroadcastMinute = currentMinute
+  lastBroadcastTime = now
 
- local dateInfo = gameTimeToDate(timeState.gameTimeDays)
+  local dateInfo = gameTimeToDate(timeState.gameTimeDays)
 
- -- Pre-format clock string (no i18n needed)
- local timeStr
- if timeState.timeFormat24h then
- timeStr = string.format("%02d:%02d", hours, minutes)
- else
- local period = "AM"
- local dh = hours
- if hours == 0 then dh = 12
- elseif hours == 12 then period = "PM"
- elseif hours > 12 then dh = hours - 12; period = "PM"
- end
- timeStr = string.format("%d:%02d %s", dh, minutes, period)
- end
+  -- Pre-format clock string (no i18n needed)
+  local timeStr
+  if timeState.timeFormat24h then
+    timeStr = string.format("%02d:%02d", hours, minutes)
+  else
+    local period = "AM"
+    local dh = hours
+    if hours == 0 then dh = 12
+    elseif hours == 12 then period = "PM"
+    elseif hours > 12 then dh = hours - 12; period = "PM"
+    end
+    timeStr = string.format("%d:%02d %s", dh, minutes, period)
+  end
 
- guihooks.trigger("BCMTimeUpdate", {
- time = timeStr,
- date = string.format("%02d/%02d", dateInfo.day, dateInfo.month),
- -- Raw keys for i18n translation in Vue
- dayOfWeek = DAY_KEYS[dateInfo.dayOfWeek] or "monday",
- monthNum = dateInfo.month,
- dayNum = dateInfo.day,
- yearNum = dateInfo.year,
- season = dateInfo.season,
- gameDay = timeState.gameTimeDays,
- todFloat = todTime,
- timeFormat24h = timeState.timeFormat24h
- })
+  guihooks.trigger("BCMTimeUpdate", {
+    time = timeStr,
+    date = string.format("%02d/%02d", dateInfo.day, dateInfo.month),
+    -- Raw keys for i18n translation in Vue
+    dayOfWeek = DAY_KEYS[dateInfo.dayOfWeek] or "monday",
+    monthNum = dateInfo.month,
+    dayNum = dateInfo.day,
+    yearNum = dateInfo.year,
+    season = dateInfo.season,
+    gameDay = timeState.gameTimeDays,
+    todFloat = todTime,
+    timeFormat24h = timeState.timeFormat24h
+  })
 end
 
 -- ============================================================================
@@ -265,18 +265,18 @@ end
 
 -- Apply current speed and night ratio settings to scenetree.tod
 applyTodSettings = function()
- if not scenetree.tod then return end
+  if not scenetree.tod then return end
 
- -- Set overall cycle speed based on multiplier
- scenetree.tod.dayLength = BASE_DAY_LENGTH / timeState.speedMultiplier
+  -- Set overall cycle speed based on multiplier
+  scenetree.tod.dayLength = BASE_DAY_LENGTH / timeState.speedMultiplier
 
- -- Set night scale for asymmetric day/night duration
- -- nightScale > 1 makes night pass faster (shorter duration)
- -- nightRatio = 1/3 means night is 1/3 of day, so nightScale = 3.0
- scenetree.tod.nightScale = 1 / timeState.nightRatio
+  -- Set night scale for asymmetric day/night duration
+  -- nightScale > 1 makes night pass faster (shorter duration)
+  -- nightRatio = 1/3 means night is 1/3 of day, so nightScale = 3.0
+  scenetree.tod.nightScale = 1 / timeState.nightRatio
 
- -- dayScale stays at 1.0 (baseline)
- scenetree.tod.dayScale = 1.0
+  -- dayScale stays at 1.0 (baseline)
+  scenetree.tod.dayScale = 1.0
 end
 
 -- ============================================================================
@@ -285,84 +285,84 @@ end
 
 -- Called every frame when career is active
 onUpdate = function(dtReal, dtSim, dtRaw)
- if not activated then return end
- if not scenetree.tod then return end
+  if not activated then return end
+  if not scenetree.tod then return end
 
- -- Accumulate real time (for loan system compatibility)
- timeState.realTimeAccumSecs = timeState.realTimeAccumSecs + dtReal
+  -- Accumulate real time (for loan system compatibility)
+  timeState.realTimeAccumSecs = timeState.realTimeAccumSecs + dtReal
 
- -- Read current tod
- local currentTod = scenetree.tod.time
+  -- Read current tod
+  local currentTod = scenetree.tod.time
 
- -- Day boundary detection: tod.time wraps from ~1.0 back to ~0.0
- -- Use threshold of 0.1 to distinguish real wraps from minor fluctuations
- if timeState.lastTodTime ~= nil then
- if currentTod < timeState.lastTodTime - 0.1 then
- -- Crossed midnight boundary: increment game day counter
- timeState.gameTimeDays = timeState.gameTimeDays + 1
- log('D', logTag, 'Day boundary crossed. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
+  -- Day boundary detection: tod.time wraps from ~1.0 back to ~0.0
+  -- Use threshold of 0.1 to distinguish real wraps from minor fluctuations
+  if timeState.lastTodTime ~= nil then
+    if currentTod < timeState.lastTodTime - 0.1 then
+      -- Crossed midnight boundary: increment game day counter
+      timeState.gameTimeDays = timeState.gameTimeDays + 1
+      log('D', logTag, 'Day boundary crossed. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
 
- -- Notify all modules that a new game day has started
- extensions.hook('onBCMNewGameDay', { gameDay = math.floor(timeState.gameTimeDays) })
+      -- Notify all modules that a new game day has started
+      extensions.hook('onBCMNewGameDay', { gameDay = math.floor(timeState.gameTimeDays) })
 
- -- Fast-forward: count down remaining days
- if fastForward then
- fastForward.daysRemaining = fastForward.daysRemaining - 1
- log('I', logTag, 'Fast-forward: ' .. tostring(fastForward.daysRemaining) .. ' days remaining')
- if fastForward.daysRemaining <= 0 then
- -- Restore original settings
- timeState.speedMultiplier = fastForward.originalSpeed
- timeState.nightRatio = fastForward.originalNightRatio
- timeState.skipNights = fastForward.originalSkipNights
- timeState.isNightSkipping = false
- log('I', logTag, 'Fast-forward complete. Speed restored to ' .. tostring(timeState.speedMultiplier))
- fastForward = nil
- end
- end
- end
- end
+      -- Fast-forward: count down remaining days
+      if fastForward then
+        fastForward.daysRemaining = fastForward.daysRemaining - 1
+        log('I', logTag, 'Fast-forward: ' .. tostring(fastForward.daysRemaining) .. ' days remaining')
+        if fastForward.daysRemaining <= 0 then
+          -- Restore original settings
+          timeState.speedMultiplier = fastForward.originalSpeed
+          timeState.nightRatio = fastForward.originalNightRatio
+          timeState.skipNights = fastForward.originalSkipNights
+          timeState.isNightSkipping = false
+          log('I', logTag, 'Fast-forward complete. Speed restored to ' .. tostring(timeState.speedMultiplier))
+          fastForward = nil
+        end
+      end
+    end
+  end
 
- -- Midday boundary detection: tod crosses 0.5 (noon)
- -- Used by marketplace for 12h listing rotation
- if timeState.lastTodTime ~= nil then
- if timeState.lastTodTime < 0.5 and currentTod >= 0.5 then
- extensions.hook('onBCMMidday', { gameDay = math.floor(timeState.gameTimeDays) })
- end
- end
+  -- Midday boundary detection: tod crosses 0.5 (noon)
+  -- Used by marketplace for 12h listing rotation
+  if timeState.lastTodTime ~= nil then
+    if timeState.lastTodTime < 0.5 and currentTod >= 0.5 then
+      extensions.hook('onBCMMidday', { gameDay = math.floor(timeState.gameTimeDays) })
+    end
+  end
 
- -- Update last known tod
- timeState.lastTodTime = currentTod
+  -- Update last known tod
+  timeState.lastTodTime = currentTod
 
- -- Night skip logic: boost speedMultiplier during night hours
- if timeState.skipNights and not fastForward then
- local inNight = isInNightRange(currentTod)
- if inNight and not timeState.isNightSkipping then
- -- Entering night: save current speed and boost to skip speed
- nightSkipSavedSpeed = timeState.speedMultiplier
- timeState.speedMultiplier = NIGHT_SKIP_SPEED
- timeState.isNightSkipping = true
- log('D', logTag, 'Night skip activated (x' .. tostring(NIGHT_SKIP_SPEED) .. ')')
- elseif not inNight and timeState.isNightSkipping then
- -- Exiting night: restore original speed
- timeState.speedMultiplier = nightSkipSavedSpeed or 1.0
- nightSkipSavedSpeed = nil
- timeState.isNightSkipping = false
- log('D', logTag, 'Night skip deactivated, speed restored to x' .. tostring(timeState.speedMultiplier))
- end
- else
- -- skipNights disabled or fastForward active: ensure we're not stuck in skip mode
- if timeState.isNightSkipping then
- timeState.speedMultiplier = nightSkipSavedSpeed or timeState.speedMultiplier
- nightSkipSavedSpeed = nil
- timeState.isNightSkipping = false
- end
- end
+  -- Night skip logic: boost speedMultiplier during night hours
+  if timeState.skipNights and not fastForward then
+    local inNight = isInNightRange(currentTod)
+    if inNight and not timeState.isNightSkipping then
+      -- Entering night: save current speed and boost to skip speed
+      nightSkipSavedSpeed = timeState.speedMultiplier
+      timeState.speedMultiplier = NIGHT_SKIP_SPEED
+      timeState.isNightSkipping = true
+      log('D', logTag, 'Night skip activated (x' .. tostring(NIGHT_SKIP_SPEED) .. ')')
+    elseif not inNight and timeState.isNightSkipping then
+      -- Exiting night: restore original speed
+      timeState.speedMultiplier = nightSkipSavedSpeed or 1.0
+      nightSkipSavedSpeed = nil
+      timeState.isNightSkipping = false
+      log('D', logTag, 'Night skip deactivated, speed restored to x' .. tostring(timeState.speedMultiplier))
+    end
+  else
+    -- skipNights disabled or fastForward active: ensure we're not stuck in skip mode
+    if timeState.isNightSkipping then
+      timeState.speedMultiplier = nightSkipSavedSpeed or timeState.speedMultiplier
+      nightSkipSavedSpeed = nil
+      timeState.isNightSkipping = false
+    end
+  end
 
- -- Apply tod settings (speed, night ratio, night skip)
- applyTodSettings()
+  -- Apply tod settings (speed, night ratio, night skip)
+  applyTodSettings()
 
- -- Broadcast time update to Vue
- broadcastTimeUpdate(currentTod)
+  -- Broadcast time update to Vue
+  broadcastTimeUpdate(currentTod)
 end
 
 -- ============================================================================
@@ -371,129 +371,149 @@ end
 
 -- Save time state to disk
 saveTimeData = function(currentSavePath)
- if not isInitialized then return end
+  if not isInitialized then return end
 
- if not career_saveSystem then
- log('W', logTag, 'career_saveSystem not available, cannot save time data')
- return
- end
+  if not career_saveSystem then
+    log('W', logTag, 'career_saveSystem not available, cannot save time data')
+    return
+  end
 
- -- Ensure BCM directory exists
- local bcmDir = currentSavePath .. "/career/bcm"
- if not FS:directoryExists(bcmDir) then
- FS:directoryCreate(bcmDir)
- end
+  -- Ensure BCM directory exists
+  local bcmDir = currentSavePath .. "/career/bcm"
+  if not FS:directoryExists(bcmDir) then
+    FS:directoryCreate(bcmDir)
+  end
 
- local data = {
- gameTimeDays = timeState.gameTimeDays,
- realTimeAccumSecs = timeState.realTimeAccumSecs,
- speedMultiplier = timeState.speedMultiplier,
- nightRatio = timeState.nightRatio,
- skipNights = timeState.skipNights,
- timeFormat24h = timeState.timeFormat24h,
- todTime = scenetree.tod and scenetree.tod.time or 0,
- version = 1 -- For future migration support
- }
+  -- Save the user's actual speed, not the night skip speed
+  local savedSpeed = timeState.speedMultiplier
+  if timeState.isNightSkipping and nightSkipSavedSpeed then
+    savedSpeed = nightSkipSavedSpeed
+  end
 
- local dataPath = bcmDir .. "/timeSystem.json"
- career_saveSystem.jsonWriteFileSafe(dataPath, data, true)
- log('I', logTag, 'Time data saved. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
+  local data = {
+    gameTimeDays = timeState.gameTimeDays,
+    realTimeAccumSecs = timeState.realTimeAccumSecs,
+    speedMultiplier = savedSpeed,
+    nightRatio = timeState.nightRatio,
+    skipNights = timeState.skipNights,
+    timeFormat24h = timeState.timeFormat24h,
+    todTime = scenetree.tod and scenetree.tod.time or 0,
+    version = 1  -- For future migration support
+  }
+
+  local dataPath = bcmDir .. "/timeSystem.json"
+  career_saveSystem.jsonWriteFileSafe(dataPath, data, true)
+  log('I', logTag, 'Time data saved. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
 end
 
 -- Load time state from disk
 loadTimeData = function(newSave)
- if not career_career or not career_career.isActive() then
- return
- end
+  if not career_career or not career_career.isActive() then
+    return
+  end
 
- if not career_saveSystem then
- log('W', logTag, 'career_saveSystem not available, cannot load time data')
- return
- end
+  if not career_saveSystem then
+    log('W', logTag, 'career_saveSystem not available, cannot load time data')
+    return
+  end
 
- -- New career: start on today's real-world date
- if newSave then
- -- Fallback: May 15 = day 134 (31+28+31+30+14) if OS date detection fails
- local FALLBACK_DAY = 134
- local startDays = calcRealDateGameDays() or FALLBACK_DAY
- timeState.gameTimeDays = startDays
- timeState.realTimeAccumSecs = 0
- timeState.speedMultiplier = 1.0
- timeState.nightRatio = 10/48
- timeState.skipNights = false
- timeState.timeFormat24h = true
- timeState.lastTodTime = nil
- timeState.isNightSkipping = false
+  -- New career: start on today's real-world date
+  if newSave then
+    -- Fallback: May 15 = day 134 (31+28+31+30+14) if OS date detection fails
+    local FALLBACK_DAY = 134
+    local startDays = calcRealDateGameDays() or FALLBACK_DAY
+    timeState.gameTimeDays = startDays
+    timeState.realTimeAccumSecs = 0
+    timeState.speedMultiplier = 1.0
+    timeState.nightRatio = 10/48
+    timeState.skipNights = false
+    timeState.timeFormat24h = true
+    timeState.lastTodTime = nil
+    timeState.isNightSkipping = false
 
- -- Set starting time: 5 PM on first career day
- if scenetree.tod then
- scenetree.tod.time = START_TOD
- scenetree.tod.play = true
- end
+    -- Set starting time: 5 PM on first career day
+    if scenetree.tod then
+      scenetree.tod.time = START_TOD
+      scenetree.tod.play = true
+    end
 
- local startDate = gameTimeToDate(startDays)
- log('I', logTag, string.format('New career started on real date: %04d-%02d-%02d (gameDay=%d)',
- startDate.year, startDate.month, startDate.day, startDays))
- return
- end
+    local startDate = gameTimeToDate(startDays)
+    log('I', logTag, string.format('New career started on real date: %04d-%02d-%02d (gameDay=%d)',
+      startDate.year, startDate.month, startDate.day, startDays))
+    return
+  end
 
- -- Existing career: restore from save
- local currentSaveSlot = career_saveSystem.getCurrentSaveSlot()
- if not currentSaveSlot then
- log('W', logTag, 'No save slot active, cannot load time data')
- return
- end
+  -- Existing career: restore from save
+  local currentSaveSlot = career_saveSystem.getCurrentSaveSlot()
+  if not currentSaveSlot then
+    log('W', logTag, 'No save slot active, cannot load time data')
+    return
+  end
 
- local autosavePath = career_saveSystem.getAutosave(currentSaveSlot)
- if not autosavePath then
- log('W', logTag, 'No autosave found for slot: ' .. tostring(currentSaveSlot))
- return
- end
+  local autosavePath = career_saveSystem.getAutosave(currentSaveSlot)
+  if not autosavePath then
+    log('W', logTag, 'No autosave found for slot: ' .. tostring(currentSaveSlot))
+    return
+  end
 
- local dataPath = autosavePath .. "/career/bcm/timeSystem.json"
- local data = jsonReadFile(dataPath)
+  local dataPath = autosavePath .. "/career/bcm/timeSystem.json"
+  local data = jsonReadFile(dataPath)
 
- if data then
- timeState.gameTimeDays = data.gameTimeDays or 0
- timeState.realTimeAccumSecs = data.realTimeAccumSecs or 0
- timeState.speedMultiplier = data.speedMultiplier or 1.0
- timeState.nightRatio = data.nightRatio or (1/3)
- timeState.skipNights = data.skipNights or false
- timeState.timeFormat24h = (data.timeFormat24h ~= false) -- default true
- timeState.lastTodTime = nil -- Reset boundary detection on load
- timeState.isNightSkipping = false
+  if data then
+    timeState.gameTimeDays = data.gameTimeDays or 0
+    timeState.realTimeAccumSecs = data.realTimeAccumSecs or 0
+    -- Sanitize speed: if saved during night skip, it may be NIGHT_SKIP_SPEED (100)
+    -- User-configurable range is 0.25-8.0, anything above 8 is corruption
+    -- Recover from BCM settings menu (source of truth for user preference)
+    local loadedSpeed = data.speedMultiplier or 1.0
+    if loadedSpeed > 8.0 then
+      local settingsSpeed = 1.0
+      if bcm_settings and bcm_settings.getSetting then
+        local preset = bcm_settings.getSetting("timeSpeed") or "normal"
+        local presetMap = { veryslow = 0.25, slow = 0.5, normal = 1.0, fast = 2.0 }
+        settingsSpeed = presetMap[preset] or 1.0
+      end
+      log('W', logTag, 'Saved speedMultiplier was ' .. tostring(loadedSpeed) .. ' (corrupt), restored from settings: ' .. tostring(settingsSpeed))
+      loadedSpeed = settingsSpeed
+    end
+    timeState.speedMultiplier = loadedSpeed
+    timeState.nightRatio = data.nightRatio or (1/3)
+    timeState.skipNights = data.skipNights or false
+    timeState.timeFormat24h = (data.timeFormat24h ~= false)  -- default true
+    timeState.lastTodTime = nil  -- Reset boundary detection on load
+    timeState.isNightSkipping = false
 
- -- Restore tod position (play is always forced true by initModule)
- if scenetree.tod and data.todTime ~= nil then
- scenetree.tod.time = data.todTime
- end
+    -- Restore tod position (play is always forced true by initModule)
+    if scenetree.tod and data.todTime ~= nil then
+      scenetree.tod.time = data.todTime
+    end
 
- log('I', logTag, 'Time data loaded. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
- else
- -- Fallback: no save file but not flagged as new (shouldn't happen) — use May 15
- timeState.gameTimeDays = 134
- timeState.realTimeAccumSecs = 0
- timeState.speedMultiplier = 1.0
- timeState.nightRatio = 10/48
- timeState.skipNights = false
- timeState.timeFormat24h = true
- timeState.lastTodTime = nil
- timeState.isNightSkipping = false
+    log('I', logTag, 'Time data loaded. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
+  else
+    -- Fallback: no save file but not flagged as new (shouldn't happen) — use May 15
+    timeState.gameTimeDays = 134
+    timeState.realTimeAccumSecs = 0
+    timeState.speedMultiplier = 1.0
+    timeState.nightRatio = 10/48
+    timeState.skipNights = false
+    timeState.timeFormat24h = true
+    timeState.lastTodTime = nil
+    timeState.isNightSkipping = false
 
- if scenetree.tod then
- scenetree.tod.time = START_TOD
- scenetree.tod.play = true
- end
+    if scenetree.tod then
+      scenetree.tod.time = START_TOD
+      scenetree.tod.play = true
+    end
 
- log('W', logTag, 'No save file and not newSave — initialized defaults')
- end
+    log('W', logTag, 'No save file and not newSave — initialized defaults')
+  end
 
- -- Apply speed settings after load
- applyTodSettings()
+  -- Apply speed settings after load
+  applyTodSettings()
 
- -- Reset broadcast state
- lastBroadcastMinute = -1
- lastBroadcastTime = 0
+  -- Reset broadcast state
+  lastBroadcastMinute = -1
+  lastBroadcastTime = 0
 end
 
 -- ============================================================================
@@ -502,46 +522,46 @@ end
 
 -- Initialize module state
 initModule = function(newSave)
- loadTimeData(newSave)
- isInitialized = true
- activated = true
+  loadTimeData(newSave)
+  isInitialized = true
+  activated = true
 
- -- Ensure day/night cycle is running
- if scenetree.tod then
- scenetree.tod.play = true
- -- Safety net: if loadTimeData couldn't set tod (scenetree.tod was nil at that point),
- -- ensure new saves start at noon instead of whatever BeamNG defaulted to
- if newSave and timeState.lastTodTime == nil then
- scenetree.tod.time = START_TOD
- end
- end
+  -- Ensure day/night cycle is running
+  if scenetree.tod then
+    scenetree.tod.play = true
+    -- Safety net: if loadTimeData couldn't set tod (scenetree.tod was nil at that point),
+    -- ensure new saves start at noon instead of whatever BeamNG defaulted to
+    if newSave and timeState.lastTodTime == nil then
+      scenetree.tod.time = START_TOD
+    end
+  end
 
- -- Immediately broadcast current time
- if scenetree.tod then
- broadcastTimeUpdate(scenetree.tod.time)
- end
+  -- Immediately broadcast current time
+  if scenetree.tod then
+    broadcastTimeUpdate(scenetree.tod.time)
+  end
 
- log('I', logTag, 'Time system activated')
+  log('I', logTag, 'Time system activated')
 end
 
 -- Reset module state
 resetModule = function()
- timeState.gameTimeDays = 0
- timeState.realTimeAccumSecs = 0
- timeState.speedMultiplier = 1.0
- timeState.nightRatio = 1/3
- timeState.skipNights = false
- timeState.timeFormat24h = true
- timeState.lastTodTime = nil
- timeState.isNightSkipping = false
+  timeState.gameTimeDays = 0
+  timeState.realTimeAccumSecs = 0
+  timeState.speedMultiplier = 1.0
+  timeState.nightRatio = 1/3
+  timeState.skipNights = false
+  timeState.timeFormat24h = true
+  timeState.lastTodTime = nil
+  timeState.isNightSkipping = false
 
- activated = false
- isInitialized = false
- lastBroadcastMinute = -1
- lastBroadcastTime = 0
- nightSkipSavedSpeed = nil
+  activated = false
+  isInitialized = false
+  lastBroadcastMinute = -1
+  lastBroadcastTime = 0
+  nightSkipSavedSpeed = nil
 
- log('I', logTag, 'Time system reset')
+  log('I', logTag, 'Time system reset')
 end
 
 -- ============================================================================
@@ -551,26 +571,26 @@ end
 
 -- Snapshot TOD state before radial menu opens
 onBeforeRadialOpened = function()
- if not activated then return end
- if not scenetree.tod then return end
+  if not activated then return end
+  if not scenetree.tod then return end
 
- todSnapshot = {
- time = scenetree.tod.time,
- play = scenetree.tod.play
- }
+  todSnapshot = {
+    time = scenetree.tod.time,
+    play = scenetree.tod.play
+  }
 end
 
 -- Restore TOD state when radial menu closes, reverting any vanilla time changes
 onHideRadialMenu = function()
- if not activated then return end
- if not todSnapshot then return end
- if not scenetree.tod then return end
+  if not activated then return end
+  if not todSnapshot then return end
+  if not scenetree.tod then return end
 
- scenetree.tod.time = todSnapshot.time
- scenetree.tod.play = todSnapshot.play
- todSnapshot = nil
+  scenetree.tod.time = todSnapshot.time
+  scenetree.tod.play = todSnapshot.play
+  todSnapshot = nil
 
- log('D', logTag, 'TOD values restored after radial menu close')
+  log('D', logTag, 'TOD values restored after radial menu close')
 end
 
 -- ============================================================================
@@ -580,54 +600,54 @@ end
 local originalGetUiData = nil
 
 installQuickAccessFilter = function()
- if originalGetUiData then return end -- Already installed
- if not core_quickAccess then return end
+  if originalGetUiData then return end  -- Already installed
+  if not core_quickAccess then return end
 
- originalGetUiData = core_quickAccess.getUiData
- core_quickAccess.getUiData = function(...)
- local data = originalGetUiData(...)
- if not data then return data end
- if not activated then return data end -- Only filter during active BCM career
+  originalGetUiData = core_quickAccess.getUiData
+  core_quickAccess.getUiData = function(...)
+    local data = originalGetUiData(...)
+    if not data then return data end
+    if not activated then return data end  -- Only filter during active BCM career
 
- -- Filter items: remove entries whose action contains time-of-day keywords
- if data.items and type(data.items) == "table" then
- local filtered = {}
- for _, item in ipairs(data.items) do
- local dominated = false
- local title = type(item.title) == "string" and item.title:lower() or ""
- local icon = type(item.icon) == "string" and item.icon:lower() or ""
- local action = type(item.action) == "string" and item.action:lower() or ""
+    -- Filter items: remove entries whose action contains time-of-day keywords
+    if data.items and type(data.items) == "table" then
+      local filtered = {}
+      for _, item in ipairs(data.items) do
+        local dominated = false
+        local title = type(item.title) == "string" and item.title:lower() or ""
+        local icon = type(item.icon) == "string" and item.icon:lower() or ""
+        local action = type(item.action) == "string" and item.action:lower() or ""
 
- -- Match vanilla time-of-day entries by their known characteristics
- if action:find("core_environment") then
- dominated = true
- end
- if icon == "sunrise" or icon == "sunset" or icon:find("sunrise") or icon:find("sunset") then
- dominated = true
- end
- if title:find("time of day") or title:find("time slider") then
- dominated = true
- end
+        -- Match vanilla time-of-day entries by their known characteristics
+        if action:find("core_environment") then
+          dominated = true
+        end
+        if icon == "sunrise" or icon == "sunset" or icon:find("sunrise") or icon:find("sunset") then
+          dominated = true
+        end
+        if title:find("time of day") or title:find("time slider") then
+          dominated = true
+        end
 
- if not dominated then
- table.insert(filtered, item)
- end
- end
- data.items = filtered
- end
+        if not dominated then
+          table.insert(filtered, item)
+        end
+      end
+      data.items = filtered
+    end
 
- return data
- end
- log('I', logTag, 'QuickAccess filter installed — vanilla time controls hidden during career')
+    return data
+  end
+  log('I', logTag, 'QuickAccess filter installed — vanilla time controls hidden during career')
 end
 
 uninstallQuickAccessFilter = function()
- if not originalGetUiData then return end
- if not core_quickAccess then return end
+  if not originalGetUiData then return end
+  if not core_quickAccess then return end
 
- core_quickAccess.getUiData = originalGetUiData
- originalGetUiData = nil
- log('I', logTag, 'QuickAccess filter removed — vanilla time controls restored')
+  core_quickAccess.getUiData = originalGetUiData
+  originalGetUiData = nil
+  log('I', logTag, 'QuickAccess filter removed — vanilla time controls restored')
 end
 
 -- ============================================================================
@@ -636,31 +656,31 @@ end
 -- ============================================================================
 
 getRadialTimeData = function()
- if not activated then return nil end
+  if not activated then return nil end
 
- local todTime = scenetree.tod and scenetree.tod.time or 0
- local visualHours = todToVisualHours(todTime)
- local hours = math.floor(visualHours)
- local minutes = math.floor((visualHours - hours) * 60)
+  local todTime = scenetree.tod and scenetree.tod.time or 0
+  local visualHours = todToVisualHours(todTime)
+  local hours = math.floor(visualHours)
+  local minutes = math.floor((visualHours - hours) * 60)
 
- local timeStr
- if timeState.timeFormat24h then
- timeStr = string.format("%02d:%02d", hours, minutes)
- else
- local period = hours >= 12 and "PM" or "AM"
- local h12 = hours % 12
- if h12 == 0 then h12 = 12 end
- timeStr = string.format("%d:%02d %s", h12, minutes, period)
- end
+  local timeStr
+  if timeState.timeFormat24h then
+    timeStr = string.format("%02d:%02d", hours, minutes)
+  else
+    local period = hours >= 12 and "PM" or "AM"
+    local h12 = hours % 12
+    if h12 == 0 then h12 = 12 end
+    timeStr = string.format("%d:%02d %s", h12, minutes, period)
+  end
 
- local gameDays = math.floor(timeState.gameTimeDays) + 1 -- 1-based day number
+  local gameDays = math.floor(timeState.gameTimeDays) + 1  -- 1-based day number
 
- return {
- timeString = timeStr,
- dayNumber = gameDays,
- hours = hours,
- minutes = minutes
- }
+  return {
+    timeString = timeStr,
+    dayNumber = gameDays,
+    hours = hours,
+    minutes = minutes
+  }
 end
 
 -- ============================================================================
@@ -671,32 +691,32 @@ end
 -- NOTE: BCM extensions receive onCareerActive (global hook), NOT onCareerActivated
 -- (which only fires for career/modules/ registered modules).
 M.onCareerActive = function(active, newSave)
- if active then
- initModule(newSave)
- installQuickAccessFilter()
- else
- uninstallQuickAccessFilter()
- activated = false
- todSnapshot = nil
- end
+  if active then
+    initModule(newSave)
+    installQuickAccessFilter()
+  else
+    uninstallQuickAccessFilter()
+    activated = false
+    todSnapshot = nil
+  end
 end
 
 -- Called during save
 M.onSaveCurrentSaveSlot = function(currentSavePath)
- saveTimeData(currentSavePath)
+  saveTimeData(currentSavePath)
 end
 
 -- Called before switching save slots (clear state)
 M.onBeforeSetSaveSlot = function()
- uninstallQuickAccessFilter()
- resetModule()
+  uninstallQuickAccessFilter()
+  resetModule()
 end
 
 -- Called when world is fully loaded (restore tod state)
 M.onWorldReadyState = function(state)
- if state == 2 and activated then
- loadTimeData()
- end
+  if state == 2 and activated then
+    loadTimeData()
+  end
 end
 
 -- Called every frame
@@ -713,23 +733,23 @@ M.getRadialTimeData = getRadialTimeData
 
 -- Get accumulated game days (float)
 M.getGameTimeDays = function()
- return timeState.gameTimeDays
+  return timeState.gameTimeDays
 end
 
 -- Get real-time accumulator in seconds (for loan system)
 M.getRealTimeAccumSecs = function()
- return timeState.realTimeAccumSecs
+  return timeState.realTimeAccumSecs
 end
 
 -- Get full date info table
 M.getDateInfo = function()
- return gameTimeToDate(timeState.gameTimeDays)
+  return gameTimeToDate(timeState.gameTimeDays)
 end
 
 -- Get current day of week (1=Monday through 7=Sunday)
 getGameDayOfWeek = function()
- local dateInfo = gameTimeToDate(timeState.gameTimeDays)
- return dateInfo.dayOfWeek
+  local dateInfo = gameTimeToDate(timeState.gameTimeDays)
+  return dateInfo.dayOfWeek
 end
 
 M.getGameDayOfWeek = getGameDayOfWeek
@@ -742,162 +762,162 @@ M.todToVisualHours = todToVisualHours
 
 -- Get formatted time string (using current format setting)
 M.getFormattedTime = function()
- if not scenetree.tod then return "--:--" end
- local visualHours = todToVisualHours(scenetree.tod.time)
- local h = math.floor(visualHours)
- local m = math.floor((visualHours - h) * 60)
- if timeState.timeFormat24h then
- return string.format("%02d:%02d", h, m)
- else
- local period = "AM"
- local dh = h
- if h == 0 then dh = 12
- elseif h == 12 then period = "PM"
- elseif h > 12 then dh = h - 12; period = "PM"
- end
- return string.format("%d:%02d %s", dh, m, period)
- end
+  if not scenetree.tod then return "--:--" end
+  local visualHours = todToVisualHours(scenetree.tod.time)
+  local h = math.floor(visualHours)
+  local m = math.floor((visualHours - h) * 60)
+  if timeState.timeFormat24h then
+    return string.format("%02d:%02d", h, m)
+  else
+    local period = "AM"
+    local dh = h
+    if h == 0 then dh = 12
+    elseif h == 12 then period = "PM"
+    elseif h > 12 then dh = h - 12; period = "PM"
+    end
+    return string.format("%d:%02d %s", dh, m, period)
+  end
 end
 
 -- Get compact date string (dd/mm)
 M.getFormattedDate = function()
- local dateInfo = gameTimeToDate(timeState.gameTimeDays)
- return string.format("%02d/%02d", dateInfo.day, dateInfo.month)
+  local dateInfo = gameTimeToDate(timeState.gameTimeDays)
+  return string.format("%02d/%02d", dateInfo.day, dateInfo.month)
 end
 
 -- Get raw date info table (for external formatting)
 M.getFullDateInfo = function()
- local dateInfo = gameTimeToDate(timeState.gameTimeDays)
- dateInfo.dayOfWeekKey = DAY_KEYS[dateInfo.dayOfWeek] or "monday"
- return dateInfo
+  local dateInfo = gameTimeToDate(timeState.gameTimeDays)
+  dateInfo.dayOfWeekKey = DAY_KEYS[dateInfo.dayOfWeek] or "monday"
+  return dateInfo
 end
 
 -- Speed multiplier (0.25 to 8.0)
 M.getSpeedMultiplier = function()
- return timeState.speedMultiplier
+  return timeState.speedMultiplier
 end
 
 M.setSpeedMultiplier = function(mult)
- mult = tonumber(mult) or 1.0
- mult = math.max(0.25, math.min(8.0, mult))
- if timeState.isNightSkipping then
- -- Update the saved speed so it restores to the new value after skip ends
- nightSkipSavedSpeed = mult
- else
- timeState.speedMultiplier = mult
- end
- applyTodSettings()
- log('I', logTag, 'Speed multiplier set to: ' .. tostring(mult))
+  mult = tonumber(mult) or 1.0
+  mult = math.max(0.25, math.min(8.0, mult))
+  if timeState.isNightSkipping then
+    -- Update the saved speed so it restores to the new value after skip ends
+    nightSkipSavedSpeed = mult
+  else
+    timeState.speedMultiplier = mult
+  end
+  applyTodSettings()
+  log('I', logTag, 'Speed multiplier set to: ' .. tostring(mult))
 end
 
 -- Debug: fast-forward N days at turbo speed (x20), then restore original settings.
 -- The game visually speeds up and all systems (offers, timers) run naturally.
 M.debugFastForward = function(days, speed)
- days = tonumber(days) or 3
- speed = tonumber(speed) or 20
+  days = tonumber(days) or 3
+  speed = tonumber(speed) or 20
 
- if fastForward then
- log('W', logTag, 'Fast-forward already active (' .. tostring(fastForward.daysRemaining) .. ' days remaining). Ignoring.')
- return
- end
+  if fastForward then
+    log('W', logTag, 'Fast-forward already active (' .. tostring(fastForward.daysRemaining) .. ' days remaining). Ignoring.')
+    return
+  end
 
- fastForward = {
- targetDays = days,
- daysRemaining = days,
- originalSpeed = timeState.speedMultiplier,
- originalNightRatio = timeState.nightRatio,
- originalSkipNights = timeState.skipNights,
- }
+  fastForward = {
+    targetDays = days,
+    daysRemaining = days,
+    originalSpeed = timeState.speedMultiplier,
+    originalNightRatio = timeState.nightRatio,
+    originalSkipNights = timeState.skipNights,
+  }
 
- -- Turbo: high speed, skip nights, compress night duration
- timeState.speedMultiplier = speed
- timeState.skipNights = true
- timeState.nightRatio = 0.1 -- Night passes very fast
- applyTodSettings()
+  -- Turbo: high speed, skip nights, compress night duration
+  timeState.speedMultiplier = speed
+  timeState.skipNights = true
+  timeState.nightRatio = 0.1  -- Night passes very fast
+  applyTodSettings()
 
- log('I', logTag, 'Fast-forward started: ' .. tostring(days) .. ' days at x' .. tostring(speed))
+  log('I', logTag, 'Fast-forward started: ' .. tostring(days) .. ' days at x' .. tostring(speed))
 end
 
 -- Cancel an active fast-forward
 M.debugStopFastForward = function()
- if not fastForward then
- log('W', logTag, 'No fast-forward active')
- return
- end
- timeState.speedMultiplier = fastForward.originalSpeed
- timeState.nightRatio = fastForward.originalNightRatio
- timeState.skipNights = fastForward.originalSkipNights
- timeState.isNightSkipping = false
- fastForward = nil
- applyTodSettings()
- log('I', logTag, 'Fast-forward cancelled. Speed restored.')
+  if not fastForward then
+    log('W', logTag, 'No fast-forward active')
+    return
+  end
+  timeState.speedMultiplier = fastForward.originalSpeed
+  timeState.nightRatio = fastForward.originalNightRatio
+  timeState.skipNights = fastForward.originalSkipNights
+  timeState.isNightSkipping = false
+  fastForward = nil
+  applyTodSettings()
+  log('I', logTag, 'Fast-forward cancelled. Speed restored.')
 end
 
 -- Check if fast-forward is active
 M.isFastForwarding = function()
- return fastForward ~= nil
+  return fastForward ~= nil
 end
 
 -- Time format (24h or 12h)
 M.getTimeFormat24h = function()
- return timeState.timeFormat24h
+  return timeState.timeFormat24h
 end
 
 M.setTimeFormat24h = function(use24h)
- timeState.timeFormat24h = use24h and true or false
- -- Force immediate broadcast with new format
- lastBroadcastMinute = -1
- if scenetree.tod then
- broadcastTimeUpdate(scenetree.tod.time)
- end
- log('I', logTag, 'Time format set to: ' .. (timeState.timeFormat24h and '24h' or '12h'))
+  timeState.timeFormat24h = use24h and true or false
+  -- Force immediate broadcast with new format
+  lastBroadcastMinute = -1
+  if scenetree.tod then
+    broadcastTimeUpdate(scenetree.tod.time)
+  end
+  log('I', logTag, 'Time format set to: ' .. (timeState.timeFormat24h and '24h' or '12h'))
 end
 
 -- Night ratio (0.1 to 1.0)
 M.getNightRatio = function()
- return timeState.nightRatio
+  return timeState.nightRatio
 end
 
 M.setNightRatio = function(ratio)
- ratio = tonumber(ratio) or (1/3)
- timeState.nightRatio = math.max(0.01, math.min(1.0, ratio))
- applyTodSettings()
- log('I', logTag, 'Night ratio set to: ' .. tostring(timeState.nightRatio))
+  ratio = tonumber(ratio) or (1/3)
+  timeState.nightRatio = math.max(0.01, math.min(1.0, ratio))
+  applyTodSettings()
+  log('I', logTag, 'Night ratio set to: ' .. tostring(timeState.nightRatio))
 end
 
 -- Night skip toggle
 M.getSkipNights = function()
- return timeState.skipNights
+  return timeState.skipNights
 end
 
 M.setSkipNights = function(skip)
- timeState.skipNights = skip and true or false
- if not timeState.skipNights and timeState.isNightSkipping then
- -- Restore speed if currently in skip mode
- timeState.speedMultiplier = nightSkipSavedSpeed or timeState.speedMultiplier
- nightSkipSavedSpeed = nil
- timeState.isNightSkipping = false
- end
- applyTodSettings()
- log('I', logTag, 'Night skip set to: ' .. tostring(timeState.skipNights))
+  timeState.skipNights = skip and true or false
+  if not timeState.skipNights and timeState.isNightSkipping then
+    -- Restore speed if currently in skip mode
+    timeState.speedMultiplier = nightSkipSavedSpeed or timeState.speedMultiplier
+    nightSkipSavedSpeed = nil
+    timeState.isNightSkipping = false
+  end
+  applyTodSettings()
+  log('I', logTag, 'Night skip set to: ' .. tostring(timeState.skipNights))
 end
 
 -- Full state (for debug)
 M.getTimeState = function()
- local state = {}
- for k, v in pairs(timeState) do
- state[k] = v
- end
- state.activated = activated
- state.isInitialized = isInitialized
- if scenetree.tod then
- state.currentTodTime = scenetree.tod.time
- state.todPlay = scenetree.tod.play
- state.todDayLength = scenetree.tod.dayLength
- state.todDayScale = scenetree.tod.dayScale
- state.todNightScale = scenetree.tod.nightScale
- end
- return state
+  local state = {}
+  for k, v in pairs(timeState) do
+    state[k] = v
+  end
+  state.activated = activated
+  state.isInitialized = isInitialized
+  if scenetree.tod then
+    state.currentTodTime = scenetree.tod.time
+    state.todPlay = scenetree.tod.play
+    state.todDayLength = scenetree.tod.dayLength
+    state.todDayScale = scenetree.tod.dayScale
+    state.todNightScale = scenetree.tod.nightScale
+  end
+  return state
 end
 
 -- Advance game-time by N days (for Phase 16 sleep integration)
@@ -905,46 +925,46 @@ end
 -- @param gameDays number - Number of game days to advance
 -- @return number - Number of game days actually advanced
 M.advanceTime = function(gameDays)
- gameDays = tonumber(gameDays) or 0
- if gameDays <= 0 then return 0 end
+  gameDays = tonumber(gameDays) or 0
+  if gameDays <= 0 then return 0 end
 
- local dayBefore = math.floor(timeState.gameTimeDays)
+  local dayBefore = math.floor(timeState.gameTimeDays)
 
- -- Advance game day counter
- timeState.gameTimeDays = timeState.gameTimeDays + gameDays
- log('I', logTag, 'Advanced time by ' .. tostring(gameDays) .. ' days. New game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
+  -- Advance game day counter
+  timeState.gameTimeDays = timeState.gameTimeDays + gameDays
+  log('I', logTag, 'Advanced time by ' .. tostring(gameDays) .. ' days. New game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
 
- -- Sync real-time accumulator proportionally
- -- realSecsPerGameDay = BASE_DAY_LENGTH / speedMultiplier
- local realSecsPerGameDay = BASE_DAY_LENGTH / timeState.speedMultiplier
- local realSecsAdvance = gameDays * realSecsPerGameDay
- timeState.realTimeAccumSecs = timeState.realTimeAccumSecs + realSecsAdvance
+  -- Sync real-time accumulator proportionally
+  -- realSecsPerGameDay = BASE_DAY_LENGTH / speedMultiplier
+  local realSecsPerGameDay = BASE_DAY_LENGTH / timeState.speedMultiplier
+  local realSecsAdvance = gameDays * realSecsPerGameDay
+  timeState.realTimeAccumSecs = timeState.realTimeAccumSecs + realSecsAdvance
 
- -- Advance tod.time by the fractional part of days
- if scenetree.tod then
- -- Each full day = 1.0 in tod.time cycle, fractional days = partial cycle
- local todAdvance = gameDays % 1.0 -- only fractional part affects tod position
- local newTod = (scenetree.tod.time + todAdvance) % 1.0
- scenetree.tod.time = newTod
- -- Reset boundary detection to avoid false day increments
- timeState.lastTodTime = newTod
- end
+  -- Advance tod.time by the fractional part of days
+  if scenetree.tod then
+    -- Each full day = 1.0 in tod.time cycle, fractional days = partial cycle
+    local todAdvance = gameDays % 1.0  -- only fractional part affects tod position
+    local newTod = (scenetree.tod.time + todAdvance) % 1.0
+    scenetree.tod.time = newTod
+    -- Reset boundary detection to avoid false day increments
+    timeState.lastTodTime = newTod
+  end
 
- -- Fire onBCMNewGameDay for each full day crossed during the advance.
- -- This ensures marketplace rotation, negotiation ticks, and buyer interest
- -- are processed even when time jumps (sleep, fast-forward).
- local dayAfter = math.floor(timeState.gameTimeDays)
- for day = dayBefore + 1, dayAfter do
- extensions.hook('onBCMNewGameDay', { gameDay = day })
- end
+  -- Fire onBCMNewGameDay for each full day crossed during the advance.
+  -- This ensures marketplace rotation, negotiation ticks, and buyer interest
+  -- are processed even when time jumps (sleep, fast-forward).
+  local dayAfter = math.floor(timeState.gameTimeDays)
+  for day = dayBefore + 1, dayAfter do
+    extensions.hook('onBCMNewGameDay', { gameDay = day })
+  end
 
- -- Force immediate broadcast
- lastBroadcastMinute = -1
- if scenetree.tod then
- broadcastTimeUpdate(scenetree.tod.time)
- end
+  -- Force immediate broadcast
+  lastBroadcastMinute = -1
+  if scenetree.tod then
+    broadcastTimeUpdate(scenetree.tod.time)
+  end
 
- return gameDays
+  return gameDays
 end
 
 return M

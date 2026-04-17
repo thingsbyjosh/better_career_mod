@@ -1,47 +1,47 @@
 {
- "planex": {
- "name": "PlanEx Logistics",
- "description": "Next-day delivery, guaranteed. Unless the driver totals the van. Then it's next-week delivery. PlanEx: we plan, you execute.",
- "icon": "cardboardBox",
- "loanableVehicles": [
- { "model": "pigeon", "config": "planex", "reputationLvl": -1, "deliveryLvl": 0, "mileage": 80000000 },
- { "model": "miramar", "config": "planex", "reputationLvl": -1, "deliveryLvl": 0, "mileage": 120000000 },
- { "model": "lansdale", "config": "planex", "reputationLvl": 0, "deliveryLvl": 0, "mileage": 60000000 },
- { "model": "van", "config": "planex", "reputationLvl": 1, "deliveryLvl": 0, "mileage": 150000000 },
- { "model": "md_series", "config": "planex", "reputationLvl": 2, "deliveryLvl": 0, "mileage": 200000000 },
- { "model": "us_semi", "config": "planex", "reputationLvl": 3, "deliveryLvl": 0, "mileage": 300000000 }
- ],
- "reputationLevels": [
- {
- "requiredValue": -100,
- "unlocks": [{"icon": "boxPickUp03", "label": "Temp Worker"}],
- "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
- "deliveryBonus": {"value": 0.90}
- },
- {
- "requiredValue": 250,
- "unlocks": [{"icon": "boxPickUp03", "label": "Contractor"}],
- "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
- "deliveryBonus": {"value": 1.00}
- },
- {
- "requiredValue": 1500,
- "unlocks": [{"icon": "smallTrailer", "label": "Driver"}],
- "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
- "deliveryBonus": {"value": 1.10}
- },
- {
- "requiredValue": 4000,
- "unlocks": [{"icon": "smallTrailer", "label": "Senior Driver"}],
- "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
- "deliveryBonus": {"value": 1.25}
- },
- {
- "requiredValue": 8000,
- "unlocks": [{"icon": "smallTrailer", "label": "Fleet Captain"}],
- "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
- "deliveryBonus": {"value": 1.40}
- }
- ]
- }
+  "planex": {
+    "name": "PlanEx Logistics",
+    "description": "Next-day delivery, guaranteed. Unless the driver totals the van. Then it's next-week delivery. PlanEx: we plan, you execute.",
+    "icon": "cardboardBox",
+    "loanableVehicles": [
+      { "model": "pigeon",    "config": "planex", "reputationLvl": -1, "deliveryLvl": 0, "mileage": 80000000 },
+      { "model": "miramar",   "config": "planex", "reputationLvl": -1, "deliveryLvl": 0, "mileage": 120000000 },
+      { "model": "lansdale",  "config": "planex", "reputationLvl":  0, "deliveryLvl": 0, "mileage": 60000000 },
+      { "model": "van",       "config": "planex", "reputationLvl":  1, "deliveryLvl": 0, "mileage": 150000000 },
+      { "model": "md_series", "config": "planex", "reputationLvl":  2, "deliveryLvl": 0, "mileage": 200000000 },
+      { "model": "us_semi",   "config": "planex", "reputationLvl":  3, "deliveryLvl": 0, "mileage": 300000000 }
+    ],
+    "reputationLevels": [
+      {
+        "requiredValue": -100,
+        "unlocks": [{"icon": "boxPickUp03", "label": "Temp Worker"}],
+        "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
+        "deliveryBonus": {"value": 0.90}
+      },
+      {
+        "requiredValue": 250,
+        "unlocks": [{"icon": "boxPickUp03", "label": "Contractor"}],
+        "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
+        "deliveryBonus": {"value": 1.00}
+      },
+      {
+        "requiredValue": 1500,
+        "unlocks": [{"icon": "smallTrailer", "label": "Driver"}],
+        "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
+        "deliveryBonus": {"value": 1.10}
+      },
+      {
+        "requiredValue": 4000,
+        "unlocks": [{"icon": "smallTrailer", "label": "Senior Driver"}],
+        "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
+        "deliveryBonus": {"value": 1.25}
+      },
+      {
+        "requiredValue": 8000,
+        "unlocks": [{"icon": "smallTrailer", "label": "Fleet Captain"}],
+        "loanerCut": {"value": 0.00, "icon": "boxPickUp03"},
+        "deliveryBonus": {"value": 1.40}
+      }
+    ]
+  }
 }

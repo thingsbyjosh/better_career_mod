@@ -1,2 +1,2 @@
-{"continent":"","country":"italy","worldMapPos":[0,0],"fuelPriceMultiplier":1,"type":"mapInfo","localPartsDepot":"","importPartsDepot":"","displayName":""}
-{"name":"Italy port","center":[487.19583129883,1593.4371337891,139.74006652832],"connections":[{"toll":0,"targetNode":"wc_port","minDistanceLevel":1,"connectionType":"ship","targetMap":"west_coast_usa"}],"type":"travelNode","rotation":[0,0,0.097167404279527,0.99526805210736],"id":"it_port1","triggerSize":[8,8,4]}
+{"continent":"europe","worldMapPos":[51.1,25],"country":"italy","fuelPriceMultiplier":1,"type":"mapInfo","localPartsDepot":"","importPartsDepot":"","displayName":"Italy"}
+{"connections":[{"toll":12,"targetNode":"wc_port","connectionType":"ship","targetMap":"west_coast_usa"}],"name":"Italy port","center":[487.50640869141,1591.3547363281,139.02310180664],"nodeType":"road","type":"travelNode","triggerSize":[8,8,4],"id":"it_port1","rotation":[0,0,0.023059536437361,0.99973409353652]}

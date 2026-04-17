@@ -1,3 +1,11 @@
 {"name":"bcm_it_villa","class":"SimGroup","__parent":"BCM_AREAS"}
 {"name":"bcm_it_portino","class":"SimGroup","__parent":"BCM_AREAS"}
 {"name":"bcm_it_fbx","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"it_garage_1","class":"SimGroup","__parent":"BCM_AREAS"}
+{"name":"bcm_Seaview","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_Farm_with_a_view","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_one_bed_Harbour_View","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_Mariner_View","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_Island_View","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_Mountain_View","__parent":"BCM_AREAS","class":"SimGroup"}
+{"name":"bcm_Mansion","class":"SimGroup","__parent":"BCM_AREAS"}
