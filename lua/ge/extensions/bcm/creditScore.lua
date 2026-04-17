@@ -324,7 +324,7 @@ generateTips = function()
     table.insert(tips, "Your account is still new. Score improves with time")
   end
 
-  -- Debt ratio tips
+  -- Debt ratio tips (Phase 13)
   if factors.debtRatio.percent < 70 then
     table.insert(tips, "Lower your debt-to-income ratio for better offers")
   end
@@ -638,4 +638,3 @@ M.onLoanPaymentEvent = onLoanPaymentEvent
 M.triggerScoreUpdate = triggerScoreUpdate
 
 return M
-

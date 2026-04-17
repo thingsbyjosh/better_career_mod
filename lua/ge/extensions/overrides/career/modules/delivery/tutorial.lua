@@ -1,7 +1,8 @@
 -- BCM Override: career_modules_delivery_tutorial
 -- Neutralizes the vanilla delivery tutorial gate per BCM v2.0 tiered access model.
 -- Basic delivery (parcels, vans) is available from day 1 without completing the tutorial.
--- Heavy delivery (trucks, trailers) is gated by CDL license, not tutorial.
+-- Heavy delivery (trucks, trailers) is gated by CDL license (Phase 65), not tutorial.
+--
 -- This override is registered automatically by bcm_overrideManager via the
 -- /overrides/ directory scan. It replaces career_modules_delivery_tutorial.
 
@@ -113,4 +114,3 @@ M.onPlayerAttributesChanged = onPlayerAttributesChanged
 M.onCareerProgressPageGetTasklistData = onCareerProgressPageGetTasklistData
 
 return M
-

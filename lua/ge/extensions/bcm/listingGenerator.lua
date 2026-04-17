@@ -926,7 +926,7 @@ generateListing = function(params)
     end
   end
 
-  -- Generate hidden defects for scammer listings
+  -- Phase 52: Generate hidden defects for scammer listings
   local defects = nil
   if isScam then
     defects = {}
@@ -1040,7 +1040,7 @@ generateListing = function(params)
     end
   end
 
-  -- Compute real value for scammer vehicles using pricingEngine
+  -- Phase 52: Compute real value for scammer vehicles using pricingEngine
   -- This is the value of the vehicle with its REAL data (real mileage, real config, real power/weight)
   local realValueCents = nil
   if isScam and defects then
@@ -1526,4 +1526,3 @@ M.injectFixedValueVehicles = function(vehiclePool)
 end
 
 return M
-

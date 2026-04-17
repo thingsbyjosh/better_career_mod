@@ -4,7 +4,7 @@
 
 -- BCM: linearTutorial stub override
 -- Neutralizes the entire tutorial system by returning safe defaults.
--- Combined with tutorialEnabled=false and boughtStarterVehicle=true,
+-- Combined with tutorialEnabled=false and boughtStarterVehicle=true (Phase 1),
 -- this fully eliminates all intro/tutorial flow.
 
 local M = {}
@@ -59,4 +59,3 @@ M.onCareerActivated = onCareerActivated
 M.onCareerActive = onCareerActive
 
 return M
-

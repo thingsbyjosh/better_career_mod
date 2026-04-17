@@ -403,7 +403,7 @@ start = function()
   loadExistingGarages()
   loadExistingTravelNodes()
 
-  -- init v2 wipCore + garages module
+  -- Phase 3: init v2 wipCore + garages module
   local wipCore = extensions.bcm_devtoolV2_wipCore
   if wipCore then
     wipCore.setWipPath(modLevels .. "/bcm_devtool_wipcore_v2.json")
@@ -4773,4 +4773,3 @@ M.deliveryHookSummary = deliveryHookSummary
 
 
 return M
-

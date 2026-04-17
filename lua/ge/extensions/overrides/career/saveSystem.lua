@@ -285,7 +285,7 @@ saveCurrentActual = function(vehiclesThumbnailUpdate)
   -- Modules currently persisting through this hook:
   --   bcm_properties.onSaveCurrentSaveSlot  -> bcm/properties.json
   --   bcm_realEstateApp.onSaveCurrentSaveSlot -> bcm/propertyTaxes.json
-  --   bcm_rentals.onSaveCurrentSaveSlot     -> bcm/rentals.json
+  --   bcm_rentals.onSaveCurrentSaveSlot     -> bcm/rentals.json  (Phase 102-03)
   extensions.hook("onSaveCurrentSaveSlot", oldestSave, oldSaveDate, vehiclesThumbnailUpdate)
   syncSaveExtensionsDone = true
   if tableIsEmpty(asyncSaveExtensions) then
@@ -564,4 +564,3 @@ M.onDeserialized = onDeserialized
 rawset(_G, 'career_saveSystem', M)
 
 return M
-

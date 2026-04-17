@@ -74,7 +74,7 @@ onCareerModulesActivated = function()
     })
   end
 
-  -- Set initial badge state on career load
+  -- Phase 60: Set initial badge state on career load
   updateBadge()
 
   log('I', logTag, 'Heat app registered')
@@ -91,12 +91,12 @@ end
 M.onCareerModulesActivated = onCareerModulesActivated
 M.sendHeatToVue = sendHeatToVue
 
--- Badge and fines bridge
+-- Phase 60: Badge and fines bridge
 M.updateBadge = updateBadge
 M.clearBadge = clearBadge
 M.sendFinesAndRecognitionToVue = sendFinesAndRecognitionToVue
 
--- Badge update on arrest
+-- Phase 60: Badge update on arrest
 M.onPursuitEvent = function(data)
   if data and data.action == 'arrest' then
     updateBadge()
@@ -104,4 +104,3 @@ M.onPursuitEvent = function(data)
 end
 
 return M
-

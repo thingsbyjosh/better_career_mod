@@ -41,11 +41,11 @@ local sendInsuranceOptionsForCheckout
 local getInsuranceClassForConfig
 local buildReceiptEmailBody
 local formatCentsForEmail
--- Defect integration
+-- Phase 52: Defect integration
 local requestTestDrive
 local debugSpawnScammer
 local debugClearScammers
--- Sell flow
+-- Phase 50: Sell flow
 local computeVehicleMarketValue
 local getSellPreconditions
 local getVehicleSellData
@@ -470,7 +470,7 @@ sendListingsToUI = function(listings, filters)
       priceDropPercent = (listing.marketValueCents and listing.marketValueCents > 0 and listing.priceCents < listing.marketValueCents)
         and math.floor((1 - listing.priceCents / listing.marketValueCents) * 100)
         or 0,
-      -- discovered defects (safe — only what player has found)
+      -- Phase 52: discovered defects (safe — only what player has found)
       discoveredDefects = bcm_defects and bcm_defects.getDiscoveredDefects and bcm_defects.getDiscoveredDefects(listing.id) or {},
       -- Do NOT expose: isGem, isScam, scamType, actualMileageKm, revealData, honesty, singleOwnerIsLie, defects
     })
@@ -567,9 +567,9 @@ requestListingDetail = function(listingId)
       or 0,
     -- Price history (visible to player — they see past drops)
     priceHistory = state.priceHistory and state.priceHistory[listing.id] or {},
-    -- Negotiation enabled
+    -- Negotiation enabled (Phase 47)
     contactDisabled = false,
-    -- discovered defects (safe — only what player has found)
+    -- Phase 52: discovered defects (safe — only what player has found)
     discoveredDefects = bcm_defects and bcm_defects.getDiscoveredDefects and bcm_defects.getDiscoveredDefects(listing.id) or {},
   }
 
@@ -610,7 +610,7 @@ requestListingStats = function()
 end
 
 -- ============================================================================
--- Negotiation API
+-- Negotiation API (Phase 47)
 -- ============================================================================
 
 sanitizeSession = function(session)
@@ -639,12 +639,12 @@ sanitizeSession = function(session)
     pendingResponse = session.pendingResponse ~= nil,
     vehicleName = session.vehicleName,
     language = session.language,
-    -- Player-first flow fields
+    -- Player-first flow fields (Phase 49.1)
     awaitingPlayerInit = session.awaitingPlayerInit or false,
     awaitingGreeting = session.awaitingGreeting or false,
     sellerHasResponded = session.sellerHasResponded or false,
     pendingGreeting = session.pendingGreeting,
-    -- v2: negotiation panel fields
+    -- v2 (Phase 49.4): negotiation panel fields
     isThinking = session.isThinking or false,
     lastPlayerOfferCents = session.lastPlayerOfferCents,
     -- v3: Frame-based typing state (must match fireSessionUpdate payload)
@@ -728,7 +728,7 @@ requestAllNegotiations = function()
 end
 
 -- ============================================================================
--- Player-first message flow
+-- Player-first message flow (Phase 49.1)
 -- ============================================================================
 
 sendPlayerInitMessage = function(listingId)
@@ -746,7 +746,7 @@ deliverSellerGreeting = function(listingId)
 end
 
 -- ============================================================================
--- Checkout data API
+-- Checkout data API (Phase 49.3)
 -- ============================================================================
 
 requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
@@ -917,7 +917,7 @@ getInsuranceClassForConfig = function(configKey)
 end
 
 -- ============================================================================
--- Vanilla insurance popup bridge
+-- Vanilla insurance popup bridge (Phase 49.3)
 -- ============================================================================
 
 sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsuranceId, vehicleConfigKey)
@@ -1054,7 +1054,7 @@ sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsu
 end
 
 -- ============================================================================
--- Email receipt builder
+-- Email receipt builder (Phase 49.3)
 -- ============================================================================
 
 buildReceiptEmailBody = function(data, lang)
@@ -1080,7 +1080,7 @@ buildReceiptEmailBody = function(data, lang)
 end
 
 -- ============================================================================
--- Purchase pipeline
+-- Purchase pipeline (Phase 49)
 -- ============================================================================
 
 confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
@@ -1427,7 +1427,7 @@ onBCMPurchaseVehicleReady = function(vehId)
     })
   end
 
-  -- Post-purchase defect/gem reveal
+  -- Phase 52: Post-purchase defect/gem reveal
   if bcm_defects and bcm_defects.revealPostPurchase then
     bcm_defects.revealPostPurchase(ctx.listingId, listing, inventoryId)
   end
@@ -1784,7 +1784,7 @@ local function onAddedVehiclePartsToInventory(inventoryId, newParts)
 end
 
 -- ============================================================================
--- Sell Flow
+-- Sell Flow (Phase 50)
 -- ============================================================================
 
 -- Compute market value for selling.
@@ -2351,7 +2351,7 @@ createPlayerListing = function(inventoryId, priceCents, description)
   local seed = pe.lcg(inventoryId * 7777 + os.time())
   local listingId = "player_listing_" .. tostring(seed)
 
-  -- Compute market variables for living market
+  -- Compute market variables for living market (Phase 50.1)
   local vehicleClass = "Economy"
   local yearMade = 2020
   local mileageKm = 100000
@@ -2425,7 +2425,7 @@ createPlayerListing = function(inventoryId, priceCents, description)
     soldGameDay = nil,
     buyerName = nil,
     salePriceCents = nil,
-    -- Market variables
+    -- Market variables (Phase 50.1)
     vehicleClass = vehicleClass,
     marketSigma = marketSigma,
     liquidity = liquidity,
@@ -2745,7 +2745,7 @@ openMyListingsPage = function()
 end
 
 -- ============================================================================
--- Test drive request + debug commands
+-- Phase 52: Test drive request + debug commands
 -- ============================================================================
 
 requestTestDrive = function(listingId)
@@ -2968,11 +2968,11 @@ M.toggleFavorite       = toggleFavorite
 M.requestFavorites     = requestFavorites
 M.requestListingStats  = requestListingStats
 
--- Dealer overlay + contact registration
+-- Dealer overlay + contact registration (Phase 48)
 M.registerSellerContacts = registerSellerContacts
 M.openDealerOverlay     = openDealerOverlay
 
--- Negotiation API
+-- Negotiation API (Phase 47)
 M.startNegotiation     = startNegotiation
 M.sendOffer            = sendOffer
 M.useLeverage          = useLeverage
@@ -2981,20 +2981,20 @@ M.callBluff            = callBluff
 M.requestNegotiation      = requestNegotiation
 M.requestAllNegotiations  = requestAllNegotiations
 
--- Player-first message flow
+-- Player-first message flow (Phase 49.1)
 M.sendPlayerInitMessage    = sendPlayerInitMessage
 M.deliverSellerGreeting    = deliverSellerGreeting
 
--- Checkout data API
+-- Checkout data API (Phase 49.3)
 M.requestCheckoutData      = requestCheckoutData
 M.sendInsuranceOptionsForCheckout = sendInsuranceOptionsForCheckout
 
--- Purchase pipeline
+-- Purchase pipeline (Phase 49)
 M.confirmPurchase          = confirmPurchase
 M.onBCMPurchaseVehicleReady = onBCMPurchaseVehicleReady
 M.onPurchaseVehicleSpawned = onPurchaseVehicleSpawned
 
--- Sell flow
+-- Sell flow (Phase 50)
 M.getSellPreconditions       = getSellPreconditions
 M.getVehicleSellData         = getVehicleSellData
 M.requestSellConfirmData     = requestSellConfirmData
@@ -3040,7 +3040,7 @@ end
 M.openSellPage               = openSellPage
 M.openMyListingsPage         = openMyListingsPage
 
--- Test drive + defect integration
+-- Phase 52: Test drive + defect integration
 M.requestTestDrive           = requestTestDrive
 M.navigateToTestDrive        = function()
   if bcm_defects then bcm_defects.navigateToTestDrive() end
@@ -3409,4 +3409,3 @@ M.onCareerActive           = onCareerActive
 -- end
 
 return M
-

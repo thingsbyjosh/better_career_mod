@@ -327,7 +327,7 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents, p
     guihooks.trigger('BCMExitPartsShopMode', {})
     guihooks.trigger('BCMPartsShopCheckoutComplete', { ordersCreated = #cartItems, deliveryType = deliveryType })
 
-    -- Notify tutorial FSM of fullservice checkout completion
+    -- Notify tutorial FSM of fullservice checkout completion (Phase 93)
     -- Note: fullservice uses vanilla applyShopping which is synchronous (no async replaceVehicle).
     -- The tutorial call fires immediately after the synchronous checkout completes.
     if extensions.isExtensionLoaded('bcm_tutorial') then
@@ -445,4 +445,3 @@ M.prepareAllForPickup = function(facId)
 end
 
 return M
-

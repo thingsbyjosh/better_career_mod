@@ -733,7 +733,7 @@ end
 -- Scaffold functions for future phases
 -- ============================================================================
 
--- Instant sale price — 60-70% of market value, seed-based deterministic
+-- Instant sale price (Phase 50) — 60-70% of market value, seed-based deterministic
 getInstantSalePrice = function(priceCents, seed)
   seed = seed or priceCents
   -- Deterministic multiplier between 0.60 and 0.70 via LCG
@@ -742,7 +742,7 @@ getInstantSalePrice = function(priceCents, seed)
   return math.max(0, result)
 end
 
--- Supply/demand multiplier — applied by marketplace state
+-- Supply/demand multiplier (Phase 46) — applied by marketplace state
 applyDemandMultiplier = function(priceCents, demandMultiplier)
   return clampPrice(math.floor(priceCents * (demandMultiplier or 1.0)))
 end
@@ -895,7 +895,7 @@ M.getArchetypeMetadata    = getArchetypeMetadata
 M.getInstantSalePrice     = getInstantSalePrice
 M.applyDemandMultiplier   = applyDemandMultiplier
 
--- Market variable functions
+-- Market variable functions (Phase 50.1)
 M.computeMarketSigma      = computeMarketSigma
 M.computeLiquidity        = computeLiquidity
 M.computeCarDesirability  = computeCarDesirability
@@ -938,4 +938,3 @@ M.ARCHETYPE_MARKUP_PARAMS = ARCHETYPE_MARKUP_PARAMS
 M.REFERENCE_YEAR          = REFERENCE_YEAR
 
 return M
-

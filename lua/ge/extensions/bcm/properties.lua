@@ -116,7 +116,7 @@ purchaseProperty = function(propertyId, propertyType, baseCapacity)
     currentCapacity = baseCapacity or 1,
     customName = nil,
     isHome = false,
-    -- paidRentalMode is nil for normal owned garages and for non-backup rentals.
+    -- Phase 102: paidRentalMode is nil for normal owned garages and for non-backup rentals.
     -- When set (table with startDay/lastChargedDay/dailyRateCents), indicates this record
     -- is the auto-granted backup garage upgraded into paid-rental mode. See bcm/rentals.lua.
     paidRentalMode = nil,
@@ -269,7 +269,7 @@ discoverProperty = function(propertyId)
 end
 
 -- ============================================================================
--- paidRentalMode helpers (hybrid data model — Pitfall 6 resolution)
+-- Phase 102: paidRentalMode helpers (hybrid data model — Pitfall 6 resolution)
 -- ============================================================================
 -- Two orthogonal concepts coexist:
 --   (1) type = "rental"       — a non-backup garage the player pays to rent
@@ -506,6 +506,7 @@ end
 -- Any new consumer that is NOT rental-aware MUST either filter by p.type == "garage"
 -- or call getOwnedGarages() instead. Consumers iterating by id-only lookups (for
 -- display-name resolution) are safe regardless of type.
+--
 -- SAFE (already filter by type == "garage"):
 --   career/modules/garageManager.lua:117 fillGarages      — filters
 --   overrides/career/modules/vehicleShopping.lua:37,53    — filters
@@ -519,11 +520,13 @@ end
 --   bcm/loans.lua:1657 foreclosure relocate loop          — filters
 --   bcm/marketplaceApp.lua:782,1150 garage list + fallback — filters
 --   bcm/realEstateApp.lua:86,261,504 property tax + lists — filters
+--
 -- SAFE (id-only lookups, type-agnostic display-name resolution):
 --   bcm/marketplaceApp.lua:1354 garage name-by-id lookup
 --   bcm/marketplaceApp.lua:1464 garage name-by-id lookup
 --   bcm/vehicleGalleryApp.lua:200 capacity map — includes rentals deliberately
 --     (rentals ARE valid vehicle locations; vehicleGallery shows vehicles in them)
+--
 -- FLAGGED — audit revisit when rentals land in Plan 03:
 --   bcm/garageManagerApp.lua:159 otherGarageCount (for sell guard)
 --     Counts non-current owned records without filtering by type. When rentals
@@ -573,4 +576,3 @@ M.addVehicleTransfer = addVehicleTransfer
 M.removeVehicleTransfer = removeVehicleTransfer
 
 return M
-

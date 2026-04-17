@@ -669,7 +669,7 @@ local function openPerformanceIndex(inventoryId, originComputerId)
   end
 end
 
--- Sell data helper — delegates to marketplaceApp
+-- Sell data helper — delegates to marketplaceApp (Phase 50)
 local function getVehicleSellData(inventoryId)
   if bcm_marketplaceApp and bcm_marketplaceApp.getVehicleSellData then
     return bcm_marketplaceApp.getVehicleSellData(inventoryId)
@@ -739,4 +739,3 @@ M.onVehicleAdded = function(inventoryId)
 end
 
 return M
-

@@ -832,7 +832,7 @@ restoreVehicleAtDestination = function(journal)
       log('I', logTag, 'restoreVehicleAtDestination: no vehicle to position, player arrives on foot')
     end
 
-    -- === TRAIN RESTORATION ===
+    -- === TRAIN RESTORATION (Phase 99) ===
     -- After tractor is positioned and restored, spawn and couple each trailer
     if journal.train and #journal.train > 0 then
       -- Update journal to "restoring" phase (for crash recovery of partial restoration)
@@ -965,6 +965,7 @@ end
 --- Test the full train serialization + journal write pipeline from the console.
 -- Discovers the current player vehicle's train, serializes all vehicles,
 -- and logs the results. Writes a DEBUG-phase journal (won't trigger real recovery).
+--
 -- Usage from BeamNG console:
 --   bcm_transitJournal.debugTestTrainTravel()
 debugTestTrainTravel = function()
@@ -1040,6 +1041,7 @@ end
 
 --- Read and log the current transit journal contents for debugging.
 -- Does not modify the journal, just reads and prints its contents.
+--
 -- Usage from BeamNG console:
 --   bcm_transitJournal.debugTestTrainRestore()
 debugTestTrainRestore = function()
@@ -1096,4 +1098,3 @@ M.onExtensionLoaded = onExtensionLoaded
 M.onUpdate = onUpdate
 
 return M
-

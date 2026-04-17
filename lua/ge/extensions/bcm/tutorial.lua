@@ -1,9 +1,9 @@
 -- BCM Tutorial Extension
 -- 6-step linear tutorial FSM: step definitions, detection hooks, watchdog timers,
 -- save/restore resilience, phone blocking, Miramar sale block, pause menu skip injection.
--- Locked save schema and FSM skeleton.
--- Full step logic, detection hooks, watchdog, save/restore, monkey-patches.
--- Restructured 7->6 steps, string sub-steps, v3->v4 migration, loaner removal.
+-- Phase 79: Locked save schema and FSM skeleton.
+-- Phase 80: Full step logic, detection hooks, watchdog, save/restore, monkey-patches.
+-- Phase 92: Restructured 7->6 steps, string sub-steps, v3->v4 migration, loaner removal.
 -- Extension name: bcm_tutorial
 
 local M = {}
@@ -1641,4 +1641,3 @@ end
 M.debugDumpState = function() return tutorialData end
 
 return M
-

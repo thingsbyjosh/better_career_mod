@@ -34,7 +34,7 @@ local optimizeRoute
 local pinStopAtPosition
 local getTrailerForVehicle
 local getVehicleNiceName
--- pause/resume bridge
+-- Phase 96.1: pause/resume bridge
 local pauseRoute
 local resumeRoute
 local resumeRouteWithVehicle
@@ -73,12 +73,12 @@ end
 requestPackDetail = function(packId)
   if not bcm_planex then return end
   local pack = bcm_planex.getPackById(packId)
-  -- Lazy optimize stop order on first detail view (deferred from generatePool)
+  -- Phase 96.1: Lazy optimize stop order on first detail view (deferred from generatePool)
   if pack and not pack._stopOrderOptimized then
     bcm_planex.optimizeStopOrder(pack)
     pack._stopOrderOptimized = true
   end
-  -- Generate manifest on-demand for available non-tutorial packs
+  -- Phase 81.1: Generate manifest on-demand for available non-tutorial packs
   if pack and pack.status == 'available' and not pack.isTutorialPack then
     local effectiveCap = resolveEffectiveCapacity()
     local manifestCap = pack._manifestCapacity or 0
@@ -156,7 +156,7 @@ abandonPack = function()
   requestPoolData()
 end
 
--- Pause/resume bridge functions
+-- Phase 96.1: Pause/resume bridge functions
 pauseRoute = function()
   if not bcm_planex then return end
   local ok = bcm_planex.pauseRoute()
@@ -351,7 +351,7 @@ reorderStops = function(newOrderJson)
   end
 end
 
--- Route optimization — nearest-neighbor with optional pinned stops
+-- Phase 81.2: Route optimization — nearest-neighbor with optional pinned stops
 optimizeRoute = function(pinnedJson)
   if not bcm_planex then return end
   local pinned = nil
@@ -411,11 +411,11 @@ end
 -- Cargo load percentage from UI slider (10-100, default 50)
 local cargoLoadPercent = 50
 
--- Store last queried vehicle capacity for resolveEffectiveCapacity
+-- Phase 81.1: Store last queried vehicle capacity for resolveEffectiveCapacity
 local lastQueriedCapacity = 0
 local lastQueriedLargestContainer = 0
 
--- Resolve effective capacity from current vehicle/loaner (no slider — slider is display-only)
+-- Phase 81.1: Resolve effective capacity from current vehicle/loaner (no slider — slider is display-only)
 resolveEffectiveCapacity = function()
   -- Returns FULL vehicle/loaner capacity — slider scaling is display-only in Vue.
   -- Manifest is always generated at 100%; the frontend scales estimates by cargoLoadPercent.
@@ -443,7 +443,7 @@ local function onVehicleCapacityReady(inventoryId, capacity, largestContainer, t
     inventoryId      = inventoryId,
     capacity         = capacity,
     largestContainer = largestContainer or capacity,
-    -- trailer coupling info
+    -- Phase 89.1: trailer coupling info
     trailerName      = trailerName,       -- nil if no trailer
     tractorCapacity  = tractorCapacity or capacity or 0,
     trailerCapacity  = trailerCapacity or 0,
@@ -454,7 +454,7 @@ local function onVehicleCapacityReady(inventoryId, capacity, largestContainer, t
   end
 end
 
--- Resolve trailer object for a tractor (if coupled)
+-- Phase 89.1: Resolve trailer object for a tractor (if coupled)
 getTrailerForVehicle = function(tractorObjId)
   local trailerData = core_trailerRespawn and core_trailerRespawn.getTrailerData and core_trailerRespawn.getTrailerData()
   if not trailerData then return nil end
@@ -462,7 +462,7 @@ getTrailerForVehicle = function(tractorObjId)
   return entry and entry.trailerId and be:getObjectByID(entry.trailerId) or nil
 end
 
--- Resolve nice name for any vehicle (inventory or model fallback)
+-- Phase 89.1: Resolve nice name for any vehicle (inventory or model fallback)
 getVehicleNiceName = function(vehObjId)
   local invId = career_modules_inventory.getInventoryIdFromVehicleId(vehObjId)
   local vehData = invId and career_modules_inventory.getVehicles()[invId]
@@ -479,8 +479,8 @@ end
 
 -- Query cargo containers via core_vehicleBridge.requestValue (vanilla API).
 -- Works on any spawned vehicle — does NOT require player to be mounted.
--- extracts both totalCapacity and largestContainer.
--- extended with trailer aggregation (tractor + trailer containers).
+-- Phase 75.1: extracts both totalCapacity and largestContainer.
+-- Phase 89.1: extended with trailer aggregation (tractor + trailer containers).
 queryCargoContainers = function(vehObj, inventoryId)
   core_vehicleBridge.requestValue(vehObj, function(data)
     local totalSlots = 0
@@ -508,7 +508,7 @@ queryCargoContainers = function(vehObj, inventoryId)
     end
     tractorCapacity = totalSlots
 
-    -- Check for coupled trailer (per D-04)
+    -- Phase 89.1: Check for coupled trailer (per D-04)
     local tractorObjId = vehObj:getID()
     local trailerObj = getTrailerForVehicle(tractorObjId)
 
@@ -627,7 +627,7 @@ requestGarageVehicles = function()
       -- Always query fresh capacity (async — UI updates when callback fires)
       queryCargoContainers(vehObj, invId)
 
-      -- detect coupled trailer for this vehicle
+      -- Phase 89.1: detect coupled trailer for this vehicle
       local trailerObj = getTrailerForVehicle(vehObjId)
       local trailerName = nil
       if trailerObj then
@@ -659,7 +659,7 @@ debugResetPacks = function()
   log('I', logTag, 'Debug: packs reset and pool regenerated')
 end
 
--- Called by Vue when player dismisses the route results popup
+-- Phase 75.2: Called by Vue when player dismisses the route results popup
 -- Unpauses the game (pair with planex.lua completePack pause)
 dismissResults = function()
   if simTimeAuthority and simTimeAuthority.pause then
@@ -685,7 +685,7 @@ dismissResults = function()
   end
 end
 
--- Auto-detect current player vehicle for phone app.
+-- Phase 76: Auto-detect current player vehicle for phone app.
 -- The phone always uses the vehicle the player is currently driving.
 requestCurrentVehicle = function()
   local veh = getPlayerVehicle(0)
@@ -717,14 +717,14 @@ requestCurrentVehicle = function()
   guihooks.trigger('BCMPlanexCurrentVehicle', { inventoryId = foundInventoryId, noVehicle = false })
 end
 
--- Loaner tier selection bridge
+-- Phase 77.3: Loaner tier selection bridge
 -- tier=0 clears selection; tier=1-5 selects that tier if unlocked
 selectLoanerTier = function(tier)
   if not bcm_planex then return end
   bcm_planex.selectLoanerTier(tier, cargoLoadPercent)
 end
 
--- Register PlanEx phone app when career is ready
+-- Phase 76: Register PlanEx phone app when career is ready
 onCareerModulesActivated = function()
   if bcm_appRegistry then
     bcm_appRegistry.register({
@@ -771,7 +771,7 @@ M.getCargoLoadPercent    = function() return cargoLoadPercent end
 M.onCareerModulesActivated = onCareerModulesActivated
 
 -- ============================================================================
--- Coupler lifecycle hooks for trailer capacity reactivity
+-- Phase 89.1: Coupler lifecycle hooks for trailer capacity reactivity
 -- ============================================================================
 
 -- onCouplerAttached: fires on physics coupler connection (per D-05, D-06)
@@ -824,4 +824,3 @@ M.onCouplerDetach = function(objId, nodeId)
 end
 
 return M
-

@@ -25,10 +25,10 @@ local addHeat          -- debug
 local resetHeat        -- debug
 local forceDecayTick   -- debug
 local printStatus      -- debug
--- Per-map heat export/import for multimap
+-- Phase 97: Per-map heat export/import for multimap
 local getHeatForExport
 local loadHeatFromImport
--- Vehicle recognition system
+-- Phase 60: Vehicle recognition system
 local captureVehicleFingerprint
 local clearRecognition
 local checkRecognition
@@ -95,7 +95,7 @@ local HEAT_POLICE_PARAMS = {
 -- These are NOT used directly anymore — applyHeatToPolice sets scoreLevels inline
 -- Kept as documentation reference only
 
--- Recognition probability per heat level (checked every 2s when a police unit has line of sight)
+-- Phase 60: Recognition probability per heat level (checked every 2s when a police unit has line of sight)
 local RECOGNITION_PROB = {
   [0]  = 0,
   [1]  = 0.03,
@@ -121,7 +121,7 @@ local heatAccum = 0              -- 0-10000
 local pursuitActive = false
 local lastDecayTimestamp = nil    -- os.time() wall clock on save
 local broadcastAccum = 0
--- Recognition system state
+-- Phase 60: Recognition system state
 local recognitionRecord = nil    -- nil when no fingerprint; table {model, licensePlate, paintColor, offenseTypes, level} when active
 recognitionCheckAccum = 0
 
@@ -152,7 +152,7 @@ broadcastHeatUpdate = function()
 end
 
 -- ============================================================================
--- Vehicle recognition system
+-- Phase 60: Vehicle recognition system
 -- ============================================================================
 
 -- Capture the player's current vehicle fingerprint (model + plate + paint)
@@ -308,7 +308,7 @@ runDecayTick = function(dt)
   local rate = DECAY_RATE[level] or 5.0
   heatAccum = math.max(0, heatAccum - rate * dt)
 
-  -- Clear recognition when heat fully decays
+  -- Phase 60: Clear recognition when heat fully decays
   if heatAccum <= 0 then
     heatAccum = 0
     if recognitionRecord then clearRecognition() end
@@ -392,7 +392,7 @@ onPursuitEvent = function(data)
     -- Neutral: no heat change
     pursuitActive = false
 
-    -- Capture fingerprint on successful evasion (not on debug reset)
+    -- Phase 60: Capture fingerprint on successful evasion (not on debug reset)
     if action == 'evade' or action == 'timeout_evade' then
       local fp = captureVehicleFingerprint()
       if fp then
@@ -511,7 +511,7 @@ onUpdate = function(dtReal, dtSim, dtRaw)
     broadcastHeatUpdate()
   end
 
-  -- Throttle recognition checks to every RECOGNITION_CHECK_INTERVAL seconds
+  -- Phase 60: Throttle recognition checks to every RECOGNITION_CHECK_INTERVAL seconds
   recognitionCheckAccum = recognitionCheckAccum + dtSim
   if recognitionCheckAccum >= RECOGNITION_CHECK_INTERVAL then
     recognitionCheckAccum = 0
@@ -547,7 +547,7 @@ resetHeat = function()
   log('I', logTag, 'Debug resetHeat: heat cleared')
 end
 
--- Create a fake recognition record for testing (without running a real pursuit)
+-- Phase 60: Create a fake recognition record for testing (without running a real pursuit)
 local setRecognition
 setRecognition = function()
   recognitionRecord = {
@@ -576,7 +576,7 @@ printStatus = function()
   log('I', logTag, 'heatAccum: ' .. string.format('%.0f', heatAccum) .. ' / ' .. MAX_HEAT)
   log('I', logTag, 'heatLevel: ' .. getHeatLevel() .. ' / ' .. NUM_LEVELS)
   log('I', logTag, 'pursuitActive: ' .. tostring(pursuitActive))
-  -- Recognition record
+  -- Phase 60: Recognition record
   if recognitionRecord then
     log('I', logTag, 'recognitionRecord.model: ' .. tostring(recognitionRecord.model))
     log('I', logTag, 'recognitionRecord.licensePlate: ' .. tostring(recognitionRecord.licensePlate))
@@ -594,7 +594,7 @@ printStatus = function()
 end
 
 -- ============================================================================
--- Per-map heat export/import
+-- Phase 97: Per-map heat export/import
 -- ============================================================================
 
 -- Export current heat state for per-map storage by bcm_multimap
@@ -639,16 +639,15 @@ M.resetHeat = resetHeat
 M.forceDecayTick = forceDecayTick
 M.printStatus = printStatus
 
--- Recognition system API
+-- Phase 60: Recognition system API
 M.clearRecognition = clearRecognition
 M.onVehicleSwitched = function(oldId, newId) clearRecognition() end
 
--- Recognition debug command
+-- Phase 60: Recognition debug command
 M.setRecognition = setRecognition
 
--- Per-map heat export/import
+-- Phase 97: Per-map heat export/import
 M.getHeatForExport = getHeatForExport
 M.loadHeatFromImport = loadHeatFromImport
 
 return M
-

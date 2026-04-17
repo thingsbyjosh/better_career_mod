@@ -1,4 +1,4 @@
--- BCM Defects Extension
+-- BCM Defects Extension (Phase 52)
 -- Manages hidden defect discovery lifecycle: test drive (hybrid: custom spawn +
 -- vanilla testDrive module for timer/tether/damage/fade), inspector NPC,
 -- and post-purchase reveal. Integrates with negotiation for chat injection.
@@ -1110,4 +1110,3 @@ M.debugInspectorInstantAll = function()
 end
 
 return M
-

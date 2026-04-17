@@ -205,7 +205,7 @@ local function apply()
   career_modules_inventory.setVehicleDirty(inventoryId)
   career_saveSystem.saveCurrent({inventoryId})
 
-  -- Clear vehicle recognition on repaint (disguise mechanic)
+  -- Phase 60: Clear vehicle recognition on repaint (disguise mechanic)
   pcall(function()
     if bcm_heatSystem and bcm_heatSystem.clearRecognition then
       bcm_heatSystem.clearRecognition()
@@ -346,4 +346,3 @@ M.onUIOpened = onUIOpened
 M.onVehicleSaveFinished = onVehicleSaveFinished
 
 return M
-

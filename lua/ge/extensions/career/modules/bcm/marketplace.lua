@@ -5,7 +5,7 @@
 -- Auto-loaded by career core from /lua/ge/extensions/career/modules/
 -- Save path: /career/bcm/marketplace.json
 -- Uses versionMigration v1 for future-proof schema evolution.
--- v2: Schema v4, seller fatigue, Poisson arrivals, relist logic.
+-- v2 (Phase 49.3.1): Schema v4, seller fatigue, Poisson arrivals, relist logic.
 
 local M = {}
 
@@ -54,7 +54,7 @@ local initializeListingsIfNeeded
 local poissonSample
 local addPoissonArrivals
 local relistExpiredListing
--- Player listing CRUD
+-- Phase 50: Player listing CRUD
 local addPlayerListing
 local removePlayerListing
 local getPlayerListings
@@ -63,7 +63,7 @@ local getPlayerListingByInventoryId
 local updatePlayerListingPrice
 local updatePlayerListingDescription
 local markPlayerListingSold
--- Buyer session management
+-- Phase 50: Buyer session management
 local getBuyerSessions
 local getBuyerSessionsForListing
 local cancelBuyerSessionsForListing
@@ -130,7 +130,7 @@ getDefaultState = function()
     -- Phase 50 player sell flow
     playerListings   = {},       -- array of player listing tables
     buyerSessions    = {},       -- { playerListingId -> { buyerId -> session } }
-    -- Distributed buyer tick system (replaces daily batch)
+    -- Phase 50.2: Distributed buyer tick system (replaces daily batch)
     lastBuyerTickGameHours = 0,  -- continuous game hours when last buyer tick ran
   }
 end
@@ -178,7 +178,7 @@ loadMarketplaceData = function()
         return d
       end,
       [4] = function(d)
-        -- set defaults for all new listing fields
+        -- Phase 49.3.1: set defaults for all new listing fields
         d.relistHistory = d.relistHistory or {}
         for _, listing in ipairs(d.listings or {}) do
           listing.conditionLabel    = listing.conditionLabel or "fair"
@@ -196,7 +196,7 @@ loadMarketplaceData = function()
         return d
       end,
       [5] = function(d)
-        -- pricing engine v2 overhaul — wipe listings to regenerate
+        -- Phase 49.3.1: pricing engine v2 overhaul — wipe listings to regenerate
         -- with new depreciation curves, curated diversity, and organic pricing
         d.listings = {}
         d.lastProcessedDay = 0
@@ -213,7 +213,7 @@ loadMarketplaceData = function()
         return d
       end,
       [7] = function(d)
-        -- Living Market — clear old buyer sessions (incompatible archetypes)
+        -- Phase 50.1: Living Market — clear old buyer sessions (incompatible archetypes)
         d.buyerSessions = {}
         -- Player listings without market variables are nil-safe (functions handle nil)
         log('I', logTag, 'Migration v7: cleared buyer sessions for Living Market overhaul')
@@ -327,7 +327,7 @@ generateDailySeed = function(gameDay)
 end
 
 -- ============================================================================
--- Poisson arrival system
+-- Poisson arrival system (Phase 49.3.1)
 -- ============================================================================
 
 -- Poisson sample using LCG (no external math library needed)
@@ -845,7 +845,7 @@ initializeListingsIfNeeded = function(gameDay)
 end
 
 -- ============================================================================
--- Player Listing CRUD
+-- Player Listing CRUD (Phase 50)
 -- ============================================================================
 
 addPlayerListing = function(listing)
@@ -919,7 +919,7 @@ markPlayerListingSold = function(listingId, buyerName, salePriceCents, gameDay)
 end
 
 -- ============================================================================
--- Buyer Session Management
+-- Buyer Session Management (Phase 50)
 -- ============================================================================
 
 getBuyerSessions = function()
@@ -1072,7 +1072,7 @@ generateTickBuyer = function(listing, tickIndex)
     hasUnread = true,
     messages = {},
     awaitingInit = true,
-    -- Living Market attributes
+    -- Living Market attributes (Phase 50.1)
     buyerTarget = latent.buyerTarget,
     buyerMax = latent.buyerMax,
     fitScore = latent.fitScore,
@@ -1174,7 +1174,7 @@ M.getFavoritedListings    = getFavoritedListings
 M.getListingStats         = getListingStats
 M.initializeListingsIfNeeded = initializeListingsIfNeeded
 
--- Player listing CRUD
+-- Phase 50: Player listing CRUD
 M.addPlayerListing              = addPlayerListing
 M.removePlayerListing           = removePlayerListing
 M.getPlayerListings             = getPlayerListings
@@ -1184,7 +1184,7 @@ M.updatePlayerListingPrice      = updatePlayerListingPrice
 M.updatePlayerListingDescription = updatePlayerListingDescription
 M.markPlayerListingSold         = markPlayerListingSold
 
--- Buyer session management
+-- Phase 50: Buyer session management
 M.getBuyerSessions              = getBuyerSessions
 M.getBuyerSessionsForListing    = getBuyerSessionsForListing
 M.cancelBuyerSessionsForListing = cancelBuyerSessionsForListing
@@ -1195,4 +1195,3 @@ M.getLastBuyerTickGameHours     = function() return marketplaceState.lastBuyerTi
 M.setLastBuyerTickGameHours     = function(h) marketplaceState.lastBuyerTickGameHours = h end
 
 return M
-

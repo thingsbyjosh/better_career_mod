@@ -3,7 +3,8 @@
 -- NOT an extension -- no lifecycle hooks, no state.
 -- All money values in integer cents.
 -- Uses pricingEngine LCG for deterministic randomness (no math.random).
--- v2 changes:
+--
+-- v2 changes (Phase 49.4):
 -- - Three-tier offer severity (classifyOffer replaces isInsultingOffer)
 -- - Mood-adjusted floor price (getEffectiveFloor)
 -- - Convergence-aware drain (transitionMood v2)
@@ -11,6 +12,7 @@
 -- - Counter-offer randomness jitter (computeCounterOffer v2)
 -- - Over-asking instant acceptance (evaluateOffer v2)
 -- - Per-archetype drain profiles and severity thresholds
+--
 -- BCMNegotiationUpdate payload shape (for Vue consumption):
 -- { listingId, archetype, mood, isBlocked, isGhosting, dealReached, dealPriceCents,
 --   dealExpiresGameDay, baselinePriceCents, lastSellerCounterCents, messages,
@@ -201,7 +203,7 @@ local computeTypingDelay
 local formatPrice
 local applyDefectLeverage
 local computeTimeSoftening
--- NPC buyer functions (Living Market)
+-- Phase 50.1: NPC buyer functions (Living Market)
 local pickBuyerArchetype
 local generateBuyerLatentAttributes
 local classifyPricingZone
@@ -789,7 +791,7 @@ computeTimeSoftening = function(listingAgeDays, archetypeKey)
 end
 
 -- ============================================================================
--- NPC Buyer Functions
+-- NPC Buyer Functions (Phase 50)
 -- ============================================================================
 
 -- Classify pricing zone based on ratio of asking price to market price
@@ -1385,7 +1387,7 @@ M.TARGET_PRICE_PARAMS      = TARGET_PRICE_PARAMS
 M.MOOD_LEVELS              = MOOD_LEVELS
 M.MOOD_INDEX               = MOOD_INDEX
 
--- NPC Buyer (Living Market)
+-- Phase 50.1: NPC Buyer (Living Market)
 M.pickBuyerArchetype           = pickBuyerArchetype
 M.generateBuyerLatentAttributes = generateBuyerLatentAttributes
 M.classifyPricingZone          = classifyPricingZone
@@ -1413,4 +1415,3 @@ M.BUYER_REACTIVE_PARAMS       = BUYER_REACTIVE_PARAMS
 M.MOOD_CONCESSION_MULT        = MOOD_CONCESSION_MULT
 
 return M
-

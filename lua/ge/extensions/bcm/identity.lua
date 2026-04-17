@@ -82,7 +82,7 @@ setIdentity = function(jsonStr)
     end
   end
 
-  -- Expiry = issue date + 8 years
+  -- Expiry = issue date + 8 years (per CONTEXT.md)
   local expiryDate = {
     day = issueDate.day,
     month = issueDate.month,
@@ -285,4 +285,3 @@ M.onSaveCurrentSaveSlot = onSaveCurrentSaveSlot
 M.onBeforeSetSaveSlot = onBeforeSetSaveSlot
 
 return M
-

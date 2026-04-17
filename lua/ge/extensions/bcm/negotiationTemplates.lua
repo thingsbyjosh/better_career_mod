@@ -2,6 +2,7 @@
 -- Stateless require()'able data module for negotiation message pools.
 -- NOT an extension -- no lifecycle hooks, no state.
 -- Mirrors listingTemplates.lua pattern: local M = {}, data tables, return M.
+--
 -- Structure: NEGOTIATION_MESSAGES[archetypeKey][language][messageType] = { "variant1", ... }
 -- Empty arrays {} indicate message type not applicable for that archetype.
 -- Placeholders: {price} (substituted by caller), {vehicle} (substituted by caller)
@@ -16,16 +17,16 @@ M.MESSAGE_TYPES = {
   "greeting", "counter_offer", "mood_warning", "block_message",
   "ghost_message", "pressure_tactic", "defect_response", "deal_confirm",
   "deal_expired", "proactive_ping",
-  -- v2: thinking excuses and threshold mood messages
+  -- v2 (Phase 49.4): thinking excuses and threshold mood messages
   "thinking_excuse", "threshold_message_cautious", "threshold_message_angry",
   "threshold_message_pre_block",
   -- v3: probe counter — good offer but seller wants to push a bit more
   "probe_counter",
   -- v3: final offer — seller won't move further, take it or leave it
   "final_offer",
-  -- defect denial (first push) and concession (second push)
+  -- Phase 52: defect denial (first push) and concession (second push)
   "defect_denial", "defect_concession",
-  -- v3: split-difference proposal and anchor repeat
+  -- v3 (Phase 85): split-difference proposal and anchor repeat
   "split_difference", "anchor_repeat"
 }
 
@@ -91,7 +92,7 @@ local NEGOTIATION_MESSAGES = {
         "Bad news — I ended up selling it to another buyer. Sorry about that.",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "I don't know, it's a lot of money... give me a day to think about it.",
         "Let me check what similar ones are going for. I'll get back to you tomorrow.",
@@ -225,7 +226,7 @@ local NEGOTIATION_MESSAGES = {
         "Malas noticias, al final se lo vendi a otro. Perdon.",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "No se, es mucho dinero... dame un dia para pensarlo.",
         "Dejame ver que precios hay por ahi. Te escribo manana.",
@@ -369,7 +370,7 @@ local NEGOTIATION_MESSAGES = {
         "Hi again! The {vehicle} is still here. I'm willing to negotiate if you're still interested!",
         "Are you still thinking about it? I can work with you on the price, just let me know!",
       },
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "I'm at work, I'll reply when I can.",
         "Sorry, dealing with some stuff right now. Let me get back to you tomorrow.",
@@ -507,7 +508,7 @@ local NEGOTIATION_MESSAGES = {
         "Hola de nuevo! El {vehicle} sigue aqui. Estoy dispuesto a negociar si te sigue interesando!",
         "Sigues pensandolo? Puedo hacer un esfuerzo en el precio, solo dime!",
       },
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Estoy trabajando, te contesto cuando pueda.",
         "Perdon, estoy liado con unas cosas. Manana te digo.",
@@ -648,7 +649,7 @@ local NEGOTIATION_MESSAGES = {
         "too late someone came thru with the cash yesterday lol",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "with another buyer rn ill let u know",
         "hold on bro got someone here rn ill hyu later",
@@ -789,7 +790,7 @@ local NEGOTIATION_MESSAGES = {
         "llegas tarde alguien vino ayer con la pasta jaja",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "estoy con otro comprador ahora te digo algo",
         "espera bro tengo a alguien aqui ya te escribo luego",
@@ -935,7 +936,7 @@ local NEGOTIATION_MESSAGES = {
         "Bad timing, just sold it this morning. Want me to let you know if I get another one in?",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "I'm with a client, give me a bit.",
         "Got someone looking at another car right now. Hit you back later.",
@@ -1069,7 +1070,7 @@ local NEGOTIATION_MESSAGES = {
         "Mal momento, lo acabo de vender esta manana. Quieres que te avise si me entra otro?",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Estoy con un cliente, dame un rato.",
         "Tengo a alguien viendo otro coche ahora. Luego te digo.",
@@ -1205,7 +1206,7 @@ local NEGOTIATION_MESSAGES = {
         "Gone. Someone came with cash. I can find you something similar though.",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Got a better offer on the table. Let me think about it.",
         "Running some numbers. Will get back to you.",
@@ -1332,7 +1333,7 @@ local NEGOTIATION_MESSAGES = {
         "Se fue. Vino alguien con efectivo. Puedo buscarte algo parecido.",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Tengo otra oferta mejor, dejame pensarlo.",
         "Haciendo cuentas. Manana te digo.",
@@ -1469,7 +1470,7 @@ local NEGOTIATION_MESSAGES = {
         "Unfortunately, the {vehicle} was purchased by another client yesterday. May I suggest some alternatives from our inventory?",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Let me check with the manager on this. I'll get back to you by tomorrow.",
         "I need to consult with our pricing team. We'll have an answer for you shortly.",
@@ -1603,7 +1604,7 @@ local NEGOTIATION_MESSAGES = {
         "Desafortunadamente, el {vehicle} fue adquirido por otro cliente ayer. Puedo sugerirle alternativas de nuestro inventario?",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Deja que lo consulte con el gerente. Manana le informo.",
         "Necesito consultarlo con nuestro equipo de precios. Tendremos una respuesta pronto.",
@@ -1743,7 +1744,7 @@ local NEGOTIATION_MESSAGES = {
         "The {vehicle} found a new home yesterday. Someone who really appreciated it came along.",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Need to think about whether I really want to sell at that price. Give me a day.",
         "I need to sleep on this. This car means a lot to me.",
@@ -1877,7 +1878,7 @@ local NEGOTIATION_MESSAGES = {
         "El {vehicle} encontro nuevo hogar ayer. Alguien que realmente lo valoro aparecio.",
       },
       proactive_ping = {},
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Necesito pensar si realmente quiero vender a ese precio. Dame un dia.",
         "Necesito dormir sobre esto. Este coche significa mucho para mi.",
@@ -2021,7 +2022,7 @@ local NEGOTIATION_MESSAGES = {
         "Hello? I was wondering if you still wanted the car? My kid says I should lower the price...",
         "Hey, the {vehicle} is still available! I could probably do a bit less if that helps?",
       },
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Uhh let me ask my brother-in-law, he knows about cars. I'll get back to you.",
         "I need to think about this... maybe ask my neighbor. Tomorrow ok?",
@@ -2159,7 +2160,7 @@ local NEGOTIATION_MESSAGES = {
         "Hola? Me preguntaba si todavia querias el coche? Mi hijo dice que deberia bajar el precio...",
         "Ey, el {vehicle} sigue disponible! Podria hacer un poco menos quizas?",
       },
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "Ehhh dejame preguntar a mi cunado que sabe de coches. Manana te digo.",
         "Necesito pensarlo... igual le pregunto al vecino. Manana vale?",
@@ -2303,7 +2304,7 @@ local NEGOTIATION_MESSAGES = {
         "HI DEAR!! THE {vehicle} IS STILL HERE!! I REALLY NEED TO SELL IT SOON!! CAN WE WORK SOMETHING OUT??",
         "HELLO?? ARE YOU STILL THERE?? THE CAR IS STILL FOR SALE IF YOU WANT IT!!",
       },
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "I NEED TO TALK TO MY SON ABOUT IT!! ILL WRITE BACK TOMORROW DEAR!!",
         "LET ME ASK MY GRANDSON!! HE KNOWS ABOUT THESE THINGS!! ILL GET BACK TO YOU!!",
@@ -2441,7 +2442,7 @@ local NEGOTIATION_MESSAGES = {
         "HOLA CIELO!! EL {vehicle} SIGUE AQUI!! NECESITO VENDERLO PRONTO!! PODEMOS LLEGAR A UN ACUERDO??",
         "HOLA?? SIGUES AHI?? EL COCHE SIGUE EN VENTA SI LO QUIERES!!",
       },
-      -- v2
+      -- v2 (Phase 49.4)
       thinking_excuse = {
         "TENGO QUE HABLARLO CON MI HIJO!! TE ESCRIBO MANANA CIELO!!",
         "DEJAME PREGUNTAR A MI NIETO!! EL SABE DE ESTAS COSAS!! TE DIGO ALGO!!",
@@ -2540,7 +2541,7 @@ M.getMessagePool = function(archetypeKey, language, messageType)
 end
 
 -- ============================================================================
--- NPC Buyer Message Pools
+-- NPC Buyer Message Pools (Phase 50)
 -- ============================================================================
 
 local BUYER_MESSAGES = {
@@ -3315,4 +3316,3 @@ M.NEGOTIATION_MESSAGES = NEGOTIATION_MESSAGES
 M.BUYER_MESSAGES = BUYER_MESSAGES
 
 return M
-

@@ -29,7 +29,7 @@ local sendGarageModeToVue
 -- ============================================================================
 local logTag = 'bcm_garageManagerApp'
 
--- Fixed tier upgrade costs(in dollars)
+-- Fixed tier upgrade costs per CONTEXT.md user decision (in dollars)
 local TIER_UPGRADE_COSTS = {
   [0] = 10000,  -- T0 -> T1
   [1] = 50000,  -- T1 -> T2
@@ -54,7 +54,7 @@ isAtOwnedGarage = function(computerId)
 end
 
 -- ============================================================================
--- Tri-state capability gate (owned / paidRental / backup / none)
+-- Phase 102: Tri-state capability gate (owned / paidRental / backup / none)
 -- ============================================================================
 -- Derives a garage's operational mode from existing data sources only; no new
 -- state. Consumers (Vue layer, action-gating logic) branch on this instead of
@@ -1119,4 +1119,3 @@ end
 M.onUpdate = onUpdateWrapped
 
 return M
-

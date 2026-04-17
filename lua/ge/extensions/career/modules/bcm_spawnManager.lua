@@ -2,12 +2,15 @@
 -- Handles player spawn on new career start and initial time setup
 -- Extension name: career_modules_bcm_spawnManager
 -- Auto-loaded by career core from /lua/ge/extensions/career/modules/
+--
 -- KEY DESIGN: Career modules are loaded inside the startFreeroam callback,
 -- which fires AFTER onWorldReadyState(2). This means career modules never
 -- receive onWorldReadyState(2) on the initial career load.
+--
 -- Solution: Use onCareerActive (which fires INSIDE the callback, after modules
 -- load) with a core_jobsystem delayed job. The world IS ready at this point
 -- because the startFreeroam callback only fires after the level loads.
+--
 -- onWorldReadyState is kept ONLY as a fallback for level switches during
 -- an active career (not the initial load).
 
@@ -33,8 +36,8 @@ local INITIAL_TIME = 0.0
 local FALLBACK_POS = {-680, 520, 114}
 local FALLBACK_ROT = {0, 0, -0.40, 0.92}
 
--- Custom tutorial spawn position (player spawns on foot facing toward Miramar)
--- Player position
+-- Phase 79: Custom tutorial spawn position (player spawns on foot facing toward Miramar)
+-- Player position from CONTEXT.md locked decision
 local TUTORIAL_PLAYER_POS = vec3(-1179.03, 1877.92, 96.04)
 -- Direction vector toward Miramar at (-1174.78, 1873.62, 94.71):
 -- Original angle was 180° off in-game. Rotated by π:
@@ -398,7 +401,7 @@ initializeNewCareer = function()
 
   -- 2. Spawn player: custom tutorial position for new career, starter garage otherwise
   if bcm_tutorial and not (bcm_settings and bcm_settings.getSetting("debugMode")) then
-    -- tutorial spawn at custom coordinates facing Miramar
+    -- Phase 79: tutorial spawn at custom coordinates facing Miramar
     gameplay_walk.setWalkingMode(true, TUTORIAL_PLAYER_POS, TUTORIAL_PLAYER_ROT)
     log("I", logTag, "Player spawned at tutorial position (facing Miramar)")
   else
@@ -492,4 +495,3 @@ M.onWorldReadyState = onWorldReadyState
 M.setPendingStartGarageId = setPendingStartGarageId
 
 return M
-

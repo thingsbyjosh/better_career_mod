@@ -1,5 +1,5 @@
 -- bcm/trailerCoupling.lua
--- Trailer re-coupling prototype module for
+-- Trailer re-coupling prototype module for Phase 98.
 -- Validates whether BeamNG's coupling APIs can reliably re-attach a trailer
 -- after both vehicles are spawned at a new position (post map-switch or teleport).
 -- Provides: serialization of coupling state, polling-based re-coupling via
@@ -247,7 +247,7 @@ end
 -- When idle (no pendingReCouple), returns immediately with zero overhead.
 -- @param dtReal number Real-time delta in seconds
 onUpdate = function(dtReal)
-  -- Poll for coupler offsets to be ready before calling placeTrailer
+  -- Phase 1: Poll for coupler offsets to be ready before calling placeTrailer
   if pendingReCouple then
     pendingReCouple.elapsed = pendingReCouple.elapsed + dtReal
 
@@ -275,7 +275,7 @@ onUpdate = function(dtReal)
     return
   end
 
-  -- Wait for onCouplerAttached confirmation after placeTrailer
+  -- Phase 2: Wait for onCouplerAttached confirmation after placeTrailer
   if pendingConfirmation then
     pendingConfirmation.elapsed = pendingConfirmation.elapsed + dtReal
 
@@ -384,8 +384,10 @@ end
 -- Works OUTSIDE career mode: teleports coupled tractor+trailer 50m forward
 -- and attempts re-coupling via the polling pipeline.
 -- Auto-detects the coupling type from the live vehicle data.
+--
 -- Usage from BeamNG console:
 --   bcm_trailerCoupling.testReCouple()
+--
 -- @param couplerType string|nil Optional override. If nil, auto-detected from serialized data.
 testReCouple = function(couplerType)
   -- Get player vehicle as tractor
@@ -487,6 +489,7 @@ end
 --- Test double-trailer chain re-coupling.
 -- Uses getVehicleTrain to discover the full chain and re-couples in order:
 -- tractor->trailer1 first, then trailer1->trailer2 on success.
+--
 -- Usage from BeamNG console:
 --   bcm_trailerCoupling.testDoubleTrailer()
 testDoubleTrailer = function()
@@ -618,6 +621,7 @@ end
 --- Log instructions for testing all 5 coupling types.
 -- Each type must be tested separately since the player needs to spawn
 -- different vehicle combinations for each coupling type.
+--
 -- Usage from BeamNG console:
 --   bcm_trailerCoupling.testAllTypes()
 testAllTypes = function()
@@ -667,4 +671,3 @@ M.testDoubleTrailer = testDoubleTrailer
 M.testAllTypes = testAllTypes
 
 return M
-

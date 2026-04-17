@@ -129,7 +129,7 @@ local activeLoans = {}         -- table keyed by loan ID
 local loanHistory = {}         -- array of completed/closed loans
 local activated = false
 local lastGeneratedOffers = nil -- cached offers from last generateOffers call
-local impoundContactId = nil   -- cached Belasco County Impound contact ID
+local impoundContactId = nil   -- cached Belasco County Impound contact ID (Phase 31)
 local pendingVehicleReturns = {} -- array of {returnGameDay, vehicles = [{model, config, niceName}], loanId}
 
 -- ============================================================================
@@ -1394,7 +1394,7 @@ executeRepossession = function(loan)
     -- Send impound notifications (SMS + email with Pay-to-Recover button)
     sendImpoundNotification(loan)
 
-    -- Generate breaking news article
+    -- Generate breaking news article (Phase 30)
     if bcm_breakingNews then
       bcm_breakingNews.onEvent("repossession", {
         vehicleNames = seizedList,
@@ -2312,4 +2312,3 @@ M.MORTGAGE_DOWN_PAYMENT_TIERS = MORTGAGE_DOWN_PAYMENT_TIERS
 M.MORTGAGE_TERMS = MORTGAGE_TERMS
 
 return M
-

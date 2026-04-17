@@ -1,7 +1,7 @@
 -- better_career_mod/lua/ge/extensions/bcm/rentals.lua
--- Per-Map Garages — Rental lifecycle module
+-- Phase 102: Per-Map Garages — Rental lifecycle module
 -- Pattern source: bcm/realEstateApp.lua (day-hook + banking + save/load)
--- Decisions: D-01..D-12
+-- Decisions: D-01..D-12 per .planning/phases/102-per-map-garages/102-CONTEXT.md
 
 local M = {}
 local logTag = 'bcm_rentals'
@@ -596,4 +596,3 @@ M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
 
 return M
-

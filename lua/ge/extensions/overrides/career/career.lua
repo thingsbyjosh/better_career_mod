@@ -305,7 +305,8 @@ end
 local function deactivateCareer(saveCareer)
   if not careerActive then return end
 
-  -- saveCurrent before this point. Saving here caused re-entrant onSaveFinished loops.
+  -- deactivateCareer does NOT save. switchCareerLevel already called saveCurrent
+  -- before this point. Saving here caused re-entrant onSaveFinished loops.
 
   M.onUpdate = nil
   careerActive = false
@@ -894,7 +895,7 @@ local function onWorldReadyState(state)
     end
     switchLevel = nil
   end
-  -- Transit vehicle restoration is handled by bcm_multimap.onWorldReadyState
+  -- Phase 97: Transit vehicle restoration is handled by bcm_multimap.onWorldReadyState
   -- which is called by BeamNG's hook system automatically (both modules receive this hook)
 end
 
@@ -910,6 +911,7 @@ end
 
 local function onSaveFinished()
   if switchLevel then
+    -- Keep switchLevel alive for onWorldReadyState to read.
     -- DO NOT clear switchLevel here — onWorldReadyState needs it to re-activate career
     spawn.preventPlayerSpawning = true
     freeroam_freeroam.startFreeroam(path.getPathLevelMain(switchLevel), nil, false, nil, function()
@@ -965,4 +967,3 @@ M.launchMostRecentCareer = launchMostRecentCareer
 rawset(_G, 'career_career', M)
 
 return M
-

@@ -463,7 +463,7 @@ isBackupGarage = function(garageId)
 end
 
 -- ============================================================================
--- Per-map owned garages query
+-- Per-map owned garages query (Phase 100.5-02)
 -- ============================================================================
 
 -- Returns an array of {id, displayName, isStarterGarage, isBackupGarage} entries for
@@ -473,6 +473,7 @@ end
 -- hypothetical future config omits mapName. Sorted alphabetically by display
 -- name. Keeps the selector UI (Plan 03) and the recoveryPrompt taxi override
 -- on the same source of truth so "owned here" always means the same thing.
+--
 -- Parameters:
 --   levelId  string|nil  Optional level id. Defaults to the current level.
 -- Returns:
@@ -709,4 +710,3 @@ M.syncAllPurchasedGaragesWithVanilla = syncAllPurchasedGaragesWithVanilla
 -- loadGarageConfig, syncGarageWithVanilla
 
 return M
-

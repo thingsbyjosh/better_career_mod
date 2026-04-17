@@ -99,12 +99,12 @@ unloadAllExtensions = function()
   extensions.unload("bcm_fixdProApp")
   extensions.unload("bcm_partsMetadata")
   extensions.unload("bcm_partsOrders")
-  -- Map switch and transit journal modules
+  -- Phase 97: Map switch and transit journal modules
   extensions.unload("bcm_multimap")
   extensions.unload("bcm_transitJournal")
-  -- Travel UI data enrichment bridge
+  -- Phase 100: Travel UI data enrichment bridge
   extensions.unload("bcm_multimapApp")
-  -- Trailer re-coupling prototype
+  -- Phase 98: Trailer re-coupling prototype
   extensions.unload("bcm_trailerCoupling")
 end
 
@@ -292,7 +292,7 @@ startup = function()
   -- Load real estate app (depends on garages + properties + banking)
   extensions.load("bcm_realEstateApp")
 
-  -- Load rentals module (depends on properties + banking + timeSystem + garages + multimapApp)
+  -- Phase 102: Load rentals module (depends on properties + banking + timeSystem + garages + multimapApp)
   extensions.load("bcm_rentals")
 
   -- Load marketplace app (depends on timeSystem + career marketplace module)
@@ -347,11 +347,11 @@ startup = function()
   extensions.load("bcm_transitJournal")
   setExtensionUnloadMode("bcm_transitJournal", "manual")
 
-  -- Travel UI data enrichment bridge (depends on multimap + banking + garages)
+  -- Phase 100: Travel UI data enrichment bridge (depends on multimap + banking + garages)
   extensions.load("bcm_multimapApp")
   setExtensionUnloadMode("bcm_multimapApp", "manual")
 
-  -- Trailer re-coupling prototype (must survive level switches)
+  -- Phase 98: Trailer re-coupling prototype (must survive level switches)
   extensions.load("bcm_trailerCoupling")
   setExtensionUnloadMode("bcm_trailerCoupling", "manual")
 
@@ -455,4 +455,3 @@ M.onModActivated = onModActivated
 M.onModDeactivated = onModDeactivated
 
 return M
-

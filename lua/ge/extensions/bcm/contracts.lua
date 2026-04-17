@@ -1,7 +1,7 @@
 -- BCM Contracts Extension
 -- Contract pool data layer: pool generation with weighted type distribution,
 -- 8-hour rotation windows, CDL gating, save/load persistence, and debug commands.
--- This is the data backbone for the trucking system.
+-- This is the data backbone for the trucking system (Phase 64).
 -- Subsequent phases (FSM/Phase 66, UI/Phase 67, phone/Phase 68) consume this pool.
 -- Extension name: bcm_contracts
 -- Loaded by bcm_extensionManager after bcm_policeDamage.
@@ -75,7 +75,7 @@ local CDL_BY_CARGO = {
   material = "CDL-A",
 }
 
--- BCM depot facilities — hardcoded from bcm_depots.facilities.json
+-- BCM depot facilities — hardcoded from bcm_depots.facilities.json (Phase 63.1)
 -- Used as fallback if freeroam_facilities API doesn't expose them cleanly.
 local BCM_DEPOT_FALLBACK = {
   { facId = "bcm_church",   displayName = "Church",     psName = "bcm_church_parking1"  },
@@ -844,4 +844,3 @@ M.debugDumpParcelTemplates = debugDumpParcelTemplates
 M.debugSetCdl            = debugSetCdl
 
 return M
-

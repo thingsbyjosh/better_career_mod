@@ -3,7 +3,8 @@
 -- counter, block, deal, expire. Delayed responses delivered via onBCMNewGameDay.
 -- Proactive pings re-engage dormant conversations.
 -- Extension name: bcm_negotiation
--- v2 changes:
+--
+-- v2 changes (Phase 49.4):
 -- - Three-tier severity via classifyOffer (replaces isInsultingOffer)
 -- - Re-bid detection with severe mood penalty
 -- - Over-asking instant acceptance
@@ -12,6 +13,7 @@
 -- - floorCents on session, excluded from Vue payload
 -- - isThinking / lastPlayerOfferCents / archetypeSeverityThresholds in Vue payload
 -- - roundsAtGoodMood tracking for brittle archetypes
+--
 -- State lives in marketplace.json under the "negotiations" key.
 -- Uses lazy require for negotiationEngine and negotiationTemplates to avoid
 -- circular dependency issues (mirrors listingGenerator pattern from Phase 46).
@@ -38,7 +40,7 @@ local getSession
 local isActivated
 local getMarketplace
 local fireSessionUpdate
--- Buyer-side functions
+-- Phase 50: Buyer-side functions
 local processBuyerInit
 local processPlayerCounterToNPCBuyer
 local confirmBuyerSale
@@ -64,7 +66,7 @@ local logTag = 'bcm_negotiation'
 --               responseText, counterCents }
 local pendingTimers = {}
 
--- Separate buyer timer array (avoids collision with seller timers)
+-- Phase 50: Separate buyer timer array (avoids collision with seller timers)
 pendingBuyerTimers = {}
 
 
@@ -269,7 +271,7 @@ fireSessionUpdate = function(session)
     pendingResponse = session.pendingResponse ~= nil,
     vehicleName = session.vehicleName,
     language = session.language,
-    -- Player-first flow fields
+    -- Player-first flow fields (Phase 49.1)
     awaitingPlayerInit = session.awaitingPlayerInit or false,
     awaitingGreeting = session.awaitingGreeting or false,
     sellerHasResponded = session.sellerHasResponded or false,
@@ -362,7 +364,7 @@ startOrGetSession = function(listingId, listing)
     pendingResponse = nil,
     sellerLastSeenGameDay = gameDay,
     createdGameDay = gameDay,
-    -- Player-first flow
+    -- Player-first flow (Phase 49.1)
     awaitingPlayerInit = true,
     sellerHasResponded = false,
     awaitingGreeting = false,
@@ -876,7 +878,7 @@ processLeverage = function(listingId, defectId, defectSeverity)
   local gameDay = getCurrentGameDay()
   local language = session.language or "en"
 
-  -- Track push counts per defect for two-step denial/concession
+  -- Phase 52: Track push counts per defect for two-step denial/concession
   session.defectPushCounts = session.defectPushCounts or {}
   local pushCount = (session.defectPushCounts[defectId] or 0) + 1
   session.defectPushCounts[defectId] = pushCount
@@ -1488,7 +1490,7 @@ M.onBeforeSetSaveSlot = function()
 end
 
 -- ============================================================================
--- NPC Buyer Session Functions
+-- NPC Buyer Session Functions (Phase 50)
 -- ============================================================================
 
 -- Pick a message index that avoids repeating the last used index for this session
@@ -1526,7 +1528,7 @@ fireBuyerSessionUpdate = function(listingId, buyerId, session)
     vehicleTitle = session.vehicleTitle,
     vehiclePreview = session.vehiclePreview,
     listingPriceCents = session.listingPriceCents,
-    -- Living Market fields
+    -- Living Market fields (Phase 50.1)
     zone = session.zone,
     strategy = session.strategy,
     buyerInterest = session.buyerInterest,
@@ -1658,7 +1660,7 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
   session.lastActivityGameDay = gameDay
   session.roundCount = (session.roundCount or 0) + 1
 
-  -- Classify counter and apply interest decay
+  -- Phase 50.1: Classify counter and apply interest decay
   if session.buyerInterest then
     local buyerMax = session.buyerMax or session.marketValueCents or counterCents
     local effectiveMax = math.floor(buyerMax * (0.85 + (session.buyerInterest or 0.5) * 0.15))
@@ -2342,7 +2344,7 @@ M.fireSessionUpdate = fireSessionUpdate  -- Phase 52: needed by bcm_defects for 
 M.isActivated = isActivated
 M.tickPendingTimers = tickTimers
 
--- NPC Buyer session processing
+-- Phase 50: NPC Buyer session processing
 M.processBuyerInit               = processBuyerInit
 M.processPlayerCounterToNPCBuyer = processPlayerCounterToNPCBuyer
 M.confirmBuyerSale               = confirmBuyerSale
@@ -2351,4 +2353,3 @@ M.tickDistributedBuyers          = tickDistributedBuyers
 M.fireBuyerSessionUpdate         = fireBuyerSessionUpdate
 
 return M
-

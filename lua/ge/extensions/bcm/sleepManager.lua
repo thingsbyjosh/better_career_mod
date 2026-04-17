@@ -90,7 +90,7 @@ requestSleep = function(targetTod)
     return false
   end
 
-  -- Enter sleeping state, notify UI
+  -- Phase 1: Enter sleeping state, notify UI
   currentState = STATE.SLEEPING
 
   -- Pause time during sleep animation
@@ -101,7 +101,7 @@ requestSleep = function(targetTod)
   guihooks.trigger('BCMSleepStarted', {})
   log('I', logTag, 'Sleep started. Target hours: ' .. tostring(gameHours))
 
-  -- After delay, advance time and show summary
+  -- Phase 2: After delay, advance time and show summary
   -- Store captured values for the timer callback
   local capturedGameDaysAdvance = gameDaysAdvance
   local capturedGameHours = gameHours
@@ -190,4 +190,3 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
 end
 
 return M
-

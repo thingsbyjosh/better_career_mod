@@ -1,7 +1,7 @@
 -- BCM Speed Traps Override
 -- Overrides vanilla career/modules/speedTraps.lua to route camera fines through
 -- BCM's economy system (banking, ledger, notifications) instead of vanilla's trivial fines.
--- Radar Cameras — fixed speed cameras + red-light cameras.
+-- Phase 61: Radar Cameras — fixed speed cameras + red-light cameras.
 -- Extension name: career_modules_speedTraps (override)
 
 local M = {}
@@ -263,4 +263,3 @@ M.onCareerModulesActivated = onCareerModulesActivated
 M.onExtensionUnloaded = onExtensionUnloaded
 
 return M
-

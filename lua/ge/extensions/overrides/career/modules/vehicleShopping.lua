@@ -1096,7 +1096,7 @@ M.onUiChangedState = onUiChangedState
 
 M.getEligibleVehiclesWithoutDealershipVehicles = getEligibleVehiclesWithoutDealershipVehicles
 
--- BCM mock vehicle injection for test drives
+-- BCM mock vehicle injection for test drives (Phase 52)
 -- Allows bcm_defects to register a temporary entry in vehiclesInShop so that
 -- vanilla inspectVehicle.startInspection → spawnVehicle → getVehicleInfoByShopId
 -- can find it.

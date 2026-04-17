@@ -2,7 +2,7 @@
 -- Pack-based multi-stop delivery dispatch system: FSM backbone, seed-based pool
 -- generation, 20-level driver progression (vanilla delivery branch), save/load
 -- persistence, banking integration, and full debug command suite.
--- This is the backend data layer for the PlanEx dispatch system.
+-- This is the backend data layer for the PlanEx dispatch system (Phase 73).
 -- Subsequent phases (waypoint/Phase 74, IE site/Phase 75, phone app/Phase 76) consume this module.
 -- Extension name: bcm_planex
 -- Loaded by bcm_extensionManager after bcm_contracts.
@@ -83,28 +83,28 @@ local packHasMechanic
 local checkSpeedInfraction
 local estimateDriveSeconds
 local checkTemperatureTimers
--- pack type system
+-- Phase 75.1: pack type system
 local loadPackTypes
 local loadFacilityTags
 local pickPackType
 local filterCandidatesByDestMode
--- star rating system
+-- Phase 75.2: star rating system
 local checkGForce
 local measurePrecision
 local calculateStarRating
 local computeAveragePrecisionScore
 local computeTimeScore
--- loaner vehicle system
+-- Phase 77.3: loaner vehicle system
 local findOffsetSpawnPos
 local spawnLoanerAtDepot
 local despawnLoaner
 local computeRentalRate
--- tutorial pack injection
+-- Phase 80: tutorial pack injection
 local injectTutorialPack
 local assessLoanerDamage
 local getLoanerTiers
 local selectLoanerTier
--- courier route system
+-- Phase 81.2: courier route system
 local loadTagPairs
 local loadSpecialRoutes
 local loadDeliveryParcels
@@ -124,7 +124,7 @@ local optimizeStopOrder
 local respawnPickupCargoOnLoad
 local getDepotPosition
 local resolveFacilityPsPath
--- pause/resume route system
+-- Phase 96.1: pause/resume route system
 local pauseRoute
 local resumeRoute
 
@@ -269,7 +269,7 @@ local HIGH_DAMAGE_XP_PENALTY = 0.25       -- 75% XP reduction for high damage st
 -- Lower tiers get slightly more generous timers since they have simpler routes
 local URGENT_TIER_FACTORS = { [1]=1.3, [2]=1.2, [3]=1.1, [4]=1.05, [5]=1.0 }
 
--- Star rating constants
+-- Phase 75.2: Star rating constants
 local STAR_WEIGHTS = { time=0.25, precision=0.30, gforce=0.25, police=0.20 }
 local STAR_MULTIPLIERS = { [1]=0.50, [2]=0.70, [3]=0.90, [4]=1.00, [5]=1.10 }
 local STAR_THRESHOLDS = { {90, 5}, {75, 4}, {50, 3}, {25, 2} } -- score >= threshold -> stars; else 1
@@ -309,7 +309,7 @@ local planexState = {
   accumulatedXP  = 0,   -- Running total of per-stop XP (for star % adjustment at completePack)
   grossPay       = 0,   -- Running total of per-stop payouts WITHOUT damage (for history gross display)
   deliveryVehicleInventoryId = nil,  -- Inventory ID of the vehicle used for the active delivery
-  -- history, lifetime stats, vehicle capacity cache
+  -- Phase 75: history, lifetime stats, vehicle capacity cache
   completedRoutes     = {},   -- FIFO array of completed route summaries (max 50)
   earningsToday       = 0,    -- Reset on new game day
   totalEarnings       = 0,    -- Lifetime earnings accumulator
@@ -322,7 +322,7 @@ local planexState = {
   speedOverLimitTimer      = 0,   -- seconds player has been continuously over limit
   speedPenaltyAccumulated  = 0,   -- accumulated penalty (0.0–0.5) applied at completePack
   speedInfractionCount     = 0,   -- number of 5s infractions this route
-  -- Star rating per-route tracking
+  -- Phase 75.2: Star rating per-route tracking
   routeElapsedTime        = 0,      -- accumulated dtReal seconds while en_route/returning (pause-safe)
   routeArrestCount        = 0,      -- arrests during this route
   stopPrecisionScores     = {},     -- {[stopIndex] = 0-100}
@@ -333,7 +333,7 @@ local planexState = {
   -- Streak persistence (saved/loaded)
   bestStreak              = 0,      -- best consecutive 5-star count (persisted)
   currentStreak           = 0,      -- current consecutive 5-star count (persisted)
-  -- loaner vehicle state
+  -- Phase 77.3: loaner vehicle state
   loanerSelectedTier    = nil,   -- nil = no loaner, 1-5 = tier selected
   loanerInventoryId     = nil,   -- career_modules_inventory ID of spawned loaner
   loanerVehId           = nil,   -- raw vehicle object ID of spawned loaner
@@ -357,10 +357,10 @@ local cargoScreenWasOpen = false      -- track vanilla cargo screen state to res
 local tmpVec = nil  -- Lazy-init vec3 for distance calculations
 local originalSetBestRoute = nil     -- monkey-patch: original vanilla setBestRoute
 
--- pack type system caches (loaded once from JSON, then cached)
+-- Phase 75.1: pack type system caches (loaded once from JSON, then cached)
 local packTypeDefs = nil    -- cached from bcm_planex.packTypes.json
 local facilityTagMap = nil  -- cached from bcm_planex.facilityTags.json
--- courier route system caches
+-- Phase 81.2: courier route system caches
 local tagPairsCache = nil       -- cached from bcm_planex.tagPairs.json
 local specialRoutesCache = nil  -- cached from bcm_planex.specialRoutes.json
 local deliveryParcelsCache = nil -- cached from bcm_planex.deliveryParcels.json
@@ -540,7 +540,7 @@ enumerateStopCandidates = function()
     log('W', logTag, 'No delivery facilities found from any source — pool cannot be generated')
   end
 
-  -- attach facility tag to each candidate for locked-dest routing
+  -- Phase 75.1: attach facility tag to each candidate for locked-dest routing
   local tags = loadFacilityTags()
   for _, cand in ipairs(candidates) do
     cand.tag = tags[cand.facId] or nil
@@ -605,7 +605,7 @@ end
 -- Estimate pack pay based on a cargo simulation (for pack card display).
 -- Uses DEFAULT_ESTIMATE_CAPACITY to approximate what an average vehicle would earn.
 -- Actual pay is computed from real cargo in generateCargoForPack.
--- typeDef optional, applies payMultiplier if provided.
+-- Phase 75.1: typeDef optional, applies payMultiplier if provided.
 computePackPay = function(tier, stopCount, totalDistanceM, typeDef)
   local parcelDefs = jsonReadFile('gameplay/delivery/bcm_planex.deliveryParcels.json')
   if not parcelDefs then return stopCount * 20000 end -- fallback
@@ -656,7 +656,7 @@ computePackPay = function(tier, stopCount, totalDistanceM, typeDef)
 
   -- Stop-count bonus (matches generateCargoForPack logic) — Phase 96.1: 7% per extra stop
   local stopBonus = 1 + math.max(0, stopCount - 3) * 0.07
-  -- apply pack type pay multiplier to base estimate
+  -- Phase 75.1: apply pack type pay multiplier to base estimate
   local payMult = (typeDef and typeDef.payMultiplier) or 1.0
   return math.floor(totalPay * stopBonus * payMult)
 end
@@ -796,7 +796,7 @@ checkTemperatureTimers = function()
 end
 
 -- ============================================================================
--- Star rating data collection functions
+-- Phase 75.2: Star rating data collection functions
 -- ============================================================================
 
 -- G-force sampling — called every frame during en_route; has its own 0.5s internal timer
@@ -1015,7 +1015,7 @@ calculateStarRating = function(pack)
 end
 
 -- ============================================================================
--- Pack type data layer
+-- Pack type data layer (Phase 75.1)
 -- ============================================================================
 
 -- Load and cache pack type definitions from JSON
@@ -1048,7 +1048,7 @@ loadFacilityTags = function()
   return facilityTagMap
 end
 
--- Load and cache tag-pair mappings (sender → receiver tag coherence)
+-- Phase 81.2: Load and cache tag-pair mappings (sender → receiver tag coherence)
 loadTagPairs = function()
   if tagPairsCache then return tagPairsCache end
   tagPairsCache = jsonReadFile('/gameplay/delivery/bcm_planex.tagPairs.json')
@@ -1063,7 +1063,7 @@ loadTagPairs = function()
   return tagPairsCache
 end
 
--- Load and cache special route definitions
+-- Phase 81.2: Load and cache special route definitions
 loadSpecialRoutes = function()
   if specialRoutesCache then return specialRoutesCache end
   specialRoutesCache = jsonReadFile('/gameplay/delivery/bcm_planex.specialRoutes.json')
@@ -1078,7 +1078,7 @@ loadSpecialRoutes = function()
   return specialRoutesCache
 end
 
--- Load and cache delivery parcel definitions (with pickup types)
+-- Phase 81.2: Load and cache delivery parcel definitions (with pickup types)
 loadDeliveryParcels = function()
   if deliveryParcelsCache then return deliveryParcelsCache end
   deliveryParcelsCache = jsonReadFile('/gameplay/delivery/bcm_planex.deliveryParcels.json')
@@ -1093,12 +1093,12 @@ loadDeliveryParcels = function()
   return deliveryParcelsCache
 end
 
--- Generate PNX-XXXX route code
+-- Phase 81.2: Generate PNX-XXXX route code
 generateRouteCode = function()
   return string.format("PNX-%04d", math.random(1000, 9999))
 end
 
--- Generate pickup definitions for a single stop
+-- Phase 81.2: Generate pickup definitions for a single stop
 -- pickupVolume: fraction of deliveryWeight that becomes pickups (e.g. 0.35 = 35%)
 -- Only ~40% of stops actually have pickups (realistic — not every address has outgoing packages)
 generatePickupsForStop = function(stop, deliveryWeight, pickupVolume)
@@ -1216,7 +1216,7 @@ getFatigueMultiplier = function()
 end
 
 -- ============================================================================
--- Loaner vehicle system
+-- Phase 77.3: Loaner vehicle system
 -- ============================================================================
 
 -- Compute rental rate based on planex reputation level.
@@ -1489,7 +1489,7 @@ despawnLoaner = function()
 end
 
 -- ============================================================================
--- GPS and depot arrival helpers
+-- GPS and depot arrival helpers (Phase 74)
 -- ============================================================================
 
 -- Set GPS arrow to depot warehouse parking spot
@@ -1899,6 +1899,7 @@ end
 
 -- Optimize stop order using nearest-neighbor with positional pinning.
 -- Pinned stops are fixed at specific positions; free stops are optimized around them.
+--
 -- @param pack: the pack to optimize
 -- @param pinnedPositions: (optional) table { [position] = stopIndex }
 --   e.g. { [1] = 3 } = stop 3 at position 1, rest optimized
@@ -2094,16 +2095,16 @@ respawnPickupCargoOnLoad = function(pack)
 end
 
 -- Two-phase depot pickup detection. Called every 1s when routeState == 'traveling_to_depot'.
--- Player arrives near depot → register transient moves so vanilla shows "Pick Up" button.
+-- Phase 1: Player arrives near depot → register transient moves so vanilla shows "Pick Up" button.
 --          (We can't register them at accept time because the player is at the computer, far from vehicle,
 --          and getNearbyVehicleCargoContainers needs proximity to find the vehicle's containers.)
--- After vanilla "Pick Up" moves cargo from facility to vehicle → transition to en_route.
+-- Phase 2: After vanilla "Pick Up" moves cargo from facility to vehicle → transition to en_route.
 checkDepotPickup = function()
   if planexState.routeState ~= 'traveling_to_depot' then return end
   local pack = planexState.activePack
   if not pack or not pack.stops then return end
 
-  -- Check if vanilla already moved any parcel into the vehicle
+  -- Phase 2: Check if vanilla already moved any parcel into the vehicle
   for _, stop in ipairs(pack.stops) do
     if stop.parcelId then
       local cargo = career_modules_delivery_parcelManager.getCargoById(stop.parcelId)
@@ -2115,7 +2116,7 @@ checkDepotPickup = function()
     end
   end
 
-  -- If transient moves not yet registered, check if player is now near vehicle
+  -- Phase 1: If transient moves not yet registered, check if player is now near vehicle
   if pack._transientMovesRegistered then return end
 
   career_modules_delivery_general.getNearbyVehicleCargoContainers(function(containers)
@@ -2591,7 +2592,7 @@ end
 -- Build stops for a pack
 -- ============================================================================
 
--- accepts optional packTypeDef for locked-dest routing
+-- Phase 75.1: accepts optional packTypeDef for locked-dest routing
 buildStopsForPack = function(candidates, density, packTypeDef)
   local config = DENSITY_CONFIG[density] or DENSITY_CONFIG.low
 
@@ -2651,7 +2652,7 @@ buildStopsForPack = function(candidates, density, packTypeDef)
     })
   end
 
-  -- Enrich each stop with sender-receiver tag coherence and pickup definitions
+  -- Phase 81.2: Enrich each stop with sender-receiver tag coherence and pickup definitions
   local tagPairs = loadTagPairs()
   local facTags = loadFacilityTags()
   local pvol = (packTypeDef and packTypeDef.pickupVolume) or 0.35
@@ -2839,7 +2840,7 @@ assignDepot = function(stops, candidates)
 end
 
 -- ============================================================================
--- Build a pack from a special route definition
+-- Phase 81.2: Build a pack from a special route definition
 -- ============================================================================
 
 buildRouteFromSpecial = function(sDef, sKey, candidates)
@@ -3019,7 +3020,7 @@ buildRouteFromSpecial = function(sDef, sKey, candidates)
     flavorText        = sDef.flavorText,
     speedLimitKmh     = nil,
     minContainerSize  = nil,
-    -- courier route fields
+    -- Phase 81.2: courier route fields
     routeCode         = generateRouteCode(),
     isSpecialRoute    = true,
     specialRouteId    = sKey,
@@ -3111,7 +3112,7 @@ generatePool = function(rotationId)
     return
   end
 
-  -- pre-load pack types once for this generation
+  -- Phase 75.1: pre-load pack types once for this generation
   local typeDefs = loadPackTypes()
 
   local poolSize = computePoolSize(planexState.driverLevel)
@@ -3124,7 +3125,7 @@ generatePool = function(rotationId)
     local tier = pickTierForLevel(planexState.driverLevel)
     local density = DENSITY_TIERS[((i - 1) % #DENSITY_TIERS) + 1]
 
-    -- pick pack type for this tier
+    -- Phase 75.1: pick pack type for this tier
     local typeId, typeDef = pickPackType(tier, typeDefs)
 
     -- Build stops filtered by pack type's destMode/destTag
@@ -3185,7 +3186,7 @@ generatePool = function(rotationId)
       depotDistanceKm   = math.floor((depotDistanceM / 1000) * 10) / 10,
       -- Runtime tracking (not persisted with pool)
       stopsDelivered    = 0,
-      -- pack type fields
+      -- Phase 75.1: pack type fields
       packTypeId        = typeId,
       packTypeName      = typeDef.name,
       mechanics         = typeDef.mechanics or {},
@@ -3196,7 +3197,7 @@ generatePool = function(rotationId)
       flavorText        = typeDef.flavorText,
       speedLimitKmh     = typeDef.speedLimitKmh,
       minContainerSize  = typeDef.minContainerSize,
-      -- courier route fields
+      -- Phase 81.2: courier route fields
       routeCode         = generateRouteCode(),
       isSpecialRoute    = false,
       specialRouteId    = nil,
@@ -3208,7 +3209,7 @@ generatePool = function(rotationId)
       collectMode       = typeDef.collectMode or false,
     }
 
-    -- build stopOrder index array and compute totalPickupCount
+    -- Phase 81.2: build stopOrder index array and compute totalPickupCount
     for idx = 1, #stops do
       table.insert(pack.stopOrder, idx)
     end
@@ -3225,7 +3226,7 @@ generatePool = function(rotationId)
     -- Add depot as last stop (for depot-return routes)
     appendDepotStop(pack, candidates)
 
-    -- optimizeStopOrder moved to requestPackDetail (lazy, on-demand).
+    -- Phase 96.1: optimizeStopOrder moved to requestPackDetail (lazy, on-demand).
     -- Stop order is optimized when the player views pack detail, not at pool generation time.
 
     table.insert(pool, pack)
@@ -3233,7 +3234,7 @@ generatePool = function(rotationId)
     ::continue::
   end
 
-  -- Special route injection (0-2 per rotation)
+  -- Phase 81.2: Special route injection (0-2 per rotation)
   local specialDefs = loadSpecialRoutes()
   local specialKeys = {}
   for k, v in pairs(specialDefs) do
@@ -3254,12 +3255,12 @@ generatePool = function(rotationId)
         specialPack.hasDepotReturn = false
       end
       appendDepotStop(specialPack, candidates)
-      -- optimizeStopOrder deferred to requestPackDetail (lazy)
+      -- Phase 96.1: optimizeStopOrder deferred to requestPackDetail (lazy)
       table.insert(pool, specialPack)
     end
   end
 
-  -- enforce pool guarantees
+  -- Phase 75.1: enforce pool guarantees
   -- Guarantee >= 3 distinct pack type IDs
   local typeIdSet = {}
   local typeIdCount = 0
@@ -3538,7 +3539,7 @@ acceptPack = function(packId)
     effectiveCapacity = math.max(1, math.floor(usingLoaner.capacity * sliderPct / 100))
   end
 
-  -- container size gate — prevent accepting if vehicle's largest container is too small
+  -- Phase 75.1: container size gate — prevent accepting if vehicle's largest container is too small
   if pack.minContainerSize and pack.minContainerSize > 0 then
     local largestContainer = effectiveCapacity  -- loaner = single cargo area, so capacity IS largest
     if not usingLoaner then
@@ -3566,7 +3567,7 @@ acceptPack = function(packId)
   planexState.speedPenaltyAccumulated = 0
   planexState.speedInfractionCount    = 0
 
-  -- reset star rating tracking for new route
+  -- Phase 75.2: reset star rating tracking for new route
   planexState.routeElapsedTime    = 0
   planexState.routeArrestCount    = 0
   planexState.stopPrecisionScores = {}
@@ -3575,7 +3576,7 @@ acceptPack = function(packId)
   planexState.gforceTimer         = 0
   planexState.damageBaseline      = nil  -- reset; will be captured in onArriveAtDepot
 
-  -- Always regenerate manifest at accept time with the slider-adjusted capacity.
+  -- Phase 81.1: Always regenerate manifest at accept time with the slider-adjusted capacity.
   -- generateCargoForPool generated at full vehicle capacity for estimation;
   -- now we regenerate at the effective (slider-adjusted) capacity for the real delivery.
   log('I', logTag, string.format('acceptPack: regenerating manifest at effectiveCapacity=%d (vehicleCapacity=%s, manifestCap=%s)',
@@ -3598,10 +3599,10 @@ acceptPack = function(packId)
     return nil
   end
 
-  -- Store loaner tier in pack so it survives save/load regardless of state cleanup
+  -- Phase 96.1: Store loaner tier in pack so it survives save/load regardless of state cleanup
   pack.loanerTier = planexState.loanerSelectedTier or nil
 
-  -- Loaner vehicle handling
+  -- Phase 77.3: Loaner vehicle handling
   if planexState.loanerSelectedTier then
     if planexState.loanerVehId and planexState.loanerIdleTimer then
       -- Reuse existing idle loaner — cancel idle timer
@@ -3679,7 +3680,7 @@ onArriveAtDepot = function()
 
   planexState.routeState = 'en_route'
 
-  -- initialize route timer and G-force tracking on en_route start
+  -- Phase 75.2: initialize route timer and G-force tracking on en_route start
   planexState.routeElapsedTime = 0  -- accumulated via dtReal in onUpdate (pause-safe)
   planexState.prevVehVel       = nil
   planexState.gforceTimer    = 0
@@ -3863,7 +3864,7 @@ completeStop = function(stopIndex)
   planexState.accumulatedPay = (planexState.accumulatedPay or 0) + stopPay
   planexState.grossPay = (planexState.grossPay or 0) + stopPay
 
-  -- record per-stop precision score for star rating (no damage score)
+  -- Phase 75.2: record per-stop precision score for star rating (no damage score)
   table.insert(planexState.stopPrecisionScores, measurePrecision(stop))
 
   -- Record per-stop summary for history UI (no damage deduction per stop)
@@ -4023,7 +4024,7 @@ completePack = function()
       log('I', logTag, string.format('Reputation granted: +%d planexReputation (%d stops, %d stars)', repGain, pack.stopsDelivered or 0, stars))
     end
 
-    -- Loaner usage tracking — daily fee charged at end of game day
+    -- Phase 77.3: Loaner usage tracking — daily fee charged at end of game day
     local loanerGrossPay        = finalPay
     local loanerRentalDeduction = 0
     if planexState.loanerSelectedTier then
@@ -4036,7 +4037,7 @@ completePack = function()
       log('I', logTag, string.format('Loaner tier %d marked as used today (daily fee at end of day)', tier))
     end
 
-    -- Start idle timer instead of immediate despawn — player can reuse loaner for next pack
+    -- Phase 77.3: Start idle timer instead of immediate despawn — player can reuse loaner for next pack
     if planexState.loanerInventoryId or planexState.loanerVehId then
       planexState.loanerIdleTimer = LOANER_IDLE_TIMEOUT
       loanerIdleWarningShown = false
@@ -4069,7 +4070,7 @@ completePack = function()
       if s.overtimePenalty then routeHadOvertime = true; break end
     end
 
-    -- Use original totals if route was resumed (pre-pause + post-resume combined)
+    -- Phase 96.1: Use original totals if route was resumed (pre-pause + post-resume combined)
     local totalDeliveryStops = pack._originalStopCount or ((pack.stopCount or #pack.stops) - (pack.hasDepotReturn ~= false and 1 or 0))
     local totalDelivered = (pack._deliveredPreResume or 0) + (pack.stopsDelivered or 0)
 
@@ -4100,11 +4101,11 @@ completePack = function()
       driverLevel    = planexState.driverLevel,
       prevLevel      = prevLevel,
       leveledUp      = planexState.driverLevel > prevLevel,
-      -- overtime flag for results popup note
+      -- Phase 77: overtime flag for results popup note
       overtimeApplied = routeHadOvertime,
       -- Reputation data for results popup
       repData               = getPlanexRepData(),
-      -- loaner breakdown for results popup
+      -- Phase 77.3: loaner breakdown for results popup
       loanerTier            = planexState.loanerSelectedTier,
       loanerDailyCost       = getLoanerDailyCost(planexState.loanerSelectedTier or 0),
       loanerRepairCharged   = planexState.loanerRepairCharged   or 0,
@@ -4124,7 +4125,7 @@ completePack = function()
       be:setSimulationTimeScale(0)
     end
 
-    -- Push completed route summary to history (field names match PlanExHistory.vue)
+    -- Phase 75: Push completed route summary to history (field names match PlanExHistory.vue)
     local fatApplied = fatigueMult < 1.0
     table.insert(planexState.completedRoutes, {
       packId = pack.id,
@@ -4179,7 +4180,7 @@ completePack = function()
     planexState.speedOverLimitTimer      = 0
     planexState.speedPenaltyAccumulated  = 0
     planexState.speedInfractionCount     = 0
-    -- reset star tracking fields
+    -- Phase 75.2: reset star tracking fields
     planexState.routeElapsedTime         = 0
     planexState.routeArrestCount         = 0
     planexState.stopPrecisionScores      = {}
@@ -4187,14 +4188,14 @@ completePack = function()
     planexState.prevVehVel               = nil
     planexState.gforceTimer              = 0
     planexState.damageBaseline           = nil
-    -- reset financial loaner fields (keep tier/inventoryId/vehId alive for idle reuse)
+    -- Phase 77.3: reset financial loaner fields (keep tier/inventoryId/vehId alive for idle reuse)
     planexState.loanerRentalRate      = 0
     planexState.loanerTiersUsedToday  = {}
     planexState.loanerGrossPay        = 0
     planexState.loanerRentalDeduction = 0
     planexState.loanerRepairCharged   = 0
 
-    -- if this was the tutorial pack, fire the tutorial completion hook
+    -- Phase 80: if this was the tutorial pack, fire the tutorial completion hook
     if pack.isTutorialPack then
       log('I', logTag, 'Tutorial pack completed — firing onBCMTutorialPackComplete')
       extensions.hook("onBCMTutorialPackComplete")
@@ -4265,7 +4266,7 @@ abandonPack = function()
     end
   end)
 
-  -- Despawn loaner on abandon (repair cost applies, no rental charge)
+  -- Phase 77.3: Despawn loaner on abandon (repair cost applies, no rental charge)
   if planexState.loanerInventoryId or planexState.loanerVehId then
     despawnLoaner()
   end
@@ -4297,7 +4298,7 @@ abandonPack = function()
   planexState.speedPenaltyAccumulated  = 0
   planexState.speedInfractionCount     = 0
   planexState.damageBaseline           = nil
-  -- reset loaner fields (abandon = full reset, no idle grace period)
+  -- Phase 77.3: reset loaner fields (abandon = full reset, no idle grace period)
   planexState.loanerSelectedTier    = nil
   planexState.loanerInventoryId     = nil
   planexState.loanerVehId           = nil
@@ -4314,7 +4315,7 @@ abandonPack = function()
 end
 
 -- ============================================================================
--- Pause / Resume route
+-- Phase 96.1: Pause / Resume route
 -- ============================================================================
 
 -- en_route|returning -> paused (D-09)
@@ -4389,7 +4390,7 @@ resumeRoute = function(inventoryId)
     log('I', logTag, 'resumeRoute: delivery vehicle set to invId=' .. tostring(inventoryId))
   end
 
-  -- Track original totals for final summary (pre-pause + post-resume combined)
+  -- Phase 96.1: Track original totals for final summary (pre-pause + post-resume combined)
   local deliveredPrePause = pack.stopsDelivered or 0
   -- Count non-depot stops for the original total
   local originalDeliveryStops = 0
@@ -4551,7 +4552,7 @@ broadcastState = function()
       stopsDelivered  = ap.stopsDelivered or 0,
       totalPay        = ap.totalPay,
       depotName       = ap.depotName,
-      -- full pack type fields
+      -- Phase 75.1: full pack type fields
       packTypeId      = ap.packTypeId,
       packTypeName    = ap.packTypeName,
       mechanics       = ap.mechanics,
@@ -4561,16 +4562,16 @@ broadcastState = function()
       destMode        = ap.destMode,
       speedLimitKmh   = ap.speedLimitKmh,
       minContainerSize = ap.minContainerSize,
-      -- real cargo data (from manifest, available after accept)
+      -- Phase 81.1: real cargo data (from manifest, available after accept)
       cargoWeightKg   = ap.cargoWeightKg,
       cargoSlotsUsed  = ap.cargoSlotsUsed,
       -- Include per-stop temp timer info (stops array passthrough for Vue)
       stops           = ap.stops,
-      -- per-stop completion history for Route tab
+      -- Phase 76: per-stop completion history for Route tab
       stopHistory     = planexState.stopHistory or {},
       -- Running accumulated pay for active route progress card
       accumulatedPay  = planexState.accumulatedPay or 0,
-      -- courier route fields
+      -- Phase 81.2: courier route fields
       routeCode        = ap.routeCode,
       isSpecialRoute   = ap.isSpecialRoute,
       specialRouteId   = ap.specialRouteId,
@@ -4616,13 +4617,13 @@ broadcastState = function()
     -- 75.1 Plan 02: speed tracking state for Vue speedometer UI
     speedPenalty         = planexState.speedPenaltyAccumulated,
     speedInfractions     = planexState.speedInfractionCount,
-    -- locked teasers for pool display
+    -- Phase 75.1: locked teasers for pool display
     lockedTeasers  = planexState.lockedTeasers or {},
-    -- operating hours gate and fatigue state
+    -- Phase 77: operating hours gate and fatigue state
     operatingHoursOpen = operatingHoursOpen,
     fatigueMultiplier  = fatigueMult,
     fatigueApplied     = fatigueApplied,
-    -- loaner system state for Vue selector
+    -- Phase 77.3: loaner system state for Vue selector
     loanerSelectedTier = planexState.loanerSelectedTier,
     -- PlanEx reputation data for Vue dashboard
     repData            = getPlanexRepData(),
@@ -4680,7 +4681,7 @@ savePlanexData = function(currentSavePath)
     -- D-12: persist damage baseline across save/load when route is active
     damageBaseline = (planexState.routeState == 'en_route' or planexState.routeState == 'returning' or planexState.routeState == 'completing' or planexState.routeState == 'paused')
                      and planexState.damageBaseline or nil,
-    -- history, lifetime stats
+    -- Phase 75: history, lifetime stats
     completedRoutes      = planexState.completedRoutes,
     earningsToday        = planexState.earningsToday,
     totalEarnings        = planexState.totalEarnings,
@@ -4692,10 +4693,10 @@ savePlanexData = function(currentSavePath)
     speedInfractionCount    = planexState.speedInfractionCount,
     -- Route elapsed time (accumulated dtReal, pause-safe)
     routeElapsedTime        = planexState.routeElapsedTime or 0,
-    -- streak persistence
+    -- Phase 75.2: streak persistence
     bestStreak              = planexState.bestStreak,
     currentStreak           = planexState.currentStreak,
-    -- persist loaner tier selection (relevant when route active OR idle timer running)
+    -- Phase 77.3: persist loaner tier selection (relevant when route active OR idle timer running)
     loanerSelectedTier      = planexState.loanerSelectedTier,
     loanerTiersUsedToday    = planexState.loanerTiersUsedToday,
     loanerIdleTimer         = planexState.loanerIdleTimer,  -- nil or seconds remaining
@@ -4788,7 +4789,7 @@ loadPlanexData = function()
     planexState.grossPay       = data.grossPay       or 0
     -- D-12: restore damage baseline
     planexState.damageBaseline = data.damageBaseline or nil
-    -- restore history, lifetime stats
+    -- Phase 75: restore history, lifetime stats
     planexState.completedRoutes      = data.completedRoutes      or {}
     planexState.earningsToday        = data.earningsToday        or 0
     planexState.totalEarnings        = data.totalEarnings        or 0
@@ -4805,11 +4806,11 @@ loadPlanexData = function()
     -- Route elapsed time (accumulated dtReal, pause-safe — persisted across save/load)
     planexState.routeElapsedTime = data.routeElapsedTime or 0
 
-    -- restore streak persistence
+    -- Phase 75.2: restore streak persistence
     planexState.bestStreak    = data.bestStreak    or 0
     planexState.currentStreak = data.currentStreak or 0
 
-    -- restore loaner tier selection (vehicle itself is NOT restored — re-spawned if needed)
+    -- Phase 77.3: restore loaner tier selection (vehicle itself is NOT restored — re-spawned if needed)
     planexState.loanerSelectedTier = data.loanerSelectedTier or nil
     planexState.loanerTiersUsedToday = data.loanerTiersUsedToday or {}
     -- Note: loanerInventoryId/loanerVehId are NOT persisted — loaner vehicle is gone after reload.
@@ -4862,7 +4863,7 @@ loadPlanexData = function()
       end
     end
 
-    -- REST-like model — clear manifest fields from saved pool packs
+    -- Phase 81.1: REST-like model — clear manifest fields from saved pool packs
     -- Active pack keeps its manifest intact; available packs use estimates only
     for _, poolPack in ipairs(planexState.pool or {}) do
       if poolPack.status == 'available' then
@@ -4878,7 +4879,7 @@ loadPlanexData = function()
       end
     end
 
-    -- backward compatibility — pre-75.1 saves lack packTypeId/mechanics
+    -- Phase 75.1: backward compatibility — pre-75.1 saves lack packTypeId/mechanics
     if planexState.activePack and not planexState.activePack.packTypeId then
       planexState.activePack.packTypeId    = 'standard_courier'
       planexState.activePack.mechanics     = {}
@@ -4888,7 +4889,7 @@ loadPlanexData = function()
       log('I', logTag, 'loadPlanexData: applied pre-75.1 backward compat (packTypeId = standard_courier)')
     end
 
-    -- Any active route state on load → force to paused.
+    -- Phase 96.1: Any active route state on load → force to paused.
     -- Player resumes explicitly; no state should auto-continue after reload.
     if planexState.routeState == 'en_route' or planexState.routeState == 'returning' or planexState.routeState == 'traveling_to_depot' then
       log('I', logTag, 'loadPlanexData: converting ' .. planexState.routeState .. ' -> paused (auto-pause on load)')
@@ -4970,7 +4971,7 @@ initModule = function()
   -- Clear loaner vehicle refs (vehicle doesn't survive reload)
   planexState.loanerInventoryId = nil
   planexState.loanerVehId = nil
-  -- Preserve loanerSelectedTier while route is active — resumeRoute needs it to respawn at depot
+  -- Phase 96.1: Preserve loanerSelectedTier while route is active — resumeRoute needs it to respawn at depot
   if planexState.routeState == 'idle' then
     planexState.loanerSelectedTier = nil
   end
@@ -5097,7 +5098,7 @@ initModule = function()
         local bestIdx = nil
         local bestDist = math.huge
 
-        -- Skip depot return stop in nearest search — depot is always last (pinned).
+        -- Phase 96.1: Skip depot return stop in nearest search — depot is always last (pinned).
         -- Only fall back to depot if it's the only pending stop.
         for _, entry in ipairs(pendingStops) do
           if not laterPinned[entry.idx] and not entry.stop.isDepotStop and entry.stop.pos and playerPos then
@@ -5168,7 +5169,7 @@ resetModule = function()
   planexState.speedPenaltyAccumulated = 0
   planexState.speedInfractionCount    = 0
   planexState.lockedTeasers           = {}
-  -- reset star tracking on module reset
+  -- Phase 75.2: reset star tracking on module reset
   planexState.routeElapsedTime    = 0
   planexState.routeArrestCount    = 0
   planexState.stopPrecisionScores = {}
@@ -5180,13 +5181,13 @@ resetModule = function()
   planexState.currentStreak       = 0
   cachedStopCandidates       = {}
   distanceCache              = {}
-  -- also clear pack type caches on reset (allows hot-reload)
+  -- Phase 75.1: also clear pack type caches on reset (allows hot-reload)
   packTypeDefs   = nil
   facilityTagMap = nil
   isInitialized              = false
   updateTimer                = 0
   depotPickupTimer           = 0
-  -- reset tutorial pack flag
+  -- Phase 80: reset tutorial pack flag
   tutorialPackInjected = false
   -- Unpatch vanilla setBestRoute
   if originalSetBestRoute and career_modules_delivery_cargoScreen then
@@ -5393,7 +5394,7 @@ end
 
 debugCompletePack = function()
   log('I', logTag, 'DEBUG: Completing pack...')
-  -- seed fake star data for debug flow (simulate perfect route)
+  -- Phase 75.2: seed fake star data for debug flow (simulate perfect route)
   if planexState.activePack then
     local stopCount = #(planexState.activePack.stops or {})
     if stopCount > 0 and #planexState.stopPrecisionScores == 0 then
@@ -5487,7 +5488,7 @@ debugComputePay = function(packId)
 end
 
 -- ============================================================================
--- Tutorial pack injection
+-- Phase 80: Tutorial pack injection
 -- ============================================================================
 
 -- injectTutorialPack() — creates a 1-stop welcome delivery pack for tutorial step 4.
@@ -5734,14 +5735,14 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
     end
   end
 
-  -- route elapsed time accumulation (pause-safe — dtReal is 0 when paused)
+  -- Phase 75.2: route elapsed time accumulation (pause-safe — dtReal is 0 when paused)
   -- Active during both en_route and returning (route timer runs until completePack)
   if planexState.routeState == 'en_route' or planexState.routeState == 'returning' then
     planexState.routeElapsedTime = (planexState.routeElapsedTime or 0) + dtReal
     checkGForce(dtReal)
   end
 
-  -- Loaner idle timer countdown (runs independently of route state)
+  -- Phase 77.3: Loaner idle timer countdown (runs independently of route state)
   if planexState.loanerIdleTimer then
     planexState.loanerIdleTimer = planexState.loanerIdleTimer - dtSim
     -- Broadcast timer to Vue every second
@@ -5767,7 +5768,7 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
       ui_message("PlanEx loaner returned.", 5, "planexLoanerIdle")
       despawnLoaner()
       planexState.loanerIdleTimer     = nil
-      -- preserve tier while route is active — resumeRoute will respawn at depot
+      -- Phase 96.1: preserve tier while route is active — resumeRoute will respawn at depot
       if planexState.routeState == 'idle' then
         planexState.loanerSelectedTier  = nil
       end
@@ -5793,7 +5794,7 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
           ui_message("PlanEx loaner returned (too far).", 5, "planexLoanerFar")
           despawnLoaner()
           planexState.loanerIdleTimer    = nil
-          -- preserve tier while route is active
+          -- Phase 96.1: preserve tier while route is active
           if planexState.routeState == 'idle' then
             planexState.loanerSelectedTier = nil
           end
@@ -5844,7 +5845,7 @@ M.onUpdate = function(dtReal, dtSim, dtRaw)
     end
   end
 
-  -- checkRotation removed from onUpdate — now on-demand in requestPoolData (D-13)
+  -- Phase 96.1: checkRotation removed from onUpdate — now on-demand in requestPoolData (D-13)
 end
 
 -- Hook from bcm_timeSystem: new game day
@@ -5890,7 +5891,7 @@ M.onDeliveryFacilityProgressStatsChanged = function(affectedFacilities)
   onVanillaDropOff()
 end
 
--- Hook from police system — fired when player is arrested during a pursuit
+-- Phase 75.2: Hook from police system — fired when player is arrested during a pursuit
 -- Only arrests count for the police star factor (not pursuits/heat/fines)
 M.onPursuitAction = function(vehId, action, pursuitData)
   if action == 'arrest' and planexState.routeState ~= 'idle' then
@@ -5914,7 +5915,7 @@ M.onVehicleRemoved = function(inventoryId)
     planexState.loanerIdleTimer   = nil
     loanerIdleWarningShown = false
     -- If there's an active route (not paused), force abandon it (player lost their loaner)
-    -- Don't abandon paused routes — loaner will respawn on resume
+    -- Phase 96.1: Don't abandon paused routes — loaner will respawn on resume
     if planexState.routeState ~= 'idle' and planexState.routeState ~= 'paused' and planexState.activePack then
       log('I', logTag, 'onVehicleRemoved: active route detected — forcing abandon')
       abandonPack()
@@ -5971,7 +5972,7 @@ M.getState = function()
   return planexState
 end
 
--- generateCargoForPool REMOVED (REST-like model — manifests generated lazily on pack detail view)
+-- Phase 81.1: generateCargoForPool REMOVED (REST-like model — manifests generated lazily on pack detail view)
 
 -- FSM actions
 M.acceptPack     = acceptPack
@@ -5982,19 +5983,19 @@ M.completePack   = completePack
 M.abandonPack    = abandonPack
 M.broadcastState = broadcastState
 
--- Tutorial pack API
+-- Phase 80: Tutorial pack API
 M.injectTutorialPack = injectTutorialPack
 M.isTutorialPackActive = function()
   return planexState.activePack ~= nil and planexState.activePack.isTutorialPack == true
 end
 
--- loaner system public API
+-- Phase 77.3: loaner system public API
 M.selectLoanerTier = selectLoanerTier
 M.getLoanerTiers   = getLoanerTiers
 M.getLoanerSelectedTier = function() return planexState.loanerSelectedTier end
 M.getLoanerInventoryId  = function() return planexState.loanerInventoryId end
 
--- Extended public API for IE site bridge
+-- Phase 75: Extended public API for IE site bridge
 M.getFullPool = function()
   return planexState.pool
 end
@@ -6044,7 +6045,7 @@ M.getDriverStats = function()
     abandonedRoutes = planexState.abandonedRoutes,
     loanerFeesToday  = planexState.loanerFeesToday,
     totalLoanerFees  = planexState.totalLoanerFees,
-    -- streak fields for Vue Profile tab
+    -- Phase 75.2: streak fields for Vue Profile tab
     bestStreak     = planexState.bestStreak    or 0,
     currentStreak  = planexState.currentStreak or 0,
   }
@@ -6118,7 +6119,7 @@ M.getDeliveryVehicleInventoryId = getDeliveryVehicleInventoryId
 -- Pack's totalPay (cargo-based) replaces the old flat estimate.
 M.generateCargoForPack = function(packId, totalSlots)
   local pack = M.getPackById(packId)
-  -- also check activePack (paused route may not be in the pool)
+  -- Phase 96.1: also check activePack (paused route may not be in the pool)
   if not pack and planexState.activePack and planexState.activePack.id == packId then
     pack = planexState.activePack
   end
@@ -6363,7 +6364,7 @@ M.generateCargoForPack = function(packId, totalSlots)
   return cargoManifest
 end
 
--- pause/resume route exports + on-demand rotation
+-- Phase 96.1: pause/resume route exports + on-demand rotation
 M.pauseRoute     = function() return pauseRoute() end
 M.resumeRoute    = function(inventoryId) return resumeRoute(inventoryId) end
 M.checkRotation  = function() return checkRotation() end
@@ -6453,4 +6454,3 @@ M.onEnterCargoOverviewScreen = function()
 end
 
 return M
-
