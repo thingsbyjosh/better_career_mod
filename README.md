@@ -60,7 +60,7 @@ Per-part painting. Hood one color, fenders another, roof something else. Basic p
 2. Place `better_career_mod.zip` in `%LOCALAPPDATA%\BeamNG.drive\current\mods\` — **don't unzip it**, BeamNG reads zips directly
 3. Launch BeamNG.drive and start a **new career** (existing vanilla saves won't work with BCM)
 
-**Requires BeamNG.drive v0.34+.** Not compatible with other career overhaul mods.
+**Requires BeamNG.drive v0.38+.** Compatible with any car mod. Not compatible with other career mods.
 
 ---
 
