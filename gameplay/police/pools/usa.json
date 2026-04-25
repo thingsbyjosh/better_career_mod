@@ -1,17 +1,26 @@
 {
   "country": "usa",
-  "version": 1,
-  "note": "Migrated verbatim from police.lua POLICE_CONFIGS (Phase 100.5-06). Curated west coast USA police vehicle pool.",
+  "version": 3,
+  "note": "Curated west coast USA police pool — 1990-onward US models plus a couple of Euro-body US police variants. ~26% unmarked/ex-cop for undercover presence.",
   "configs": [
     "fullsize/police",
+    "fullsize/interceptor",
+    "fullsize/bcpd",
+    "fullsize/unmarked",
+    "fullsize/excop",
     "bastion/police_v8_awd_A",
+    "bastion/police_v8_awd_A_interceptor",
     "bastion/police_unmarked_v8_awd_A",
     "roamer/police",
+    "roamer/unmarked",
+    "roamer/sheriff",
+    "midsize/police",
+    "midsize/unmarked",
+    "sunburst2/interceptor",
+    "sunburst2/police",
     "van/police",
     "van/police_passenger",
-    "midtruck/4x4_police_petrol",
-    "sunburst2/interceptor",
-    "md_series/md_60_armored_police",
-    "bastion/police_v8_awd_A_interceptor"
+    "etk800/844_police_A",
+    "pickup/d10_4wd_parkranger"
   ]
 }

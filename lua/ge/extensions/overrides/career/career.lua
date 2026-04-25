@@ -1,4 +1,4 @@
--- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+﻿-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
 -- If a copy of the bCDDL was not distributed with this
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 
@@ -207,7 +207,7 @@ local function toggleCareerModules(active, alreadyInLevel)
       end
     end
 
-    -- BCM: All modules loaded and onCareerActivated() called — saves are now safe
+    -- BCM: All modules loaded and onCareerActivated called â€” saves are now safe
     career_saveSystem.setCareerModulesReady(true)
 
     onCareerModulesActivated(alreadyInLevel)
@@ -562,19 +562,26 @@ local function formatSaveSlotForUi(saveSlot)
     data.playerName = identityData.firstName .. " " .. (identityData.lastName or "")
   end
 
-  -- Plan 100.5-03: starter garage selector — enrich the payload with the list
+  -- starter garage selector â€” enrich the payload with the list
   -- of garages the player owns on the save's active map. Same disk-read idiom
   -- used for playerName above: works from the save-menu screen without
   -- activating the career. ProfileCard.vue consumes `bcmStarterGarages` and
   -- `bcmSelectedGarageId` as props and renders the dropdown when there are
   -- 2+ entries. 1 entry is handled by the lua auto-select-if-one in
   -- spawnAtStarterGarage, so no UI is shown. 0 entries means no owned garages
-  -- on this map — falls through to the starter/rental chain.
+  -- on this map â€” falls through to the starter/rental chain.
   if careerData and careerData.level and propertiesData and type(propertiesData.ownedProperties) == "table" then
     local levelName = careerData.level
+    -- Selector scope: owned ("garage") and rental only. Backup garages are
+    -- explicitly excluded â€” the player shouldn't be able to "choose" a backup
+    -- as a spawn preference when they have a real home available, and when
+    -- the backup is the only option the dropdown shouldn't surface at all
+    -- (spawnAtStarterGarage's auto-select-if-one handles that case silently).
+    -- If the save-time stash landed on a backup because nothing else existed,
+    -- it won't resolve here and we fall through to the alphabetical default.
     local ownedIds = {}
     for _, p in pairs(propertiesData.ownedProperties) do
-      if type(p) == "table" and p.type == "garage" and p.id then
+      if type(p) == "table" and p.id and (p.type == "garage" or p.type == "rental") then
         ownedIds[p.id] = true
       end
     end
@@ -598,7 +605,23 @@ local function formatSaveSlotForUi(saveSlot)
     table.sort(starterGarages, function(a, b) return (a.displayName or "") < (b.displayName or "") end)
     data.bcmStarterGarages = starterGarages
     if #starterGarages > 0 then
-      data.bcmSelectedGarageId = starterGarages[1].id
+      -- Default the dropdown to the garage the player was nearest to at save
+      -- time (computed by bcm_properties.onSaveCurrentSaveSlotAsyncStart from
+      -- the avatar world position and the ownership-filtered picker). Falls
+      -- back to alphabetical first when the stash is absent (old save) or no
+      -- longer owned on this map (sold/removed since).
+      local stashed = propertiesData.lastPlayerHomeGarage
+      local validStashed = false
+      if type(stashed) == "string" and stashed ~= "" then
+        for _, entry in ipairs(starterGarages) do
+          if entry.id == stashed then validStashed = true; break end
+        end
+      end
+      if validStashed then
+        data.bcmSelectedGarageId = stashed
+      else
+        data.bcmSelectedGarageId = starterGarages[1].id
+      end
     end
   end
 
@@ -630,7 +653,7 @@ local function formatSaveSlotForUi(saveSlot)
   local currentSaveSlot, _ = career_saveSystem.getCurrentSaveSlot()
   if career_career and career_career.isActive() and currentSaveSlot == saveSlot and career_modules_playerAttributes then
 
-    -- current save slot — use live identity data from memory
+    -- current save slot â€” use live identity data from memory
     if bcm_identity and bcm_identity.hasIdentity() then
       data.playerName = bcm_identity.getFullName()
     end
@@ -839,7 +862,7 @@ local function hasInteractedWithOrganization(id)
 end
 
 local function interactWithOrganization(id)
-  --print("Interact with: " .. dumps(id))
+  --print("Interact with: ".. dumps(id))
   organizationInteraction[id] = true
 end
 
@@ -895,7 +918,7 @@ local function onWorldReadyState(state)
     end
     switchLevel = nil
   end
-  -- Phase 97: Transit vehicle restoration is handled by bcm_multimap.onWorldReadyState
+  -- Transit vehicle restoration is handled by bcm_multimap.onWorldReadyState
   -- which is called by BeamNG's hook system automatically (both modules receive this hook)
 end
 
@@ -912,7 +935,7 @@ end
 local function onSaveFinished()
   if switchLevel then
     -- Keep switchLevel alive for onWorldReadyState to read.
-    -- DO NOT clear switchLevel here — onWorldReadyState needs it to re-activate career
+    -- DO NOT clear switchLevel here â€” onWorldReadyState needs it to re-activate career
     spawn.preventPlayerSpawning = true
     freeroam_freeroam.startFreeroam(path.getPathLevelMain(switchLevel), nil, false, nil, function()
       server.fadeoutLoadingScreen()

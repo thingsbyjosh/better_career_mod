@@ -1,4 +1,4 @@
--- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+﻿-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
 -- If a copy of the bCDDL was not distributed with this
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 local M = {}
@@ -244,7 +244,7 @@ local function onTrafficStarted()
 end
 
 local function onTrafficStopped()
-  playerData.traffic = nil  -- FIX PFND-02: dereference only, engine recreates on next onTrafficStarted
+  playerData.traffic = nil  -- FIX: dereference only, engine recreates on next onTrafficStarted
 
   if M.ensureTraffic then -- temp solution to reset traffic
     setupTraffic(true)
@@ -279,7 +279,7 @@ local function onUpdate(dtReal, dtSim, dtRaw)
     end
   end
 
-  -- Pursuit stuck detection — delegated to bcm_police for intelligent recovery (PFND-04)
+  -- Pursuit stuck detection â€” delegated to bcm_police for intelligent recovery
   if playerPursuitActive() and bcm_police then
     bcm_police.onPursuitUpdate(dtSim, playerData, playerVehId)
   end

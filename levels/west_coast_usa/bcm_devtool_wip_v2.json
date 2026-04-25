@@ -1,6 +1,23 @@
 {
-  "cameraWizardStep":0,
-  "cameras":{},
+  "cameraWizardStep":4,
+  "cameras":[
+    {
+      "id":"wc_bcmCamera_1",
+      "lineEnd":[
+        119.56134796143,
+        1067.7176513672,
+        105.88352328539
+      ],
+      "lineStart":[
+        138.82362365723,
+        1066.1322021484,
+        105.83075457811
+      ],
+      "name":"",
+      "speedLimit":130,
+      "type":"speed"
+    }
+  ],
   "deletedGarageIds":{},
   "deliveryFacilities":[
     {
@@ -34,6 +51,49 @@
             -190.98931884766,
             -789.73266601563,
             133.33248901367
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmFacility_19",
+      "description":"",
+      "id":"bcmFacility_19",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 158",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.0033205907588862,
+            0.019798976891627,
+            -0.7271011612104,
+            0.68623674891217
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -472.58062744141,
+            -512.22821044922,
+            121.83280944824
           ],
           "scl":[
             2.5,
@@ -133,135 +193,6 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_31",
-      "description":"",
-      "id":"bcmFacility_31",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 198",
-      "parkingSpots":[
-        {
-          "dir":[
-            0.012461376562523,
-            0.040411631495378,
-            -0.33408777143547,
-            0.94159278624644
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -215.6781463623,
-            -716.38293457031,
-            128.86255264282
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
-      "associatedOrganization":"bcmFacility_19",
-      "description":"",
-      "id":"bcmFacility_19",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 158",
-      "parkingSpots":[
-        {
-          "dir":[
-            0.0033205907588862,
-            0.019798976891627,
-            -0.7271011612104,
-            0.68623674891217
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -472.58062744141,
-            -512.22821044922,
-            121.83280944824
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
-      "associatedOrganization":"bcmFacility_18",
-      "description":"",
-      "id":"bcmFacility_18",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 156",
-      "parkingSpots":[
-        {
-          "dir":[
-            0.019358229975543,
-            0.020453641346398,
-            -0.63150543403511,
-            0.77485985460082
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -488.58258056641,
-            -510.94143676758,
-            121.14065170288
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
       "associatedOrganization":"bcmFacility_41",
       "description":"",
       "id":"bcmFacility_41",
@@ -348,22 +279,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_28",
+      "associatedOrganization":"bcmFacility_18",
       "description":"",
-      "id":"bcmFacility_28",
+      "id":"bcmFacility_18",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 188",
+      "name":"Gamusino Lane 156",
       "parkingSpots":[
         {
           "dir":[
-            0.012744207813814,
-            0.020824261310074,
-            -0.65681865641837,
-            0.75365322787662
+            0.019358229975543,
+            0.020453641346398,
+            -0.63150543403511,
+            0.77485985460082
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -375,9 +306,9 @@
             "food"
           ],
           "pos":[
-            -286.68783569336,
-            -678.60711669922,
-            124.93046951294
+            -488.58258056641,
+            -510.94143676758,
+            121.14065170288
           ],
           "scl":[
             2.5,
@@ -391,22 +322,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_22",
+      "associatedOrganization":"lasventas_2",
       "description":"",
-      "id":"bcmFacility_22",
+      "id":"lasventas_2",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 164",
+      "name":"Las Ventas St 202",
       "parkingSpots":[
         {
           "dir":[
-            0.032759122353217,
-            0.0038809253275273,
-            -0.20384921004465,
-            0.97844635922743
+            -0.020059030886987,
+            -0.011532548081903,
+            -0.4175334377195,
+            0.90836692145892
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -418,9 +349,9 @@
             "food"
           ],
           "pos":[
-            -410.33975219727,
-            -542.306640625,
-            124.03411102295
+            -153.87571716309,
+            -862.00561523438,
+            131.775390625
           ],
           "scl":[
             2.5,
@@ -434,22 +365,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_14",
+      "associatedOrganization":"bcmFacility_31",
       "description":"",
-      "id":"bcmFacility_14",
+      "id":"bcmFacility_31",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 140",
+      "name":"Gamusino Lane 198",
       "parkingSpots":[
         {
           "dir":[
-            0.0065427985859199,
-            0.014229444824161,
-            -0.70842328256809,
-            0.70561403571791
+            0.012461376562523,
+            0.040411631495378,
+            -0.33408777143547,
+            0.94159278624644
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -461,9 +392,9 @@
             "food"
           ],
           "pos":[
-            -579.94720458984,
-            -452.93014526367,
-            114.16445922852
+            -215.6781463623,
+            -716.38293457031,
+            128.86255264282
           ],
           "scl":[
             2.5,
@@ -563,22 +494,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_50",
+      "associatedOrganization":"bcmFacility_14",
       "description":"",
-      "id":"bcmFacility_50",
+      "id":"bcmFacility_14",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 175",
+      "name":"Gamusino Lane 140",
       "parkingSpots":[
         {
           "dir":[
-            0.022156269478514,
-            -0.014536273964439,
-            0.91180044633374,
-            0.40977767451097
+            0.0065427985859199,
+            0.014229444824161,
+            -0.70842328256809,
+            0.70561403571791
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -590,9 +521,52 @@
             "food"
           ],
           "pos":[
-            -346.01837158203,
-            -606.41857910156,
-            126.49314498901
+            -579.94720458984,
+            -452.93014526367,
+            114.16445922852
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmFacility_28",
+      "description":"",
+      "id":"bcmFacility_28",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 188",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.012744207813814,
+            0.020824261310074,
+            -0.65681865641837,
+            0.75365322787662
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -286.68783569336,
+            -678.60711669922,
+            124.93046951294
           ],
           "scl":[
             2.5,
@@ -649,6 +623,92 @@
       ]
     },
     {
+      "associatedOrganization":"bcmFacility_22",
+      "description":"",
+      "id":"bcmFacility_22",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 164",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.032759122353217,
+            0.0038809253275273,
+            -0.20384921004465,
+            0.97844635922743
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -410.33975219727,
+            -542.306640625,
+            124.03411102295
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmFacility_50",
+      "description":"",
+      "id":"bcmFacility_50",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 175",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.022156269478514,
+            -0.014536273964439,
+            0.91180044633374,
+            0.40977767451097
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -346.01837158203,
+            -606.41857910156,
+            126.49314498901
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
       "associatedOrganization":"bcmFacility_15",
       "description":"",
       "id":"bcmFacility_15",
@@ -692,22 +752,22 @@
       ]
     },
     {
-      "associatedOrganization":"lasventas_2",
+      "associatedOrganization":"bcmFacility_27",
       "description":"",
-      "id":"lasventas_2",
+      "id":"bcmFacility_27",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Las Ventas St 202",
+      "name":"Gamusino Lane 184",
       "parkingSpots":[
         {
           "dir":[
-            -0.020059030886987,
-            -0.011532548081903,
-            -0.4175334377195,
-            0.90836692145892
+            0.017087116790292,
+            -0.0034976661391321,
+            -0.21077513642311,
+            0.97737896367642
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -719,9 +779,9 @@
             "food"
           ],
           "pos":[
-            -153.87571716309,
-            -862.00561523438,
-            131.775390625
+            -307.87838745117,
+            -660.71765136719,
+            124.23445510864
           ],
           "scl":[
             2.5,
@@ -735,22 +795,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_26",
+      "associatedOrganization":"bcmFacility_63",
       "description":"",
-      "id":"bcmFacility_26",
+      "id":"bcmFacility_63",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 180",
+      "name":"Gamusino Lane 135",
       "parkingSpots":[
         {
           "dir":[
-            -0.018235949346529,
-            0.0041617668486283,
-            -0.32684976249856,
-            0.94489119088007
+            -0.014759887542973,
+            0.022627073689191,
+            0.7151751731532,
+            0.69842296136458
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -762,9 +822,9 @@
             "food"
           ],
           "pos":[
-            -317.43542480469,
-            -643.81433105469,
-            124.35010910034
+            -591.041015625,
+            -444.20977783203,
+            113.63298797607
           ],
           "scl":[
             2.5,
@@ -864,36 +924,36 @@
       ]
     },
     {
-      "associatedOrganization":"lasventas_7",
+      "associatedOrganization":"freya_116",
       "description":"",
-      "id":"lasventas_7",
+      "id":"freya_116",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Las Ventas St 207",
+      "name":"Gamusino Lane 116",
       "parkingSpots":[
         {
           "dir":[
-            0.040072925107694,
-            -0.01290477463773,
-            0.9041247312891,
-            0.42518948450812
+            -0.027450284664997,
+            0.023593381738786,
+            0.92142847440473,
+            -0.38685837300763
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
           "logisticTypesReceived":[
+            "parcel",
             "shopSupplies",
             "mechanicalParts",
             "foodSupplies",
-            "food",
-            "parcel"
+            "food"
           ],
           "pos":[
-            -170.60200500488,
-            -835.75256347656,
-            133.26678466797
+            -765.09881591797,
+            -497.00881958008,
+            99.646423339844
           ],
           "scl":[
             2.5,
@@ -1036,22 +1096,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_27",
+      "associatedOrganization":"bcmFacility_26",
       "description":"",
-      "id":"bcmFacility_27",
+      "id":"bcmFacility_26",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 184",
+      "name":"Gamusino Lane 180",
       "parkingSpots":[
         {
           "dir":[
-            0.017087116790292,
-            -0.0034976661391321,
-            -0.21077513642311,
-            0.97737896367642
+            -0.018235949346529,
+            0.0041617668486283,
+            -0.32684976249856,
+            0.94489119088007
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -1063,9 +1123,9 @@
             "food"
           ],
           "pos":[
-            -307.87838745117,
-            -660.71765136719,
-            124.23445510864
+            -317.43542480469,
+            -643.81433105469,
+            124.35010910034
           ],
           "scl":[
             2.5,
@@ -1165,92 +1225,6 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_63",
-      "description":"",
-      "id":"bcmFacility_63",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 135",
-      "parkingSpots":[
-        {
-          "dir":[
-            -0.014759887542973,
-            0.022627073689191,
-            0.7151751731532,
-            0.69842296136458
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -591.041015625,
-            -444.20977783203,
-            113.63298797607
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
-      "associatedOrganization":"bcmFacility_53",
-      "description":"",
-      "id":"bcmFacility_53",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 163",
-      "parkingSpots":[
-        {
-          "dir":[
-            -0.041503022101499,
-            0.020158636757496,
-            0.9549292341686,
-            0.29322565755865
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -392.3088684082,
-            -560.62884521484,
-            126.03514862061
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
       "associatedOrganization":"bcm_church",
       "description":"",
       "id":"bcm_church",
@@ -1305,22 +1279,22 @@
       "tags":{}
     },
     {
-      "associatedOrganization":"bcmFacility_16",
+      "associatedOrganization":"bcmFacility_53",
       "description":"",
-      "id":"bcmFacility_16",
+      "id":"bcmFacility_53",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 150",
+      "name":"Gamusino Lane 163",
       "parkingSpots":[
         {
           "dir":[
-            0.029874832717791,
-            0.023659483056846,
-            -0.23607484584179,
-            0.97098732761676
+            -0.041503022101499,
+            0.020158636757496,
+            0.9549292341686,
+            0.29322565755865
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -1332,9 +1306,9 @@
             "food"
           ],
           "pos":[
-            -515.64398193359,
-            -489.9377746582,
-            118.90618133545
+            -392.3088684082,
+            -560.62884521484,
+            126.03514862061
           ],
           "scl":[
             2.5,
@@ -1391,22 +1365,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_45",
+      "associatedOrganization":"bcmFacility_16",
       "description":"",
-      "id":"bcmFacility_45",
+      "id":"bcmFacility_16",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 201",
+      "name":"Gamusino Lane 150",
       "parkingSpots":[
         {
           "dir":[
-            -0.020011052863124,
-            0.029803139664355,
-            0.99497740821559,
-            -0.093441360060916
+            0.029874832717791,
+            0.023659483056846,
+            -0.23607484584179,
+            0.97098732761676
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -1418,9 +1392,9 @@
             "food"
           ],
           "pos":[
-            -174.06504821777,
-            -773.25329589844,
-            131.81432723999
+            -515.64398193359,
+            -489.9377746582,
+            118.90618133545
           ],
           "scl":[
             2.5,
@@ -1432,6 +1406,113 @@
       "tags":[
         "residential"
       ]
+    },
+    {
+      "associatedOrganization":"lasventas_7",
+      "description":"",
+      "id":"lasventas_7",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Las Ventas St 207",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.040072925107694,
+            -0.01290477463773,
+            0.9041247312891,
+            0.42518948450812
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food",
+            "parcel"
+          ],
+          "pos":[
+            -170.60200500488,
+            -835.75256347656,
+            133.26678466797
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmNeedle",
+      "description":"",
+      "id":"bcmNeedle",
+      "images":{
+        "preview":"bcmNeedle.png"
+      },
+      "logisticGenerators":[
+        {
+          "interval":90,
+          "logisticTypes":[
+            "parcel"
+          ],
+          "max":2,
+          "min":1,
+          "type":"parcelProvider"
+        },
+        {
+          "interval":90,
+          "logisticTypes":[
+            "parcel"
+          ],
+          "max":2,
+          "min":1,
+          "type":"parcelReceiver"
+        }
+      ],
+      "logisticMaxItems":8,
+      "name":"The Needle",
+      "parkingSpots":[
+        {
+          "dir":[
+            -9.9609427346154e-06,
+            -4.1466783844405e-06,
+            0.9245570577661,
+            0.38104362849743
+          ],
+          "isInspectSpot":true,
+          "logisticTypesProvided":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies"
+          ],
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies"
+          ],
+          "pos":[
+            -532.80334472656,
+            468.78494262695,
+            102.80152893066
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":{}
     },
     {
       "associatedOrganization":"bcmFacility_46",
@@ -1477,22 +1558,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_60",
+      "associatedOrganization":"bcmFacility_62",
       "description":"",
-      "id":"bcmFacility_60",
+      "id":"bcmFacility_62",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 145",
+      "name":"Gamusino Lane 139",
       "parkingSpots":[
         {
           "dir":[
-            -0.0053843363482543,
-            0.02326625938234,
-            0.97690439360187,
-            0.21233816392208
+            -0.031095752015731,
+            0.01033578671518,
+            0.71962600976793,
+            0.69358822927227
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -1504,138 +1585,9 @@
             "food"
           ],
           "pos":[
-            -517.10180664063,
-            -469.75885009766,
-            117.79682540894
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
-      "associatedOrganization":"freya_116",
-      "description":"",
-      "id":"freya_116",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 116",
-      "parkingSpots":[
-        {
-          "dir":[
-            -0.027450284664997,
-            0.023593381738786,
-            0.92142847440473,
-            -0.38685837300763
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -765.09881591797,
-            -497.00881958008,
-            99.646423339844
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
-      "associatedOrganization":"lasventas_5",
-      "description":"",
-      "id":"lasventas_5",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Las Ventas St 205",
-      "parkingSpots":[
-        {
-          "dir":[
-            0.025279642513275,
-            -0.018080801397892,
-            0.91931220102262,
-            0.39229975955404
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -147.59515380859,
-            -855.10321044922,
-            131.6100769043
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
-      "associatedOrganization":"bcmFacility_11",
-      "description":"",
-      "id":"bcmFacility_11",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 128",
-      "parkingSpots":[
-        {
-          "dir":[
-            0.019404402971246,
-            0.075451151791541,
-            -0.74619679324136,
-            0.66115122218368
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -688.92633056641,
-            -451.83590698242,
-            104.75419616699
+            -560.24591064453,
+            -444.5888671875,
+            114.90789031982
           ],
           "scl":[
             2.5,
@@ -1692,22 +1644,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_59",
+      "associatedOrganization":"bcmFacility_45",
       "description":"",
-      "id":"bcmFacility_59",
+      "id":"bcmFacility_45",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 147",
+      "name":"Gamusino Lane 201",
       "parkingSpots":[
         {
           "dir":[
-            -0.018907952396969,
-            0.031023062147282,
-            0.83576348308616,
-            0.54788635618242
+            -0.020011052863124,
+            0.029803139664355,
+            0.99497740821559,
+            -0.093441360060916
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -1719,9 +1671,52 @@
             "food"
           ],
           "pos":[
-            -491.61166381836,
-            -501.15280151367,
-            120.82085418701
+            -174.06504821777,
+            -773.25329589844,
+            131.81432723999
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"lasventas_5",
+      "description":"",
+      "id":"lasventas_5",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Las Ventas St 205",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.025279642513275,
+            -0.018080801397892,
+            0.91931220102262,
+            0.39229975955404
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -147.59515380859,
+            -855.10321044922,
+            131.6100769043
           ],
           "scl":[
             2.5,
@@ -1821,22 +1816,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_35",
+      "associatedOrganization":"bcmFacility_59",
       "description":"",
-      "id":"bcmFacility_35",
+      "id":"bcmFacility_59",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 216",
+      "name":"Gamusino Lane 147",
       "parkingSpots":[
         {
           "dir":[
-            0.013675355906814,
-            0.0091467109840063,
-            0.88547997489581,
-            0.46438619313832
+            -0.018907952396969,
+            0.031023062147282,
+            0.83576348308616,
+            0.54788635618242
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -1848,9 +1843,95 @@
             "food"
           ],
           "pos":[
-            -265.37008666992,
-            -817.17510986328,
-            137.06301116943
+            -491.61166381836,
+            -501.15280151367,
+            120.82085418701
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmFacility_47",
+      "description":"",
+      "id":"bcmFacility_47",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 185",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.027984619214423,
+            0.0098224290548527,
+            0.97150764949882,
+            0.23514520607524
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -299.97674560547,
+            -657.99243164063,
+            123.8678855896
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmFacility_11",
+      "description":"",
+      "id":"bcmFacility_11",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 128",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.019404402971246,
+            0.075451151791541,
+            -0.74619679324136,
+            0.66115122218368
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -688.92633056641,
+            -451.83590698242,
+            104.75419616699
           ],
           "scl":[
             2.5,
@@ -1950,22 +2031,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_62",
+      "associatedOrganization":"bcmFacility_35",
       "description":"",
-      "id":"bcmFacility_62",
+      "id":"bcmFacility_35",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 139",
+      "name":"Gamusino Lane 216",
       "parkingSpots":[
         {
           "dir":[
-            -0.031095752015731,
-            0.01033578671518,
-            0.71962600976793,
-            0.69358822927227
+            0.013675355906814,
+            0.0091467109840063,
+            0.88547997489581,
+            0.46438619313832
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -1977,9 +2058,9 @@
             "food"
           ],
           "pos":[
-            -560.24591064453,
-            -444.5888671875,
-            114.90789031982
+            -265.37008666992,
+            -817.17510986328,
+            137.06301116943
           ],
           "scl":[
             2.5,
@@ -2122,22 +2203,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_47",
+      "associatedOrganization":"bcmFacility_32",
       "description":"",
-      "id":"bcmFacility_47",
+      "id":"bcmFacility_32",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 185",
+      "name":"Gamusino Lane 200",
       "parkingSpots":[
         {
           "dir":[
-            0.027984619214423,
-            0.0098224290548527,
-            0.97150764949882,
-            0.23514520607524
+            -0.0035146629450463,
+            0.055220950059126,
+            -0.31413598556056,
+            0.94776414597454
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -2149,9 +2230,9 @@
             "food"
           ],
           "pos":[
-            -299.97674560547,
-            -657.99243164063,
-            123.8678855896
+            -197.99183654785,
+            -739.28039550781,
+            129.90044021606
           ],
           "scl":[
             2.5,
@@ -2208,22 +2289,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_32",
+      "associatedOrganization":"bcmFacility_66",
       "description":"",
-      "id":"bcmFacility_32",
+      "id":"bcmFacility_66",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 200",
+      "name":"Gamusino Lane 129",
       "parkingSpots":[
         {
           "dir":[
-            -0.0035146629450463,
-            0.055220950059126,
-            -0.31413598556056,
-            0.94776414597454
+            -0.017379828277045,
+            0.04930141351892,
+            0.71433690092474,
+            0.69784676267167
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -2235,9 +2316,52 @@
             "food"
           ],
           "pos":[
-            -197.99183654785,
-            -739.28039550781,
-            129.90044021606
+            -658.34820556641,
+            -442.53628540039,
+            108.57855987549
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmFacility_36",
+      "description":"",
+      "id":"bcmFacility_36",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 220",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.0028141896600117,
+            -0.00098564406421441,
+            0.89718383167921,
+            0.44164723594261
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -294.80697631836,
+            -796.80944824219,
+            137.01978683472
           ],
           "scl":[
             2.5,
@@ -2337,22 +2461,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_48",
+      "associatedOrganization":"bcmFacility_24",
       "description":"",
-      "id":"bcmFacility_48",
+      "id":"bcmFacility_24",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 183",
+      "name":"Gamusino Lane 124",
       "parkingSpots":[
         {
           "dir":[
-            0.018278924840246,
-            -0.017789710614364,
-            0.93391027082935,
-            0.35659642895351
+            0.00054143362375427,
+            0.059689002839115,
+            -0.82348549888084,
+            0.56418841083691
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -2364,9 +2488,9 @@
             "food"
           ],
           "pos":[
-            -312.94515991211,
-            -636.55267333984,
-            124.39533996582
+            -712.84954833984,
+            -457.91418457031,
+            101.88145446777
           ],
           "scl":[
             2.5,
@@ -2380,22 +2504,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_36",
+      "associatedOrganization":"bcmFacility_60",
       "description":"",
-      "id":"bcmFacility_36",
+      "id":"bcmFacility_60",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 220",
+      "name":"Gamusino Lane 145",
       "parkingSpots":[
         {
           "dir":[
-            0.0028141896600117,
-            -0.00098564406421441,
-            0.89718383167921,
-            0.44164723594261
+            -0.0053843363482543,
+            0.02326625938234,
+            0.97690439360187,
+            0.21233816392208
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -2407,9 +2531,9 @@
             "food"
           ],
           "pos":[
-            -294.80697631836,
-            -796.80944824219,
-            137.01978683472
+            -517.10180664063,
+            -469.75885009766,
+            117.79682540894
           ],
           "scl":[
             2.5,
@@ -2466,22 +2590,22 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_24",
+      "associatedOrganization":"bcmFacility_56",
       "description":"",
-      "id":"bcmFacility_24",
+      "id":"bcmFacility_56",
       "images":{
         "preview":""
       },
       "logisticGenerators":{},
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 124",
+      "name":"Gamusino Lane 153",
       "parkingSpots":[
         {
           "dir":[
-            0.00054143362375427,
-            0.059689002839115,
-            -0.82348549888084,
-            0.56418841083691
+            -0.015460563296325,
+            -0.015827691846043,
+            0.82572987379839,
+            0.5636316444898
           ],
           "isInspectSpot":false,
           "logisticTypesProvided":{},
@@ -2493,9 +2617,52 @@
             "food"
           ],
           "pos":[
-            -712.84954833984,
-            -457.91418457031,
-            101.88145446777
+            -429.90875244141,
+            -506.95489501953,
+            122.51720428467
+          ],
+          "scl":[
+            2.5,
+            6,
+            3
+          ]
+        }
+      ],
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"bcmFacility_48",
+      "description":"",
+      "id":"bcmFacility_48",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "name":"Gamusino Lane 183",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.018278924840246,
+            -0.017789710614364,
+            0.93391027082935,
+            0.35659642895351
+          ],
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "pos":[
+            -312.94515991211,
+            -636.55267333984,
+            124.39533996582
           ],
           "scl":[
             2.5,
@@ -2552,36 +2719,44 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_56",
+      "associatedOrganization":"bcmTelepizza",
       "description":"",
-      "id":"bcmFacility_56",
+      "id":"bcmTelepizza",
       "images":{
-        "preview":""
+        "preview":"bcmTelepizza.png"
       },
-      "logisticGenerators":{},
+      "logisticGenerators":[
+        {
+          "interval":90,
+          "logisticTypes":[
+            "foodSupplies"
+          ],
+          "max":20,
+          "min":1,
+          "type":"parcelReceiver"
+        }
+      ],
       "logisticMaxItems":8,
-      "name":"Gamusino Lane 153",
+      "name":"Telepizza",
       "parkingSpots":[
         {
           "dir":[
-            -0.015460563296325,
-            -0.015827691846043,
-            0.82572987379839,
-            0.5636316444898
+            0.0056424943697766,
+            0.0057743076011759,
+            0.99996132322613,
+            0.0034887936097647
           ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
+          "isInspectSpot":true,
+          "logisticTypesProvided":[
+            "foodSupplies"
+          ],
           "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
+            "foodSupplies"
           ],
           "pos":[
-            -429.90875244141,
-            -506.95489501953,
-            122.51720428467
+            -733.28479003906,
+            603.67767333984,
+            115.65245783329
           ],
           "scl":[
             2.5,
@@ -2590,9 +2765,7 @@
           ]
         }
       ],
-      "tags":[
-        "residential"
-      ]
+      "tags":{}
     },
     {
       "associatedOrganization":"bcmFacility_42",
@@ -2625,49 +2798,6 @@
             -213.2741394043,
             -825.08135986328,
             136.27516174316
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":[
-        "residential"
-      ]
-    },
-    {
-      "associatedOrganization":"bcmFacility_66",
-      "description":"",
-      "id":"bcmFacility_66",
-      "images":{
-        "preview":""
-      },
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "name":"Gamusino Lane 129",
-      "parkingSpots":[
-        {
-          "dir":[
-            -0.017379828277045,
-            0.04930141351892,
-            0.71433690092474,
-            0.69784676267167
-          ],
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "pos":[
-            -658.34820556641,
-            -442.53628540039,
-            108.57855987549
           ],
           "scl":[
             2.5,
@@ -2765,119 +2895,6 @@
       "tags":[
         "residential"
       ]
-    },
-    {
-      "associatedOrganization":"bcmNeedle",
-      "description":"",
-      "id":"bcmNeedle",
-      "images":{
-        "preview":"bcmNeedle.png"
-      },
-      "logisticGenerators":[
-        {
-          "interval":90,
-          "logisticTypes":[
-            "parcel"
-          ],
-          "max":2,
-          "min":1,
-          "type":"parcelProvider"
-        },
-        {
-          "interval":90,
-          "logisticTypes":[
-            "parcel"
-          ],
-          "max":2,
-          "min":1,
-          "type":"parcelReceiver"
-        }
-      ],
-      "logisticMaxItems":8,
-      "name":"The Needle",
-      "parkingSpots":[
-        {
-          "dir":[
-            -9.9609427346154e-06,
-            -4.1466783844405e-06,
-            0.9245570577661,
-            0.38104362849743
-          ],
-          "isInspectSpot":true,
-          "logisticTypesProvided":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies"
-          ],
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies"
-          ],
-          "pos":[
-            -532.80334472656,
-            468.78494262695,
-            102.80152893066
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":{}
-    },
-    {
-      "associatedOrganization":"bcmTelepizza",
-      "description":"",
-      "id":"bcmTelepizza",
-      "images":{
-        "preview":"bcmTelepizza.png"
-      },
-      "logisticGenerators":[
-        {
-          "interval":90,
-          "logisticTypes":[
-            "foodSupplies"
-          ],
-          "max":20,
-          "min":1,
-          "type":"parcelReceiver"
-        }
-      ],
-      "logisticMaxItems":8,
-      "name":"Telepizza",
-      "parkingSpots":[
-        {
-          "dir":[
-            0.0056424943697766,
-            0.0057743076011759,
-            0.99996132322613,
-            0.0034887936097647
-          ],
-          "isInspectSpot":true,
-          "logisticTypesProvided":[
-            "foodSupplies"
-          ],
-          "logisticTypesReceived":[
-            "foodSupplies"
-          ],
-          "pos":[
-            -733.28479003906,
-            603.67767333984,
-            115.65245783329
-          ],
-          "scl":[
-            2.5,
-            6,
-            3
-          ]
-        }
-      ],
-      "tags":{}
     },
     {
       "associatedOrganization":"bcmFacility_67",
@@ -3086,293 +3103,379 @@
         }
       ],
       "tags":{}
-    }
-  ],
-  "deliveryTemplates":{},
-  "deliveryWizardStep":5,
-  "devtoolMode":"delivery",
-  "garages":[
+    },
     {
-      "baseCapacity":1,
-      "basePrice":500000,
-      "center":[
-        -722.40057373047,
-        -48.433055877686,
-        102.97200407982
-      ],
-      "computerPoint":[
-        -722.40057373047,
-        -48.433055877686,
-        102.97200407982
-      ],
-      "description":"",
-      "id":"bcm_bungalow",
+      "associatedOrganization":"dirt_track_a",
+      "description":"Receives Sand and Gravel.",
+      "id":"dirt_track_a",
       "images":{
-        "preview":"bcm_bungalow.png"
+        "preview":"previews/dirt_track_a.jpg"
       },
-      "isBackupGarage":false,
-      "isStarterGarage":false,
-      "maxCapacity":5,
-      "name":"Bungalow",
+      "logisticGenerators":[
+        {
+          "capacity":3000,
+          "interval":270,
+          "logisticTypes":[
+            "sand"
+          ],
+          "materialType":"sand",
+          "rate":200,
+          "target":1500,
+          "type":"materialReceiver",
+          "variance":1000
+        },
+        {
+          "capacity":1000,
+          "interval":360,
+          "logisticTypes":[
+            "gravel"
+          ],
+          "materialType":"gravel",
+          "rate":100,
+          "target":200,
+          "type":"materialReceiver",
+          "variance":400
+        }
+      ],
+      "logisticMaxItems":8,
+      "name":"Derby Track A",
       "parkingSpots":[
         {
           "dir":[
-            -0.64983296009629,
-            -0.73134647649198,
-            -0.20700109974407
+            -0.01562764143,
+            -0.0003055893178,
+            -0.01954828473,
+            0.9996867249
           ],
-          "normal":[
-            -0.0084070217745575,
-            0.0080713512136859,
-            0.99993208533103
-          ],
-          "pos":[
-            -735.80053710938,
-            -58.637928009033,
-            102.09804207087
-          ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
-        },
-        {
-          "dir":[
-            -0.66609510819561,
-            -0.71373805714626,
-            -0.21655320967136
-          ],
-          "normal":[
-            0.011739009348599,
-            0.017604700179705,
-            0.99977611003219
+          "isInspectSpot":true,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "sand",
+            "gravel"
           ],
           "pos":[
-            -731.20544433594,
-            -62.113285064697,
-            102.17207282782
+            547.4729004,
+            -44.94662094,
+            146.5759277
           ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
-        },
-        {
-          "dir":[
-            -0.81474345282975,
-            -0.54963814531147,
-            -0.18463752405623
-          ],
-          "normal":[
-            0.031019748625762,
-            0.024494090030615,
-            0.99921860208303
-          ],
-          "pos":[
-            -726.88317871094,
-            -65.986938476563,
-            102.16775131226
-          ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
-        },
-        {
-          "dir":[
-            -0.77325095316265,
-            -0.59242611540688,
-            -0.22608463286338
-          ],
-          "normal":[
-            0,
-            0,
-            1
-          ],
-          "pos":[
-            -721.91998291016,
-            -70.589920043945,
-            102.09958100319
-          ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
-        },
-        {
-          "dir":[
-            0.46461215781453,
-            0.84573906809721,
-            -0.26241374107504
-          ],
-          "normal":[
-            -0.078627424414064,
-            0.052089149597339,
-            0.99554228871718
-          ],
-          "pos":[
-            -721.52624511719,
-            -81.751609802246,
-            102.17814612389
-          ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
+          "scl":[
+            3.25,
+            8,
+            4
+          ]
         }
       ],
-      "props":[
+      "tags":{}
+    },
+    {
+      "associatedOrganization":"dirt_track_b",
+      "description":"Receives Sand and Gravel.",
+      "id":"dirt_track_b",
+      "images":{
+        "preview":"previews/dirt_track_b.jpg"
+      },
+      "logisticGenerators":[
         {
-          "position":[
-            -721.70538330078,
-            -48.874366760254,
-            102.09430706501
+          "capacity":3000,
+          "interval":270,
+          "logisticTypes":[
+            "sand"
           ],
-          "rotationMatrix":[
-            -0.66693388398627,
-            0.74511689981572,
-            0,
-            -0.74511689981572,
-            -0.66693388398627,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+          "materialType":"sand",
+          "rate":200,
+          "target":1500,
+          "type":"materialReceiver",
+          "variance":1000
         },
         {
-          "position":[
-            -721.98921843909,
-            -48.999581033648,
-            102.86630706501
+          "capacity":1000,
+          "interval":360,
+          "logisticTypes":[
+            "gravel"
           ],
-          "rotationMatrix":[
-            -0.9973665611918,
-            -0.072039104772622,
-            0,
-            0.072039104772622,
-            -0.9973665611918,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
-        },
-        {
-          "position":[
-            -722.64273218648,
-            -49.546945429609,
-            102.10330706501
-          ],
-          "rotationMatrix":[
-            -0.99639138399687,
-            -0.085123791602596,
-            0,
-            0.085123791602596,
-            -0.99639138399687,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
-        },
-        {
-          "position":[
-            -721.43005718043,
-            -48.762136962719,
-            102.84130706501
-          ],
-          "rotationMatrix":[
-            -0.66693388398627,
-            0.74511689981572,
-            0,
-            -0.74511689981572,
-            -0.66693388398627,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
-        },
-        {
-          "position":[
-            -720.5934628762,
-            -47.722094670249,
-            102.07930706501
-          ],
-          "rotationMatrix":[
-            0.66693388398627,
-            -0.74511689981572,
-            0,
-            0.74511689981572,
-            0.66693388398627,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
-        },
-        {
-          "position":[
-            -722.01603447322,
-            -48.857166496771,
-            102.09830706501
-          ],
-          "rotationMatrix":[
-            -0.66693388398627,
-            0.74511689981572,
-            0,
-            -0.74511689981572,
-            -0.66693388398627,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+          "materialType":"gravel",
+          "rate":100,
+          "target":200,
+          "type":"materialReceiver",
+          "variance":400
         }
       ],
+      "logisticMaxItems":8,
+      "name":"Derby Track B",
+      "parkingSpots":[
+        {
+          "dir":[
+            0,
+            -0,
+            -0.300499099,
+            0.9537820985
+          ],
+          "isInspectSpot":true,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "sand",
+            "gravel"
+          ],
+          "pos":[
+            174.5405884,
+            28.52080727,
+            128.7806854
+          ],
+          "scl":[
+            3.25,
+            8,
+            4
+          ]
+        }
+      ],
+      "tags":{}
+    }
+  ],
+  "deliveryTemplates":{},
+  "deliveryWizardStep":4,
+  "devtoolMode":"garages",
+  "garages":[
+    {
+      "baseCapacity":2,
+      "basePrice":300000,
+      "center":[
+        905.041015625,
+        -541.4453125,
+        163.64583915472
+      ],
+      "computerPoint":[
+        905.041015625,
+        -541.4453125,
+        163.64583915472
+      ],
+      "description":"",
+      "id":"bcm_belasco",
+      "images":{
+        "preview":""
+      },
+      "isBackupGarage":false,
+      "isStarterGarage":false,
+      "maxCapacity":6,
+      "name":"Belasco City Garage",
+      "parkingSpots":[
+        {
+          "dir":[
+            0.98353289031382,
+            -0.1551334823583,
+            -0.092718155300498
+          ],
+          "pos":[
+            902.45709228516,
+            -545.75219726563,
+            163.64551585913
+          ]
+        },
+        {
+          "dir":[
+            0.58387843526969,
+            0.80471830441865,
+            -0.10730528114028
+          ],
+          "pos":[
+            910.90014648438,
+            -546.01959228516,
+            163.64597499371
+          ]
+        },
+        {
+          "dir":[
+            0.19425017544739,
+            0.97833449073543,
+            -0.071613501353475
+          ],
+          "pos":[
+            915.08038330078,
+            -537.74041748047,
+            163.64552736282
+          ]
+        },
+        {
+          "dir":[
+            0.99201055608408,
+            -0.10385837973731,
+            0.07161350135348
+          ],
+          "pos":[
+            905.61785888672,
+            -521.64581298828,
+            163.43551635742
+          ]
+        },
+        {
+          "dir":[
+            0.99201055608408,
+            -0.10385837973731,
+            0.07161350135348
+          ],
+          "pos":[
+            912.99334716797,
+            -522.35632324219,
+            163.43551635742
+          ]
+        },
+        {
+          "dir":[
+            0.98619698927062,
+            -0.16544800408403,
+            -0.0065158497667513
+          ],
+          "pos":[
+            920.50268554688,
+            -523.62188720703,
+            163.43551635742
+          ]
+        },
+        {
+          "dir":[
+            0.94474287056479,
+            -0.083598081826803,
+            -0.31697360967735
+          ],
+          "pos":[
+            893.03186035156,
+            -531.48669433594,
+            163.50801664591
+          ]
+        },
+        {
+          "dir":[
+            0.94474287056479,
+            -0.083598081826803,
+            -0.31697360967735
+          ],
+          "pos":[
+            892.50671386719,
+            -536.97088623047,
+            163.54361218214
+          ]
+        },
+        {
+          "dir":[
+            0.99056212742136,
+            -0.11373834157584,
+            -0.076487001340349
+          ],
+          "pos":[
+            878.88415527344,
+            -543.66833496094,
+            163.54360556602
+          ]
+        },
+        {
+          "dir":[
+            0.99773499413991,
+            -0.0084191430818166,
+            -0.066738291095956
+          ],
+          "pos":[
+            878.58770751953,
+            -546.34710693359,
+            163.54361158609
+          ]
+        },
+        {
+          "dir":[
+            0.99773499413991,
+            -0.0084191430818166,
+            -0.066738291095956
+          ],
+          "pos":[
+            879.11053466797,
+            -548.90069580078,
+            163.54360949993
+          ]
+        },
+        {
+          "dir":[
+            0.99773499413991,
+            -0.0084191430818166,
+            -0.066738291095956
+          ],
+          "pos":[
+            879.10668945313,
+            -551.62017822266,
+            163.54360932112
+          ]
+        },
+        {
+          "dir":[
+            0.99773499413991,
+            -0.0084191430818166,
+            -0.066738291095956
+          ],
+          "pos":[
+            879.07879638672,
+            -554.32916259766,
+            163.54361206293
+          ]
+        },
+        {
+          "dir":[
+            0.99773499413991,
+            -0.0084191430818166,
+            -0.066738291095956
+          ],
+          "pos":[
+            879.05932617188,
+            -556.92828369141,
+            163.54360669851
+          ]
+        },
+        {
+          "dir":[
+            0.99773499413991,
+            -0.0084191430818166,
+            -0.066738291095956
+          ],
+          "pos":[
+            879.09344482422,
+            -559.77484130859,
+            163.543607831
+          ]
+        }
+      ],
+      "props":{},
       "propsAngle":0,
       "zoneVertices":[
         [
-          -717.63891601563,
-          -45.62345123291,
-          101.74700093269
+          879.98657226563,
+          -564.25012207031,
+          163.54361134768
         ],
         [
-          -722.16870117188,
-          -41.14115524292,
-          101.93716669083
+          914.32733154297,
+          -566.76715087891,
+          163.54360407591
         ],
         [
-          -750.03674316406,
-          -68.657699584961,
-          101.82374596596
+          925.01556396484,
+          -517.41046142578,
+          163.22878414392
         ],
         [
-          -721.57122802734,
-          -88.597496032715,
-          102.1777831316
+          887.90295410156,
+          -511.60372924805,
+          163.58196675777
         ],
         [
-          -714.16937255859,
-          -72.435958862305,
-          102.09957379103
+          876.37506103516,
+          -541.12408447266,
+          163.67554003
         ],
         [
-          -727.92120361328,
-          -56.840557098389,
-          102.09957021475
+          875.80438232422,
+          -559.43255615234,
+          163.67631745338
+        ],
+        [
+          876.65380859375,
+          -562.9990234375,
+          163.67659986019
         ]
       ]
     },
@@ -4499,922 +4602,6 @@
     },
     {
       "baseCapacity":2,
-      "basePrice":300000,
-      "center":[
-        905.041015625,
-        -541.4453125,
-        163.64583915472
-      ],
-      "computerPoint":[
-        905.041015625,
-        -541.4453125,
-        163.64583915472
-      ],
-      "description":"",
-      "id":"bcm_belasco",
-      "images":{
-        "preview":""
-      },
-      "isBackupGarage":false,
-      "isStarterGarage":false,
-      "maxCapacity":6,
-      "name":"Belasco City Garage",
-      "parkingSpots":[
-        {
-          "dir":[
-            0.98353289031382,
-            -0.1551334823583,
-            -0.092718155300498
-          ],
-          "pos":[
-            902.45709228516,
-            -545.75219726563,
-            163.64551585913
-          ]
-        },
-        {
-          "dir":[
-            0.58387843526969,
-            0.80471830441865,
-            -0.10730528114028
-          ],
-          "pos":[
-            910.90014648438,
-            -546.01959228516,
-            163.64597499371
-          ]
-        },
-        {
-          "dir":[
-            0.19425017544739,
-            0.97833449073543,
-            -0.071613501353475
-          ],
-          "pos":[
-            915.08038330078,
-            -537.74041748047,
-            163.64552736282
-          ]
-        },
-        {
-          "dir":[
-            0.99201055608408,
-            -0.10385837973731,
-            0.07161350135348
-          ],
-          "pos":[
-            905.61785888672,
-            -521.64581298828,
-            163.43551635742
-          ]
-        },
-        {
-          "dir":[
-            0.99201055608408,
-            -0.10385837973731,
-            0.07161350135348
-          ],
-          "pos":[
-            912.99334716797,
-            -522.35632324219,
-            163.43551635742
-          ]
-        },
-        {
-          "dir":[
-            0.98619698927062,
-            -0.16544800408403,
-            -0.0065158497667513
-          ],
-          "pos":[
-            920.50268554688,
-            -523.62188720703,
-            163.43551635742
-          ]
-        },
-        {
-          "dir":[
-            0.94474287056479,
-            -0.083598081826803,
-            -0.31697360967735
-          ],
-          "pos":[
-            893.03186035156,
-            -531.48669433594,
-            163.50801664591
-          ]
-        },
-        {
-          "dir":[
-            0.94474287056479,
-            -0.083598081826803,
-            -0.31697360967735
-          ],
-          "pos":[
-            892.50671386719,
-            -536.97088623047,
-            163.54361218214
-          ]
-        },
-        {
-          "dir":[
-            0.99056212742136,
-            -0.11373834157584,
-            -0.076487001340349
-          ],
-          "pos":[
-            878.88415527344,
-            -543.66833496094,
-            163.54360556602
-          ]
-        },
-        {
-          "dir":[
-            0.99773499413991,
-            -0.0084191430818166,
-            -0.066738291095956
-          ],
-          "pos":[
-            878.58770751953,
-            -546.34710693359,
-            163.54361158609
-          ]
-        },
-        {
-          "dir":[
-            0.99773499413991,
-            -0.0084191430818166,
-            -0.066738291095956
-          ],
-          "pos":[
-            879.11053466797,
-            -548.90069580078,
-            163.54360949993
-          ]
-        },
-        {
-          "dir":[
-            0.99773499413991,
-            -0.0084191430818166,
-            -0.066738291095956
-          ],
-          "pos":[
-            879.10668945313,
-            -551.62017822266,
-            163.54360932112
-          ]
-        },
-        {
-          "dir":[
-            0.99773499413991,
-            -0.0084191430818166,
-            -0.066738291095956
-          ],
-          "pos":[
-            879.07879638672,
-            -554.32916259766,
-            163.54361206293
-          ]
-        },
-        {
-          "dir":[
-            0.99773499413991,
-            -0.0084191430818166,
-            -0.066738291095956
-          ],
-          "pos":[
-            879.05932617188,
-            -556.92828369141,
-            163.54360669851
-          ]
-        },
-        {
-          "dir":[
-            0.99773499413991,
-            -0.0084191430818166,
-            -0.066738291095956
-          ],
-          "pos":[
-            879.09344482422,
-            -559.77484130859,
-            163.543607831
-          ]
-        }
-      ],
-      "props":{},
-      "propsAngle":0,
-      "zoneVertices":[
-        [
-          879.98657226563,
-          -564.25012207031,
-          163.54361134768
-        ],
-        [
-          914.32733154297,
-          -566.76715087891,
-          163.54360407591
-        ],
-        [
-          925.01556396484,
-          -517.41046142578,
-          163.22878414392
-        ],
-        [
-          887.90295410156,
-          -511.60372924805,
-          163.58196675777
-        ],
-        [
-          876.37506103516,
-          -541.12408447266,
-          163.67554003
-        ],
-        [
-          875.80438232422,
-          -559.43255615234,
-          163.67631745338
-        ],
-        [
-          876.65380859375,
-          -562.9990234375,
-          163.67659986019
-        ]
-      ]
-    },
-    {
-      "baseCapacity":1,
-      "basePrice":100000,
-      "center":[
-        -523.98547363281,
-        114.72576904297,
-        101.40338820219
-      ],
-      "computerPoint":[
-        -523.98547363281,
-        114.72576904297,
-        101.10338820219
-      ],
-      "description":"",
-      "id":"bcm_motel",
-      "images":{
-        "preview":"bcm_motel.png"
-      },
-      "isBackupGarage":false,
-      "isStarterGarage":false,
-      "maxCapacity":3,
-      "name":"Motel",
-      "parkingSpots":[
-        {
-          "dir":[
-            -0.64316709050769,
-            -0.60603757293615,
-            -0.4680326418932
-          ],
-          "normal":[
-            0,
-            0,
-            1
-          ],
-          "pos":[
-            -532.30413818359,
-            127.71852111816,
-            100.503393507
-          ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
-        },
-        {
-          "dir":[
-            -0.66439762444248,
-            -0.63841616026547,
-            -0.38858796037331
-          ],
-          "normal":[
-            0,
-            0,
-            1
-          ],
-          "pos":[
-            -536.14929199219,
-            131.34080505371,
-            100.40339320898
-          ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
-        },
-        {
-          "dir":[
-            0.72347446142976,
-            0.61407633473902,
-            -0.31542821492762
-          ],
-          "normal":[
-            0,
-            0,
-            1
-          ],
-          "pos":[
-            -540.00061035156,
-            134.97413635254,
-            100.40339994431
-          ],
-          "tags":{
-            "backwards":true,
-            "ignoreOthers":true,
-            "perfect":true
-          }
-        }
-      ],
-      "props":[
-        {
-          "position":[
-            -524.37701416016,
-            113.88964080811,
-            100.40338641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
-        },
-        {
-          "position":[
-            -524.52729165957,
-            114.16104027968,
-            101.17538641405
-          ],
-          "rotationMatrix":[
-            -0.16160505154287,
-            0.98681989102157,
-            0,
-            -0.98681989102157,
-            -0.16160505154287,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
-        },
-        {
-          "position":[
-            -525.13130905927,
-            114.7625807861,
-            100.41238641405
-          ],
-          "rotationMatrix":[
-            -0.17454866410047,
-            0.98466979940523,
-            0,
-            -0.98466979940523,
-            -0.17454866410047,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
-        },
-        {
-          "position":[
-            -524.24043495971,
-            113.62554589713,
-            101.15038641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
-        },
-        {
-          "position":[
-            -523.12924849054,
-            112.88605781018,
-            100.38838641405
-          ],
-          "rotationMatrix":[
-            -0.6819983600625,
-            -0.73135370161917,
-            0,
-            0.73135370161917,
-            -0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
-        },
-        {
-          "position":[
-            -527.70942065165,
-            117.59468223506,
-            100.91438641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
-        },
-        {
-          "position":[
-            -526.25183272432,
-            116.23545950346,
-            101.66638641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
-        },
-        {
-          "position":[
-            -526.96124581489,
-            116.89699791272,
-            100.91438641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
-        },
-        {
-          "position":[
-            -527.41276022162,
-            117.04184176146,
-            101.67038641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/plastic_can_big.DAE"
-        },
-        {
-          "position":[
-            -524.3878723353,
-            114.20057826168,
-            100.40738641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
-        },
-        {
-          "position":[
-            -525.28443577874,
-            115.64236326364,
-            100.91238641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
-        },
-        {
-          "position":[
-            -525.37073551554,
-            115.72283907012,
-            100.91238641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
-        },
-        {
-          "position":[
-            -525.18204626052,
-            115.54688349323,
-            100.91238641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
-        },
-        {
-          "position":[
-            -525.06868643677,
-            115.44117374742,
-            100.91238641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
-        },
-        {
-          "position":[
-            -525.9301044637,
-            116.42357895041,
-            100.43638641405
-          ],
-          "rotationMatrix":[
-            0.96497131974946,
-            -0.26226551824627,
-            0,
-            0.26226551824627,
-            0.96497131974946,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_hand_dolly.dae"
-        },
-        {
-          "position":[
-            -525.54239267453,
-            115.28949184241,
-            101.66538641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
-        },
-        {
-          "position":[
-            -525.24435939118,
-            115.60909341002,
-            101.66538641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
-        },
-        {
-          "position":[
-            -525.43054494348,
-            115.40943384947,
-            101.66538641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
-        },
-        {
-          "position":[
-            -525.34052115995,
-            115.50597253809,
-            101.66538641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
-        },
-        {
-          "position":[
-            -527.47645545162,
-            118.25799755644,
-            100.41038641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/italy_clutter_big_dustbin.DAE"
-        },
-        {
-          "position":[
-            -524.03993191508,
-            113.73938582464,
-            100.40238641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
-        },
-        {
-          "position":[
-            -525.4697957998,
-            115.78376574803,
-            101.65038641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_small_dirt.DAE"
-        },
-        {
-          "position":[
-            -523.73415872967,
-            113.18898618885,
-            100.39338641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
-        },
-        {
-          "position":[
-            -525.25921525912,
-            115.3658891683,
-            101.65938641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_white_bottle.dae"
-        },
-        {
-          "position":[
-            -526.65380802747,
-            116.44075893273,
-            100.41138641405
-          ],
-          "rotationMatrix":[
-            0.73094450260313,
-            -0.68243717228347,
-            0,
-            0.68243717228347,
-            0.73094450260313,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_shelves_4x1.dae"
-        },
-        {
-          "position":[
-            -526.96669729858,
-            116.76945073978,
-            101.66738641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_green_can.dae"
-        },
-        {
-          "position":[
-            -525.94599229063,
-            116.08835875866,
-            100.91138641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_white_bucket.dae"
-        },
-        {
-          "position":[
-            -527.33001403946,
-            116.84025289932,
-            100.13838641405
-          ],
-          "rotationMatrix":[
-            -0.72316478576427,
-            0.69063326927576,
-            0,
-            -0.69063326927576,
-            -0.72316478576427,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/si_crate.DAE"
-        },
-        {
-          "position":[
-            -525.0545618027,
-            114.79356237112,
-            101.42738641405
-          ],
-          "rotationMatrix":[
-            0.6819983600625,
-            0.73135370161917,
-            0,
-            -0.73135370161917,
-            0.6819983600625,
-            0,
-            0,
-            0,
-            1
-          ],
-          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_toolbox.dae"
-        }
-      ],
-      "propsAngle":0,
-      "zoneVertices":[
-        [
-          -520.75701904297,
-          109.4158782959,
-          99.948634624481
-        ],
-        [
-          -546.38134765625,
-          134.81341552734,
-          100.57293796539
-        ],
-        [
-          -533.51959228516,
-          147.3151550293,
-          100.36073303223
-        ],
-        [
-          -530.05871582031,
-          145.28691101074,
-          100.36073303223
-        ],
-        [
-          -518.36145019531,
-          133.69828796387,
-          100.55762481689
-        ]
-      ]
-    },
-    {
-      "baseCapacity":2,
       "basePrice":125000,
       "center":[
         -213.72535705566,
@@ -6087,6 +5274,290 @@
       ]
     },
     {
+      "baseCapacity":1,
+      "basePrice":500000,
+      "center":[
+        -722.40057373047,
+        -48.433055877686,
+        102.97200407982
+      ],
+      "computerPoint":[
+        -722.40057373047,
+        -48.433055877686,
+        102.97200407982
+      ],
+      "description":"",
+      "id":"bcm_bungalow",
+      "images":{
+        "preview":"bcm_bungalow.png"
+      },
+      "isBackupGarage":false,
+      "isStarterGarage":false,
+      "maxCapacity":5,
+      "name":"Bungalow",
+      "parkingSpots":[
+        {
+          "dir":[
+            -0.64983296009629,
+            -0.73134647649198,
+            -0.20700109974407
+          ],
+          "normal":[
+            -0.0084070217745575,
+            0.0080713512136859,
+            0.99993208533103
+          ],
+          "pos":[
+            -735.80053710938,
+            -58.637928009033,
+            102.09804207087
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.66609510819561,
+            -0.71373805714626,
+            -0.21655320967136
+          ],
+          "normal":[
+            0.011739009348599,
+            0.017604700179705,
+            0.99977611003219
+          ],
+          "pos":[
+            -731.20544433594,
+            -62.113285064697,
+            102.17207282782
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.81474345282975,
+            -0.54963814531147,
+            -0.18463752405623
+          ],
+          "normal":[
+            0.031019748625762,
+            0.024494090030615,
+            0.99921860208303
+          ],
+          "pos":[
+            -726.88317871094,
+            -65.986938476563,
+            102.16775131226
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.77325095316265,
+            -0.59242611540688,
+            -0.22608463286338
+          ],
+          "normal":[
+            0,
+            0,
+            1
+          ],
+          "pos":[
+            -721.91998291016,
+            -70.589920043945,
+            102.09958100319
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            0.46461215781453,
+            0.84573906809721,
+            -0.26241374107504
+          ],
+          "normal":[
+            -0.078627424414064,
+            0.052089149597339,
+            0.99554228871718
+          ],
+          "pos":[
+            -721.52624511719,
+            -81.751609802246,
+            102.17814612389
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        }
+      ],
+      "props":[
+        {
+          "position":[
+            -721.70538330078,
+            -48.874366760254,
+            102.09430706501
+          ],
+          "rotationMatrix":[
+            -0.66693388398627,
+            0.74511689981572,
+            0,
+            -0.74511689981572,
+            -0.66693388398627,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+        },
+        {
+          "position":[
+            -721.98921843909,
+            -48.999581033648,
+            102.86630706501
+          ],
+          "rotationMatrix":[
+            -0.9973665611918,
+            -0.072039104772622,
+            0,
+            0.072039104772622,
+            -0.9973665611918,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+        },
+        {
+          "position":[
+            -722.64273218648,
+            -49.546945429609,
+            102.10330706501
+          ],
+          "rotationMatrix":[
+            -0.99639138399687,
+            -0.085123791602596,
+            0,
+            0.085123791602596,
+            -0.99639138399687,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+        },
+        {
+          "position":[
+            -721.43005718043,
+            -48.762136962719,
+            102.84130706501
+          ],
+          "rotationMatrix":[
+            -0.66693388398627,
+            0.74511689981572,
+            0,
+            -0.74511689981572,
+            -0.66693388398627,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+        },
+        {
+          "position":[
+            -720.5934628762,
+            -47.722094670249,
+            102.07930706501
+          ],
+          "rotationMatrix":[
+            0.66693388398627,
+            -0.74511689981572,
+            0,
+            0.74511689981572,
+            0.66693388398627,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+        },
+        {
+          "position":[
+            -722.01603447322,
+            -48.857166496771,
+            102.09830706501
+          ],
+          "rotationMatrix":[
+            -0.66693388398627,
+            0.74511689981572,
+            0,
+            -0.74511689981572,
+            -0.66693388398627,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+        }
+      ],
+      "propsAngle":0,
+      "zoneVertices":[
+        [
+          -717.63891601563,
+          -45.62345123291,
+          101.74700093269
+        ],
+        [
+          -722.16870117188,
+          -41.14115524292,
+          101.93716669083
+        ],
+        [
+          -750.03674316406,
+          -68.657699584961,
+          101.82374596596
+        ],
+        [
+          -721.57122802734,
+          -88.597496032715,
+          102.1777831316
+        ],
+        [
+          -714.16937255859,
+          -72.435958862305,
+          102.09957379103
+        ],
+        [
+          -727.92120361328,
+          -56.840557098389,
+          102.09957021475
+        ]
+      ]
+    },
+    {
       "baseCapacity":2,
       "basePrice":105000,
       "center":[
@@ -6111,19 +5582,19 @@
       "parkingSpots":[
         {
           "dir":[
-            -0.0012733910739885,
-            -0.99422530400034,
-            -0.10730528114028
+            0.069762159907395,
+            0.99660954746126,
+            0.043619387365338
           ],
           "normal":[
-            -0.00024414060519007,
-            0.00032043454431197,
-            0.99999991885853
+            -0.0011520376930175,
+            -0.00045013393303334,
+            0.99999923509401
           ],
           "pos":[
-            -819.75897216797,
-            607.46112060547,
-            117.01424872875
+            -819.73773193359,
+            604.16796875,
+            117.01389503479
           ],
           "tags":{
             "ignoreOthers":true
@@ -6131,19 +5602,59 @@
         },
         {
           "dir":[
-            -0.99943679043454,
-            0.018958380751618,
-            0.02768901813305
+            0.99699214341257,
+            0.029633973704185,
+            -0.071613501353472
           ],
           "normal":[
-            -1.5258789058947e-05,
-            -1.5258789058947e-05,
+            3.0517578102796e-05,
+            2.2888183577097e-05,
+            0.9999999992724
+          ],
+          "pos":[
+            -809.13513183594,
+            605.23791503906,
+            117.01305401325
+          ],
+          "tags":{
+            "ignoreOthers":true
+          }
+        },
+        {
+          "dir":[
+            0.99699214341257,
+            0.029633973704185,
+            -0.071613501353472
+          ],
+          "normal":[
+            7.6293945308059e-06,
+            7.6293945308059e-06,
+            0.99999999994179
+          ],
+          "pos":[
+            -809.20123291016,
+            608.15197753906,
+            117.01303070784
+          ],
+          "tags":{
+            "ignoreOthers":true
+          }
+        },
+        {
+          "dir":[
+            0.99699214341257,
+            0.029633973704185,
+            -0.071613501353472
+          ],
+          "normal":[
+            1.5258789058947e-05,
+            1.5258789058947e-05,
             0.99999999976717
           ],
           "pos":[
-            -807.91125488281,
-            605.55059814453,
-            117.01303631067
+            -809.26666259766,
+            610.92144775391,
+            117.0130084157
           ],
           "tags":{
             "ignoreOthers":true
@@ -6151,29 +5662,9 @@
         },
         {
           "dir":[
-            -0.99943679043454,
-            0.018958380751618,
-            0.02768901813305
-          ],
-          "normal":[
-            2.288818358176e-05,
-            2.288818358176e-05,
-            0.99999999947613
-          ],
-          "pos":[
-            -807.89654541016,
-            608.30108642578,
-            117.01302886009
-          ],
-          "tags":{
-            "ignoreOthers":true
-          }
-        },
-        {
-          "dir":[
-            -0.99907807251846,
-            -0.0070903701843819,
-            0.042340662057382
+            0.99699214341257,
+            0.029633973704185,
+            -0.071613501353472
           ],
           "normal":[
             0,
@@ -6181,9 +5672,9 @@
             1
           ],
           "pos":[
-            -807.81622314453,
-            611.21783447266,
-            117.01300466061
+            -809.31988525391,
+            613.38427734375,
+            117.01300042868
           ],
           "tags":{
             "ignoreOthers":true
@@ -6191,19 +5682,19 @@
         },
         {
           "dir":[
-            -0.99907807251846,
-            -0.0070903701843819,
-            0.042340662057382
+            -0.1222998284959,
+            -0.99164342129439,
+            -0.04106186738845
           ],
           "normal":[
-            0,
-            0,
-            1
+            0.0014038071277907,
+            0.0003433223953836,
+            0.9999989557271
           ],
           "pos":[
-            -807.82110595703,
-            613.60681152344,
-            117.01300048828
+            -814.72430419922,
+            608.22125244141,
+            117.01504397392
           ],
           "tags":{
             "ignoreOthers":true
@@ -6211,19 +5702,19 @@
         },
         {
           "dir":[
-            0.066130132189806,
-            0.99737860071013,
-            -0.029372307741538
+            0.13411548326277,
+            0.98880122915295,
+            -0.065461182198358
           ],
           "normal":[
-            0.00011444091709945,
-            -4.5776366839778e-05,
-            0.9999999924039
+            0.00012969970593657,
+            7.6293944668571e-06,
+            0.99999999155989
           ],
           "pos":[
-            -818.92779541016,
-            615.77380371094,
-            117.01362580061
+            -819.36511230469,
+            611.60943603516,
+            117.01356118917
           ],
           "tags":{
             "ignoreOthers":true
@@ -6231,19 +5722,19 @@
         },
         {
           "dir":[
-            0.066130132189806,
-            0.99737860071013,
-            -0.029372307741538
+            0.11819508429879,
+            0.99256775744811,
+            0.028968412487124
           ],
           "normal":[
-            0.00065612757389417,
-            0.00080871538177654,
-            0.99999945773787
+            -1.5258789006989e-05,
+            -8.3923339538439e-05,
+            0.99999999636202
           ],
           "pos":[
-            -816.67443847656,
-            620.49005126953,
-            117.01246142387
+            -816.78009033203,
+            616.12445068359,
+            117.01349359751
           ],
           "tags":{
             "ignoreOthers":true
@@ -6251,22 +5742,24 @@
         },
         {
           "dir":[
-            -0.99702470958534,
-            0.069836216764182,
-            -0.032628688363684
+            -0.081691221685047,
+            -0.98541082194886,
+            -0.14930524533881
           ],
           "normal":[
-            -0.00069427410198314,
-            0.0013504012752859,
-            0.99999884719927
+            -0.00027465817932804,
+            0.00031280514867916,
+            0.99999991335791
           ],
           "pos":[
-            -820.21826171875,
-            625.72943115234,
-            117.00678139925
+            -815.73809814453,
+            611.24554443359,
+            117.01402562857
           ],
           "tags":{
-            "ignoreOthers":true
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
           }
         }
       ],
@@ -6899,6 +6392,700 @@
           117.5098449707
         ]
       ]
+    },
+    {
+      "baseCapacity":1,
+      "basePrice":100000,
+      "center":[
+        -523.98547363281,
+        114.72576904297,
+        101.40338820219
+      ],
+      "computerPoint":[
+        -523.98547363281,
+        114.72576904297,
+        101.10338820219
+      ],
+      "description":"",
+      "id":"bcm_motel",
+      "images":{
+        "preview":"bcm_motel.png"
+      },
+      "isBackupGarage":false,
+      "isStarterGarage":false,
+      "maxCapacity":3,
+      "name":"Motel",
+      "parkingSpots":[
+        {
+          "dir":[
+            -0.64316709050769,
+            -0.60603757293615,
+            -0.4680326418932
+          ],
+          "normal":[
+            0,
+            0,
+            1
+          ],
+          "pos":[
+            -532.30413818359,
+            127.71852111816,
+            100.503393507
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.66439762444248,
+            -0.63841616026547,
+            -0.38858796037331
+          ],
+          "normal":[
+            0,
+            0,
+            1
+          ],
+          "pos":[
+            -536.14929199219,
+            131.34080505371,
+            100.40339320898
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            0.72347446142976,
+            0.61407633473902,
+            -0.31542821492762
+          ],
+          "normal":[
+            0,
+            0,
+            1
+          ],
+          "pos":[
+            -540.00061035156,
+            134.97413635254,
+            100.40339994431
+          ],
+          "tags":{
+            "backwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.98725438944782,
+            -0.13956542960913,
+            -0.076487001340351
+          ],
+          "normal":[
+            -0.00034332242063333,
+            0.0013504015211578,
+            0.99999902927225
+          ],
+          "pos":[
+            -819.87609863281,
+            625.28588867188,
+            117.00761806965
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        }
+      ],
+      "props":[
+        {
+          "position":[
+            -524.37701416016,
+            113.88964080811,
+            100.40338641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+        },
+        {
+          "position":[
+            -524.52729165957,
+            114.16104027968,
+            101.17538641405
+          ],
+          "rotationMatrix":[
+            -0.16160505154287,
+            0.98681989102157,
+            0,
+            -0.98681989102157,
+            -0.16160505154287,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+        },
+        {
+          "position":[
+            -525.13130905927,
+            114.7625807861,
+            100.41238641405
+          ],
+          "rotationMatrix":[
+            -0.17454866410047,
+            0.98466979940523,
+            0,
+            -0.98466979940523,
+            -0.17454866410047,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+        },
+        {
+          "position":[
+            -524.24043495971,
+            113.62554589713,
+            101.15038641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+        },
+        {
+          "position":[
+            -523.12924849054,
+            112.88605781018,
+            100.38838641405
+          ],
+          "rotationMatrix":[
+            -0.6819983600625,
+            -0.73135370161917,
+            0,
+            0.73135370161917,
+            -0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+        },
+        {
+          "position":[
+            -527.70942065165,
+            117.59468223506,
+            100.91438641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+        },
+        {
+          "position":[
+            -526.25183272432,
+            116.23545950346,
+            101.66638641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+        },
+        {
+          "position":[
+            -526.96124581489,
+            116.89699791272,
+            100.91438641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+        },
+        {
+          "position":[
+            -527.41276022162,
+            117.04184176146,
+            101.67038641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/plastic_can_big.DAE"
+        },
+        {
+          "position":[
+            -524.3878723353,
+            114.20057826168,
+            100.40738641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+        },
+        {
+          "position":[
+            -525.28443577874,
+            115.64236326364,
+            100.91238641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
+        },
+        {
+          "position":[
+            -525.37073551554,
+            115.72283907012,
+            100.91238641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
+        },
+        {
+          "position":[
+            -525.18204626052,
+            115.54688349323,
+            100.91238641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
+        },
+        {
+          "position":[
+            -525.06868643677,
+            115.44117374742,
+            100.91238641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_black_oil.dae"
+        },
+        {
+          "position":[
+            -525.9301044637,
+            116.42357895041,
+            100.43638641405
+          ],
+          "rotationMatrix":[
+            0.96497131974946,
+            -0.26226551824627,
+            0,
+            0.26226551824627,
+            0.96497131974946,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_hand_dolly.dae"
+        },
+        {
+          "position":[
+            -525.54239267453,
+            115.28949184241,
+            101.66538641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
+        },
+        {
+          "position":[
+            -525.24435939118,
+            115.60909341002,
+            101.66538641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
+        },
+        {
+          "position":[
+            -525.43054494348,
+            115.40943384947,
+            101.66538641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
+        },
+        {
+          "position":[
+            -525.34052115995,
+            115.50597253809,
+            101.66538641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_short_bottle.dae"
+        },
+        {
+          "position":[
+            -527.47645545162,
+            118.25799755644,
+            100.41038641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/italy_clutter_big_dustbin.DAE"
+        },
+        {
+          "position":[
+            -524.03993191508,
+            113.73938582464,
+            100.40238641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
+        },
+        {
+          "position":[
+            -525.4697957998,
+            115.78376574803,
+            101.65038641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_small_dirt.DAE"
+        },
+        {
+          "position":[
+            -523.73415872967,
+            113.18898618885,
+            100.39338641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+        },
+        {
+          "position":[
+            -525.25921525912,
+            115.3658891683,
+            101.65938641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_white_bottle.dae"
+        },
+        {
+          "position":[
+            -526.65380802747,
+            116.44075893273,
+            100.41138641405
+          ],
+          "rotationMatrix":[
+            0.73094450260313,
+            -0.68243717228347,
+            0,
+            0.68243717228347,
+            0.73094450260313,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_shelves_4x1.dae"
+        },
+        {
+          "position":[
+            -526.96669729858,
+            116.76945073978,
+            101.66738641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_green_can.dae"
+        },
+        {
+          "position":[
+            -525.94599229063,
+            116.08835875866,
+            100.91138641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_white_bucket.dae"
+        },
+        {
+          "position":[
+            -527.33001403946,
+            116.84025289932,
+            100.13838641405
+          ],
+          "rotationMatrix":[
+            -0.72316478576427,
+            0.69063326927576,
+            0,
+            -0.69063326927576,
+            -0.72316478576427,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/si_crate.DAE"
+        },
+        {
+          "position":[
+            -525.0545618027,
+            114.79356237112,
+            101.42738641405
+          ],
+          "rotationMatrix":[
+            0.6819983600625,
+            0.73135370161917,
+            0,
+            -0.73135370161917,
+            0.6819983600625,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_toolbox.dae"
+        }
+      ],
+      "propsAngle":0,
+      "zoneVertices":[
+        [
+          -520.75701904297,
+          109.4158782959,
+          99.948634624481
+        ],
+        [
+          -546.38134765625,
+          134.81341552734,
+          100.57293796539
+        ],
+        [
+          -533.51959228516,
+          147.3151550293,
+          100.36073303223
+        ],
+        [
+          -530.05871582031,
+          145.28691101074,
+          100.36073303223
+        ],
+        [
+          -518.36145019531,
+          133.69828796387,
+          100.55762481689
+        ]
+      ]
     }
   ],
   "gasStationWizardStep":0,
@@ -7396,111 +7583,6 @@
       "vanillaOverride":false
     },
     {
-      "description":"levels.west_coast_usa.gasStationPoints.tyranos_island.description",
-      "energyTypes":[
-        "gasoline",
-        "diesel",
-        "unknown"
-      ],
-      "id":"tyranos_island",
-      "name":"levels.west_coast_usa.gasStationPoints.tyranos_island.title",
-      "preview":"fuel_tyranos_island.jpg",
-      "prices":{
-        "diesel":{
-          "displayObjects":[
-            [
-              "tyranos_island_sign_A4_1",
-              "tyranos_island_sign_B4_1"
-            ],
-            [
-              "tyranos_island_sign_A4_2",
-              "tyranos_island_sign_B4_2"
-            ],
-            [
-              "tyranos_island_sign_A4_3",
-              "tyranos_island_sign_B4_3"
-            ],
-            [
-              "tyranos_island_sign_A4_4",
-              "tyranos_island_sign_B4_4"
-            ]
-          ],
-          "priceBaseline":5,
-          "priceRandomnessBias":0.2,
-          "priceRandomnessGain":0.1,
-          "us_9_10_tax":true
-        },
-        "gasoline":{
-          "displayObjects":[
-            [
-              "tyranos_island_sign_A1_1",
-              "tyranos_island_sign_B1_1"
-            ],
-            [
-              "tyranos_island_sign_A1_2",
-              "tyranos_island_sign_B1_2"
-            ],
-            [
-              "tyranos_island_sign_A1_3",
-              "tyranos_island_sign_B1_3"
-            ],
-            [
-              "tyranos_island_sign_A1_4",
-              "tyranos_island_sign_B1_4"
-            ]
-          ],
-          "priceBaseline":4,
-          "priceRandomnessBias":0.2,
-          "priceRandomnessGain":0.1,
-          "us_9_10_tax":true
-        },
-        "gasoline2":{
-          "disabled":true,
-          "displayObjects":[
-            [
-              "tyranos_island_sign_A2_1",
-              "tyranos_island_sign_B2_1"
-            ],
-            [
-              "tyranos_island_sign_A2_2",
-              "tyranos_island_sign_B2_2"
-            ],
-            [
-              "tyranos_island_sign_A2_3",
-              "tyranos_island_sign_B2_3"
-            ],
-            [
-              "tyranos_island_sign_A2_4",
-              "tyranos_island_sign_B2_4"
-            ]
-          ]
-        },
-        "gasoline3":{
-          "disabled":true,
-          "displayObjects":[
-            [
-              "tyranos_island_sign_A3_1",
-              "tyranos_island_sign_B3_1"
-            ],
-            [
-              "tyranos_island_sign_A3_2",
-              "tyranos_island_sign_B3_2"
-            ],
-            [
-              "tyranos_island_sign_A3_3",
-              "tyranos_island_sign_B3_3"
-            ],
-            [
-              "tyranos_island_sign_A3_4",
-              "tyranos_island_sign_B3_4"
-            ]
-          ]
-        }
-      },
-      "pumps":{},
-      "vanillaOverride":false
-    },
-    {
       "description":"levels.west_coast_usa.gasStationPoints.trilobite_city.description",
       "energyTypes":[
         "gasoline",
@@ -7530,7 +7612,7 @@
               "trilobite_city_sign_B4_4"
             ]
           ],
-          "priceBaseline":5.012,
+          "priceBaseline":1.532,
           "priceRandomnessBias":0.2,
           "priceRandomnessGain":0.1,
           "us_9_10_tax":true
@@ -7554,7 +7636,7 @@
               "trilobite_city_sign_B1_4"
             ]
           ],
-          "priceBaseline":4.215,
+          "priceBaseline":1.373,
           "priceRandomnessBias":0.2,
           "priceRandomnessGain":0.1,
           "us_9_10_tax":true
@@ -7604,18 +7686,123 @@
       },
       "pumps":{},
       "vanillaOverride":false
+    },
+    {
+      "description":"levels.west_coast_usa.gasStationPoints.tyranos_island.description",
+      "energyTypes":[
+        "gasoline",
+        "diesel",
+        "unknown"
+      ],
+      "id":"tyranos_island",
+      "name":"levels.west_coast_usa.gasStationPoints.tyranos_island.title",
+      "preview":"fuel_tyranos_island.jpg",
+      "prices":{
+        "diesel":{
+          "displayObjects":[
+            [
+              "tyranos_island_sign_A4_1",
+              "tyranos_island_sign_B4_1"
+            ],
+            [
+              "tyranos_island_sign_A4_2",
+              "tyranos_island_sign_B4_2"
+            ],
+            [
+              "tyranos_island_sign_A4_3",
+              "tyranos_island_sign_B4_3"
+            ],
+            [
+              "tyranos_island_sign_A4_4",
+              "tyranos_island_sign_B4_4"
+            ]
+          ],
+          "priceBaseline":1.49,
+          "priceRandomnessBias":0.2,
+          "priceRandomnessGain":0.1,
+          "us_9_10_tax":true
+        },
+        "gasoline":{
+          "displayObjects":[
+            [
+              "tyranos_island_sign_A1_1",
+              "tyranos_island_sign_B1_1"
+            ],
+            [
+              "tyranos_island_sign_A1_2",
+              "tyranos_island_sign_B1_2"
+            ],
+            [
+              "tyranos_island_sign_A1_3",
+              "tyranos_island_sign_B1_3"
+            ],
+            [
+              "tyranos_island_sign_A1_4",
+              "tyranos_island_sign_B1_4"
+            ]
+          ],
+          "priceBaseline":1.373,
+          "priceRandomnessBias":0.2,
+          "priceRandomnessGain":0.1,
+          "us_9_10_tax":true
+        },
+        "gasoline2":{
+          "disabled":true,
+          "displayObjects":[
+            [
+              "tyranos_island_sign_A2_1",
+              "tyranos_island_sign_B2_1"
+            ],
+            [
+              "tyranos_island_sign_A2_2",
+              "tyranos_island_sign_B2_2"
+            ],
+            [
+              "tyranos_island_sign_A2_3",
+              "tyranos_island_sign_B2_3"
+            ],
+            [
+              "tyranos_island_sign_A2_4",
+              "tyranos_island_sign_B2_4"
+            ]
+          ]
+        },
+        "gasoline3":{
+          "disabled":true,
+          "displayObjects":[
+            [
+              "tyranos_island_sign_A3_1",
+              "tyranos_island_sign_B3_1"
+            ],
+            [
+              "tyranos_island_sign_A3_2",
+              "tyranos_island_sign_B3_2"
+            ],
+            [
+              "tyranos_island_sign_A3_3",
+              "tyranos_island_sign_B3_3"
+            ],
+            [
+              "tyranos_island_sign_A3_4",
+              "tyranos_island_sign_B3_4"
+            ]
+          ]
+        }
+      },
+      "pumps":{},
+      "vanillaOverride":false
     }
   ],
   "globalDaePacks":{},
-  "lastSaved":1776408352,
+  "lastSaved":1777102216,
   "levelName":"west_coast_usa",
   "mapInfo":{
     "continent":"",
     "country":"usa",
     "displayName":"West Coast USA",
     "fuelPriceMultiplier":1,
-    "importPartsDepot":"",
-    "localPartsDepot":"",
+    "importPartsDepot":"spearleafLogistics",
+    "localPartsDepot":"sealbrik",
     "worldMapPos":[
       13.6,
       27.9
@@ -7623,28 +7810,70 @@
   },
   "radarSpots":[
     {
-      "heading":-2.56467523716,
-      "id":"bcmRadar_1",
+      "heading":-0.78272617141534,
+      "id":"wc_bcmRadar_2",
       "lineEnd":[
-        -598.3681640625,
-        632.58422851563,
-        91.071060419083
+        -575.6865234375,
+        -526.39337158203,
+        116.83587515354
       ],
       "lineStart":[
-        -586.96099853516,
-        642.39263916016,
-        91.002168595791
+        -578.28344726563,
+        -538.02099609375,
+        116.3861168623
       ],
       "name":"",
       "position":[
-        -581.54058837891,
-        645.57238769531,
-        91.131059527397
+        -585.89093017578,
+        -518.15875244141,
+        116.76518684626
       ],
-      "speedLimit":50
+      "speedLimit":80
     },
     {
-      "heading":-1.5260471576197,
+      "heading":-0.21723949376917,
+      "id":"wc_bcmRadar_1",
+      "lineEnd":[
+        123.0846862793,
+        -959.97137451172,
+        125.95270967484
+      ],
+      "lineStart":[
+        119.26366424561,
+        -969.89666748047,
+        126.29197210073
+      ],
+      "name":"highway2",
+      "position":[
+        99.759155273438,
+        -974.31744384766,
+        126.27914220095
+      ],
+      "speedLimit":120
+    },
+    {
+      "heading":1.4000989464123,
+      "id":"wc_bcmRadar_3",
+      "lineEnd":[
+        960.92236328125,
+        -46.315650939941,
+        148.19400525093
+      ],
+      "lineStart":[
+        982.34301757813,
+        -51.948299407959,
+        148.24130964279
+      ],
+      "name":"highway3",
+      "position":[
+        987.95074462891,
+        -65.623435974121,
+        148.8419470787
+      ],
+      "speedLimit":120
+    },
+    {
+      "heading":-3.0968434844146,
       "id":"bcmRadar_2",
       "lineEnd":[
         -504.91888427734,
@@ -7665,7 +7894,7 @@
       "speedLimit":127
     },
     {
-      "heading":0.012205047228242,
+      "heading":-1.5585912795667,
       "id":"bcmRadar_4",
       "lineEnd":[
         -970.32769775391,
@@ -7686,32 +7915,34 @@
       "speedLimit":50
     },
     {
-      "heading":0.17764407665597,
-      "id":"bcmRadar_3",
+      "heading":-4.1354715638949,
+      "id":"bcmRadar_1",
       "lineEnd":[
-        134.26480102539,
-        1089.2139892578,
-        106.0520195365
+        -598.3681640625,
+        632.58422851563,
+        91.071060419083
       ],
       "lineStart":[
-        116.09075927734,
-        1085.6558837891,
-        106.05243694782
+        -586.96099853516,
+        642.39263916016,
+        91.002168595791
       ],
-      "name":"puente",
+      "name":"",
       "position":[
-        125.44165039063,
-        1086.4982910156,
-        106.0436026454
+        -581.54058837891,
+        645.57238769531,
+        91.131059527397
       ],
-      "speedLimit":127
+      "speedLimit":50
     }
   ],
-  "selectedDeliveryIdx":68,
+  "selectedCameraIdx":1,
+  "selectedDeliveryIdx":30,
   "selectedGasStationIdx":8,
   "selectedIdx":7,
-  "selectedRadarSpotIdx":4,
-  "travelNodeWizardStep":0,
+  "selectedRadarSpotIdx":1,
+  "selectedTravelNodeIdx":2,
+  "travelNodeWizardStep":5,
   "travelNodes":[
     {
       "center":[
@@ -7730,6 +7961,7 @@
       "id":"wc_port",
       "name":"West Coast Port",
       "nodeType":"port",
+      "preview":"",
       "rotation":[
         0,
         0,
@@ -7744,9 +7976,9 @@
     },
     {
       "center":[
-        -889.70336914063,
-        -515.11602783203,
-        104.67040252686
+        -887.25714111328,
+        -515.04937744141,
+        104.39493966103
       ],
       "connections":[
         {
@@ -7765,11 +7997,12 @@
       "id":"wc_road_1",
       "name":"West Coast highway Exit",
       "nodeType":"road",
+      "preview":"",
       "rotation":[
         0,
         0,
-        0.92831820960255,
-        -0.37178663467145
+        0.91133740099811,
+        -0.4116602258441
       ],
       "triggerSize":[
         8,
@@ -7778,5 +8011,5 @@
       ]
     }
   ],
-  "wizardStep":6
+  "wizardStep":4
 }

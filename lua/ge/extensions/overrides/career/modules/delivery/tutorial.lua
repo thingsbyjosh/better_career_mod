@@ -1,8 +1,7 @@
--- BCM Override: career_modules_delivery_tutorial
+﻿-- BCM Override: career_modules_delivery_tutorial
 -- Neutralizes the vanilla delivery tutorial gate per BCM v2.0 tiered access model.
 -- Basic delivery (parcels, vans) is available from day 1 without completing the tutorial.
--- Heavy delivery (trucks, trailers) is gated by CDL license (Phase 65), not tutorial.
---
+-- Heavy delivery (trucks, trailers) is gated by CDL license, not tutorial.
 -- This override is registered automatically by bcm_overrideManager via the
 -- /overrides/ directory scan. It replaces career_modules_delivery_tutorial.
 
@@ -33,7 +32,7 @@ onCareerActivated = function()
   dTutorial = career_modules_delivery_tutorial
 end
 
--- All tutorial gates return false — tutorials are bypassed
+-- All tutorial gates return false â€” tutorials are bypassed
 isCargoDeliveryTutorialActive = function()
   return false
 end
@@ -65,12 +64,12 @@ getTutorialInfo = function()
   return tutorialInfo
 end
 
--- Attribute change handler — kept for compatibility but cache is unused since tutorials are disabled
+-- Attribute change handler â€” kept for compatibility but cache is unused since tutorials are disabled
 onPlayerAttributesChanged = function(change, reason)
   -- No-op: tutorial status cache not needed when tutorials are always inactive
 end
 
--- Tasklist data — shows tutorials as completed
+-- Tasklist data â€” shows tutorials as completed
 onCareerProgressPageGetTasklistData = function(tasklistData, tasklistId)
   if tasklistId == "delivery-introduction" then
     tasklistData.headerLabel = "Delivery Introduction"

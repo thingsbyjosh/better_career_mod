@@ -1,4 +1,4 @@
--- BCM Heat System Extension
+﻿-- BCM Heat System Extension
 -- Persistent heat accumulator (0-10000, 10 levels) that tracks police heat across pursuits,
 -- decays over real time with a non-linear curve, dynamically modifies police sensitivity
 -- via setPursuitVars, and persists across save/load with retroactive decay.
@@ -25,10 +25,10 @@ local addHeat          -- debug
 local resetHeat        -- debug
 local forceDecayTick   -- debug
 local printStatus      -- debug
--- Phase 97: Per-map heat export/import for multimap
+-- Per-map heat export/import for multimap
 local getHeatForExport
 local loadHeatFromImport
--- Phase 60: Vehicle recognition system
+-- Vehicle recognition system
 local captureVehicleFingerprint
 local clearRecognition
 local checkRecognition
@@ -92,10 +92,10 @@ local HEAT_POLICE_PARAMS = {
 
 -- Score levels per heat range (3-level system)
 -- Only level 1 threshold varies by heat; levels 2-3 blocked (driven by damage cost)
--- These are NOT used directly anymore — applyHeatToPolice sets scoreLevels inline
+-- These are NOT used directly anymore â€” applyHeatToPolice sets scoreLevels inline
 -- Kept as documentation reference only
 
--- Phase 60: Recognition probability per heat level (checked every 2s when a police unit has line of sight)
+-- Recognition probability per heat level (checked every 2s when a police unit has line of sight)
 local RECOGNITION_PROB = {
   [0]  = 0,
   [1]  = 0.03,
@@ -119,9 +119,9 @@ local RECOGNITION_CHECK_INTERVAL  = 2.0   -- seconds between recognition checks
 local activated = false
 local heatAccum = 0              -- 0-10000
 local pursuitActive = false
-local lastDecayTimestamp = nil    -- os.time() wall clock on save
+local lastDecayTimestamp = nil    -- os.time wall clock on save
 local broadcastAccum = 0
--- Phase 60: Recognition system state
+-- Recognition system state
 local recognitionRecord = nil    -- nil when no fingerprint; table {model, licensePlate, paintColor, offenseTypes, level} when active
 recognitionCheckAccum = 0
 
@@ -152,7 +152,7 @@ broadcastHeatUpdate = function()
 end
 
 -- ============================================================================
--- Phase 60: Vehicle recognition system
+-- Vehicle recognition system
 -- ============================================================================
 
 -- Capture the player's current vehicle fingerprint (model + plate + paint)
@@ -213,7 +213,7 @@ end
 triggerRecognitionPursuit = function()
   if not recognitionRecord then return end
 
-  log('I', logTag, 'Recognition triggered — stored vehicle fingerprint matched by police unit')
+  log('I', logTag, 'Recognition triggered â€” stored vehicle fingerprint matched by police unit')
 
   -- Send phone notification
   pcall(function()
@@ -252,7 +252,7 @@ triggerRecognitionPursuit = function()
     end
   end)
 
-  -- Force pursuit start — lower score threshold so next infraction triggers pursuit
+  -- Force pursuit start â€” lower score threshold so next infraction triggers pursuit
   -- Only lower level 1 threshold; levels 2-3 are controlled by BCM damage escalation
   pcall(function()
     if gameplay_police and gameplay_police.setPursuitVars then
@@ -308,7 +308,7 @@ runDecayTick = function(dt)
   local rate = DECAY_RATE[level] or 5.0
   heatAccum = math.max(0, heatAccum - rate * dt)
 
-  -- Phase 60: Clear recognition when heat fully decays
+  -- Clear recognition when heat fully decays
   if heatAccum <= 0 then
     heatAccum = 0
     if recognitionRecord then clearRecognition() end
@@ -363,7 +363,7 @@ onPursuitEvent = function(data)
     pursuitActive = true
 
   elseif action == 'level_change' then
-    -- Add heat for ALL intermediate levels when pursuit jumps (e.g., 0→3 awards levels 1+2+3)
+    -- Add heat for ALL intermediate levels when pursuit jumps (e.g., 0â†’3 awards levels 1+2+3)
     local prevLevel = data.prevLevel or 0
     local totalPts = 0
     for l = prevLevel + 1, level do
@@ -392,7 +392,7 @@ onPursuitEvent = function(data)
     -- Neutral: no heat change
     pursuitActive = false
 
-    -- Phase 60: Capture fingerprint on successful evasion (not on debug reset)
+    -- Capture fingerprint on successful evasion (not on debug reset)
     if action == 'evade' or action == 'timeout_evade' then
       local fp = captureVehicleFingerprint()
       if fp then
@@ -477,7 +477,7 @@ loadHeatData = function()
 
     log('I', logTag, string.format('Heat loaded: accum=%.0f, level=%d (after retroactive decay)', heatAccum, getHeatLevel()))
   else
-    -- Clean slate for pre-Phase 55 saves
+    -- Clean slate for pre-saves
     heatAccum = 0
     log('I', logTag, 'No heat data found, starting clean')
   end
@@ -511,7 +511,7 @@ onUpdate = function(dtReal, dtSim, dtRaw)
     broadcastHeatUpdate()
   end
 
-  -- Phase 60: Throttle recognition checks to every RECOGNITION_CHECK_INTERVAL seconds
+  -- Throttle recognition checks to every RECOGNITION_CHECK_INTERVAL seconds
   recognitionCheckAccum = recognitionCheckAccum + dtSim
   if recognitionCheckAccum >= RECOGNITION_CHECK_INTERVAL then
     recognitionCheckAccum = 0
@@ -520,7 +520,7 @@ onUpdate = function(dtReal, dtSim, dtRaw)
 end
 
 -- ============================================================================
--- Debug commands (callable from BeamNG console as bcm_heatSystem.commandName())
+-- Debug commands (callable from BeamNG console as bcm_heatSystem.commandName)
 -- ============================================================================
 
 -- Set heat to exact accumulator value (0-10000)
@@ -547,7 +547,7 @@ resetHeat = function()
   log('I', logTag, 'Debug resetHeat: heat cleared')
 end
 
--- Phase 60: Create a fake recognition record for testing (without running a real pursuit)
+-- Create a fake recognition record for testing (without running a real pursuit)
 local setRecognition
 setRecognition = function()
   recognitionRecord = {
@@ -576,7 +576,7 @@ printStatus = function()
   log('I', logTag, 'heatAccum: ' .. string.format('%.0f', heatAccum) .. ' / ' .. MAX_HEAT)
   log('I', logTag, 'heatLevel: ' .. getHeatLevel() .. ' / ' .. NUM_LEVELS)
   log('I', logTag, 'pursuitActive: ' .. tostring(pursuitActive))
-  -- Phase 60: Recognition record
+  -- Recognition record
   if recognitionRecord then
     log('I', logTag, 'recognitionRecord.model: ' .. tostring(recognitionRecord.model))
     log('I', logTag, 'recognitionRecord.licensePlate: ' .. tostring(recognitionRecord.licensePlate))
@@ -594,7 +594,7 @@ printStatus = function()
 end
 
 -- ============================================================================
--- Phase 97: Per-map heat export/import
+-- Per-map heat export/import
 -- ============================================================================
 
 -- Export current heat state for per-map storage by bcm_multimap
@@ -639,14 +639,14 @@ M.resetHeat = resetHeat
 M.forceDecayTick = forceDecayTick
 M.printStatus = printStatus
 
--- Phase 60: Recognition system API
+-- Recognition system API
 M.clearRecognition = clearRecognition
 M.onVehicleSwitched = function(oldId, newId) clearRecognition() end
 
--- Phase 60: Recognition debug command
+-- Recognition debug command
 M.setRecognition = setRecognition
 
--- Phase 97: Per-map heat export/import
+-- Per-map heat export/import
 M.getHeatForExport = getHeatForExport
 M.loadHeatFromImport = loadHeatFromImport
 

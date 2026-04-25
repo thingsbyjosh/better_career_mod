@@ -1,2 +1,3 @@
-{"position":[-790.62976074219,-76.059135437012,296.62423753738],"name":"ut_garage_2_icon","__parent":"ut_garage_2","class":"BeamNGPointOfInterest"}
-{"name":"ut_garage_2_area","__parent":"ut_garage_2","position":[-790.62957763672,-76.059181213379,296.6242389679],"scale":[2,2,2],"class":"BeamNGGameplayArea"}
+{"position":[624.14440917969,-550.11480712891,136.18128967285],"name":"ut_garage_2_icon","__parent":"ut_garage_2","class":"BeamNGPointOfInterest"}
+{"name":"ut_garage_2_area","__parent":"ut_garage_2","position":[624.14440917969,-550.11480712891,136.18128967285],"scale":[2,2,2],"class":"BeamNGGameplayArea"}
+{"rotationMatrix":[-0.70710678118655,-0.70710678118655,0,0.70710678118655,-0.70710678118655,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae","position":[624.11448974609,-549.93696289063,136.22830810547],"useInstanceRenderData":true,"__parent":"ut_garage_2"}

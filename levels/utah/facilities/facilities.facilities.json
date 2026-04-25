@@ -47,6 +47,44 @@
           "keyLabel":"Vehicle & Parts Shopping"
         }
       ],
+      "description":"What used to be an airstrip is now a place where engines come to prove how far they can go… and where they fail.\nWith a runway that never seems to end and hangars filled with tools, parts and questionable projects, this is the perfect place to test ideas that would be a bad decision anywhere else.\nNo one’s going to stop you here. That part is on you.",
+      "doors":[
+        [
+          "ut_garage_3_area",
+          "ut_garage_3_icon"
+        ]
+      ],
+      "functions":{
+        "insurances":true,
+        "painting":true,
+        "partInventory":true,
+        "partShop":true,
+        "playerAbstract":true,
+        "sleep":true,
+        "tuning":true,
+        "vehicleInventory":true,
+        "vehicleShop":true
+      },
+      "garageId":"ut_garage_3",
+      "icon":"poi_laptop_round",
+      "iconLift":0.24,
+      "iconOffsetHeight":0.24,
+      "id":"ut_garage_3_area",
+      "name":"Dust Run Airfield",
+      "preview":"",
+      "screens":[
+        "commercialGarageComputer_screen_2"
+      ]
+    },
+    {
+      "activityAcceptProps":[
+        {
+          "keyLabel":"Vehicle & Parts Management"
+        },
+        {
+          "keyLabel":"Vehicle & Parts Shopping"
+        }
+      ],
       "description":"ui.career.computer.bigmapLabel.garage",
       "doors":[
         [
@@ -99,6 +137,32 @@
     },
     {
       "capacity":2,
+      "defaultPrice":750000,
+      "description":"What used to be an airstrip is now a place where engines come to prove how far they can go… and where they fail.\nWith a runway that never seems to end and hangars filled with tools, parts and questionable projects, this is the perfect place to test ideas that would be a bad decision anywhere else.\nNo one’s going to stop you here. That part is on you.",
+      "icon":"poi_garage_2_round",
+      "id":"ut_garage_3",
+      "name":"Dust Run Airfield",
+      "parkingSpotNames":[
+        "ut_garage_3_parking1",
+        "ut_garage_3_parking2",
+        "ut_garage_3_parking3",
+        "ut_garage_3_parking4",
+        "ut_garage_3_parking5",
+        "ut_garage_3_parking6",
+        "ut_garage_3_parking7",
+        "ut_garage_3_parking8",
+        "ut_garage_3_parking9",
+        "ut_garage_3_parking10",
+        "ut_garage_3_parking11"
+      ],
+      "preview":"",
+      "tags":{},
+      "zoneNames":[
+        "ut_garage_3"
+      ]
+    },
+    {
+      "capacity":4,
       "defaultPrice":100000,
       "description":"",
       "icon":"poi_garage_2_round",
@@ -107,9 +171,10 @@
       "parkingSpotNames":[
         "ut_garage_2_parking1",
         "ut_garage_2_parking2",
-        "ut_garage_2_parking3"
+        "ut_garage_2_parking3",
+        "ut_garage_2_parking4"
       ],
-      "preview":"",
+      "preview":"ut_garage_2.png",
       "tags":{},
       "zoneNames":[
         "ut_garage_2"

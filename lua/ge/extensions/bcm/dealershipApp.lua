@@ -534,7 +534,7 @@ requestDealershipCheckout = function(modelKey, configKey, colorIndex, deliveryTy
 
   -- Insurance options (filtered by vehicle insurance class — same as vanilla)
   local insuranceOptions = {}
-  table.insert(insuranceOptions, { id = -1, name = "Sin seguro / No Insurance", premium = 0 })
+  table.insert(insuranceOptions, { id = -1, name = "No insurance", premium = 0 })
 
   -- Determine applicable insurance class from vehicle config
   -- NOTE: configList.configs keys use format "modelKey_configKey", not bare configKey.

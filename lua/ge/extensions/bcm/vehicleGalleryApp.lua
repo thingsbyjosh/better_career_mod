@@ -1,4 +1,4 @@
--- BCM Vehicle Gallery App Extension
+﻿-- BCM Vehicle Gallery App Extension
 -- Provides consolidated vehicle data for the My Vehicles gallery window.
 -- Gathers from inventory, properties, garageManager, dynoApp, and valueCalculator.
 -- Extension name: bcm_vehicleGalleryApp
@@ -65,7 +65,7 @@ end
 getVehiclePermissions = function(inventoryId, vehicleInfo, currentGarageId)
   local perms = {}
 
-  -- needsRepair (skip for vehicles still in delivery — no partConditions yet)
+  -- needsRepair (skip for vehicles still in delivery â€” no partConditions yet)
   if vehicleInfo.timeToAccess and vehicleInfo.timeToAccess > 0 then
     perms.needsRepair = false
   elseif career_modules_insurance_insurance and career_modules_insurance_insurance.inventoryVehNeedsRepair then
@@ -194,8 +194,8 @@ getAllVehiclesForGallery = function()
     end
   end
 
-  -- Get garage capacity data — prefer BCM capacity (supports upgrades) over vanilla
-  -- Phase 102 fix: include mapName for Vue nicename display; track which garages
+  -- Get garage capacity data â€” prefer BCM capacity (supports upgrades) over vanilla
+  -- fix: include mapName for Vue nicename display; track which garages
   -- are backup-free on OTHER maps so we can hide empty cross-map backups later.
   local garageCapacity = {}
   local currentMap = getCurrentLevelIdentifier and getCurrentLevelIdentifier() or nil
@@ -260,7 +260,7 @@ getAllVehiclesForGallery = function()
   local totalVehicles = 0
 
   for inventoryId, vehicleInfo in pairs(allVehicles) do
-    -- BCM: skip non-owned vehicles (loaners) — they are not player property
+    -- BCM: skip non-owned vehicles (loaners) â€” they are not player property
     if vehicleInfo.owned == false then goto continueGallery end
 
     local invIdStr = tostring(inventoryId)
@@ -409,7 +409,7 @@ getAllVehiclesForGallery = function()
   end
 
   -- Collect empty garages (owned but no vehicles).
-  -- Phase 102 fix: hide backup-free garages from OTHER maps when empty — they
+  -- fix: hide backup-free garages from OTHER maps when empty â€” they
   -- clutter My Vehicles with sections like "Portofino" when the player is in WCUSA
   -- and has never parked a car there. Show them only if they have vehicles.
   local emptyGarages = {}
@@ -587,7 +587,7 @@ local function deliverVehicle(inventoryId, skipSpaceCheck)
     vehicleInfo.niceLocation = career_modules_garageManager.garageIdToName(closestGarage.id)
   end
 
-  -- Set delivery delay (120 seconds) — vanilla onUpdate loop decrements timeToAccess each frame
+  -- Set delivery delay (120 seconds) â€” vanilla onUpdate loop decrements timeToAccess each frame
   vehicleInfo.timeToAccess = 120
   vehicleInfo.delayReason = "delivery"
 
@@ -636,7 +636,7 @@ local function deliverAndReplaceVehicle(inventoryId)
     career_modules_computer.refreshComputerData()
   end
 
-  -- Deliver (skip space check — we just freed a slot)
+  -- Deliver (skip space check â€” we just freed a slot)
   deliverVehicle(inventoryId, true)
 end
 
@@ -669,7 +669,7 @@ local function openPerformanceIndex(inventoryId, originComputerId)
   end
 end
 
--- Sell data helper — delegates to marketplaceApp (Phase 50)
+-- Sell data helper â€” delegates to marketplaceApp
 local function getVehicleSellData(inventoryId)
   if bcm_marketplaceApp and bcm_marketplaceApp.getVehicleSellData then
     return bcm_marketplaceApp.getVehicleSellData(inventoryId)

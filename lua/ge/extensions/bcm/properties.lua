@@ -1,4 +1,4 @@
--- BCM Properties Extension
+﻿-- BCM Properties Extension
 -- Property data model: ownership records, tier state, vehicle assignments, and persistence.
 -- Foundational data layer for all property/garage features in v1.6.
 -- Every later phase (purchase UI, paint tier gating, mortgages, dyno) reads and writes through this module.
@@ -28,12 +28,12 @@ local discoverProperty
 local getVehicleTransfers
 local addVehicleTransfer
 local removeVehicleTransfer
--- Phase 102 hybrid data model helpers (paidRentalMode flag + rental type discriminator)
+-- hybrid data model helpers (paidRentalMode flag + rental type discriminator)
 local isPaidRental
 local setPaidRentalMode
 local clearPaidRentalMode
 local getOwnedGarages
--- Save migration: type=garage → type=backup for backup garages
+-- Save migration: type=garage â†’ type=backup for backup garages
 local migrateBackupGarageTypes
 
 -- ============================================================================
@@ -52,6 +52,12 @@ local homeGarageId = nil
 
 -- Pending vehicle transfers: vehicleInventoryId (string) -> { fromGarageId, toGarageId, startTime, completionTime }
 local vehicleTransfers = {}
+
+-- Last computed player-home garage id. Set at save time by onSaveCurrentSaveSlotAsyncStart
+-- from the avatar's world position + bcm_garages.pickGarageForPosition. Read at load
+-- time by the career.lua override's formatSaveSlotForUi to pre-select the ProfileCard
+-- garage dropdown. Nil if the player's save-time map had no owned/rental/backup garages.
+local lastPlayerHomeGarage = nil
 
 -- ============================================================================
 -- Query functions
@@ -116,7 +122,7 @@ purchaseProperty = function(propertyId, propertyType, baseCapacity)
     currentCapacity = baseCapacity or 1,
     customName = nil,
     isHome = false,
-    -- Phase 102: paidRentalMode is nil for normal owned garages and for non-backup rentals.
+    -- paidRentalMode is nil for normal owned garages and for non-backup rentals.
     -- When set (table with startDay/lastChargedDay/dailyRateCents), indicates this record
     -- is the auto-granted backup garage upgraded into paid-rental mode. See bcm/rentals.lua.
     paidRentalMode = nil,
@@ -269,13 +275,13 @@ discoverProperty = function(propertyId)
 end
 
 -- ============================================================================
--- Phase 102: paidRentalMode helpers (hybrid data model — Pitfall 6 resolution)
+-- paidRentalMode helpers (hybrid data model â€” Pitfall 6 resolution)
 -- ============================================================================
 -- Two orthogonal concepts coexist:
---   (1) type = "rental"       — a non-backup garage the player pays to rent
---   (2) paidRentalMode flag   — an owned (type="garage") backup garage upgraded
---                               into paid-rental mode, unlocking extra caps
--- bcm/rentals.lua is the sole writer; other modules read via isPaidRental().
+-- (1) type = "rental" â€” a non-backup garage the player pays to rent
+-- (2) paidRentalMode flag â€” an owned (type="garage") backup garage upgraded
+-- into paid-rental mode, unlocking extra caps
+-- bcm/rentals.lua is the sole writer; other modules read via isPaidRental.
 
 isPaidRental = function(propertyId)
   if not propertyId then return false end
@@ -308,9 +314,9 @@ clearPaidRentalMode = function(propertyId)
   return true
 end
 
--- Save migration: converts type="garage" → type="backup" for garages whose JSON
+-- Save migration: converts type="garage" â†’ type="backup" for garages whose JSON
 -- definition has isBackupGarage=true. Runs once per load to handle saves created
--- before the backup type was introduced. Idempotent — already-migrated records
+-- before the backup type was introduced. Idempotent â€” already-migrated records
 -- (type="backup") are skipped.
 migrateBackupGarageTypes = function()
   if not ownedProperties then return end
@@ -327,7 +333,7 @@ end
 
 -- Returns an array of records where type == "garage" (excludes type == "rental"
 -- and type == "backup"). Use this helper anywhere the caller means "real owned
--- garages" — e.g. monthly property tax, home-garage assignment, garage-count
+-- garages" â€” e.g. monthly property tax, home-garage assignment, garage-count
 -- for sell guards.
 getOwnedGarages = function()
   local garages = {}
@@ -384,7 +390,8 @@ saveData = function(currentSavePath)
     ownedProperties = ownedProperties,
     discoveredProperties = discoveredProperties,
     homeGarageId = homeGarageId,
-    vehicleTransfers = vehicleTransfers
+    vehicleTransfers = vehicleTransfers,
+    lastPlayerHomeGarage = lastPlayerHomeGarage
   }
 
   local dataPath = bcmDir .. "/properties.json"
@@ -426,21 +433,23 @@ loadData = function()
   discoveredProperties = {}
   homeGarageId = nil
   vehicleTransfers = {}
+  lastPlayerHomeGarage = nil
 
   if data then
     ownedProperties = data.ownedProperties or {}
     discoveredProperties = data.discoveredProperties or {}
     homeGarageId = data.homeGarageId or nil
     vehicleTransfers = data.vehicleTransfers or {}
+    lastPlayerHomeGarage = data.lastPlayerHomeGarage or nil
 
     local count = 0
     for _ in pairs(ownedProperties) do count = count + 1 end
     log('I', 'bcm_properties', 'Loaded property data: ' .. count .. ' owned properties, homeGarage=' .. tostring(homeGarageId))
   else
-    log('I', 'bcm_properties', 'No saved property data found — starting fresh')
+    log('I', 'bcm_properties', 'No saved property data found â€” starting fresh')
   end
 
-  -- Migrate old saves: type="garage" + isBackupGarage → type="backup"
+  -- Migrate old saves: type="garage" + isBackupGarage â†’ type="backup"
   migrateBackupGarageTypes()
 end
 
@@ -453,25 +462,58 @@ end
 -- pipeline (before the main onSaveCurrentSaveSlot hook), which is where we
 -- need to be so that marking a vehicle dirty here gets picked up by vanilla's
 -- saveVehiclesData writer. Doing this in onSaveCurrentSaveSlot would race with
--- vanilla's save — whichever runs first wins, and load order isn't guaranteed.
+-- vanilla's save â€” whichever runs first wins, and load order isn't guaranteed.
+-- Ownership filter (vs the earlier unfiltered vanilla getClosestGarage):
+-- `bcm_garages.pickGarageForPosition` returns the nearest entry among the
+-- player's owned / paidRental / rental garages on the current map, falling
+-- back to the backup garage only when no non-backup is available. When the
+-- map has no candidates at all the helper returns nil and this hook leaves
+-- `vehicles[invId].location` untouched â€” a parked car near a non-owned
+-- garage is NOT re-associated to it just because it happens to be closest.
+-- Also stashes the player's current home garage id (computed from the avatar
+-- world position with the same helper) in `lastPlayerHomeGarage`. Persisted
+-- to properties.json so the ProfileCard.vue garage dropdown can default to
+-- the garage the player was last closest to â€” see the career.lua override's
+-- formatSaveSlotForUi for the read side.
 onSaveCurrentSaveSlotAsyncStart = function()
   if not (career_modules_inventory
      and career_modules_inventory.getVehicles
-     and career_modules_inventory.getClosestGarage
      and career_modules_inventory.getMapInventoryIdToVehId) then return end
+  if not (bcm_garages and bcm_garages.pickGarageForPosition) then return end
+
+  local levelId = getCurrentLevelIdentifier and getCurrentLevelIdentifier() or nil
+  if not levelId or levelId == "" then return end
+
   local vehicles = career_modules_inventory.getVehicles()
   local invIdToVehId = career_modules_inventory.getMapInventoryIdToVehId() or {}
   for invId, vehId in pairs(invIdToVehId) do
     local veh = vehicles and vehicles[invId] and getObjectByID and getObjectByID(vehId)
     if veh and veh.getPosition then
-      local ok, garage = pcall(career_modules_inventory.getClosestGarage, veh:getPosition())
-      if ok and garage and garage.id and vehicles[invId] then
-        if vehicles[invId].location ~= garage.id then
-          vehicles[invId].location = garage.id
+      local ok, entry = pcall(bcm_garages.pickGarageForPosition, veh:getPosition(), levelId)
+      if ok and entry and entry.id and vehicles[invId] then
+        if vehicles[invId].location ~= entry.id then
+          vehicles[invId].location = entry.id
           if career_modules_inventory.setVehicleDirty then
             career_modules_inventory.setVehicleDirty(invId)
           end
         end
+      end
+    end
+  end
+
+  -- Avatar home-garage stash. be:getPlayerVehicleID(0) returns the unicycle
+  -- while walking and the driven vehicle otherwise; either way its position
+  -- is where the avatar physically is. If the map has no candidates the
+  -- helper returns nil and we clear the field so the UI falls through to
+  -- the alphabetical-first default.
+  lastPlayerHomeGarage = nil
+  local playerVehId = be and be.getPlayerVehicleID and be:getPlayerVehicleID(0)
+  if playerVehId and playerVehId >= 0 then
+    local playerObj = getObjectByID and getObjectByID(playerVehId)
+    if playerObj and playerObj.getPosition then
+      local ok, entry = pcall(bcm_garages.pickGarageForPosition, playerObj:getPosition(), levelId)
+      if ok and entry and entry.id then
+        lastPlayerHomeGarage = entry.id
       end
     end
   end
@@ -496,46 +538,44 @@ onCareerActive = function(active)
     discoveredProperties = {}
     homeGarageId = nil
     vehicleTransfers = {}
+    lastPlayerHomeGarage = nil
     log('I', 'bcm_properties', 'Properties module deactivated, state reset')
   end
 end
 
 -- ============================================================================
--- Phase 102 audit: getAllOwnedProperties consumers (verified 2026-04-15)
+-- audit: getAllOwnedProperties consumers (verified 2026-04-15)
 -- ============================================================================
 -- Any new consumer that is NOT rental-aware MUST either filter by p.type == "garage"
--- or call getOwnedGarages() instead. Consumers iterating by id-only lookups (for
+-- or call getOwnedGarages instead. Consumers iterating by id-only lookups (for
 -- display-name resolution) are safe regardless of type.
---
 -- SAFE (already filter by type == "garage"):
---   career/modules/garageManager.lua:117 fillGarages      — filters
---   overrides/career/modules/vehicleShopping.lua:37,53    — filters
---   bcm/dealershipApp.lua:276,689 resolveGarageList       — filters
---   bcm/garageManagerApp.lua:421 buildTransferTargets     — filters
---   bcm/garages.lua:110 syncAllPurchasedGaragesWithVanilla — filters
---   bcm/garages.lua:256 isPositionInOwnedGarage           — filters
---   bcm/garages.lua:300 getGarageCount                    — filters
---   bcm/garages.lua:403 getOwnedGaragesOnCurrentMap       — filters
---   bcm/loans.lua:1108 mortgage foreclosure vehicle hunt  — filters
---   bcm/loans.lua:1657 foreclosure relocate loop          — filters
---   bcm/marketplaceApp.lua:782,1150 garage list + fallback — filters
---   bcm/realEstateApp.lua:86,261,504 property tax + lists — filters
---
+-- career/modules/garageManager.lua:117 fillGarages â€” filters
+-- overrides/career/modules/vehicleShopping.lua:37,53 â€” filters
+-- bcm/dealershipApp.lua:276,689 resolveGarageList â€” filters
+-- bcm/garageManagerApp.lua:421 buildTransferTargets â€” filters
+-- bcm/garages.lua:110 syncAllPurchasedGaragesWithVanilla â€” filters
+-- bcm/garages.lua:256 isPositionInOwnedGarage â€” filters
+-- bcm/garages.lua:300 getGarageCount â€” filters
+-- bcm/garages.lua:403 getOwnedGaragesOnCurrentMap â€” filters
+-- bcm/loans.lua:1108 mortgage foreclosure vehicle hunt â€” filters
+-- bcm/loans.lua:1657 foreclosure relocate loop â€” filters
+-- bcm/marketplaceApp.lua:782,1150 garage list + fallback â€” filters
+-- bcm/realEstateApp.lua:86,261,504 property tax + lists â€” filters
 -- SAFE (id-only lookups, type-agnostic display-name resolution):
---   bcm/marketplaceApp.lua:1354 garage name-by-id lookup
---   bcm/marketplaceApp.lua:1464 garage name-by-id lookup
---   bcm/vehicleGalleryApp.lua:200 capacity map — includes rentals deliberately
---     (rentals ARE valid vehicle locations; vehicleGallery shows vehicles in them)
---
--- FLAGGED — audit revisit when rentals land in Plan 03:
---   bcm/garageManagerApp.lua:159 otherGarageCount (for sell guard)
---     Counts non-current owned records without filtering by type. When rentals
---     exist this will count a rental as "another garage" and could wrongly allow
---     selling the only real garage. Plan 03 MUST switch this to getOwnedGarages().
---   bcm/garageManagerApp.lua:616 importable vehicles source iteration
---     Iterates ALL properties as possible source garages. Rentals are valid
---     sources (they contain vehicles), so behavior is acceptable, but Plan 03/04
---     should audit the transfer delay + display name paths for rental sources.
+-- bcm/marketplaceApp.lua:1354 garage name-by-id lookup
+-- bcm/marketplaceApp.lua:1464 garage name-by-id lookup
+-- bcm/vehicleGalleryApp.lua:200 capacity map â€” includes rentals deliberately
+-- (rentals ARE valid vehicle locations; vehicleGallery shows vehicles in them)
+-- FLAGGED â€” audit revisit when rentals land in
+-- bcm/garageManagerApp.lua:159 otherGarageCount (for sell guard)
+-- Counts non-current owned records without filtering by type. When rentals
+-- exist this will count a rental as "another garage" and could wrongly allow
+-- selling the only real garage. MUST switch this to getOwnedGarages.
+-- bcm/garageManagerApp.lua:616 importable vehicles source iteration
+-- Iterates ALL properties as possible source garages. Rentals are valid
+-- sources (they contain vehicles), so behavior is acceptable, but /04
+-- should audit the transfer delay + display name paths for rental sources.
 -- ============================================================================
 
 -- ============================================================================

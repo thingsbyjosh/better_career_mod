@@ -1,4 +1,4 @@
--- BCM Identity Extension
+﻿-- BCM Identity Extension
 -- Core player identity module: name, sex, birthday, driver's license number.
 -- Persists per save slot. Fires guihook events consumed by identityStore.js.
 -- Foundation for all v1.4 Identity & Communications features.
@@ -82,7 +82,7 @@ setIdentity = function(jsonStr)
     end
   end
 
-  -- Expiry = issue date + 8 years (per CONTEXT.md)
+  -- Expiry = issue date + 8 years
   local expiryDate = {
     day = issueDate.day,
     month = issueDate.month,
@@ -158,7 +158,7 @@ sendIdentityToUI = function()
   if identityData then
     guihooks.trigger('BCMIdentityUpdate', identityData)
   elseif activated then
-    -- Career is active but no identity — show modal (Vue missed the first trigger)
+    -- Career is active but no identity â€” show modal (Vue missed the first trigger)
     log('I', 'bcm_identity', 'sendIdentityToUI: no identity, re-triggering modal')
     guihooks.trigger('BCMShowIdentityModal', {})
   end
@@ -229,7 +229,7 @@ loadIdentityData = function()
     log('I', 'bcm_identity', 'Loaded identity: ' .. data.firstName .. ' ' .. data.lastName)
   else
     -- No identity data = new career, show modal
-    log('I', 'bcm_identity', 'No identity data found — triggering identity modal')
+    log('I', 'bcm_identity', 'No identity data found â€” triggering identity modal')
     guihooks.trigger('BCMShowIdentityModal', {})
   end
 end
@@ -238,7 +238,7 @@ end
 -- Lifecycle Hooks
 -- ============================================================================
 
--- Career modules activated — load existing identity or prompt for new one
+-- Career modules activated â€” load existing identity or prompt for new one
 onCareerModulesActivated = function()
   loadIdentityData()
   activated = true
@@ -246,19 +246,19 @@ onCareerModulesActivated = function()
   -- Fallback: if loadIdentityData couldn't reach identity.json (new career, no autosave yet),
   -- guarantee the modal fires so the player can set their identity
   if not identityData then
-    log('I', 'bcm_identity', 'No identity after activation — triggering modal (fallback)')
+    log('I', 'bcm_identity', 'No identity after activation â€” triggering modal (fallback)')
     guihooks.trigger('BCMShowIdentityModal', {})
   end
 
   log('I', 'bcm_identity', 'Identity module activated')
 end
 
--- Save hook — persist identity to disk
+-- Save hook â€” persist identity to disk
 onSaveCurrentSaveSlot = function(currentSavePath)
   saveIdentityData(currentSavePath)
 end
 
--- Before save slot change — clean up state
+-- Before save slot change â€” clean up state
 onBeforeSetSaveSlot = function()
   identityData = nil
   activated = false

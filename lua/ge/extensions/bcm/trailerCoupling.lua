@@ -1,5 +1,5 @@
--- bcm/trailerCoupling.lua
--- Trailer re-coupling prototype module for Phase 98.
+﻿-- bcm/trailerCoupling.lua
+-- Trailer re-coupling prototype module for
 -- Validates whether BeamNG's coupling APIs can reliably re-attach a trailer
 -- after both vehicles are spawned at a new position (post map-switch or teleport).
 -- Provides: serialization of coupling state, polling-based re-coupling via
@@ -184,7 +184,7 @@ executeReCouple = function(data)
 end
 
 -- ============================================================================
--- Fallback path (D-23, D-24)
+-- Fallback path
 -- ============================================================================
 
 --- Activate fallback when auto-coupling times out.
@@ -247,11 +247,11 @@ end
 -- When idle (no pendingReCouple), returns immediately with zero overhead.
 -- @param dtReal number Real-time delta in seconds
 onUpdate = function(dtReal)
-  -- Phase 1: Poll for coupler offsets to be ready before calling placeTrailer
+  -- Poll for coupler offsets to be ready before calling placeTrailer
   if pendingReCouple then
     pendingReCouple.elapsed = pendingReCouple.elapsed + dtReal
 
-    -- Timeout check (D-10): 2 seconds max polling for offsets
+    -- Timeout check: 2 seconds max polling for offsets
     if pendingReCouple.elapsed > 2.0 then
       log('W', logTag, 'Re-coupling offset polling timeout after 2s, activating fallback')
       lastTestResult = lastTestResult or {}
@@ -275,7 +275,7 @@ onUpdate = function(dtReal)
     return
   end
 
-  -- Phase 2: Wait for onCouplerAttached confirmation after placeTrailer
+  -- Wait for onCouplerAttached confirmation after placeTrailer
   if pendingConfirmation then
     pendingConfirmation.elapsed = pendingConfirmation.elapsed + dtReal
 
@@ -286,7 +286,7 @@ onUpdate = function(dtReal)
     end
 
     -- fifthwheel_v2 won't auto-couple (collision-based), but placeTrailer already positioned it.
-    -- Use short timeout — just enough for placeTrailer to settle, then fallback leaves it in place.
+    -- Use short timeout â€” just enough for placeTrailer to settle, then fallback leaves it in place.
     local timeout = (pendingConfirmation.couplerTag == "fifthwheel_v2") and CONFIRM_TIMEOUT_V2 or CONFIRM_TIMEOUT
 
     -- Confirmation timeout: if coupling doesn't confirm in time, activate fallback
@@ -320,7 +320,7 @@ onCouplerAttached = function(objId1, objId2, nodeId, obj2nodeId)
 
   couplingConfirmed = true
 
-  -- Clear confirmation pending state — coupling succeeded
+  -- Clear confirmation pending state â€” coupling succeeded
   pendingConfirmation = nil
 
   -- Clear fallback GPS markers when player manually re-hitches (or auto-couple confirms)
@@ -384,10 +384,8 @@ end
 -- Works OUTSIDE career mode: teleports coupled tractor+trailer 50m forward
 -- and attempts re-coupling via the polling pipeline.
 -- Auto-detects the coupling type from the live vehicle data.
---
 -- Usage from BeamNG console:
---   bcm_trailerCoupling.testReCouple()
---
+-- bcm_trailerCoupling.testReCouple
 -- @param couplerType string|nil Optional override. If nil, auto-detected from serialized data.
 testReCouple = function(couplerType)
   -- Get player vehicle as tractor
@@ -489,9 +487,8 @@ end
 --- Test double-trailer chain re-coupling.
 -- Uses getVehicleTrain to discover the full chain and re-couples in order:
 -- tractor->trailer1 first, then trailer1->trailer2 on success.
---
 -- Usage from BeamNG console:
---   bcm_trailerCoupling.testDoubleTrailer()
+-- bcm_trailerCoupling.testDoubleTrailer
 testDoubleTrailer = function()
   local tractorId = be:getPlayerVehicleID(0)
   if not tractorId or tractorId < 0 then
@@ -621,9 +618,8 @@ end
 --- Log instructions for testing all 5 coupling types.
 -- Each type must be tested separately since the player needs to spawn
 -- different vehicle combinations for each coupling type.
---
 -- Usage from BeamNG console:
---   bcm_trailerCoupling.testAllTypes()
+-- bcm_trailerCoupling.testAllTypes
 testAllTypes = function()
   log('I', logTag, '============================================================')
   log('I', logTag, 'TRAILER RE-COUPLING TEST INSTRUCTIONS')

@@ -1,4 +1,4 @@
--- bcm/multimapApp.lua
+﻿-- bcm/multimapApp.lua
 -- Data enrichment bridge for the travel destination picker UI.
 -- Queries multimap (discovery, graph), garages (per-map), banking (balance),
 -- and vehicle info to build a rich payload for the Vue picker.
@@ -37,8 +37,8 @@ getGaragesForMap = function(mapName)
     if bcm_properties and bcm_properties.isOwned then
       owned = bcm_properties.isOwned(g.id) or false
     end
-    -- Phase 102 hotfix — project the full economic shape. Downstream consumers
-    -- (bcm_rentals.resolveGarageDef → computeDailyRateCents, Realty Rentals tab,
+    -- hotfix â€” project the full economic shape. Downstream consumers
+    -- (bcm_rentals.resolveGarageDef â†’ computeDailyRateCents, Realty Rentals tab,
     -- TravelConfirmation garage dropdown) all need basePrice/capacities/description.
     -- Omitting any of these previously silently forced dailyRateCents=0, which
     -- bricked every rental start with 'zero_rate'.
@@ -65,7 +65,7 @@ getGaragesForMap = function(mapName)
 end
 
 -- ============================================================================
--- 2. Vehicle summary (D-20, D-21)
+-- 2. Vehicle summary
 -- ============================================================================
 
 getVehicleSummary = function()
@@ -77,7 +77,7 @@ getVehicleSummary = function()
   if not veh then
     return { hasVehicle = false, walking = true, name = "", trailerCount = 0 }
   end
-  -- Phase 102 hotfix BUG #3 — prefer inventory niceName, detect walking via unicycle chassis.
+  -- hotfix BUG #3 â€” prefer inventory niceName, detect walking via unicycle chassis.
   -- When the player is "a pie", BeamNG still has a vehicle object (the unicycle) but
   -- career_modules_inventory never maps it, so getInventoryIdFromVehicleId returns nil.
   -- We detect that combo and return walking=true so the UI can render "On foot"/"A pie"
@@ -107,7 +107,7 @@ getVehicleSummary = function()
 end
 
 -- ============================================================================
--- 3. Destination enrichment (D-09, D-10, D-12-D-14)
+-- 3. Destination enrichment
 -- ============================================================================
 
 enrichDestinations = function(nodeId, rawDestinations)
@@ -128,7 +128,7 @@ enrichDestinations = function(nodeId, rawDestinations)
       if g.isBackupGarage or g.isStarterGarage then hasBackup = true end
     end
 
-    -- Phase 102 (D-13, D-14): query bcm_rentals.hasActiveRental per garage so
+    -- query bcm_rentals.hasActiveRental per garage so
     -- the destination picker can render the "paid rental active here" badge
     -- and skip the lodging warning. paidRental takes precedence over owned in
     -- the status enum because "I'm currently paying for this" is the most
@@ -244,7 +244,7 @@ onDestinationPickerResult = function(data)
     end
     return
   end
-  -- T-100-01 mitigation: Validate targetMap exists in travelGraph before delegating
+  -- -01 mitigation: Validate targetMap exists in travelGraph before delegating
   if bcm_multimap and bcm_multimap.getGraph then
     local graph = bcm_multimap.getGraph()
     if not graph[data.targetMap] then

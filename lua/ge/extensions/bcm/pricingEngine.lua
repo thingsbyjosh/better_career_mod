@@ -1,8 +1,8 @@
--- BCM Pricing Engine v2
--- Stateless require()'able module for vehicle pricing in the BCM marketplace.
--- NOT an extension — no lifecycle hooks, no state.
+﻿-- BCM Pricing Engine v2
+-- Stateless require'able module for vehicle pricing in the BCM marketplace.
+-- NOT an extension â€” no lifecycle hooks, no state.
 -- All money values in integer cents. Mileage expected in km.
--- Uses LCG for deterministic randomness — NEVER calls math.randomseed().
+-- Uses LCG for deterministic randomness â€” NEVER calls math.randomseed.
 -- v2: S-curve classic transition, Gaussian markup, 8+ organic factor functions,
 -- psychological rounding, clustering bias, weekend/single-owner modifiers.
 
@@ -259,7 +259,7 @@ ageFactor = function(params)
   -- Years 16-25: very slow depreciation
   elseif age <= 25 then
     base = 0.70 * (0.93 ^ 4) * (0.97 ^ 10) * (0.99 ^ (age - 15))
-  -- 25+: divergence — classics appreciate, others continue decay
+  -- 25+: divergence â€” classics appreciate, others continue decay
   else
     local plateauBase = 0.70 * (0.93 ^ 4) * (0.97 ^ 10) * (0.99 ^ 10)
     local vehicleClass = params.vehicleClass or "Economy"
@@ -276,18 +276,18 @@ end
 -- v2 Age factor: decelerating depreciation + universal vintage appreciation
 -- Key insight: depreciation flattens after 15yr. ALL old cars gain value after ~30yr.
 -- Classic-eligible vehicles appreciate faster and start sooner.
--- Year 15 ≈ Year 20 (almost same depreciation). Year 40+ = appreciation territory.
+-- Year 15 â‰ˆ Year 20 (almost same depreciation). Year 40+ = appreciation territory.
 ageFactor_v2 = function(params)
   local age = REFERENCE_YEAR - (params.yearMade or 2020)
   if age < 0 then age = 0 end
 
   local vehicleClass = params.vehicleClass or "Economy"
 
-  -- Base depreciation curve (decelerating — flattens into plateau)
-  -- Year 0→1: -20% (new car hit)
-  -- Year 1→5: gradual decline (~0.67 at year 5)
-  -- Year 5→15: slow decline (~0.57 at year 15)
-  -- Year 15→25: near-flat (~0.56 at year 25)
+  -- Base depreciation curve (decelerating â€” flattens into plateau)
+  -- Year 0â†’1: -20% (new car hit)
+  -- Year 1â†’5: gradual decline (~0.67 at year 5)
+  -- Year 5â†’15: slow decline (~0.57 at year 15)
+  -- Year 15â†’25: near-flat (~0.56 at year 25)
   local depFactor
   if age <= 1 then
     depFactor = 0.80
@@ -335,7 +335,7 @@ ageFactor_v2 = function(params)
 end
 
 -- Mileage factor: softer curve so high-km cars aren't destroyed
--- 80k→0.90, 150k→0.78, 300k→0.60, 600k→0.45, 1M→0.37
+-- 80kâ†’0.90, 150kâ†’0.78, 300kâ†’0.60, 600kâ†’0.45, 1Mâ†’0.37
 -- Asymptotic floor at 0.35 (a car with infinite km still has scrap+parts value)
 mileageFactor = function(params)
   local km = params.mileageKm or 0
@@ -391,7 +391,7 @@ powerFactor_v2 = function(params)
   return mult
 end
 
--- Parts factor — returns raw cents to ADD (not a multiplier)
+-- Parts factor â€” returns raw cents to ADD (not a multiplier)
 partsFactor = function(params)
   local partsValue = params.partsValueCents
   if not partsValue or partsValue <= 0 then
@@ -485,7 +485,7 @@ seasonalityFactor = function(params)
   return 1.0  -- neutral for types/seasons not in the table
 end
 
--- Geographic factor: scaffold — always returns 1.0
+-- Geographic factor: scaffold â€” always returns 1.0
 -- Activated when multi-map support arrives.
 geographicFactor = function(params)
   -- Placeholder: activated when multi-map support arrives
@@ -519,7 +519,7 @@ dynamicFloorCents = function(powerHP, weightKg)
   if weight <= 0 then weight = 1500 end
   local hpPerTon = hp / (weight / 1000)
 
-  -- Also consider raw HP — a 150cv car is always worth something regardless of weight
+  -- Also consider raw HP â€” a 150cv car is always worth something regardless of weight
   -- Use the HIGHER floor of hp/ton vs raw HP
   local floorByRatio = PRICE_FLOOR_CENTS
   if hpPerTon >= 300 then floorByRatio = 2000000       -- 300+ hp/ton: min $20k
@@ -545,20 +545,20 @@ end
 -- ============================================================================
 
 -- computePrice params table expected fields:
---   configBaseValue (number, dollars)
---   yearMade (number)
---   mileageKm (number)
---   vehicleClass (string: "Economy", "Sedan", "Coupe", "Sports", "Muscle", "Supercar", "SUV", "Family", "Pickup", "Van", "HeavyDuty", "Luxury", "OffRoad", "Special")
---   powerHP (number)
---   weightKg (number, for fallback)
---   partsValueCents (number, additive)
---   listingQuality (number 0-1)
---   listingSeed (number)
---   conditionLabel (string: "excellent", "good", "fair", "poor")
---   colorCategory (string: "premium", "standard", "unusual")
---   archetypeKey (string, for color factor enthusiast special case)
---   season (string: "spring", "summer", "autumn", "winter")
---   vehicleType (string, for seasonality)
+-- configBaseValue (number, dollars)
+-- yearMade (number)
+-- mileageKm (number)
+-- vehicleClass (string: "Economy", "Sedan", "Coupe", "Sports", "Muscle", "Supercar", "SUV", "Family", "Pickup", "Van", "HeavyDuty", "Luxury", "OffRoad", "Special")
+-- powerHP (number)
+-- weightKg (number, for fallback)
+-- partsValueCents (number, additive)
+-- listingQuality (number 0-1)
+-- listingSeed (number)
+-- conditionLabel (string: "excellent", "good", "fair", "poor")
+-- colorCategory (string: "premium", "standard", "unusual")
+-- archetypeKey (string, for color factor enthusiast special case)
+-- season (string: "spring", "summer", "autumn", "winter")
+-- vehicleType (string, for seasonality)
 computePrice = function(params)
   -- Nil/zero configBaseValue -> weight fallback
   if not params.configBaseValue or params.configBaseValue <= 0 then
@@ -677,12 +677,12 @@ applyPsychologicalRounding = function(priceCents, archetypeKey)
     return math.floor(dollars / 100 + 0.5) * 100 * 100
 
   elseif archetypeKey == "dealer_pro" then
-    -- .995 style: $14,995
+    --.995 style: $14,995
     local roundedUp = math.ceil(dollars / 1000) * 1000
     return (roundedUp - 5) * 100
 
   elseif archetypeKey == "scammer" then
-    -- .999 style: $14,999
+    --.999 style: $14,999
     local roundedUp = math.ceil(dollars / 1000) * 1000
     return (roundedUp - 1) * 100
 
@@ -733,7 +733,7 @@ end
 -- Scaffold functions for future phases
 -- ============================================================================
 
--- Instant sale price (Phase 50) — 60-70% of market value, seed-based deterministic
+-- Instant sale price â€” 60-70% of market value, seed-based deterministic
 getInstantSalePrice = function(priceCents, seed)
   seed = seed or priceCents
   -- Deterministic multiplier between 0.60 and 0.70 via LCG
@@ -742,16 +742,16 @@ getInstantSalePrice = function(priceCents, seed)
   return math.max(0, result)
 end
 
--- Supply/demand multiplier (Phase 46) — applied by marketplace state
+-- Supply/demand multiplier â€” applied by marketplace state
 applyDemandMultiplier = function(priceCents, demandMultiplier)
   return clampPrice(math.floor(priceCents * (demandMultiplier or 1.0)))
 end
 
 -- ============================================================================
--- Market variable functions (Phase 50.1 — Living Market)
+-- Market variable functions
 -- ============================================================================
 
--- Price dispersion — how spread out real-world prices are for this type of car.
+-- Price dispersion â€” how spread out real-world prices are for this type of car.
 -- Older cars and niche segments have wider sigma (less price consensus).
 -- params: { vehicleClass, yearMade, seed }
 computeMarketSigma = function(params)
@@ -764,12 +764,12 @@ computeMarketSigma = function(params)
   local ageBonus = math.min(age, 40) * 0.005 -- +0.5% per year, cap 40 years
   local raw = base + ageBonus
 
-  -- Jitter ±15%
+  -- Jitter Â±15%
   local jitter = 1.0 + (lcgFloat(seed * 54321 + 9876) - 0.5) * 0.30
   return math.max(0.05, math.min(0.25, raw * jitter))
 end
 
--- Market demand — how quickly this type of car sells.
+-- Market demand â€” how quickly this type of car sells.
 -- Sweet spot $5k-$25k gets full liquidity; extremes get penalized.
 -- params: { vehicleClass, marketPriceCents, seed }
 computeLiquidity = function(params)
@@ -796,12 +796,12 @@ computeLiquidity = function(params)
 
   local raw = base * priceMod
 
-  -- Small jitter ±10%
+  -- Small jitter Â±10%
   local jitter = 1.0 + (lcgFloat(seed * 11111 + 3333) - 0.5) * 0.20
   return math.max(0.05, math.min(1.0, raw * jitter))
 end
 
--- Car desirability — how attractive this specific car is to buyers.
+-- Car desirability â€” how attractive this specific car is to buyers.
 -- Combines condition, mods, class appeal, classic status, low mileage.
 -- params: { vehicleClass, yearMade, mileageKm, conditionLabel, partsValueCents }
 computeCarDesirability = function(params)
@@ -895,13 +895,13 @@ M.getArchetypeMetadata    = getArchetypeMetadata
 M.getInstantSalePrice     = getInstantSalePrice
 M.applyDemandMultiplier   = applyDemandMultiplier
 
--- Market variable functions (Phase 50.1)
+-- Market variable functions
 M.computeMarketSigma      = computeMarketSigma
 M.computeLiquidity        = computeLiquidity
 M.computeCarDesirability  = computeCarDesirability
 
--- Market value range — imprecise bracket shown to player instead of exact value
--- Asymmetric ±10-15%, rounded to "nice" numbers based on price tier
+-- Market value range â€” imprecise bracket shown to player instead of exact value
+-- Asymmetric Â±10-15%, rounded to "nice" numbers based on price tier
 computeMarketRange = function(valueCents)
   if not valueCents or valueCents <= 0 then
     return { low = 0, high = 0 }

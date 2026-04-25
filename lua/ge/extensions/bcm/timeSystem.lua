@@ -1,4 +1,4 @@
--- BCM Time System
+﻿-- BCM Time System
 -- Core time management for BCM career mode.
 -- Manages day/night cycle, dual time tracking (real-time for loans + game-time for calendar),
 -- 56-day year date system, save/load persistence, and guihook broadcasts to Vue.
@@ -54,7 +54,7 @@ calcRealDateGameDays = function()
   local ok, now = pcall(os.date, "*t")
   if not ok or type(now) ~= "table" then
     log('W', logTag, 'os.date("*t") failed: ' .. tostring(now))
-    -- Fallback: try os.time() to build date manually
+    -- Fallback: try os.time to build date manually
     local ok2, epoch = pcall(os.time)
     if ok2 and epoch then
       local ok3, dateStr = pcall(os.date, "%Y-%m-%d", epoch)
@@ -105,7 +105,7 @@ local NIGHT_SKIP_SPEED = 100
 -- Max broadcast rate (seconds between broadcasts at high speed)
 local MAX_BROADCAST_INTERVAL = 0.5
 
--- Day name keys (Monday=1 through Sunday=7) — translated in Vue
+-- Day name keys (Monday=1 through Sunday=7) â€” translated in Vue
 local DAY_KEYS = {
   "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
 }
@@ -126,9 +126,9 @@ local timeState = {
 
 local activated = false
 local isInitialized = false
-local todSnapshot = nil  -- Captures TOD state before radial menu opens (Phase 31 — FIX-02)
+local todSnapshot = nil  -- Captures TOD state before radial menu opens
 local lastBroadcastMinute = -1
-local lastBroadcastTime = 0  -- os.clock() of last broadcast (for high-speed throttle)
+local lastBroadcastTime = 0  -- os.clock of last broadcast (for high-speed throttle)
 
 -- Night skip: stores the user's speedMultiplier before skip engaged
 local nightSkipSavedSpeed = nil
@@ -185,7 +185,7 @@ gameTimeToDate = function(gameDays)
   }
 end
 
--- formatFullDate removed — Vue handles localized formatting via bcmI18n
+-- formatFullDate removed â€” Vue handles localized formatting via bcmI18n
 
 -- ============================================================================
 -- Time conversion and formatting
@@ -490,7 +490,7 @@ loadTimeData = function(newSave)
 
     log('I', logTag, 'Time data loaded. Game day: ' .. tostring(math.floor(timeState.gameTimeDays)))
   else
-    -- Fallback: no save file but not flagged as new (shouldn't happen) — use May 15
+    -- Fallback: no save file but not flagged as new (shouldn't happen) â€” use May 15
     timeState.gameTimeDays = 134
     timeState.realTimeAccumSecs = 0
     timeState.speedMultiplier = 1.0
@@ -505,7 +505,7 @@ loadTimeData = function(newSave)
       scenetree.tod.play = true
     end
 
-    log('W', logTag, 'No save file and not newSave — initialized defaults')
+    log('W', logTag, 'No save file and not newSave â€” initialized defaults')
   end
 
   -- Apply speed settings after load
@@ -565,7 +565,7 @@ resetModule = function()
 end
 
 -- ============================================================================
--- Radial menu TOD lock (Phase 31 — FIX-02)
+-- Radial menu TOD lock
 -- Prevents vanilla time-of-day controls from overriding BCM time during career
 -- ============================================================================
 
@@ -594,7 +594,7 @@ onHideRadialMenu = function()
 end
 
 -- ============================================================================
--- Radial menu quickAccess filter (Phase 31 — FIX-02)
+-- Radial menu quickAccess filter
 -- Wraps core_quickAccess.getUiData to hide vanilla time entries during career
 -- ============================================================================
 local originalGetUiData = nil
@@ -638,7 +638,7 @@ installQuickAccessFilter = function()
 
     return data
   end
-  log('I', logTag, 'QuickAccess filter installed — vanilla time controls hidden during career')
+  log('I', logTag, 'QuickAccess filter installed â€” vanilla time controls hidden during career')
 end
 
 uninstallQuickAccessFilter = function()
@@ -647,11 +647,11 @@ uninstallQuickAccessFilter = function()
 
   core_quickAccess.getUiData = originalGetUiData
   originalGetUiData = nil
-  log('I', logTag, 'QuickAccess filter removed — vanilla time controls restored')
+  log('I', logTag, 'QuickAccess filter removed â€” vanilla time controls restored')
 end
 
 -- ============================================================================
--- Radial menu BCM time data (Phase 31 — FIX-02)
+-- Radial menu BCM time data
 -- Provides time info for BCM radial menu entries
 -- ============================================================================
 
@@ -722,7 +722,7 @@ end
 -- Called every frame
 M.onUpdate = onUpdate
 
--- Radial menu lifecycle hooks (Phase 31 — prevent vanilla time controls)
+-- Radial menu lifecycle hooks
 M.onBeforeRadialOpened = onBeforeRadialOpened
 M.onHideRadialMenu = onHideRadialMenu
 M.getRadialTimeData = getRadialTimeData
@@ -920,7 +920,7 @@ M.getTimeState = function()
   return state
 end
 
--- Advance game-time by N days (for Phase 16 sleep integration)
+-- Advance game-time by N days (for sleep integration)
 -- Adjusts gameTimeDays, tod.time, and realTimeAccumSecs accordingly
 -- @param gameDays number - Number of game days to advance
 -- @return number - Number of game days actually advanced

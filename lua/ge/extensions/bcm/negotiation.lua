@@ -1,10 +1,9 @@
--- BCM Negotiation Extension v2
+﻿-- BCM Negotiation Extension v2
 -- Stateful extension managing negotiation session lifecycle: create, offer,
 -- counter, block, deal, expire. Delayed responses delivered via onBCMNewGameDay.
 -- Proactive pings re-engage dormant conversations.
 -- Extension name: bcm_negotiation
---
--- v2 changes (Phase 49.4):
+-- v2 changes:
 -- - Three-tier severity via classifyOffer (replaces isInsultingOffer)
 -- - Re-bid detection with severe mood penalty
 -- - Over-asking instant acceptance
@@ -13,10 +12,9 @@
 -- - floorCents on session, excluded from Vue payload
 -- - isThinking / lastPlayerOfferCents / archetypeSeverityThresholds in Vue payload
 -- - roundsAtGoodMood tracking for brittle archetypes
---
 -- State lives in marketplace.json under the "negotiations" key.
 -- Uses lazy require for negotiationEngine and negotiationTemplates to avoid
--- circular dependency issues (mirrors listingGenerator pattern from Phase 46).
+-- circular dependency issues (mirrors listingGenerator pattern from ).
 
 local M = {}
 
@@ -40,7 +38,7 @@ local getSession
 local isActivated
 local getMarketplace
 local fireSessionUpdate
--- Phase 50: Buyer-side functions
+-- Buyer-side functions
 local processBuyerInit
 local processPlayerCounterToNPCBuyer
 local confirmBuyerSale
@@ -63,10 +61,10 @@ local logTag = 'bcm_negotiation'
 
 -- v3: Frame-based response timers (in-memory, not persisted)
 -- Each entry: { listingId, phase="reading"|"typing", readRemaining, typingRemaining,
---               responseText, counterCents }
+-- responseText, counterCents }
 local pendingTimers = {}
 
--- Phase 50: Separate buyer timer array (avoids collision with seller timers)
+-- Separate buyer timer array (avoids collision with seller timers)
 pendingBuyerTimers = {}
 
 
@@ -98,7 +96,7 @@ local PLAYER_MESSAGES_ES = {
   "Aceptarias {price}?",
 }
 
--- Player init messages (first contact — player-first flow)
+-- Player init messages (first contact â€” player-first flow)
 local PLAYER_INIT_MESSAGES_ES = {
   "Hola, sigue disponible el {vehicle}?",
   "Buenas, me interesa el {vehicle}. Esta libre?",
@@ -144,7 +142,7 @@ end
 appendMessage = function(session, direction, text, gameDay, extra)
   session.messages = session.messages or {}
   local preciseTime = getGameTimePrecise()
-  -- Use os.time() for chat ordering — real wall-clock seconds, always unique,
+  -- Use os.time for chat ordering â€” real wall-clock seconds, always unique,
   -- never affected by game time pauses/resets. Not used for gameplay decisions
   -- (prices, rolls) so determinism is preserved.
   local activityTime = os.time()
@@ -187,12 +185,12 @@ scheduleSellerResponse = function(session, responseText, currentGameDay)
     }
     session.isThinking = true
   else
-    -- v3: Frame-based timer — message held until onUpdate delivers it
+    -- v3: Frame-based timer â€” message held until onUpdate delivers it
     -- Read delay: 2-4s (seller reads the offer)
     local readSeed = pricingEng.lcg((session.listingSeed or 0) + (session.roundCount or 0) * 7919)
     local readDelay = 2.0 + pricingEng.lcgFloat(readSeed) * 2.0
 
-    -- Typing delay: based on message length × archetype speed
+    -- Typing delay: based on message length Ã— archetype speed
     local msgLen = #responseText
     local baseTyping = math.max(1.5, math.min(6.0, msgLen * 0.04))
     local speed = ARCHETYPE_TYPING_SPEED[session.archetype] or 1.0
@@ -271,7 +269,7 @@ fireSessionUpdate = function(session)
     pendingResponse = session.pendingResponse ~= nil,
     vehicleName = session.vehicleName,
     language = session.language,
-    -- Player-first flow fields (Phase 49.1)
+    -- Player-first flow fields
     awaitingPlayerInit = session.awaitingPlayerInit or false,
     awaitingGreeting = session.awaitingGreeting or false,
     sellerHasResponded = session.sellerHasResponded or false,
@@ -287,9 +285,9 @@ fireSessionUpdate = function(session)
     dismissed = session.dismissed or false,
     lastActivityTime = session.lastActivityTime or 0,
     _batchLeveragePushCount = session._batchLeveragePushCount or 0,
-    -- NOTE: floorCents is intentionally EXCLUDED — it's secret from Vue
-    -- NOTE: thresholdModeCents is intentionally EXCLUDED — internal only
-    -- NOTE: targetPriceCents is intentionally EXCLUDED — it's the seller's secret goal
+    -- NOTE: floorCents is intentionally EXCLUDED â€” it's secret from Vue
+    -- NOTE: thresholdModeCents is intentionally EXCLUDED â€” internal only
+    -- NOTE: targetPriceCents is intentionally EXCLUDED â€” it's the seller's secret goal
   }
   guihooks.trigger('BCMNegotiationUpdate', payload)
 end
@@ -300,7 +298,7 @@ end
 
 startOrGetSession = function(listingId, listing)
   if not activated then
-    log('W', logTag, 'startOrGetSession called but not activated — auto-activating')
+    log('W', logTag, 'startOrGetSession called but not activated â€” auto-activating')
     activated = true
   end
 
@@ -364,7 +362,7 @@ startOrGetSession = function(listingId, listing)
     pendingResponse = nil,
     sellerLastSeenGameDay = gameDay,
     createdGameDay = gameDay,
-    -- Player-first flow (Phase 49.1)
+    -- Player-first flow
     awaitingPlayerInit = true,
     sellerHasResponded = false,
     awaitingGreeting = false,
@@ -399,7 +397,7 @@ startOrGetSession = function(listingId, listing)
   end
   session.vehicleShortName = shortName
 
-  -- Do NOT fire seller greeting here — player sends first message via processPlayerInit
+  -- Do NOT fire seller greeting here â€” player sends first message via processPlayerInit
   state.negotiations[listingId] = session
   return session
 end
@@ -464,7 +462,7 @@ deliverSellerGreeting = function(listingId)
   local readSeed = pricingEng.lcg((session.listingSeed or 0) + 5555)
   local readDelay = 1.5 + pricingEng.lcgFloat(readSeed) * 1.5
 
-  -- Typing delay: based on greeting length × archetype speed
+  -- Typing delay: based on greeting length Ã— archetype speed
   local msgLen = #greetingText
   local baseTyping = math.max(1.5, math.min(5.0, msgLen * 0.04))
   local speed = ARCHETYPE_TYPING_SPEED[session.archetype] or 1.0
@@ -577,7 +575,7 @@ processOffer = function(listingId, offerCents, metadata)
     end
 
     session.mood = negotiationEngine.transitionMood(session.mood, -0.01, session)
-    log('W', logTag, 'Re-bid lower detected: ' .. offerCents .. ' < previous ' .. prevPlayerOffer .. ' — mood crash')
+    log('W', logTag, 'Re-bid lower detected: ' .. offerCents .. ' < previous ' .. prevPlayerOffer .. ' â€” mood crash')
 
     if session.mood == "blocked" then
       session.isBlocked = true
@@ -645,7 +643,7 @@ processOffer = function(listingId, offerCents, metadata)
   if session.roundCount == 1 then
     local margin = session.baselinePriceCents - (session.floorCents or session.thresholdModeCents or 0)
     -- Guard: if floor > asking (negative-markup archetype where marketValue > asking),
-    -- margin is negative → opening concession would be negative → counter ABOVE asking.
+    -- margin is negative â†’ opening concession would be negative â†’ counter ABOVE asking.
     -- Clamp margin to 0 minimum so the seller never raises their own price.
     if margin < 0 then margin = 0 end
     local openingAmount, openPct = negotiationEngine.computeOpeningConcession(
@@ -878,7 +876,7 @@ processLeverage = function(listingId, defectId, defectSeverity)
   local gameDay = getCurrentGameDay()
   local language = session.language or "en"
 
-  -- Phase 52: Track push counts per defect for two-step denial/concession
+  -- Track push counts per defect for two-step denial/concession
   session.defectPushCounts = session.defectPushCounts or {}
   local pushCount = (session.defectPushCounts[defectId] or 0) + 1
   session.defectPushCounts[defectId] = pushCount
@@ -924,7 +922,7 @@ processLeverage = function(listingId, defectId, defectSeverity)
     }
 
   if pushCount == 1 then
-    -- FIRST PUSH: DENIAL — no price change, seller denies the defect
+    -- FIRST PUSH: DENIAL â€” no price change, seller denies the defect
     local defectMsgIdx = (math.abs(#listingId + #defectId) % #playerDefectMsgs) + 1
     appendMessage(session, "player", playerDefectMsgs[defectMsgIdx], gameDay, { action = "leverage" })
 
@@ -936,7 +934,7 @@ processLeverage = function(listingId, defectId, defectSeverity)
     return session
   end
 
-  -- SECOND PUSH: CONCESSION — apply leverage + price reduction
+  -- SECOND PUSH: CONCESSION â€” apply leverage + price reduction
   local pushMsgIdx = (math.abs(#listingId + #defectId + 1) % #pushMsgs) + 1
   appendMessage(session, "player", pushMsgs[pushMsgIdx], gameDay, { action = "leverage" })
 
@@ -954,7 +952,7 @@ processLeverage = function(listingId, defectId, defectSeverity)
   -- Record defect as fully used (prevents third push)
   table.insert(session.usedDefectIds, defectId)
 
-  -- Pick concession response (not defect_response — use defect_concession)
+  -- Pick concession response (not defect_response â€” use defect_concession)
   local concessionText = negotiationEngine.pickMessage(session, "defect_concession", gameDay)
   concessionText = formatAndSubstitute(session, concessionText, session.baselinePriceCents)
 
@@ -966,7 +964,7 @@ processLeverage = function(listingId, defectId, defectSeverity)
   return session
 end
 
--- Batch leverage: report ALL discovered defects at once (2-step: deny → concede)
+-- Batch leverage: report ALL discovered defects at once (2-step: deny â†’ concede)
 processBatchLeverage = function(listingId)
   if not activated then return nil end
 
@@ -1094,7 +1092,7 @@ processBatchLeverage = function(listingId)
         table.insert(session.usedDefectIds, d.id)
       end
     else
-      log('W', logTag, 'SCAMMER but no realValueCents available for ' .. tostring(listingId) .. ' — falling back to per-defect reductions')
+      log('W', logTag, 'SCAMMER but no realValueCents available for ' .. tostring(listingId) .. ' â€” falling back to per-defect reductions')
       -- Fall through to normal per-defect reductions below
       for _, d in ipairs(unusedDefects) do
         local leverageResult = negotiationEngine.applyDefectLeverage(session, d.id, d.severity or 2)
@@ -1212,9 +1210,9 @@ end
 -- bcm_marketplaceApp.onUpdate call tickTimers in the same frame
 local _lastTickFrame = -1
 
--- Core timer tick logic — called by onUpdate and also exposed for external callers
+-- Core timer tick logic â€” called by onUpdate and also exposed for external callers
 local function tickTimers(dtReal)
-  -- Use os.clock() as a frame-unique identifier (same value within a single frame)
+  -- Use os.clock as a frame-unique identifier (same value within a single frame)
   local now = os.clock()
   if now == _lastTickFrame then return end  -- already ticked this frame
   _lastTickFrame = now
@@ -1412,7 +1410,7 @@ M.onBCMNewGameDay = function(data)
         expiredText = formatAndSubstitute(session, expiredText, nil)
         appendMessage(session, "seller", expiredText, gameDay)
 
-        -- Mark listing as sold by someone else (not the player — allow relist)
+        -- Mark listing as sold by someone else (not the player â€” allow relist)
         local listing = mp.getListingById(listingId)
         if listing and not listing.isSold then
           listing.isSold = true
@@ -1443,7 +1441,7 @@ M.onBCMNewGameDay = function(data)
         guihooks.trigger('BCMNegotiationNewMessage', { listingId = listingId, unread = true })
         fireSessionUpdate(session)
 
-      -- 3a. Proactive ping at 3 days of silence (only once — don't re-ping after sold elsewhere)
+      -- 3a. Proactive ping at 3 days of silence (only once â€” don't re-ping after sold elsewhere)
       elseif daysSincePlayer >= PROACTIVE_PING_THRESHOLD and not session._proactivePingSent then
         session._proactivePingSent = true
 
@@ -1459,7 +1457,7 @@ M.onBCMNewGameDay = function(data)
             local moodShift = negotiationEngine.computeTimeSoftening(listingAge, session.archetype)
             if moodShift < 0 then
               local currentIdx = negotiationEngine.MOOD_INDEX[session.mood] or 2
-              -- Allow improvement up to eager (index 1) — time softens all moods
+              -- Allow improvement up to eager (index 1) â€” time softens all moods
               local newIdx = math.max(1, currentIdx - 1)
               session.mood = negotiationEngine.MOOD_LEVELS[newIdx]
             end
@@ -1481,8 +1479,8 @@ M.onBCMNewGameDay = function(data)
     end
   end
 
-  -- 4. Phase 50.1: Buyer ghost check is now handled by marketplace.lua daily decay.
-  -- Legacy check removed — interest-based ghosting in generateBuyerInterest.
+  -- 4. Buyer ghost check is now handled by marketplace.lua daily decay.
+  -- Legacy check removed â€” interest-based ghosting in generateBuyerInterest.
 end
 
 M.onBeforeSetSaveSlot = function()
@@ -1490,7 +1488,7 @@ M.onBeforeSetSaveSlot = function()
 end
 
 -- ============================================================================
--- NPC Buyer Session Functions (Phase 50)
+-- NPC Buyer Session Functions
 -- ============================================================================
 
 -- Pick a message index that avoids repeating the last used index for this session
@@ -1499,7 +1497,7 @@ pickNonRepeatingMsgIdx = function(pool, session, pricingEng)
   if poolSize <= 1 then return 1 end
   local round = session.roundCount or 0
   local seed = session.seed or 0
-  -- Deterministic entropy — no os.time() to preserve save-scum prevention
+  -- Deterministic entropy â€” no os.time to preserve save-scum prevention
   local raw = pricingEng.lcg(seed * 104729 + round * 7919 + round * round * 13)
   local idx = raw % poolSize + 1
   -- If same as last used, rotate forward
@@ -1528,7 +1526,7 @@ fireBuyerSessionUpdate = function(listingId, buyerId, session)
     vehicleTitle = session.vehicleTitle,
     vehiclePreview = session.vehiclePreview,
     listingPriceCents = session.listingPriceCents,
-    -- Living Market fields (Phase 50.1)
+    -- Living Market fields
     zone = session.zone,
     strategy = session.strategy,
     buyerInterest = session.buyerInterest,
@@ -1563,7 +1561,7 @@ processBuyerInit = function(listingId, buyerId, instant)
   session.awaitingInit = false
 
   if instant then
-    -- Deliver immediately (recovery path — timer was lost)
+    -- Deliver immediately (recovery path â€” timer was lost)
     table.insert(session.messages, {
       direction = "buyer",
       text = rawText,
@@ -1660,7 +1658,7 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
   session.lastActivityGameDay = gameDay
   session.roundCount = (session.roundCount or 0) + 1
 
-  -- Phase 50.1: Classify counter and apply interest decay
+  -- Classify counter and apply interest decay
   if session.buyerInterest then
     local buyerMax = session.buyerMax or session.marketValueCents or counterCents
     local effectiveMax = math.floor(buyerMax * (0.85 + (session.buyerInterest or 0.5) * 0.15))
@@ -1714,7 +1712,7 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
       movement = -0.01
     end
   end
-  -- Do NOT update session.lastPlayerCounter yet — update at end of each exit path
+  -- Do NOT update session.lastPlayerCounter yet â€” update at end of each exit path
 
   -- v4: Stagnation counter for buyer side
   if not isFirstCounter then
@@ -1863,7 +1861,7 @@ processPlayerCounterToNPCBuyer = function(listingId, buyerId, counterCents)
         splitPrice = negotiationEngine.roundUp(math.floor((counterCents + newOffer) / 2))
         local hardMax = session.buyerMax or effectiveMax
         if splitPrice > hardMax then splitPrice = hardMax end
-        -- Split must be at least as high as the counter — never go backwards
+        -- Split must be at least as high as the counter â€” never go backwards
         if splitPrice < newOffer then buyerSplitAllowed = false end
       end
       if buyerSplitAllowed then
@@ -2041,7 +2039,7 @@ tickBuyerTimers = function(dtReal)
     -- Safety: track total age and force delivery after 10 seconds
     timer._age = (timer._age or 0) + dtReal
     if timer._age > 10 then
-      log('W', logTag, 'Buyer timer stuck for ' .. string.format("%.1f", timer._age) .. 's — forcing delivery: ' .. tostring(timer.buyerId))
+      log('W', logTag, 'Buyer timer stuck for ' .. string.format("%.1f", timer._age) .. 's â€” forcing delivery: ' .. tostring(timer.buyerId))
       -- For init timers, use processBuyerInit. For counter-offer timers,
       -- deliver the message directly since awaitingInit is already false.
       local mp = getMarketplace()
@@ -2101,7 +2099,7 @@ tickBuyerTimers = function(dtReal)
             goto continueBuyerTimer
           end
           if session then
-            -- Note: listing sold check removed — session-level guards (ghosted/completed)
+            -- Note: listing sold check removed â€” session-level guards (ghosted/completed)
             -- are sufficient, and getPlayerListingById can return a stale sold duplicate.
             log('I', logTag, 'Buyer timer delivered: ' .. tostring(timer.buyerId) .. ' text=' .. tostring(timer.responseText):sub(1, 40) .. (timer.isDeal and ' [DEAL]' or ''))
             table.insert(session.messages, {
@@ -2167,9 +2165,9 @@ end
 
 local BUYER_TICK_INTERVAL_HOURS = 0.5  -- 30 game-minutes per tick
 
--- Monotonic game hours — immune to day/tod desync spikes at day boundaries.
+-- Monotonic game hours â€” immune to day/tod desync spikes at day boundaries.
 -- gameDays (integer) and tod.time (0-1 fraction) can be out of sync for 1-2 frames
--- at midnight, causing ±24h jumps. This wrapper only accepts forward movement < 2h.
+-- at midnight, causing Â±24h jumps. This wrapper only accepts forward movement < 2h.
 local _lastContinuousHours = nil  -- nil = uninitialized
 
 local function getContinuousGameHours()
@@ -2189,7 +2187,7 @@ local function getContinuousGameHours()
 
   if raw > _lastContinuousHours then
     local delta = raw - _lastContinuousHours
-    -- Reject ONLY the day-boundary desync spike (~24h ± 2h).
+    -- Reject ONLY the day-boundary desync spike (~24h Â± 2h).
     -- Normal progression (small delta) AND legitimate large jumps (reload gap) are accepted.
     if delta < 22 or delta > 26 then
       _lastContinuousHours = raw
@@ -2269,7 +2267,7 @@ processRetroactiveBuyers = function()
 
   -- If game time went backwards (reloaded older save), reset pointer and seed immediate buyers
   if currentHours < lastTickHours - 24 then
-    log('W', logTag, 'lastBuyerTickGameHours (' .. string.format("%.0f", lastTickHours) .. ') ahead of current (' .. string.format("%.0f", currentHours) .. ') — resetting with seed buyers')
+    log('W', logTag, 'lastBuyerTickGameHours (' .. string.format("%.0f", lastTickHours) .. ') ahead of current (' .. string.format("%.0f", currentHours) .. ') â€” resetting with seed buyers')
     if mp.setLastBuyerTickGameHours then mp.setLastBuyerTickGameHours(currentHours) end
 
     -- Seed a few immediate buyers so listings don't feel dead after reload
@@ -2340,11 +2338,11 @@ M.processLeverage = processLeverage
 M.processBatchLeverage = processBatchLeverage
 M.processCallBluff = processCallBluff
 M.getSession = getSession
-M.fireSessionUpdate = fireSessionUpdate  -- Phase 52: needed by bcm_defects for chat injection
+M.fireSessionUpdate = fireSessionUpdate  -- needed by bcm_defects for chat injection
 M.isActivated = isActivated
 M.tickPendingTimers = tickTimers
 
--- Phase 50: NPC Buyer session processing
+-- NPC Buyer session processing
 M.processBuyerInit               = processBuyerInit
 M.processPlayerCounterToNPCBuyer = processPlayerCounterToNPCBuyer
 M.confirmBuyerSale               = confirmBuyerSale

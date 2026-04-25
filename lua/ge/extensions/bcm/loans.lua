@@ -1,4 +1,4 @@
--- BCM Loans Extension
+﻿-- BCM Loans Extension
 -- Full loan lifecycle engine: offer generation, acceptance, automatic weekly payments,
 -- carry-forward penalties, repossession, early payoff, and persistence.
 -- Integrates with bcm_banking (funds), bcm_creditScore (offers + events), career_modules_inventory (repo).
@@ -67,7 +67,7 @@ local LOAN_STATUS = {
   EARLY_PAID = "early_paid"
 }
 
--- Recovery window constants (Phase 31 — FIX-01)
+-- Recovery window constants
 local RECOVERY_WINDOW_GAME_DAYS = 3
 
 
@@ -129,7 +129,7 @@ local activeLoans = {}         -- table keyed by loan ID
 local loanHistory = {}         -- array of completed/closed loans
 local activated = false
 local lastGeneratedOffers = nil -- cached offers from last generateOffers call
-local impoundContactId = nil   -- cached Belasco County Impound contact ID (Phase 31)
+local impoundContactId = nil   -- cached Belasco County Impound contact ID
 local pendingVehicleReturns = {} -- array of {returnGameDay, vehicles = [{model, config, niceName}], loanId}
 
 -- ============================================================================
@@ -159,7 +159,7 @@ end
 
 -- Calculate the next game day when a weekly payment is due
 -- @param fromGameDay number - Current game day float
--- @param targetDayOfWeek number - 1=Monday .. 7=Sunday
+-- @param targetDayOfWeek number - 1=Monday.. 7=Sunday
 -- @return number - Integer game day of next due date
 calculateNextDueDay = function(fromGameDay, targetDayOfWeek)
   if not bcm_timeSystem then return math.floor(fromGameDay) + 7 end
@@ -239,7 +239,7 @@ generateOffers = function(requestedAmountCents, termWeeks, loanType)
     termWeeks = availableTerms[#availableTerms] or 4
   end
 
-  -- Check active loan limit (personal loans only — mortgages checked above)
+  -- Check active loan limit (personal loans only â€” mortgages checked above)
   if loanType == LOAN_TYPE.PERSONAL then
     local personalLoanCount = getActiveLoanCount(LOAN_TYPE.PERSONAL)
     if personalLoanCount >= MAX_ACTIVE_LOANS then
@@ -288,8 +288,8 @@ generateOffers = function(requestedAmountCents, termWeeks, loanType)
     -- Calculate interest and total cost
     -- APR semantics: rate is annual percentage, prorated to the loan term
     -- For mortgages (game-days): amountCents * (rate/100) * (termDays/12.0)
-    --   Each game-day represents ~1 month, so we divide by 12 (months per year)
-    --   8% on $80k over 30 game-days = $80k * 0.08 * (30/12) = ~$16,000 interest
+    -- Each game-day represents ~1 month, so we divide by 12 (months per year)
+    -- 8% on $80k over 30 game-days = $80k * 0.08 * (30/12) = ~$16,000 interest
     -- For personal loans (game-weeks): amountCents * (rate/100) * (termWeeks/52.0)
     local totalInterestCents
     if loanType == LOAN_TYPE.MORTGAGE then
@@ -401,7 +401,7 @@ acceptOffer = function(offerIndex, collateralId, collateralType, loanCategory, s
     paymentLog = {}  -- Array of { week, amountPaid, onTime, timestamp }
   }
 
-  -- Disburse funds via vanilla player money system (triggers onPlayerAttributesChanged → BCM banking)
+  -- Disburse funds via vanilla player money system (triggers onPlayerAttributesChanged â†’ BCM banking)
   if career_modules_playerAttributes then
     local dollars = offer.principalCents / 100
     career_modules_playerAttributes.addAttributes(
@@ -419,7 +419,7 @@ acceptOffer = function(offerIndex, collateralId, collateralType, loanCategory, s
   -- Fire update event
   triggerLoanUpdate()
 
-  -- Send notification and email (skipped for mortgages — Vue fires these after spinner completes)
+  -- Send notification and email (skipped for mortgages â€” Vue fires these after spinner completes)
   if not suppressNotification then
     if bcm_notifications then
       bcm_notifications.send({
@@ -772,7 +772,7 @@ processRepoWarnings = function()
 end
 
 -- ============================================================================
--- Impound Contact Helper (Phase 31 — FIX-01)
+-- Impound Contact Helper
 -- Creates a hidden "Belasco County Impound" contact for SMS/email routing.
 -- Hidden contacts are invisible in the phone contacts list.
 -- ============================================================================
@@ -803,7 +803,7 @@ ensureImpoundContact = function()
 end
 
 -- ============================================================================
--- Impound Notification Functions (Phase 31 — FIX-01)
+-- Impound Notification Functions
 -- ============================================================================
 
 -- Send initial impound notification (SMS + email with Pay-to-Recover button)
@@ -832,9 +832,9 @@ sendImpoundNotification = function(loan)
       folder = "inbox",
       from_display = "Belasco County Impound",
       from_email = "notices@belascocounty.gov",
-      subject = "IMPOUND NOTICE — Vehicle Seizure #" .. loanId,
+      subject = "IMPOUND NOTICE â€” Vehicle Seizure #" .. loanId,
       body = "<div style='font-family:Tahoma,sans-serif;font-size:12px;'>"
-        .. "<div style='background:#dc2626;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>BELASCO COUNTY IMPOUND — OFFICIAL NOTICE</div>"
+        .. "<div style='background:#dc2626;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>BELASCO COUNTY IMPOUND â€” OFFICIAL NOTICE</div>"
         .. "<div style='padding:16px;'>"
         .. "<p>Your vehicle(s) have been impounded due to continued non-payment:</p>"
         .. "<table style='border-collapse:collapse;margin:12px 0;'>"
@@ -846,7 +846,7 @@ sendImpoundNotification = function(loan)
         .. "<div style='margin:16px 0;'>"
         .. "<a href='#' onclick=\"bngApi.engineLua('bcm_loans.recoverVehicle(\\'" .. loanId .. "\\')'); return false;\" "
         .. "style='display:inline-block;padding:10px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;font-size:13px;'>"
-        .. "Pay to Recover — " .. formattedAmount
+        .. "Pay to Recover â€” " .. formattedAmount
         .. "</a>"
         .. "</div>"
         .. "<p style='color:#666;font-size:11px;'>Failure to pay before the deadline will result in permanent forfeiture of your vehicle(s).</p>"
@@ -884,9 +884,9 @@ sendImpoundReminder = function(loan)
       folder = "inbox",
       from_display = "Belasco County Impound",
       from_email = "notices@belascocounty.gov",
-      subject = "FINAL NOTICE — Impound Recovery Expires Tomorrow #" .. loanId,
+      subject = "FINAL NOTICE â€” Impound Recovery Expires Tomorrow #" .. loanId,
       body = "<div style='font-family:Tahoma,sans-serif;font-size:12px;'>"
-        .. "<div style='background:#991b1b;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>FINAL NOTICE — RECOVERY PERIOD EXPIRES TOMORROW</div>"
+        .. "<div style='background:#991b1b;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>FINAL NOTICE â€” RECOVERY PERIOD EXPIRES TOMORROW</div>"
         .. "<div style='padding:16px;'>"
         .. "<p style='color:#dc2626;font-weight:bold;'>This is your FINAL opportunity to recover your impounded vehicle(s).</p>"
         .. "<table style='border-collapse:collapse;margin:12px 0;'>"
@@ -897,7 +897,7 @@ sendImpoundReminder = function(loan)
         .. "<div style='margin:16px 0;'>"
         .. "<a href='#' onclick=\"bngApi.engineLua('bcm_loans.recoverVehicle(\\'" .. loanId .. "\\')'); return false;\" "
         .. "style='display:inline-block;padding:10px 24px;background:#dc2626;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;font-size:13px;'>"
-        .. "PAY NOW — " .. formattedAmount
+        .. "PAY NOW â€” " .. formattedAmount
         .. "</a>"
         .. "</div>"
         .. "<p style='color:#dc2626;font-size:11px;font-weight:bold;'>If payment is not received by tomorrow, your vehicle(s) will be permanently forfeited. No further notices will be sent.</p>"
@@ -912,7 +912,7 @@ sendImpoundReminder = function(loan)
 end
 
 -- ============================================================================
--- Recovery Window Lifecycle (Phase 31 — FIX-01)
+-- Recovery Window Lifecycle
 -- ============================================================================
 
 -- Process recovery windows: finalize on expiry (vehicles already removed), send reminder on last day
@@ -923,10 +923,10 @@ processRecoveryWindows = function()
   for loanId, loan in pairs(activeLoans) do
     if loan.status == LOAN_STATUS.RECOVERY_WINDOW and loan.recoveryDeadlineGameDay then
       if math.floor(currentGameDay) >= loan.recoveryDeadlineGameDay then
-        -- Window expired — finalize (vehicles already removed in executeRepossession)
+        -- Window expired â€” finalize (vehicles already removed in executeRepossession)
         table.insert(loansToFinalize, loanId)
       elseif not loan.reminderSent and math.floor(currentGameDay) >= loan.recoveryDeadlineGameDay - 1 then
-        -- Last day before expiry — send reminder
+        -- Last day before expiry â€” send reminder
         sendImpoundReminder(loan)
       end
     end
@@ -938,7 +938,7 @@ processRecoveryWindows = function()
     if loan then
       local vehicleNames = loan.seizedVehicles or "vehicle"
 
-      -- Vehicles were already removed in executeRepossession — just finalize status
+      -- Vehicles were already removed in executeRepossession â€” just finalize status
       loan.status = LOAN_STATUS.FINAL_REPOSSESSED
       loan.completedAt = os.time()
       loan.seizedVehicleData = nil  -- No longer recoverable
@@ -968,7 +968,7 @@ processRecoveryWindows = function()
       table.insert(loanHistory, loan)
       activeLoans[loanId] = nil
 
-      log('W', 'bcm_loans', 'Recovery window expired for loan ' .. loanId .. ' — vehicle(s) permanently forfeited')
+      log('W', 'bcm_loans', 'Recovery window expired for loan ' .. loanId .. ' â€” vehicle(s) permanently forfeited')
     end
   end
 
@@ -977,7 +977,7 @@ processRecoveryWindows = function()
   end
 end
 
--- Process pending vehicle returns — spawn vehicles back into player inventory
+-- Process pending vehicle returns â€” spawn vehicles back into player inventory
 -- Vehicles are returned the game day after recovery payment
 processVehicleReturns = function()
   if #pendingVehicleReturns == 0 then return end
@@ -1038,11 +1038,11 @@ processVehicleReturns = function()
           end
 
           -- CREATE insurance entry directly in the insurance module's internal table.
-          -- CRITICAL: addVehicle does NOT create insurance entries — only vehicleShopping
+          -- CRITICAL: addVehicle does NOT create insurance entries â€” only vehicleShopping
           -- fires onVehicleAddedToInventory which creates them. We must do it manually.
           if newInventoryId then
             if vehData._insuranceEntry then
-              -- Full insurance entry was saved — restore it with updated inventory ID
+              -- Full insurance entry was saved â€” restore it with updated inventory ID
               if career_modules_insurance_insurance and career_modules_insurance_insurance.getInvVehs then
                 local invVehs = career_modules_insurance_insurance.getInvVehs()
                 if invVehs then
@@ -1191,7 +1191,7 @@ recoverVehicle = function(loanId)
     local dollars = totalOwed / 100
     career_modules_playerAttributes.addAttributes(
       {money = -dollars},
-      {label = "Impound recovery — " .. (loan.seizedVehicles or "vehicle"), tags = {"loanPayment"}}
+      {label = "Impound recovery â€” " .. (loan.seizedVehicles or "vehicle"), tags = {"loanPayment"}}
     )
   end
 
@@ -1214,9 +1214,9 @@ recoverVehicle = function(loanId)
   -- Update recovery email to PAID stamp
   if loan.recoveryEmailId and bcm_email and bcm_email.updateEmail then
     bcm_email.updateEmail(loan.recoveryEmailId, {
-      subject = "PAID — Vehicle Recovered #" .. loanId,
+      subject = "PAID â€” Vehicle Recovered #" .. loanId,
       body = "<div style='font-family:Tahoma,sans-serif;font-size:12px;'>"
-        .. "<div style='background:#16a34a;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>PAID — VEHICLE RECOVERED</div>"
+        .. "<div style='background:#16a34a;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>PAID â€” VEHICLE RECOVERED</div>"
         .. "<div style='padding:16px;'>"
         .. "<p>Your vehicle(s) have been released from impound.</p>"
         .. "<table style='border-collapse:collapse;margin:12px 0;'>"
@@ -1272,11 +1272,11 @@ recoverVehicle = function(loanId)
   end
 
   triggerLoanUpdate()
-  log('I', 'bcm_loans', 'Vehicle recovered for loan ' .. loanId .. ' — paid ' .. formatMoney(totalOwed) .. '. Vehicles return tomorrow.')
+  log('I', 'bcm_loans', 'Vehicle recovered for loan ' .. loanId .. ' â€” paid ' .. formatMoney(totalOwed) .. '. Vehicles return tomorrow.')
   return true
 end
 
--- Execute repossession for a loan (Phase 31 — FIX-01)
+-- Execute repossession for a loan
 -- Vehicles are REMOVED IMMEDIATELY from garage/inventory.
 -- Loan enters RECOVERY_WINDOW: player has N game-days to pay full balance.
 -- If paid, vehicles are restored to garage the next game day.
@@ -1284,7 +1284,7 @@ end
 executeRepossession = function(loan)
   if not loan then return end
 
-  -- Mortgage foreclosure branch — collateral is a property, not a vehicle
+  -- Mortgage foreclosure branch â€” collateral is a property, not a vehicle
   if loan.loanType == LOAN_TYPE.MORTGAGE and loan.collateralId then
     executeMortgageForeclosure(loan)
     return
@@ -1336,7 +1336,7 @@ executeRepossession = function(loan)
         end
       end
       vehDataToStore.niceName = vehDataToStore.niceName or vehName
-      -- Save FULL insurance entry (not just insuranceId) — addVehicle does NOT create
+      -- Save FULL insurance entry (not just insuranceId) â€” addVehicle does NOT create
       -- insurance entries; only vehicleShopping does. We must recreate it on restore.
       if career_modules_insurance_insurance and career_modules_insurance_insurance.getInvVehs then
         local invVehs = career_modules_insurance_insurance.getInvVehs()
@@ -1372,7 +1372,7 @@ executeRepossession = function(loan)
     local seizedList = table.concat(vehicleNames, ", ")
     local currentGameDay = bcm_timeSystem and bcm_timeSystem.getGameTimeDays() or 0
 
-    -- Enter recovery window — vehicles already removed, player can pay to get them back
+    -- Enter recovery window â€” vehicles already removed, player can pay to get them back
     loan.status = LOAN_STATUS.RECOVERY_WINDOW
     loan.seizedVehicles = seizedList
     loan.seizedVehicleData = seizedVehicleData  -- For restoration if player pays
@@ -1394,7 +1394,7 @@ executeRepossession = function(loan)
     -- Send impound notifications (SMS + email with Pay-to-Recover button)
     sendImpoundNotification(loan)
 
-    -- Generate breaking news article (Phase 30)
+    -- Generate breaking news article
     if bcm_breakingNews then
       bcm_breakingNews.onEvent("repossession", {
         vehicleNames = seizedList,
@@ -1408,7 +1408,7 @@ executeRepossession = function(loan)
     triggerLoanUpdate()
     log('W', 'bcm_loans', 'Loan ' .. loanId .. ' entered recovery window (' .. RECOVERY_WINDOW_GAME_DAYS .. ' days). Vehicles SEIZED: ' .. seizedList)
   else
-    -- No vehicles available — loan defaults with massive credit hit
+    -- No vehicles available â€” loan defaults with massive credit hit
     loan.status = LOAN_STATUS.DEFAULTED
     loan.completedAt = os.time()
 
@@ -1468,7 +1468,7 @@ earlyPayoff = function(loanId)
     return false
   end
 
-  -- Process payoff via vanilla player money (triggers onPlayerAttributesChanged → BCM banking)
+  -- Process payoff via vanilla player money (triggers onPlayerAttributesChanged â†’ BCM banking)
   if career_modules_playerAttributes then
     local dollars = totalOwed / 100
     career_modules_playerAttributes.addAttributes(
@@ -1588,7 +1588,7 @@ getMortgageEligibility = function(garageId, loanCategory)
     end
   end
 
-  -- Check 3: DTI ratio — monthly debt payments > 43% of monthly income
+  -- Check 3: DTI ratio â€” monthly debt payments > 43% of monthly income
   if bcm_banking then
     local account = bcm_banking.getPersonalAccount()
     if account then
@@ -1678,7 +1678,7 @@ executeMortgageForeclosure = function(loan)
   if bcm_properties then
     local record = bcm_properties.getOwnedProperty and bcm_properties.getOwnedProperty(garageId)
     if record then
-      record.tier = 0  -- Direct reset — tier lost on foreclosure
+      record.tier = 0  -- Direct reset â€” tier lost on foreclosure
     end
     if bcm_properties.removeProperty then
       bcm_properties.removeProperty(garageId)
@@ -1720,7 +1720,7 @@ executeMortgageForeclosure = function(loan)
       folder = "inbox",
       from_display = loan.lenderName or "BCM National Bank",
       from_email = "foreclosure@" .. (loan.lenderSlug or "bcmbank") .. ".com",
-      subject = "FORECLOSURE NOTICE — Property " .. garageName,
+      subject = "FORECLOSURE NOTICE â€” Property " .. garageName,
       body = "<div style='font-family:Tahoma,sans-serif;font-size:12px;'>"
         .. "<div style='background:#991b1b;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>FORECLOSURE NOTICE</div>"
         .. "<div style='padding:16px;'>"
@@ -1790,15 +1790,15 @@ sendVehicleImpoundForForeclosure = function(vehId, loanId)
       folder = "inbox",
       from_display = "Belasco County Impound",
       from_email = "notices@belascocounty.gov",
-      subject = "IMPOUND NOTICE — Vehicle Seized (Foreclosure) #" .. tostring(loanId),
+      subject = "IMPOUND NOTICE â€” Vehicle Seized (Foreclosure) #" .. tostring(loanId),
       body = "<div style='font-family:Tahoma,sans-serif;font-size:12px;'>"
-        .. "<div style='background:#dc2626;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>BELASCO COUNTY IMPOUND — FORECLOSURE SEIZURE</div>"
+        .. "<div style='background:#dc2626;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px;'>BELASCO COUNTY IMPOUND â€” FORECLOSURE SEIZURE</div>"
         .. "<div style='padding:16px;'>"
         .. "<p>Your vehicle has been impounded due to property foreclosure:</p>"
         .. "<table style='border-collapse:collapse;margin:12px 0;'>"
         .. "<tr><td style='padding:4px 12px 4px 0;font-weight:bold;'>Vehicle:</td><td>" .. vehicleName .. "</td></tr>"
         .. "<tr><td style='padding:4px 12px 4px 0;font-weight:bold;'>Recovery Fee:</td><td>$1,000</td></tr>"
-        .. "<tr><td style='padding:4px 12px 4px 0;font-weight:bold;'>Reason:</td><td>Property foreclosure — no available garage space</td></tr>"
+        .. "<tr><td style='padding:4px 12px 4px 0;font-weight:bold;'>Reason:</td><td>Property foreclosure â€” no available garage space</td></tr>"
         .. "</table>"
         .. "<p>To recover your vehicle, visit Belasco County Impound and pay the $1,000 recovery fee.</p>"
         .. "<p style='color:#666;font-size:11px;'>Vehicles not recovered within 30 days will be auctioned.</p>"
@@ -2124,7 +2124,7 @@ onUpdate = function(dtReal, dtSim, dtRaw)
   -- Check repo warnings every frame (time-sensitive)
   processRepoWarnings()
 
-  -- Check recovery windows (Phase 31 — FIX-01)
+  -- Check recovery windows
   processRecoveryWindows()
 
   -- Process pending vehicle returns (next day after recovery payment)
@@ -2258,7 +2258,7 @@ M.debugRecoveryStatus = function()
   for id, loan in pairs(activeLoans) do
     if loan.status == LOAN_STATUS.RECOVERY_WINDOW then
       local daysLeft = loan.recoveryDeadlineGameDay - math.floor(currentGameDay)
-      log('I', 'bcm_loans', '  [' .. id .. '] RECOVERY_WINDOW — deadline day ' .. tostring(loan.recoveryDeadlineGameDay) .. ' (' .. daysLeft .. ' days left)')
+      log('I', 'bcm_loans', '  [' .. id .. '] RECOVERY_WINDOW â€” deadline day ' .. tostring(loan.recoveryDeadlineGameDay) .. ' (' .. daysLeft .. ' days left)')
       log('I', 'bcm_loans', '    Vehicles: ' .. (loan.seizedVehicles or "?"))
       log('I', 'bcm_loans', '    Owed: ' .. formatMoney(loan.remainingCents + (loan.carryForwardCents or 0)))
       log('I', 'bcm_loans', '    Has restore data: ' .. tostring(loan.seizedVehicleData ~= nil and #loan.seizedVehicleData > 0))
@@ -2266,7 +2266,7 @@ M.debugRecoveryStatus = function()
   end
   log('I', 'bcm_loans', 'Pending vehicle returns: ' .. #pendingVehicleReturns)
   for i, entry in ipairs(pendingVehicleReturns) do
-    log('I', 'bcm_loans', '  [' .. i .. '] return day ' .. tostring(entry.returnGameDay) .. ' — ' .. (entry.vehicleNames or "?"))
+    log('I', 'bcm_loans', '  [' .. i .. '] return day ' .. tostring(entry.returnGameDay) .. ' â€” ' .. (entry.vehicleNames or "?"))
   end
   log('I', 'bcm_loans', '=====================')
 end

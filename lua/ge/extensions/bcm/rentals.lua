@@ -1,7 +1,7 @@
--- better_career_mod/lua/ge/extensions/bcm/rentals.lua
--- Phase 102: Per-Map Garages — Rental lifecycle module
+﻿-- better_career_mod/lua/ge/extensions/bcm/rentals.lua
+-- Per-Map Garages â€” Rental lifecycle module
 -- Pattern source: bcm/realEstateApp.lua (day-hook + banking + save/load)
--- Decisions: D-01..D-12 per .planning/phases/102-per-map-garages/102-CONTEXT.md
+-- Decisions:.. per.planning/phases/102-per-map-garages/
 
 local M = {}
 local logTag = 'bcm_rentals'
@@ -35,12 +35,12 @@ local onExtensionUnloaded
 -- Private state
 -- ============================================================================
 -- activeRentals[garageId] = {
---   garageId,              -- string
---   startDay,              -- integer day number
---   lastChargedDay,        -- integer day number (most recent successful debit)
---   dailyRateCents,        -- integer cents
---   sourceMapName,         -- string map id (e.g. "west_coast_usa", "italy")
---   associatedVehicleIds,  -- array of inventory ids
+-- garageId, -- string
+-- startDay, -- integer day number
+-- lastChargedDay, -- integer day number (most recent successful debit)
+-- dailyRateCents, -- integer cents
+-- sourceMapName, -- string map id (e.g. "west_coast_usa", "italy")
+-- associatedVehicleIds, -- array of inventory ids
 -- }
 local activeRentals = {}
 local lastProcessedDay = 0
@@ -55,7 +55,7 @@ local DISCOUNTS = { [1] = 0, [7] = 0.05, [30] = 0.15 }
 -- ============================================================================
 
 -- Cross-map garage definition lookup.
--- NEVER use bcm_garages.loadGarageConfig here — it is hardcoded to the currently
+-- NEVER use bcm_garages.loadGarageConfig here â€” it is hardcoded to the currently
 -- loaded level, so cross-map queries would silently fail.
 resolveGarageDef = function(garageId, sourceMapName)
   if not garageId or not sourceMapName then return nil end
@@ -87,7 +87,7 @@ getAllActiveRentals = function()
   return out
 end
 
--- D-01: daily rate = 1% of purchase price per game-day, with optional term discount.
+--: daily rate = 1% of purchase price per game-day, with optional term discount.
 -- termDays: integer (1, 7, 30) or nil (indefinite). Discount from DISCOUNTS table.
 computeDailyRateCents = function(basePriceCents, termDays)
   local discount = DISCOUNTS[termDays] or 0
@@ -132,12 +132,12 @@ startRental = function(garageId, sourceMapName, assocVehicleIds, termDays)
     return nil, 'insufficient_funds'
   end
 
-  -- D-02: charge day-of-arrival up front.
+  --: charge day-of-arrival up front.
   bcm_banking.removeFunds(
     account.id,
     dailyRateCents,
     'rental_charge',
-    'Rental day 1 — ' .. (def.name or garageId)
+    'Rental day 1 â€” ' .. (def.name or garageId)
   )
 
   local currentDay = 0
@@ -159,9 +159,9 @@ startRental = function(garageId, sourceMapName, assocVehicleIds, termDays)
     endDay = endDay,        -- integer or nil (indefinite = never expires)
   }
 
-  -- D-09 hybrid data model (Plan 02 + Research Pitfall 6):
-  --   Backup-free garage being upgraded to paid mode → set paidRentalMode flag on the existing record.
-  --   Non-backup garage being rented → create a parallel ownership shell with type="rental".
+  -- hybrid data model:
+  -- Backup-free garage being upgraded to paid mode â†’ set paidRentalMode flag on the existing record.
+  -- Non-backup garage being rented â†’ create a parallel ownership shell with type="rental".
   local isBackup = bcm_garages and bcm_garages.isBackupGarage and bcm_garages.isBackupGarage(garageId)
   if bcm_properties then
     if isBackup and bcm_properties.isOwned and bcm_properties.isOwned(garageId) then
@@ -179,8 +179,8 @@ startRental = function(garageId, sourceMapName, assocVehicleIds, termDays)
     end
   end
 
-  -- Phase 102 hotfix BUG #2: use dedicated rental-started keys (title + body),
-  -- not the generic heading/CTA that produced "Daily Rentals / Rent — $X/day" on
+  -- hotfix BUG #2: use dedicated rental-started keys (title + body),
+  -- not the generic heading/CTA that produced "Daily Rentals / Rent â€” $X/day" on
   -- screen. Also deliver an email receipt so the player has persistent feedback.
   local amountStr = (bcm_banking.formatMoney and bcm_banking.formatMoney(dailyRateCents))
     or tostring(math.floor(dailyRateCents / 100))
@@ -199,7 +199,7 @@ startRental = function(garageId, sourceMapName, assocVehicleIds, termDays)
   if bcm_email and bcm_email.deliver then
     bcm_email.deliver({
       folder = 'inbox',
-      from_display = 'Belasco Realty — Rentals Desk',
+      from_display = 'Belasco Realty â€” Rentals Desk',
       from_email = 'rentals@belascorealty.com',
       subjectKey = 'garg.notifications.rentalStartedEmailSubject',
       bodyKey    = 'garg.notifications.rentalStartedEmailBody',
@@ -235,7 +235,7 @@ closeRental = function(garageId, reason)
   local rental = activeRentals[garageId]
   if not rental then return false end
 
-  -- D-07: migrate associated vehicles to the backup free garage of the same map.
+  --: migrate associated vehicles to the backup free garage of the same map.
   migrateVehiclesToBackup(rental)
 
   -- Clean up data-model side (Pitfall 6 hybrid model).
@@ -270,12 +270,12 @@ closeRental = function(garageId, reason)
   if bcm_email and bcm_email.deliver and reason == 'noFunds' then
     bcm_email.deliver({
       folder = 'inbox',
-      from_display = 'Belasco Realty — Rentals Desk',
+      from_display = 'Belasco Realty â€” Rentals Desk',
       from_email = 'rentals@belascorealty.com',
       subject = 'Rental closed: ' .. displayName,
       body = 'Your rental was closed because funds were insufficient at midnight. '
         .. 'Your vehicles migrated to the free backup bunk of the map. '
-        .. 'No debt was recorded — rentals at Belasco are pay-as-you-sleep.',
+        .. 'No debt was recorded â€” rentals at Belasco are pay-as-you-sleep.',
     })
   end
 
@@ -389,7 +389,7 @@ shouldShowRenewalPrompt = function(garageId)
 end
 
 -- ============================================================================
--- Day-hook (D-02 + D-04: idempotent, balance-check-before-debit, no debt)
+-- Day-hook
 -- ============================================================================
 
 processDailyCharges = function(newDay)
@@ -438,10 +438,10 @@ processDailyCharges = function(newDay)
             rec.paidRentalMode.lastChargedDay = newDay
           end
         end
-        -- Refresh account snapshot for the next iteration — balance changed.
+        -- Refresh account snapshot for the next iteration â€” balance changed.
         account = bcm_banking.getPersonalAccount() or account
       else
-        -- D-04: no debt, close immediately.
+        --: no debt, close immediately.
         closeRental(garageId, 'noFunds')
       end
     end
@@ -530,7 +530,7 @@ loadData = function()
     lastProcessedDay = data.lastProcessedDay or 0
     log('I', logTag, 'Rental data loaded')
   else
-    log('I', logTag, 'No saved rental data found — starting fresh')
+    log('I', logTag, 'No saved rental data found â€” starting fresh')
   end
 end
 

@@ -1,4 +1,4 @@
--- BCM Heat App Extension
+﻿-- BCM Heat App Extension
 -- Registers the "Infracciones" app on the phone for heat level display.
 -- Bridges heat data to Vue on request.
 -- Extension name: bcm_heatApp
@@ -74,7 +74,7 @@ onCareerModulesActivated = function()
     })
   end
 
-  -- Phase 60: Set initial badge state on career load
+  -- Set initial badge state on career load
   updateBadge()
 
   log('I', logTag, 'Heat app registered')
@@ -91,12 +91,12 @@ end
 M.onCareerModulesActivated = onCareerModulesActivated
 M.sendHeatToVue = sendHeatToVue
 
--- Phase 60: Badge and fines bridge
+-- Badge and fines bridge
 M.updateBadge = updateBadge
 M.clearBadge = clearBadge
 M.sendFinesAndRecognitionToVue = sendFinesAndRecognitionToVue
 
--- Phase 60: Badge update on arrest
+-- Badge update on arrest
 M.onPursuitEvent = function(data)
   if data and data.action == 'arrest' then
     updateBadge()

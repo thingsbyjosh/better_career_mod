@@ -1,4 +1,4 @@
--- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+﻿-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
 -- If a copy of the bCDDL was not distributed with this
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 
@@ -525,9 +525,9 @@ local function buyVehicleAndSendToGarage(options)
     local currentGarageId = originComputerId and career_modules_garageManager and career_modules_garageManager.computerIdToGarageId(originComputerId) or nil
     local targetGarageId = findGarageWithCapacity(currentGarageId)
     if not targetGarageId then
-      -- All garages full — block purchase
+      -- All garages full â€” block purchase
       guihooks.trigger('toastrMsg', {type = "error", title = "Garage Full", msg = "No garage capacity available. Upgrade or buy a new garage. / Sin espacio en garaje. Mejora o compra uno nuevo."})
-      log('W', 'Career', 'BCM: Vehicle purchase blocked — all garages at capacity')
+      log('W', 'Career', 'BCM: Vehicle purchase blocked â€” all garages at capacity')
       return
     end
     -- Store target garage so onVehicleSpawnFinished can assign
@@ -555,7 +555,7 @@ local function buyVehicleAndSpawnInParkingSpot(options)
     local targetGarageId = findGarageWithCapacity(currentGarageId)
     if not targetGarageId then
       guihooks.trigger('toastrMsg', {type = "error", title = "Garage Full", msg = "No garage capacity available. Upgrade or buy a new garage. / Sin espacio en garaje. Mejora o compra uno nuevo."})
-      log('W', 'Career', 'BCM: Vehicle purchase blocked — all garages at capacity')
+      log('W', 'Career', 'BCM: Vehicle purchase blocked â€” all garages at capacity')
       return
     end
     options.bcmTargetGarageId = targetGarageId
@@ -693,7 +693,7 @@ local function sendPurchaseDataToUi()
   purchaseData.vehId = spawnedVehicleInfo and spawnedVehicleInfo.vehId
 
   if not purchaseData.insuranceId then
-    -- Always try to assign default insurance — never leave uninsured
+    -- Always try to assign default insurance â€” never leave uninsured
     local defaultIns = nil
     if vehicleShopInfo.insuranceClass and vehicleShopInfo.insuranceClass.id then
       pcall(function()
@@ -787,22 +787,22 @@ local function onAddedVehiclePartsToInventory(inventoryId, newParts)
 
   -- remove old leftover slots that dont exist anymore
   --[[ local slotsToRemove = {}
-  for slot, partName in pairs(vehicle.config.parts) do
-    if not allSlotsInVehicle[slot] then
-      slotsToRemove[slot] = true
-    end
-  end
-  for slot, _ in pairs(slotsToRemove) do
-    vehicle.config.parts[slot] = nil
-  end
+ for slot, partName in pairs(vehicle.config.parts) do
+ if not allSlotsInVehicle[slot] then
+ slotsToRemove[slot] = true
+ end
+ end
+ for slot, _ in pairs(slotsToRemove) do
+ vehicle.config.parts[slot] = nil
+ end
 
-  -- every part that is now in "vehicle.config.parts", but not in "vehicle.originalParts" is either a part that no longer exists in the game or it is just some way to denote an empty slot (like "none")
-  -- in both cases we change the slot to a unified ""
-  for slot, partName in pairs(vehicle.config.parts) do
-    if not vehicle.originalParts[slot] then
-      vehicle.config.parts[slot] = ""
-    end
-  end ]]
+ -- every part that is now in "vehicle.config.parts", but not in "vehicle.originalParts" is either a part that no longer exists in the game or it is just some way to denote an empty slot (like "none")
+ -- in both cases we change the slot to a unified ""
+ for slot, partName in pairs(vehicle.config.parts) do
+ if not vehicle.originalParts[slot] then
+ vehicle.config.parts[slot] = ""
+ end
+ end]]
 
   vehicle.changedSlots = {}
 
@@ -833,7 +833,7 @@ end
 
 local function onEnterVehicleFinished()
   if removeNonUsedPlayerVehicles then
-   --removeUnusedPlayerVehicles()
+   --removeUnusedPlayerVehicles
    removeNonUsedPlayerVehicles = nil
   end
 end
@@ -1096,9 +1096,9 @@ M.onUiChangedState = onUiChangedState
 
 M.getEligibleVehiclesWithoutDealershipVehicles = getEligibleVehiclesWithoutDealershipVehicles
 
--- BCM mock vehicle injection for test drives (Phase 52)
+-- BCM mock vehicle injection for test drives
 -- Allows bcm_defects to register a temporary entry in vehiclesInShop so that
--- vanilla inspectVehicle.startInspection → spawnVehicle → getVehicleInfoByShopId
+-- vanilla inspectVehicle.startInspection â†’ spawnVehicle â†’ getVehicleInfoByShopId
 -- can find it.
 local function registerMockVehicle(vehicleInfo)
   table.insert(vehiclesInShop, vehicleInfo)

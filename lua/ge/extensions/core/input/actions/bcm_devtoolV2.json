@@ -1,0 +1,18 @@
+{
+  "bcm_devtoolV2_commit": {
+    "cat": "gameplay",
+    "order": 501,
+    "ctx": "tlua",
+    "onDown": "if bcm_devtoolV2 and bcm_devtoolV2.propsHotkeyCommit then bcm_devtoolV2.propsHotkeyCommit() end",
+    "title": "BCM DevTool V2 - Commit Props Placement/Removal",
+    "desc": "While in the BCM DevTool V2 Props tab (place or remove mode), commit the current action at the cursor."
+  },
+  "bcm_devtoolV2_cancel": {
+    "cat": "gameplay",
+    "order": 502,
+    "ctx": "tlua",
+    "onDown": "if bcm_devtoolV2 and bcm_devtoolV2.propsCancelMode then bcm_devtoolV2.propsCancelMode() end",
+    "title": "BCM DevTool V2 - Cancel Props Action",
+    "desc": "While in the BCM DevTool V2 Props tab, cancel the current place/remove action and return to idle."
+  }
+}

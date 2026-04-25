@@ -2,7 +2,45 @@
   "kinds":{
     "cameras":{
       "deleted":{},
-      "items":{}
+      "items":{
+        "wc_bcmCamera_1":{
+          "baseline":{
+            "id":"wc_bcmCamera_1",
+            "lineEnd":[
+              119.56134796143,
+              1067.7176513672,
+              105.88352328539
+            ],
+            "lineStart":[
+              138.82362365723,
+              1066.1322021484,
+              105.83075457811
+            ],
+            "name":"",
+            "speedLimit":130,
+            "type":"speed"
+          },
+          "conflicted":false,
+          "edited":{
+            "id":"wc_bcmCamera_1",
+            "lineEnd":[
+              119.56134796143,
+              1067.7176513672,
+              105.88352328539
+            ],
+            "lineStart":[
+              138.82362365723,
+              1066.1322021484,
+              105.83075457811
+            ],
+            "name":"",
+            "speedLimit":130,
+            "type":"speed"
+          },
+          "origin":"new",
+          "touchedAt":1777053275
+        }
+      }
     },
     "delivery":{
       "deleted":{},
@@ -5833,6 +5871,268 @@
           "origin":"production",
           "touchedAt":1776262672
         },
+        "dirt_track_a":{
+          "baseline":{
+            "associatedOrganization":"dirt_track_a",
+            "description":"Receives Sand and Gravel.",
+            "id":"dirt_track_a",
+            "images":{
+              "preview":"previews/dirt_track_a.jpg"
+            },
+            "logisticGenerators":[
+              {
+                "capacity":3000,
+                "interval":270,
+                "logisticTypes":[
+                  "sand"
+                ],
+                "materialType":"sand",
+                "rate":200,
+                "target":1500,
+                "type":"materialReceiver",
+                "variance":1000
+              },
+              {
+                "capacity":1000,
+                "interval":360,
+                "logisticTypes":[
+                  "gravel"
+                ],
+                "materialType":"gravel",
+                "rate":100,
+                "target":200,
+                "type":"materialReceiver",
+                "variance":400
+              }
+            ],
+            "logisticMaxItems":8,
+            "name":"Derby Track A",
+            "parkingSpots":[
+              {
+                "dir":[
+                  -0.01562764143,
+                  -0.0003055893178,
+                  -0.01954828473,
+                  0.9996867249
+                ],
+                "isInspectSpot":true,
+                "logisticTypesProvided":{},
+                "logisticTypesReceived":[
+                  "sand",
+                  "gravel"
+                ],
+                "pos":[
+                  547.4729004,
+                  -44.94662094,
+                  146.5759277
+                ],
+                "scl":[
+                  3.25,
+                  8,
+                  4
+                ]
+              }
+            ],
+            "tags":{}
+          },
+          "conflicted":false,
+          "edited":{
+            "associatedOrganization":"dirt_track_a",
+            "description":"Receives Sand and Gravel.",
+            "id":"dirt_track_a",
+            "images":{
+              "preview":"previews/dirt_track_a.jpg"
+            },
+            "logisticGenerators":[
+              {
+                "capacity":3000,
+                "interval":270,
+                "logisticTypes":[
+                  "sand"
+                ],
+                "materialType":"sand",
+                "rate":200,
+                "target":1500,
+                "type":"materialReceiver",
+                "variance":1000
+              },
+              {
+                "capacity":1000,
+                "interval":360,
+                "logisticTypes":[
+                  "gravel"
+                ],
+                "materialType":"gravel",
+                "rate":100,
+                "target":200,
+                "type":"materialReceiver",
+                "variance":400
+              }
+            ],
+            "logisticMaxItems":8,
+            "name":"Derby Track A",
+            "parkingSpots":[
+              {
+                "dir":[
+                  -0.01562764143,
+                  -0.0003055893178,
+                  -0.01954828473,
+                  0.9996867249
+                ],
+                "isInspectSpot":true,
+                "logisticTypesProvided":{},
+                "logisticTypesReceived":[
+                  "sand",
+                  "gravel"
+                ],
+                "pos":[
+                  547.4729004,
+                  -44.94662094,
+                  146.5759277
+                ],
+                "scl":[
+                  3.25,
+                  8,
+                  4
+                ]
+              }
+            ],
+            "tags":{}
+          },
+          "origin":"production",
+          "touchedAt":1777029938
+        },
+        "dirt_track_b":{
+          "baseline":{
+            "associatedOrganization":"dirt_track_b",
+            "description":"Receives Sand and Gravel.",
+            "id":"dirt_track_b",
+            "images":{
+              "preview":"previews/dirt_track_b.jpg"
+            },
+            "logisticGenerators":[
+              {
+                "capacity":3000,
+                "interval":270,
+                "logisticTypes":[
+                  "sand"
+                ],
+                "materialType":"sand",
+                "rate":200,
+                "target":1500,
+                "type":"materialReceiver",
+                "variance":1000
+              },
+              {
+                "capacity":1000,
+                "interval":360,
+                "logisticTypes":[
+                  "gravel"
+                ],
+                "materialType":"gravel",
+                "rate":100,
+                "target":200,
+                "type":"materialReceiver",
+                "variance":400
+              }
+            ],
+            "logisticMaxItems":8,
+            "name":"Derby Track B",
+            "parkingSpots":[
+              {
+                "dir":[
+                  0,
+                  -0,
+                  -0.300499099,
+                  0.9537820985
+                ],
+                "isInspectSpot":true,
+                "logisticTypesProvided":{},
+                "logisticTypesReceived":[
+                  "sand",
+                  "gravel"
+                ],
+                "pos":[
+                  174.5405884,
+                  28.52080727,
+                  128.7806854
+                ],
+                "scl":[
+                  3.25,
+                  8,
+                  4
+                ]
+              }
+            ],
+            "tags":{}
+          },
+          "conflicted":false,
+          "edited":{
+            "associatedOrganization":"dirt_track_b",
+            "description":"Receives Sand and Gravel.",
+            "id":"dirt_track_b",
+            "images":{
+              "preview":"previews/dirt_track_b.jpg"
+            },
+            "logisticGenerators":[
+              {
+                "capacity":3000,
+                "interval":270,
+                "logisticTypes":[
+                  "sand"
+                ],
+                "materialType":"sand",
+                "rate":200,
+                "target":1500,
+                "type":"materialReceiver",
+                "variance":1000
+              },
+              {
+                "capacity":1000,
+                "interval":360,
+                "logisticTypes":[
+                  "gravel"
+                ],
+                "materialType":"gravel",
+                "rate":100,
+                "target":200,
+                "type":"materialReceiver",
+                "variance":400
+              }
+            ],
+            "logisticMaxItems":8,
+            "name":"Derby Track B",
+            "parkingSpots":[
+              {
+                "dir":[
+                  0,
+                  -0,
+                  -0.300499099,
+                  0.9537820985
+                ],
+                "isInspectSpot":true,
+                "logisticTypesProvided":{},
+                "logisticTypesReceived":[
+                  "sand",
+                  "gravel"
+                ],
+                "pos":[
+                  174.5405884,
+                  28.52080727,
+                  128.7806854
+                ],
+                "scl":[
+                  3.25,
+                  8,
+                  4
+                ]
+              }
+            ],
+            "tags":{}
+          },
+          "origin":"production",
+          "touchedAt":1777029938
+        },
         "freya_116":{
           "baseline":{
             "associatedOrganization":"freya_116",
@@ -7584,7 +7884,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776262672
+          "touchedAt":1776932031
         },
         "bcm_chinatown":{
           "baseline":{
@@ -7612,19 +7912,19 @@
             "parkingSpots":[
               {
                 "dir":[
-                  -0.0012733910739885,
-                  -0.99422530400034,
-                  -0.10730528114028
+                  0.069762159907395,
+                  0.99660954746126,
+                  0.043619387365338
                 ],
                 "normal":[
-                  -0.00024414060519007,
-                  0.00032043454431197,
-                  0.99999991885853
+                  -0.0011520376930175,
+                  -0.00045013393303334,
+                  0.99999923509401
                 ],
                 "pos":[
-                  -819.75897216797,
-                  607.46112060547,
-                  117.01424872875
+                  -819.73773193359,
+                  604.16796875,
+                  117.01389503479
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -7632,19 +7932,59 @@
               },
               {
                 "dir":[
-                  -0.99943679043454,
-                  0.018958380751618,
-                  0.02768901813305
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
                 ],
                 "normal":[
-                  -1.5258789058947e-05,
-                  -1.5258789058947e-05,
+                  3.0517578102796e-05,
+                  2.2888183577097e-05,
+                  0.9999999992724
+                ],
+                "pos":[
+                  -809.13513183594,
+                  605.23791503906,
+                  117.01305401325
+                ],
+                "tags":{
+                  "ignoreOthers":true
+                }
+              },
+              {
+                "dir":[
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
+                ],
+                "normal":[
+                  7.6293945308059e-06,
+                  7.6293945308059e-06,
+                  0.99999999994179
+                ],
+                "pos":[
+                  -809.20123291016,
+                  608.15197753906,
+                  117.01303070784
+                ],
+                "tags":{
+                  "ignoreOthers":true
+                }
+              },
+              {
+                "dir":[
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
+                ],
+                "normal":[
+                  1.5258789058947e-05,
+                  1.5258789058947e-05,
                   0.99999999976717
                 ],
                 "pos":[
-                  -807.91125488281,
-                  605.55059814453,
-                  117.01303631067
+                  -809.26666259766,
+                  610.92144775391,
+                  117.0130084157
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -7652,29 +7992,9 @@
               },
               {
                 "dir":[
-                  -0.99943679043454,
-                  0.018958380751618,
-                  0.02768901813305
-                ],
-                "normal":[
-                  2.288818358176e-05,
-                  2.288818358176e-05,
-                  0.99999999947613
-                ],
-                "pos":[
-                  -807.89654541016,
-                  608.30108642578,
-                  117.01302886009
-                ],
-                "tags":{
-                  "ignoreOthers":true
-                }
-              },
-              {
-                "dir":[
-                  -0.99907807251846,
-                  -0.0070903701843819,
-                  0.042340662057382
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
                 ],
                 "normal":[
                   0,
@@ -7682,9 +8002,9 @@
                   1
                 ],
                 "pos":[
-                  -807.81622314453,
-                  611.21783447266,
-                  117.01300466061
+                  -809.31988525391,
+                  613.38427734375,
+                  117.01300042868
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -7692,19 +8012,19 @@
               },
               {
                 "dir":[
-                  -0.99907807251846,
-                  -0.0070903701843819,
-                  0.042340662057382
+                  -0.1222998284959,
+                  -0.99164342129439,
+                  -0.04106186738845
                 ],
                 "normal":[
-                  0,
-                  0,
-                  1
+                  0.0014038071277907,
+                  0.0003433223953836,
+                  0.9999989557271
                 ],
                 "pos":[
-                  -807.82110595703,
-                  613.60681152344,
-                  117.01300048828
+                  -814.72430419922,
+                  608.22125244141,
+                  117.01504397392
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -7712,19 +8032,19 @@
               },
               {
                 "dir":[
-                  0.066130132189806,
-                  0.99737860071013,
-                  -0.029372307741538
+                  0.13411548326277,
+                  0.98880122915295,
+                  -0.065461182198358
                 ],
                 "normal":[
-                  0.00011444091709945,
-                  -4.5776366839778e-05,
-                  0.9999999924039
+                  0.00012969970593657,
+                  7.6293944668571e-06,
+                  0.99999999155989
                 ],
                 "pos":[
-                  -818.92779541016,
-                  615.77380371094,
-                  117.01362580061
+                  -819.36511230469,
+                  611.60943603516,
+                  117.01356118917
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -7732,19 +8052,19 @@
               },
               {
                 "dir":[
-                  0.066130132189806,
-                  0.99737860071013,
-                  -0.029372307741538
+                  0.11819508429879,
+                  0.99256775744811,
+                  0.028968412487124
                 ],
                 "normal":[
-                  0.00065612757389417,
-                  0.00080871538177654,
-                  0.99999945773787
+                  -1.5258789006989e-05,
+                  -8.3923339538439e-05,
+                  0.99999999636202
                 ],
                 "pos":[
-                  -816.67443847656,
-                  620.49005126953,
-                  117.01246142387
+                  -816.78009033203,
+                  616.12445068359,
+                  117.01349359751
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -7752,22 +8072,24 @@
               },
               {
                 "dir":[
-                  -0.99702470958534,
-                  0.069836216764182,
-                  -0.032628688363684
+                  -0.081691221685047,
+                  -0.98541082194886,
+                  -0.14930524533881
                 ],
                 "normal":[
-                  -0.00069427410198314,
-                  0.0013504012752859,
-                  0.99999884719927
+                  -0.00027465817932804,
+                  0.00031280514867916,
+                  0.99999991335791
                 ],
                 "pos":[
-                  -820.21826171875,
-                  625.72943115234,
-                  117.00678139925
+                  -815.73809814453,
+                  611.24554443359,
+                  117.01402562857
                 ],
                 "tags":{
-                  "ignoreOthers":true
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
                 }
               }
             ],
@@ -8427,19 +8749,19 @@
             "parkingSpots":[
               {
                 "dir":[
-                  -0.0012733910739885,
-                  -0.99422530400034,
-                  -0.10730528114028
+                  0.069762159907395,
+                  0.99660954746126,
+                  0.043619387365338
                 ],
                 "normal":[
-                  -0.00024414060519007,
-                  0.00032043454431197,
-                  0.99999991885853
+                  -0.0011520376930175,
+                  -0.00045013393303334,
+                  0.99999923509401
                 ],
                 "pos":[
-                  -819.75897216797,
-                  607.46112060547,
-                  117.01424872875
+                  -819.73773193359,
+                  604.16796875,
+                  117.01389503479
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -8447,19 +8769,59 @@
               },
               {
                 "dir":[
-                  -0.99943679043454,
-                  0.018958380751618,
-                  0.02768901813305
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
                 ],
                 "normal":[
-                  -1.5258789058947e-05,
-                  -1.5258789058947e-05,
+                  3.0517578102796e-05,
+                  2.2888183577097e-05,
+                  0.9999999992724
+                ],
+                "pos":[
+                  -809.13513183594,
+                  605.23791503906,
+                  117.01305401325
+                ],
+                "tags":{
+                  "ignoreOthers":true
+                }
+              },
+              {
+                "dir":[
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
+                ],
+                "normal":[
+                  7.6293945308059e-06,
+                  7.6293945308059e-06,
+                  0.99999999994179
+                ],
+                "pos":[
+                  -809.20123291016,
+                  608.15197753906,
+                  117.01303070784
+                ],
+                "tags":{
+                  "ignoreOthers":true
+                }
+              },
+              {
+                "dir":[
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
+                ],
+                "normal":[
+                  1.5258789058947e-05,
+                  1.5258789058947e-05,
                   0.99999999976717
                 ],
                 "pos":[
-                  -807.91125488281,
-                  605.55059814453,
-                  117.01303631067
+                  -809.26666259766,
+                  610.92144775391,
+                  117.0130084157
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -8467,29 +8829,9 @@
               },
               {
                 "dir":[
-                  -0.99943679043454,
-                  0.018958380751618,
-                  0.02768901813305
-                ],
-                "normal":[
-                  2.288818358176e-05,
-                  2.288818358176e-05,
-                  0.99999999947613
-                ],
-                "pos":[
-                  -807.89654541016,
-                  608.30108642578,
-                  117.01302886009
-                ],
-                "tags":{
-                  "ignoreOthers":true
-                }
-              },
-              {
-                "dir":[
-                  -0.99907807251846,
-                  -0.0070903701843819,
-                  0.042340662057382
+                  0.99699214341257,
+                  0.029633973704185,
+                  -0.071613501353472
                 ],
                 "normal":[
                   0,
@@ -8497,9 +8839,9 @@
                   1
                 ],
                 "pos":[
-                  -807.81622314453,
-                  611.21783447266,
-                  117.01300466061
+                  -809.31988525391,
+                  613.38427734375,
+                  117.01300042868
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -8507,19 +8849,19 @@
               },
               {
                 "dir":[
-                  -0.99907807251846,
-                  -0.0070903701843819,
-                  0.042340662057382
+                  -0.1222998284959,
+                  -0.99164342129439,
+                  -0.04106186738845
                 ],
                 "normal":[
-                  0,
-                  0,
-                  1
+                  0.0014038071277907,
+                  0.0003433223953836,
+                  0.9999989557271
                 ],
                 "pos":[
-                  -807.82110595703,
-                  613.60681152344,
-                  117.01300048828
+                  -814.72430419922,
+                  608.22125244141,
+                  117.01504397392
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -8527,19 +8869,19 @@
               },
               {
                 "dir":[
-                  0.066130132189806,
-                  0.99737860071013,
-                  -0.029372307741538
+                  0.13411548326277,
+                  0.98880122915295,
+                  -0.065461182198358
                 ],
                 "normal":[
-                  0.00011444091709945,
-                  -4.5776366839778e-05,
-                  0.9999999924039
+                  0.00012969970593657,
+                  7.6293944668571e-06,
+                  0.99999999155989
                 ],
                 "pos":[
-                  -818.92779541016,
-                  615.77380371094,
-                  117.01362580061
+                  -819.36511230469,
+                  611.60943603516,
+                  117.01356118917
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -8547,19 +8889,19 @@
               },
               {
                 "dir":[
-                  0.066130132189806,
-                  0.99737860071013,
-                  -0.029372307741538
+                  0.11819508429879,
+                  0.99256775744811,
+                  0.028968412487124
                 ],
                 "normal":[
-                  0.00065612757389417,
-                  0.00080871538177654,
-                  0.99999945773787
+                  -1.5258789006989e-05,
+                  -8.3923339538439e-05,
+                  0.99999999636202
                 ],
                 "pos":[
-                  -816.67443847656,
-                  620.49005126953,
-                  117.01246142387
+                  -816.78009033203,
+                  616.12445068359,
+                  117.01349359751
                 ],
                 "tags":{
                   "ignoreOthers":true
@@ -8567,22 +8909,24 @@
               },
               {
                 "dir":[
-                  -0.99702470958534,
-                  0.069836216764182,
-                  -0.032628688363684
+                  -0.081691221685047,
+                  -0.98541082194886,
+                  -0.14930524533881
                 ],
                 "normal":[
-                  -0.00069427410198314,
-                  0.0013504012752859,
-                  0.99999884719927
+                  -0.00027465817932804,
+                  0.00031280514867916,
+                  0.99999991335791
                 ],
                 "pos":[
-                  -820.21826171875,
-                  625.72943115234,
-                  117.00678139925
+                  -815.73809814453,
+                  611.24554443359,
+                  117.01402562857
                 ],
                 "tags":{
-                  "ignoreOthers":true
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
                 }
               }
             ],
@@ -9217,7 +9561,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776264022
+          "touchedAt":1777032828
         },
         "bcm_culdesac":{
           "baseline":{
@@ -11565,6 +11909,28 @@
                   "ignoreOthers":true,
                   "perfect":true
                 }
+              },
+              {
+                "dir":[
+                  -0.98725438944782,
+                  -0.13956542960913,
+                  -0.076487001340351
+                ],
+                "normal":[
+                  -0.00034332242063333,
+                  0.0013504015211578,
+                  0.99999902927225
+                ],
+                "pos":[
+                  -819.87609863281,
+                  625.28588867188,
+                  117.00761806965
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
               }
             ],
             "props":[
@@ -12238,6 +12604,28 @@
                   "ignoreOthers":true,
                   "perfect":true
                 }
+              },
+              {
+                "dir":[
+                  -0.98725438944782,
+                  -0.13956542960913,
+                  -0.076487001340351
+                ],
+                "normal":[
+                  -0.00034332242063333,
+                  0.0013504015211578,
+                  0.99999902927225
+                ],
+                "pos":[
+                  -819.87609863281,
+                  625.28588867188,
+                  117.00761806965
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
               }
             ],
             "props":[
@@ -12823,7 +13211,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776262672
+          "touchedAt":1777102103
         },
         "bcm_trackside":{
           "baseline":{
@@ -15080,7 +15468,7 @@
             "vanillaOverride":false
           },
           "origin":"production",
-          "touchedAt":1776408330
+          "touchedAt":1776867795
         },
         "trilobite_city_KEVee":{
           "baseline":{
@@ -15592,7 +15980,7 @@
             "vanillaOverride":false
           },
           "origin":"production",
-          "touchedAt":1776408329
+          "touchedAt":1776867795
         },
         "tyranos_island_KEVee":{
           "baseline":{
@@ -15637,12 +16025,196 @@
         }
       }
     },
+    "props":{
+      "deleted":{},
+      "items":{
+        "bcm_props":{
+          "baseline":{
+            "added":[
+              {
+                "persistentId":"bcm-props-1776883523-7191",
+                "position":[
+                  -890.91162109375,
+                  -520.54650878906,
+                  104.49932861328
+                ],
+                "rotationMatrix":[
+                  -0.71933980033865,
+                  0.694658370459,
+                  0,
+                  -0.694658370459,
+                  -0.71933980033865,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/s_toll_booth_center.dae"
+              }
+            ],
+            "id":"bcm_props",
+            "removed":[
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -902.55651855469,
+                  -528.72253417969,
+                  104.56983184814
+                ],
+                "name":"",
+                "persistentId":"ff8492ef-b077-46ef-a4f3-bdb89bbdeddb",
+                "removedAt":"2026-04-22T18:39:10Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/excavator.dae"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -933.50695800781,
+                  -563.54998779297,
+                  105.01937866211
+                ],
+                "name":"",
+                "persistentId":"",
+                "removedAt":"2026-04-22T18:39:15Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/boom_lift1.dae"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -953.33380126953,
+                  -573.46978759766,
+                  104.9372177124
+                ],
+                "name":"",
+                "persistentId":"59fa0ac2-d338-46df-8b77-bbf253860002",
+                "removedAt":"2026-04-22T18:39:17Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/boom_lift2.dae"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -894.92938232422,
+                  -524.07507324219,
+                  104.45739746094
+                ],
+                "name":"",
+                "persistentId":"",
+                "removedAt":"2026-04-22T18:39:25Z",
+                "shapeName":"levels/west_coast_usa/art/shapes/objects/construction_sign_big_b.DAE"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -862.10437011719,
+                  -489.1789855957,
+                  103.96824645996
+                ],
+                "name":"",
+                "persistentId":"24afb746-6e22-4a4b-adcc-91761a64c69c",
+                "removedAt":"2026-04-22T18:40:26Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/arrowboard_R.dae"
+              }
+            ]
+          },
+          "conflicted":false,
+          "edited":{
+            "added":[
+              {
+                "persistentId":"bcm-props-1776883523-7191",
+                "position":[
+                  -890.91162109375,
+                  -520.54650878906,
+                  104.49932861328
+                ],
+                "rotationMatrix":[
+                  -0.71933980033865,
+                  0.694658370459,
+                  0,
+                  -0.694658370459,
+                  -0.71933980033865,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/s_toll_booth_center.dae"
+              }
+            ],
+            "id":"bcm_props",
+            "removed":[
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -902.55651855469,
+                  -528.72253417969,
+                  104.56983184814
+                ],
+                "name":"",
+                "persistentId":"ff8492ef-b077-46ef-a4f3-bdb89bbdeddb",
+                "removedAt":"2026-04-22T18:39:10Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/excavator.dae"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -933.50695800781,
+                  -563.54998779297,
+                  105.01937866211
+                ],
+                "name":"",
+                "persistentId":"",
+                "removedAt":"2026-04-22T18:39:15Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/boom_lift1.dae"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -953.33380126953,
+                  -573.46978759766,
+                  104.9372177124
+                ],
+                "name":"",
+                "persistentId":"59fa0ac2-d338-46df-8b77-bbf253860002",
+                "removedAt":"2026-04-22T18:39:17Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/boom_lift2.dae"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -894.92938232422,
+                  -524.07507324219,
+                  104.45739746094
+                ],
+                "name":"",
+                "persistentId":"",
+                "removedAt":"2026-04-22T18:39:25Z",
+                "shapeName":"levels/west_coast_usa/art/shapes/objects/construction_sign_big_b.DAE"
+              },
+              {
+                "className":"TSStatic",
+                "lastKnownPosition":[
+                  -862.10437011719,
+                  -489.1789855957,
+                  103.96824645996
+                ],
+                "name":"",
+                "persistentId":"24afb746-6e22-4a4b-adcc-91761a64c69c",
+                "removedAt":"2026-04-22T18:40:26Z",
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/arrowboard_R.dae"
+              }
+            ]
+          },
+          "origin":"production",
+          "touchedAt":1776883530
+        }
+      }
+    },
     "radarSpots":{
       "deleted":{},
       "items":{
         "bcmRadar_1":{
           "baseline":{
-            "heading":-2.56467523716,
+            "heading":-4.1354715638949,
             "id":"bcmRadar_1",
             "lineEnd":[
               -598.3681640625,
@@ -15664,7 +16236,7 @@
           },
           "conflicted":false,
           "edited":{
-            "heading":-2.56467523716,
+            "heading":-4.1354715638949,
             "id":"bcmRadar_1",
             "lineEnd":[
               -598.3681640625,
@@ -15685,11 +16257,11 @@
             "speedLimit":50
           },
           "origin":"production",
-          "touchedAt":1776262672
+          "touchedAt":1777102099
         },
         "bcmRadar_2":{
           "baseline":{
-            "heading":-1.5260471576197,
+            "heading":-3.0968434844146,
             "id":"bcmRadar_2",
             "lineEnd":[
               -504.91888427734,
@@ -15711,7 +16283,7 @@
           },
           "conflicted":false,
           "edited":{
-            "heading":-1.5260471576197,
+            "heading":-3.0968434844146,
             "id":"bcmRadar_2",
             "lineEnd":[
               -504.91888427734,
@@ -15732,58 +16304,11 @@
             "speedLimit":127
           },
           "origin":"production",
-          "touchedAt":1776262672
-        },
-        "bcmRadar_3":{
-          "baseline":{
-            "heading":0.17764407665597,
-            "id":"bcmRadar_3",
-            "lineEnd":[
-              134.26480102539,
-              1089.2139892578,
-              106.0520195365
-            ],
-            "lineStart":[
-              116.09075927734,
-              1085.6558837891,
-              106.05243694782
-            ],
-            "name":"puente",
-            "position":[
-              125.44165039063,
-              1086.4982910156,
-              106.0436026454
-            ],
-            "speedLimit":127
-          },
-          "conflicted":false,
-          "edited":{
-            "heading":0.17764407665597,
-            "id":"bcmRadar_3",
-            "lineEnd":[
-              134.26480102539,
-              1089.2139892578,
-              106.0520195365
-            ],
-            "lineStart":[
-              116.09075927734,
-              1085.6558837891,
-              106.05243694782
-            ],
-            "name":"puente",
-            "position":[
-              125.44165039063,
-              1086.4982910156,
-              106.0436026454
-            ],
-            "speedLimit":127
-          },
-          "origin":"production",
-          "touchedAt":1776262672
+          "touchedAt":1777102099
         },
         "bcmRadar_4":{
           "baseline":{
-            "heading":0.012205047228242,
+            "heading":-1.5585912795667,
             "id":"bcmRadar_4",
             "lineEnd":[
               -970.32769775391,
@@ -15805,7 +16330,7 @@
           },
           "conflicted":false,
           "edited":{
-            "heading":0.012205047228242,
+            "heading":-1.5585912795667,
             "id":"bcmRadar_4",
             "lineEnd":[
               -970.32769775391,
@@ -15826,7 +16351,148 @@
             "speedLimit":50
           },
           "origin":"production",
-          "touchedAt":1776262672
+          "touchedAt":1777102099
+        },
+        "wc_bcmRadar_1":{
+          "baseline":{
+            "heading":-0.21723949376917,
+            "id":"wc_bcmRadar_1",
+            "lineEnd":[
+              123.0846862793,
+              -959.97137451172,
+              125.95270967484
+            ],
+            "lineStart":[
+              119.26366424561,
+              -969.89666748047,
+              126.29197210073
+            ],
+            "name":"highway2",
+            "position":[
+              99.759155273438,
+              -974.31744384766,
+              126.27914220095
+            ],
+            "speedLimit":120
+          },
+          "conflicted":false,
+          "edited":{
+            "heading":-0.21723949376917,
+            "id":"wc_bcmRadar_1",
+            "lineEnd":[
+              123.0846862793,
+              -959.97137451172,
+              125.95270967484
+            ],
+            "lineStart":[
+              119.26366424561,
+              -969.89666748047,
+              126.29197210073
+            ],
+            "name":"highway2",
+            "position":[
+              99.759155273438,
+              -974.31744384766,
+              126.27914220095
+            ],
+            "speedLimit":120
+          },
+          "origin":"new",
+          "touchedAt":1777052975
+        },
+        "wc_bcmRadar_2":{
+          "baseline":{
+            "heading":-0.78272617141534,
+            "id":"wc_bcmRadar_2",
+            "lineEnd":[
+              -575.6865234375,
+              -526.39337158203,
+              116.83587515354
+            ],
+            "lineStart":[
+              -578.28344726563,
+              -538.02099609375,
+              116.3861168623
+            ],
+            "name":"",
+            "position":[
+              -585.89093017578,
+              -518.15875244141,
+              116.76518684626
+            ],
+            "speedLimit":80
+          },
+          "conflicted":false,
+          "edited":{
+            "heading":-0.78272617141534,
+            "id":"wc_bcmRadar_2",
+            "lineEnd":[
+              -575.6865234375,
+              -526.39337158203,
+              116.83587515354
+            ],
+            "lineStart":[
+              -578.28344726563,
+              -538.02099609375,
+              116.3861168623
+            ],
+            "name":"",
+            "position":[
+              -585.89093017578,
+              -518.15875244141,
+              116.76518684626
+            ],
+            "speedLimit":80
+          },
+          "origin":"new",
+          "touchedAt":1777052929
+        },
+        "wc_bcmRadar_3":{
+          "baseline":{
+            "heading":1.4000989464123,
+            "id":"wc_bcmRadar_3",
+            "lineEnd":[
+              960.92236328125,
+              -46.315650939941,
+              148.19400525093
+            ],
+            "lineStart":[
+              982.34301757813,
+              -51.948299407959,
+              148.24130964279
+            ],
+            "name":"highway3",
+            "position":[
+              987.95074462891,
+              -65.623435974121,
+              148.8419470787
+            ],
+            "speedLimit":120
+          },
+          "conflicted":false,
+          "edited":{
+            "heading":1.4000989464123,
+            "id":"wc_bcmRadar_3",
+            "lineEnd":[
+              960.92236328125,
+              -46.315650939941,
+              148.19400525093
+            ],
+            "lineStart":[
+              982.34301757813,
+              -51.948299407959,
+              148.24130964279
+            ],
+            "name":"highway3",
+            "position":[
+              987.95074462891,
+              -65.623435974121,
+              148.8419470787
+            ],
+            "speedLimit":120
+          },
+          "origin":"new",
+          "touchedAt":1777053110
         }
       }
     },
@@ -15851,6 +16517,7 @@
             "id":"wc_port",
             "name":"West Coast Port",
             "nodeType":"port",
+            "preview":"",
             "rotation":[
               0,
               0,
@@ -15881,6 +16548,7 @@
             "id":"wc_port",
             "name":"West Coast Port",
             "nodeType":"port",
+            "preview":"",
             "rotation":[
               0,
               0,
@@ -15894,14 +16562,14 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776262672
+          "touchedAt":1777030983
         },
         "wc_road_1":{
           "baseline":{
             "center":[
-              -889.70336914063,
-              -515.11602783203,
-              104.67040252686
+              -887.25714111328,
+              -515.04937744141,
+              104.39493966103
             ],
             "connections":[
               {
@@ -15920,11 +16588,12 @@
             "id":"wc_road_1",
             "name":"West Coast highway Exit",
             "nodeType":"road",
+            "preview":"",
             "rotation":[
               0,
               0,
-              0.92831820960255,
-              -0.37178663467145
+              0.91133740099811,
+              -0.4116602258441
             ],
             "triggerSize":[
               8,
@@ -15935,9 +16604,9 @@
           "conflicted":false,
           "edited":{
             "center":[
-              -889.70336914063,
-              -515.11602783203,
-              104.67040252686
+              -887.25714111328,
+              -515.04937744141,
+              104.39493966103
             ],
             "connections":[
               {
@@ -15956,11 +16625,12 @@
             "id":"wc_road_1",
             "name":"West Coast highway Exit",
             "nodeType":"road",
+            "preview":"",
             "rotation":[
               0,
               0,
-              0.92831820960255,
-              -0.37178663467145
+              0.91133740099811,
+              -0.4116602258441
             ],
             "triggerSize":[
               8,
@@ -15969,13 +16639,13 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776262672
+          "touchedAt":1777030983
         }
       }
     }
   },
   "lastExport":{
-    "timestamp":1776408337
+    "timestamp":1777102144
   },
   "schemaLevel":"west_coast_usa",
   "version":2

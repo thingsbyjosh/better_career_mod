@@ -1,4 +1,4 @@
-local M = {}
+﻿local M = {}
 
 local ourModName = "better_career_mod"
 local ourModId = "bcm"
@@ -29,7 +29,7 @@ loadExtensions = function()
     bcm_overrideManager.forceReloadOverride("freeroam_facilities")
   end
 
-  -- gameplay_police: no override needed — BCM uses vanilla pursuit logic
+  -- gameplay_police: no override needed â€” BCM uses vanilla pursuit logic
   -- bcm_police handles pool spawn, damage tracking, and escalation externally
 
   -- Force-reload painting if career is active (painting loaded with vanilla code at career start)
@@ -47,6 +47,9 @@ unloadAllExtensions = function()
   extensions.unload("career_saveSystem")
   extensions.unload("bcm_overrideManager")
   extensions.unload("bcm_settings")
+  extensions.unload("bcm_bigMapPoiDebounce")
+  extensions.unload("bcm_debugRawPoisTrace")
+  extensions.unload("bcm_difficulty")
   extensions.unload("bcm_phone")
   extensions.unload("bcm_timeSystem")
   extensions.unload("bcm_notifications")
@@ -87,6 +90,7 @@ unloadAllExtensions = function()
   extensions.unload("bcm_marketplaceApp")
   extensions.unload("bcm_garageManagerApp")
   extensions.unload("bcm_garages")
+  extensions.unload("bcm_parkingProtector")
   extensions.unload("bcm_properties")
   extensions.unload("bcm_police")
   extensions.unload("bcm_fines")
@@ -99,13 +103,14 @@ unloadAllExtensions = function()
   extensions.unload("bcm_fixdProApp")
   extensions.unload("bcm_partsMetadata")
   extensions.unload("bcm_partsOrders")
-  -- Phase 97: Map switch and transit journal modules
+  -- Map switch and transit journal modules
   extensions.unload("bcm_multimap")
   extensions.unload("bcm_transitJournal")
-  -- Phase 100: Travel UI data enrichment bridge
+  -- Travel UI data enrichment bridge
   extensions.unload("bcm_multimapApp")
-  -- Phase 98: Trailer re-coupling prototype
+  -- Trailer re-coupling prototype
   extensions.unload("bcm_trailerCoupling")
+  extensions.unload("bcm_propsRemover")
 end
 
 -- Remove stale user-space level overrides that persist from World Editor saves.
@@ -214,12 +219,23 @@ startup = function()
     loadExtensions()
   end
 
-  -- Note: loadManualUnloadExtensions() is NOT called here — it was already called
+  -- Note: loadManualUnloadExtensions is NOT called here â€” it was already called
   -- in modScript.lua and bcm_overrideManager is loaded explicitly above.
   -- Calling it again would cause "Failed to set unload mode" errors.
 
   -- Load global settings BEFORE time/weather so modules receive settings on activation
   extensions.load("bcm_settings")
+
+  -- Suppress the redundant rawPois.clear that vanilla bigMapPoiProvider fires
+  -- right after bigmap open, which caused a second visible stutter while career
+  -- delivery POIs rebuilt for the second time within ~150ms.
+  extensions.load("bcm_bigMapPoiDebounce")
+
+  -- TEMPORARY: per-extension POI count + timing instrumentation. DO NOT ship.
+  extensions.load("bcm_debugRawPoisTrace")
+
+  -- Load difficulty module (depends on nothing, consumed by PlanEx and future income sources)
+  extensions.load("bcm_difficulty")
 
   -- Load time system (foundation for all v1.3 features)
   extensions.load("bcm_timeSystem")
@@ -264,12 +280,13 @@ startup = function()
   extensions.load("bcm_weatherForecast")
   extensions.load("bcm_weatherApp")
 
-  -- Load breaking news engine (event-driven FBT articles — Phase 30)
+  -- Load breaking news engine (event-driven FBT articles â€” )
   extensions.load("bcm_breakingNews")
 
   -- Load property system (must load before garages feature layer)
   extensions.load("bcm_properties")
   extensions.load("bcm_garages")
+  extensions.load("bcm_parkingProtector")
 
   -- Load parts system (sidecar metadata + orders + shop app + installer app)
   extensions.load("bcm_partsMetadata")
@@ -292,7 +309,7 @@ startup = function()
   -- Load real estate app (depends on garages + properties + banking)
   extensions.load("bcm_realEstateApp")
 
-  -- Phase 102: Load rentals module (depends on properties + banking + timeSystem + garages + multimapApp)
+  -- Load rentals module (depends on properties + banking + timeSystem + garages + multimapApp)
   extensions.load("bcm_rentals")
 
   -- Load marketplace app (depends on timeSystem + career marketplace module)
@@ -304,20 +321,20 @@ startup = function()
   -- Load negotiation extension (depends on marketplace + marketplaceApp)
   extensions.load("bcm_negotiation")
 
-  -- Load defects extension (Phase 52: test drive discovery, inspector NPC, post-purchase reveal)
+  -- Load defects extension
   extensions.load("bcm_defects")
 
-  -- Load police orchestrator (Phase 54: pursuit hooks, stuck detection, debug commands)
+  -- Load police orchestrator
   extensions.load("bcm_police")
 
-  -- Load heat system (Phase 55: persistent heat accumulator, depends on police events)
+  -- Load heat system
   extensions.load("bcm_heatSystem")
   extensions.load("bcm_heatApp")
 
-  -- Load fine system (Phase 56: fine formula, ledger, bank debit, depends on police + banking)
+  -- Load fine system
   extensions.load("bcm_fines")
 
-  -- Load police HUD streaming (Phase 57: pursuit overlay data feed)
+  -- Load police HUD streaming
   extensions.load("bcm_policeHud")
 
   -- Load vanilla gameplay_police explicitly: playerDriving sets policeAmount=0
@@ -325,44 +342,48 @@ startup = function()
   -- We must load it so vanilla pursuit logic (setPursuitMode, arrest/evade) is available.
   extensions.load("gameplay_police")
 
-  -- Load police damage tracking (Phase 59.1: damage cost + anonymous benefactor)
+  -- Load police damage tracking
   extensions.load("bcm_policeDamage")
 
-  -- Load contract pool (Phase 64: trucking contract data layer, depends on timeSystem)
+  -- Load contract pool
   extensions.load("bcm_contracts")
 
   -- Load virtual cargo system (POC: inject cargo capacity into vehicles without native jbeam cargo)
   extensions.load("bcm_virtualCargo")
 
-  -- Load PlanEx dispatch (Phase 73: pack-based delivery system, depends on timeSystem + contracts patterns)
+  -- Load PlanEx dispatch
   extensions.load("bcm_planex")
 
-  -- Load PlanEx app bridge (Phase 75: Vue-to-Lua bridge for PlanEx IE site)
+  -- Load PlanEx app bridge
   extensions.load("bcm_planexApp")
 
-  -- Load multi-map system (Phase 97: travel graph, triggers, transit journal; depends on banking, planex, heatSystem)
-  -- MUST survive level switches — manual unload mode prevents BeamNG from unloading on startFreeroam
+  -- Load multi-map system
+  -- MUST survive level switches â€” manual unload mode prevents BeamNG from unloading on startFreeroam
   extensions.load("bcm_multimap")
   setExtensionUnloadMode("bcm_multimap", "manual")
   extensions.load("bcm_transitJournal")
   setExtensionUnloadMode("bcm_transitJournal", "manual")
 
-  -- Phase 100: Travel UI data enrichment bridge (depends on multimap + banking + garages)
+  -- Travel UI data enrichment bridge (depends on multimap + banking + garages)
   extensions.load("bcm_multimapApp")
   setExtensionUnloadMode("bcm_multimapApp", "manual")
 
-  -- Phase 98: Trailer re-coupling prototype (must survive level switches)
+  -- Trailer re-coupling prototype (must survive level switches)
   extensions.load("bcm_trailerCoupling")
   setExtensionUnloadMode("bcm_trailerCoupling", "manual")
 
-  -- Load tutorial FSM (Phase 79: first-run tutorial skeleton, depends on banking, time, sleepManager)
+  -- Load props remover (blacklist of vanilla TSStatic per level)
+  extensions.load("bcm_propsRemover")
+  setExtensionUnloadMode("bcm_propsRemover", "manual")
+
+  -- Load tutorial FSM
   extensions.load("bcm_tutorial")
 
 
-  -- Load dev tool (always available, activates only via bcm_devtool.start())
+  -- Load dev tool (always available, activates only via bcm_devtool.start)
   extensions.load("bcm_devtool")
 
-  -- Load dev tool v2 (parallel rework, activates via bcm_devtoolV2.start())
+  -- Load dev tool v2 (parallel rework, activates via bcm_devtoolV2.start)
   extensions.load("bcm_devtoolV2")
 
   -- Load dev tool v2 wipCore (generic WIP model shared by all v2 modules)
@@ -377,6 +398,7 @@ startup = function()
   extensions.load("bcm_devtoolV2_cameras")
   extensions.load("bcm_devtoolV2_radar")
   extensions.load("bcm_devtoolV2_gas")
+  extensions.load("bcm_devtoolV2_props")
 
   -- Load phone apps
   extensions.load("bcm_clockApp")
@@ -386,6 +408,19 @@ startup = function()
   extensions.load("bcm_walletApp")
   extensions.load("bcm_contactsApp")
   extensions.load("bcm_chatApp")
+
+  -- Force BeamNG to re-scan input actions. Without this, BCM's JSONs at
+  -- lua/ge/extensions/core/input/actions/ are not in the core_input_actions
+  -- cache at boot (cache was snapshotted before mod activated), so keyboard
+  -- bindings for bcm_togglePhone, bcm_devtoolV2_commit, etc. get skipped.
+  if core_input_actions and core_input_actions.onFileChanged then
+    core_input_actions.onFileChanged("/lua/ge/extensions/core/input/actions/bcm_phone.json")
+    core_input_actions.onFileChanged("/lua/ge/extensions/core/input/actions/bcm_devtoolV2.json")
+  end
+  -- And force bindings to be re-applied with the now-populated action table.
+  if core_input_bindings and core_input_bindings.onFileChanged then
+    core_input_bindings.onFileChanged("/lua/ge/extensions/core/input/actions/bcm_devtoolV2.json")
+  end
 
   log('I', 'bcm_extensionManager', 'Better Career Mod initialized')
 end

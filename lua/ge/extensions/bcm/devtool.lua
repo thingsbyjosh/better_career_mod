@@ -1,6 +1,6 @@
--- BCM Garage Dev Tool
+﻿-- BCM Garage Dev Tool
 -- Standalone extension: NOT loaded via career extensionManager.
--- Activation: extensions.load("bcm_devtool"); bcm_devtool.start()
+-- Activation: extensions.load("bcm_devtool"); bcm_devtool.start
 -- Works in career AND freeroam. Console-activatable dev tool for placing garage locations.
 
 local M = {}
@@ -29,7 +29,7 @@ local updateGarageField
 local updateParkingSpotTag
 local loadWip
 local saveWip
--- discardWip removed (dangerous — WIP is single source of truth)
+-- discardWip removed (dangerous â€” WIP is single source of truth)
 local loadExistingGarages
 local exportAll
 local triggerUIUpdate
@@ -244,7 +244,7 @@ local garages = {}                -- array of garage WIP objects
 local selectedGarageIdx = nil     -- 1-based index into garages
 local wizardStep = 0              -- current wizard step for selected garage
 local deletedGarageIds = {}       -- set of existing garage IDs that were explicitly deleted
-local wipFilePath = nil           -- resolved at start()
+local wipFilePath = nil           -- resolved at start
 local lastPlaceTime = 0           -- debounce for marker placement
 local customExportPath = nil      -- override for export base path (set via setExportPath)
 local spawnedPropIds = {}          -- IDs of live-spawned TSStatic preview objects
@@ -295,7 +295,7 @@ local knownTravelNodes = {}         -- {nodeId = mapName} from all maps' bcm_tra
 local gasStations = {}
 local selectedGasStationIdx = nil
 local gasStationWizardStep = 0
-local vanillaGasStations = {}  -- loaded from facilities.facilities.json for D-13(a)
+local vanillaGasStations = {}  -- loaded from facilities.facilities.json for
 
 -- Organization cache (loaded once from vanilla files)
 local cachedOrganizations
@@ -782,7 +782,7 @@ placeMarkerFromUI = function()
     table.insert(garage.zoneVertices, getPlacementPosition())
     log('I', logTag, 'Placed zone vertex #' .. #garage.zoneVertices .. ' for ' .. (garage.name or garage.id))
   elseif wizardStep == 4 then
-    -- Parking spot — drop to terrain and capture surface normal for ground alignment
+    -- Parking spot â€” drop to terrain and capture surface normal for ground alignment
     local rawPos = getPlacementPosition()
     local droppedPos, surfaceNormal = dropToTerrain(rawPos)
     table.insert(garage.parkingSpots, {
@@ -1073,7 +1073,7 @@ saveWip = function()
 end
 
 -- ============================================================================
--- discardWip removed — WIP is single source of truth, deleting it destroys data
+-- discardWip removed â€” WIP is single source of truth, deleting it destroys data
 -- that only exists there (propsAnchor, propsAngle, images.preview, etc.)
 
 -- ============================================================================
@@ -1285,7 +1285,7 @@ validateGarage = function(garage)
 end
 
 -- (Delivery facility mode: goToDeliveryStep and adjustDeliveryMarkerZ defined here,
---  full CRUD/wizard/export/markers implemented in the Delivery section below.)
+-- full CRUD/wizard/export/markers implemented in the Delivery section below.)
 
 goToDeliveryStep = function(n)
   n = tonumber(n) or 0
@@ -1899,7 +1899,7 @@ exportAll = function()
   exportSitesJson(levelName, toExport)
   exportGaragesJson(levelName, toExport)
   exportGarageDeliveryReceiversJson(levelName, toExport)  -- bcm_garages.facilities.json (bcm_parts receivers)
-  -- NOTE: bcm_depots.facilities.json is written by exportAllDelivery(), not here
+  -- NOTE: bcm_depots.facilities.json is written by exportAllDelivery, not here
   exportItemsLevelJson(levelName, toExport)
 
   -- Clean stale userdata config files that could override mod versions
@@ -1986,12 +1986,12 @@ placeDeliveryMarkerFromUI = function()
   if not facility then return end
 
   if deliveryWizardStep == 2 then
-    -- Center marker — drop to terrain
+    -- Center marker â€” drop to terrain
     local cPos = dropToTerrain(getPlacementPosition())
     facility.center = cPos
     log('I', logTag, 'Placed delivery center for ' .. (facility.name ~= "" and facility.name or facility.id))
   elseif deliveryWizardStep == 3 then
-    -- Parking spot — drop to terrain with normal
+    -- Parking spot â€” drop to terrain with normal
     local sPos, sNormal = dropToTerrain(getPlacementPosition())
     table.insert(facility.parkingSpots, {
       pos = sPos,
@@ -2309,16 +2309,16 @@ validateDeliveryFacility = function(facility)
   -- Generator validations
   local gens = facility.logisticGenerators
   if not gens or (type(gens) == "table" and next(gens) == nil) then
-    table.insert(warnings, "No generators — vanilla delivery won't create any cargo here")
+    table.insert(warnings, "No generators â€” vanilla delivery won't create any cargo here")
   else
     if type(gens) == "table" then
       -- Check for decimal min/max
       for i, gen in ipairs(gens) do
         if gen.min and gen.min ~= math.floor(gen.min) then
-          table.insert(warnings, "Generator #" .. i .. ": min=" .. gen.min .. " is decimal — Lua truncates to " .. math.floor(gen.min))
+          table.insert(warnings, "Generator #" .. i .. ": min=" .. gen.min .. " is decimal â€” Lua truncates to " .. math.floor(gen.min))
         end
         if gen.max and gen.max ~= math.floor(gen.max) then
-          table.insert(warnings, "Generator #" .. i .. ": max=" .. gen.max .. " is decimal — Lua truncates to " .. math.floor(gen.max))
+          table.insert(warnings, "Generator #" .. i .. ": max=" .. gen.max .. " is decimal â€” Lua truncates to " .. math.floor(gen.max))
         end
         if gen.min and gen.max and gen.min > gen.max then
           table.insert(warnings, "Generator #" .. i .. ": min (" .. gen.min .. ") > max (" .. gen.max .. ")")
@@ -2363,7 +2363,7 @@ validateDeliveryFacility = function(facility)
         for _, lt in ipairs(spot.logisticTypesReceived or {}) do spotReceives[lt] = true end
       end
 
-      -- Veh/trailer types don't need local generators — they are destination-only
+      -- Veh/trailer types don't need local generators â€” they are destination-only
       -- (jobs created by vehOfferProvider/trailerOfferProvider at OTHER facilities)
       local NO_LOCAL_GEN_NEEDED = {}
       for k, _ in pairs(VEH_TYPES) do NO_LOCAL_GEN_NEEDED[k] = true end
@@ -2372,21 +2372,21 @@ validateDeliveryFacility = function(facility)
       -- Provides always needs a local generator (you're the origin)
       for lt, _ in pairs(spotProvides) do
         if not genTypes[lt] then
-          table.insert(warnings, "Spot provides '" .. lt .. "' but no generator handles it — cargo won't be created")
+          table.insert(warnings, "Spot provides '" .. lt .. "' but no generator handles it â€” cargo won't be created")
         end
       end
       -- Receives: veh/trailer types are destination-only (job created at origin facility)
       -- Parcel/material types need a local receiver generator to create demand
       for lt, _ in pairs(spotReceives) do
         if not genTypes[lt] and not NO_LOCAL_GEN_NEEDED[lt] then
-          table.insert(warnings, "Spot receives '" .. lt .. "' but no generator handles it — no demand will be created")
+          table.insert(warnings, "Spot receives '" .. lt .. "' but no generator handles it â€” no demand will be created")
         end
       end
 
       -- Check: generator types not in any spot
       for lt, _ in pairs(genTypes) do
         if not spotProvides[lt] and not spotReceives[lt] then
-          table.insert(warnings, "Generator creates '" .. lt .. "' but no spot provides or receives it — cargo has no pickup/dropoff")
+          table.insert(warnings, "Generator creates '" .. lt .. "' but no spot provides or receives it â€” cargo has no pickup/dropoff")
         end
       end
 
@@ -2402,10 +2402,10 @@ validateDeliveryFacility = function(facility)
         end
       end
       if hasProvider and not hasReceiver then
-        table.insert(warnings, "Has provider but no receiver — this facility creates cargo but never requests deliveries")
+        table.insert(warnings, "Has provider but no receiver â€” this facility creates cargo but never requests deliveries")
       end
       if hasReceiver and not hasProvider then
-        table.insert(warnings, "Has receiver but no provider — this facility requests deliveries but never creates cargo to send")
+        table.insert(warnings, "Has receiver but no provider â€” this facility requests deliveries but never creates cargo to send")
       end
     end
   end
@@ -2487,7 +2487,7 @@ cloneDeliveryFacilityConfig = function(sourceId, sourceMap)
     return
   end
 
-  -- Migrate legacy facilityType → tags (for exported facilities from old disk format)
+  -- Migrate legacy facilityType â†’ tags (for exported facilities from old disk format)
   if source.facilityType and not source.tags then
     if source.facilityType == "custom" or source.facilityType == "" then
       source.tags = {}
@@ -2827,7 +2827,7 @@ exportDeliveryFacilitiesJson = function(levelName, facilityList)
 
     local org = (f.associatedOrganization and f.associatedOrganization ~= "") and f.associatedOrganization or f.id
 
-    -- preview is a relative filename — image lives alongside the facilities JSON
+    -- preview is a relative filename â€” image lives alongside the facilities JSON
     local previewFilename = (f.images and f.images.preview and f.images.preview ~= "") and f.images.preview or ""
 
     local entry = {
@@ -2925,7 +2925,7 @@ exportAllDelivery = function()
 
   if #deliveryFacilities == 0 then
     -- No facilities: write empty files to clean up ghost data
-    log('I', logTag, 'exportAllDelivery: No facilities — writing empty export to clean up')
+    log('I', logTag, 'exportAllDelivery: No facilities â€” writing empty export to clean up')
     local facPath = getModLevelsPath(levelName) .. "/facilities/delivery/bcm_depots.facilities.json"
     writeJsonToMod(facPath, {deliveryProviders = setmetatable({}, {__jsontype = "array"})})
     local sitePath = getModLevelsPath(levelName) .. "/facilities/delivery/bcm_depots.sites.json"
@@ -2979,8 +2979,8 @@ spawnLiveProps = function(props)
       obj.useInstanceRenderData = true
       obj.canSave = false
 
-      -- Compute Z rotation from column-major rotationMatrix → quaternion
-      -- File convention: [cos(θ), sin(θ), 0, -sin(θ), cos(θ), ...]
+      -- Compute Z rotation from column-major rotationMatrix â†’ quaternion
+      -- File convention: [cos(Î¸), sin(Î¸), 0, -sin(Î¸), cos(Î¸),...]
       -- quatFromEuler convention is SIGN-INVERTED for Z rotations
       -- So we pass -theta to match the file's visual orientation
       local rot = prop.rotationMatrix
@@ -3014,12 +3014,12 @@ end
 -- ============================================================================
 
 -- Places the standard wall props template at the current position.
--- User faces the wall → camera forward = into wall.
+-- User faces the wall â†’ camera forward = into wall.
 -- Props are placed along the wall to the user's right.
 -- Internal: compute and place props given anchor + angle (degrees)
 local function computeWallProps(garage, anchor, angleDeg)
   local angleRad = math.rad(angleDeg)
-  -- Original template faces -X (angle = 180°). Delta from original:
+  -- Original template faces -X (angle = 180Â°). Delta from original:
   local delta = angleRad - math.pi
   local cos_d = math.cos(delta)
   local sin_d = math.sin(delta)
@@ -3097,7 +3097,7 @@ placeWallProps = function()
   spawnLiveProps(garage.props)
   saveWip()
   triggerUIUpdate()
-  log('I', logTag, 'Placed ' .. #garage.props .. ' wall props at angle ' .. string.format("%.1f", angleDeg) .. '° for ' .. (garage.name or garage.id))
+  log('I', logTag, 'Placed ' .. #garage.props .. ' wall props at angle ' .. string.format("%.1f", angleDeg) .. 'Â° for ' .. (garage.name or garage.id))
 end
 
 -- Rotate existing wall props to a new angle (called from slider)
@@ -3119,7 +3119,7 @@ end
 
 -- ============================================================================
 -- DAE Packs (user-defined reusable prop packs for garages)
--- Cloned from wall props pattern — original wall props code is NOT modified
+-- Cloned from wall props pattern â€” original wall props code is NOT modified
 -- ============================================================================
 
 -- globalDaePacks is declared in the forward declarations section at the top
@@ -3143,7 +3143,7 @@ saveDaePack = function(packName)
     end
   end
 
-  -- Collect existing pack positions for deduplication (D-15)
+  -- Collect existing pack positions for deduplication
   local existingPositions = {}
   for _, pack in ipairs(globalDaePacks) do
     for _, asset in ipairs(pack.assets or {}) do
@@ -3257,7 +3257,7 @@ deleteDaePack = function(packIdx)
 end
 
 -- ============================================================================
--- Sync props from World Editor (userdata → mod)
+-- Sync props from World Editor (userdata â†’ mod)
 -- ============================================================================
 
 -- After placing props in World Editor (F11) and saving (Ctrl+S),
@@ -3677,7 +3677,7 @@ exportAllCameras = function()
 
   if #toExport == 0 then
     -- No cameras: remove sub-file and SimGroup from parent
-    log('I', logTag, 'exportAllCameras: No valid cameras — cleaning up exported files')
+    log('I', logTag, 'exportAllCameras: No valid cameras â€” cleaning up exported files')
     FS:removeFile(writeBasePath .. "bcm_cameras/items.level.json")
     local filtered = {}
     for _, obj in ipairs(parentObjects) do
@@ -3913,7 +3913,7 @@ drawAllRadarSpotMarkers = function()
         local lineDir = le - ls
         local lineLen = lineDir:length()
         if lineLen > 0.01 then
-          local halfWidth = 2  -- 4m total width → 2m each side
+          local halfWidth = 2  -- 4m total width â†’ 2m each side
           local halfHeight = 2 -- 4m tall
           -- Perpendicular direction (horizontal)
           local perp = vec3(-lineDir.y, lineDir.x, 0):normalized() * halfWidth
@@ -3977,7 +3977,7 @@ exportAllRadarSpots = function()
 
   if #toExport == 0 then
     -- No radar spots: remove files and SimGroup from parent
-    log('I', logTag, 'exportAllRadarSpots: No valid spots — cleaning up exported files')
+    log('I', logTag, 'exportAllRadarSpots: No valid spots â€” cleaning up exported files')
     local basePath = getModLevelsPath(levelName)
     FS:removeFile(basePath .. "/facilities/bcm_radarSpots.json")
     FS:removeFile(basePath .. "/main/MissionGroup/BCM_AREAS/bcm_radarzones/items.level.json")
@@ -4192,11 +4192,11 @@ loadExistingTravelNodes = function()
 
   for _, entry in ipairs(entries) do
     if entry and entry.type == "travelNode" and entry.id and not wipIds[entry.id] then
-      -- Map production entry → WIP schema. The export pipeline rewrites the
+      -- Map production entry â†’ WIP schema. The export pipeline rewrites the
       -- WIP node.type (road/port/airport/border/restStop) with "travelNode"
       -- as the file discriminator, so the original category is preserved in
       -- the separate `nodeType` field. Legacy files written before that fix
-      -- have no `nodeType` — fall back to "road" for those.
+      -- have no `nodeType` â€” fall back to "road" for those.
       local wipNode = {
         id           = entry.id,
         name         = entry.name or "",
@@ -4215,7 +4215,7 @@ loadExistingTravelNodes = function()
       -- session had left a parcial mapInfo in the WIP (e.g. the atlas picker
       -- writing just `worldMapPos` without the rest). Merging field by field
       -- keeps the user's unexported edits while backfilling anything they
-      -- never touched — so exporting can never silently drop a production
+      -- never touched â€” so exporting can never silently drop a production
       -- field that existed on disk.
       if not mapInfo then
         mapInfo = {}
@@ -4577,7 +4577,7 @@ updateMapInfoField = function(field, value)
 
   -- plan 100.5-04: worldMapPos is stored as an array [x, y] in 0-100 percentage format
   -- (matches Italy's shipped [54.2, 25.5] and WorldMap.vue:186-187 which divides by 100).
-  -- D-09 corrected: NOT [0.0-1.0] normalized. Zero JSON migration needed.
+  -- corrected: NOT [0.0-1.0] normalized. Zero JSON migration needed.
   local function clampPct(n)
     n = tonumber(n) or 0
     if n < 0 then n = 0 end
@@ -4671,7 +4671,7 @@ exportAllTravelNodes = function()
 
   -- Warn about incomplete mapInfo
   if mapInfo and (not mapInfo.displayName or mapInfo.displayName == "" or not mapInfo.country or mapInfo.country == "") then
-    log('W', logTag, 'exportAllTravelNodes: mapInfo is missing displayName or country — exporting anyway')
+    log('W', logTag, 'exportAllTravelNodes: mapInfo is missing displayName or country â€” exporting anyway')
   end
 
   -- Build objects array: mapInfo first, then travel nodes
@@ -5044,7 +5044,7 @@ exportAllGasStations = function()
   log('I', logTag, 'Exported ' .. #gasStations .. ' gas stations to ' .. path)
 end
 
--- D-13(a): Vanilla gas station override functions
+--: Vanilla gas station override functions
 importVanillaStation = function(vanillaId)
   -- Find vanilla station by id
   local vanilla = nil
@@ -5223,7 +5223,7 @@ createShareZip = function(configJson)
   end
   manifest.itemTypes = typeCounts
 
-  -- Write to user path (not mod folder — mod may be read-only in production)
+  -- Write to user path (not mod folder â€” mod may be read-only in production)
   local sharePath = FS:getUserPath() .. "bcm_share/"
   FS:directoryCreate(sharePath, true)
 
@@ -5337,7 +5337,7 @@ M.deleteGarage = deleteGarage
 M.updateGarageField = updateGarageField
 M.updateParkingSpotTag = updateParkingSpotTag
 M.saveWip = saveWip
--- M.discardWip removed (dangerous — destroys WIP data that isn't in exports)
+-- M.discardWip removed (dangerous â€” destroys WIP data that isn't in exports)
 M.exportAll = exportAll
 M.syncProps = syncPropsFromUserdata
 M.placeWallProps = placeWallProps
@@ -5445,7 +5445,7 @@ M.movePropToPlayer = movePropToPlayer
 -- DAE file scanner & custom prop placement
 -- ============================================================================
 
--- Scan all .dae files in the game VFS and send the list to the UI
+-- Scan all.dae files in the game VFS and send the list to the UI
 scanDaeFiles = function()
   local paths = {}
   -- Scan common art directories
@@ -5652,16 +5652,16 @@ M.adjustMarkerZ = function(markerType, index, delta)
 end
 
 -- ============================================================================
--- Delivery Hook Testing Panel (DLVR-04)
+-- Delivery Hook Testing Panel
 -- Console-accessible functions for testing trailer/coupler hooks and
 -- polling during live gameplay. Always active when extension is loaded.
 -- Usage:
---   extensions.load("bcm_devtool")
---   bcm_devtool.clearDeliveryLogs()
---   -- drive near trailer, couple it --
---   bcm_devtool.deliveryHookSummary()
---   bcm_devtool.testTrailerPolling()
---   bcm_devtool.listDeliveryFacilities()
+-- extensions.load("bcm_devtool")
+-- bcm_devtool.clearDeliveryLogs
+-- -- drive near trailer, couple it --
+-- bcm_devtool.deliveryHookSummary
+-- bcm_devtool.testTrailerPolling
+-- bcm_devtool.listDeliveryFacilities
 -- ============================================================================
 
 M._deliveryHookLog = {
@@ -5671,7 +5671,7 @@ M._deliveryHookLog = {
   pollingResults = {},
 }
 
--- Hook listeners — always active when extension is loaded (no isActive gate)
+-- Hook listeners â€” always active when extension is loaded (no isActive gate)
 M.onTrailerAttached = function(trailerId, pullerId)
   M._deliveryHookLog.trailerAttached = (M._deliveryHookLog.trailerAttached or 0) + 1
   log('I', logTag, 'DELIVERY HOOK: onTrailerAttached trailerId=' .. tostring(trailerId) .. ' pullerId=' .. tostring(pullerId))
@@ -5687,7 +5687,7 @@ M.onCouplerDetached = function(objId1, objId2, nodeId, obj2nodeId)
   log('I', logTag, 'DELIVERY HOOK: onCouplerDetached obj1=' .. tostring(objId1) .. ' obj2=' .. tostring(objId2) .. ' node1=' .. tostring(nodeId) .. ' node2=' .. tostring(obj2nodeId))
 end
 
--- Polling test — checks all vehicles for trailer attachment using core_trailerRespawn
+-- Polling test â€” checks all vehicles for trailer attachment using core_trailerRespawn
 testTrailerPolling = function()
   local playerId = be:getPlayerVehicleID(0)
   log('I', logTag, 'DELIVERY POLL TEST: Player vehicle ID = ' .. tostring(playerId))
@@ -5719,11 +5719,11 @@ testTrailerPolling = function()
 end
 M.testTrailerPolling = testTrailerPolling
 
--- Facility enumeration — lists delivery facilities from the generator module
+-- Facility enumeration â€” lists delivery facilities from the generator module
 listDeliveryFacilities = function()
   local generator = career_modules_delivery_generator
   if not generator then
-    log('W', logTag, 'DELIVERY FACILITIES: delivery generator not loaded — is career active?')
+    log('W', logTag, 'DELIVERY FACILITIES: delivery generator not loaded â€” is career active?')
     return
   end
 
@@ -5793,12 +5793,12 @@ end
 M.deliveryHookSummary = deliveryHookSummary
 
 -- ============================================================================
--- Plan 100.5-05: debugExportRoundTrip — devtool export pipeline audit
+-- debugExportRoundTrip â€” devtool export pipeline audit
 -- ============================================================================
 -- Regression tool. Given a mode, it runs the real exporter twice and compares
 -- the on-disk files structurally (field-by-field, recursive, ignoring Lua key
 -- order). For modes with a cheap reload-from-disk path, the in-memory state is
--- cleared between exports so the test covers the full write→read→rewrite loop.
+-- cleared between exports so the test covers the full writeâ†’readâ†’rewrite loop.
 -- For modes whose loader is too coupled to vanilla facility formats to rebuild
 -- from just the exported JSON, the test degrades to a deterministic double
 -- export check and logs that limitation in the diff output.
@@ -5837,8 +5837,8 @@ structuralEqual = function(a, b, path)
 end
 
 -- Round-trip path resolvers and reloaders per mode.
--- Each spec: { paths = function() -> {list-of-full-paths},
---              reload = function() -> nil or "reason-string" (nil = ok) }
+-- Each spec: { paths = function -> {list-of-full-paths},
+-- reload = function -> nil or "reason-string" (nil = ok) }
 local function buildRoundTripSpecs()
   local levelName = getCurrentLevelIdentifier()
   if not levelName then return nil, "no level loaded" end
@@ -5889,9 +5889,9 @@ local function buildRoundTripSpecs()
   }
 
   -- garages: 5 files, each a merge of vanilla base + BCM overlay. A full
-  -- reload-from-disk would require unraveling the facilities→sites zone/spot
+  -- reload-from-disk would require unraveling the facilitiesâ†’sites zone/spot
   -- name mangling and stripping the computers entries. Downgrade to a
-  -- determinism double-export check — still catches write-side non-determinism
+  -- determinism double-export check â€” still catches write-side non-determinism
   -- (ordering instability, map iteration drift) but does not cover silent
   -- drops introduced inside exportFacilitiesJson's merge logic.
   specs.garages = {

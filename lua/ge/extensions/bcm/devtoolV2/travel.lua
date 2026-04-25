@@ -47,6 +47,7 @@ defaults = function(id)
     nodeType = "road",  -- enum placeholder: road, port, airport, border, restStop
     triggerSize = { 8, 8, 4 },
     connections = {},
+    preview = "",
   }
 end
 
@@ -117,6 +118,7 @@ hydrate = function(levelName)
         nodeType    = obj.nodeType or "road",
         triggerSize = obj.triggerSize or { 8, 8, 4 },
         connections = connections,
+        preview     = obj.preview or "",
       }
       table.insert(result, { id = obj.id, data = entry })
     end
@@ -163,6 +165,7 @@ travelNodeToNdjsonObject = function(node)
     nodeType    = node.nodeType or "road",
     triggerSize = node.triggerSize or { 8, 8, 4 },
     connections = conns,
+    preview     = node.preview or "",
   }
 end
 

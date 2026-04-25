@@ -1,6 +1,6 @@
--- BCM Bank App Extension
+﻿-- BCM Bank App Extension
 -- Registers the Bank app on the phone and bridges bcm_banking to Vue.
--- Evolved from Phase 10 simple balance card to full banking bridge.
+-- Evolved from simple balance card to full banking bridge.
 
 local M = {}
 

@@ -1,8 +1,8 @@
--- BCM Contracts Extension
+﻿-- BCM Contracts Extension
 -- Contract pool data layer: pool generation with weighted type distribution,
 -- 8-hour rotation windows, CDL gating, save/load persistence, and debug commands.
--- This is the data backbone for the trucking system (Phase 64).
--- Subsequent phases (FSM/Phase 66, UI/Phase 67, phone/Phase 68) consume this pool.
+-- This is the data backbone for the trucking system.
+-- Subsequent phases (FSM/, UI/, phone/) consume this pool.
 -- Extension name: bcm_contracts
 -- Loaded by bcm_extensionManager after bcm_policeDamage.
 
@@ -75,7 +75,7 @@ local CDL_BY_CARGO = {
   material = "CDL-A",
 }
 
--- BCM depot facilities — hardcoded from bcm_depots.facilities.json (Phase 63.1)
+-- BCM depot facilities â€” hardcoded from bcm_depots.facilities.json
 -- Used as fallback if freeroam_facilities API doesn't expose them cleanly.
 local BCM_DEPOT_FALLBACK = {
   { facId = "bcm_church",   displayName = "Church",     psName = "bcm_church_parking1"  },
@@ -140,7 +140,7 @@ enumerateFacilities = function()
 
   -- Fallback to hardcoded list if query produced nothing
   if #facilities == 0 then
-    log('W', logTag, 'freeroam_facilities query yielded no BCM facilities — using hardcoded fallback')
+    log('W', logTag, 'freeroam_facilities query yielded no BCM facilities â€” using hardcoded fallback')
     for _, f in ipairs(BCM_DEPOT_FALLBACK) do
       table.insert(facilities, { facId = f.facId, displayName = f.displayName, psName = f.psName })
     end
@@ -251,7 +251,7 @@ generateContract = function(id, contractType, facilities, currentRotationId)
   end
 
   if not originFac then
-    log('W', logTag, 'Cannot generate contract — no facilities available')
+    log('W', logTag, 'Cannot generate contract â€” no facilities available')
     return nil
   end
   -- If only one facility, destination = origin (degenerate but non-crashing)
@@ -345,7 +345,7 @@ generatePool = function(rotationId)
 
   local facilities = enumerateFacilities()
   if #facilities == 0 then
-    log('W', logTag, 'No facilities available — contract pool not generated')
+    log('W', logTag, 'No facilities available â€” contract pool not generated')
     contractState.pool = {}
     contractState.lastRotationId = rotationId
     return
@@ -363,7 +363,7 @@ generatePool = function(rotationId)
     -- CDL gating: if CDL not unlocked, skip contracts requiring CDL
     if not contractState.cdlUnlocked then
       local tempType = contractType
-      -- Standard and urgent can have CDL-required cargo — filter if needed
+      -- Standard and urgent can have CDL-required cargo â€” filter if needed
       -- We'll generate and check CDL requirement after
     end
 
@@ -406,7 +406,7 @@ checkRotation = function()
   local currentRotationId = getCurrentRotationId()
   if currentRotationId ~= contractState.lastRotationId then
     log('I', logTag, string.format(
-      'Rotation changed: %d -> %d — expiring old contracts, generating fresh pool',
+      'Rotation changed: %d -> %d â€” expiring old contracts, generating fresh pool',
       contractState.lastRotationId, currentRotationId
     ))
 
@@ -445,7 +445,7 @@ saveContractData = function(currentSavePath)
   if not isInitialized then return end
 
   if not career_saveSystem then
-    log('W', logTag, 'career_saveSystem not available — cannot save contract data')
+    log('W', logTag, 'career_saveSystem not available â€” cannot save contract data')
     return
   end
 
@@ -486,13 +486,13 @@ end
 loadContractData = function()
   if not career_career or not career_career.isActive() then return end
   if not career_saveSystem then
-    log('W', logTag, 'career_saveSystem not available — cannot load contract data')
+    log('W', logTag, 'career_saveSystem not available â€” cannot load contract data')
     return
   end
 
   local currentSaveSlot = career_saveSystem.getCurrentSaveSlot()
   if not currentSaveSlot then
-    log('W', logTag, 'No save slot active — cannot load contract data')
+    log('W', logTag, 'No save slot active â€” cannot load contract data')
     return
   end
 
@@ -519,7 +519,7 @@ loadContractData = function()
       contractState.completedCount
     ))
   else
-    log('I', logTag, 'No saved contract data found — fresh career start')
+    log('I', logTag, 'No saved contract data found â€” fresh career start')
   end
 end
 
@@ -532,7 +532,7 @@ initModule = function()
 
   local currentRotationId = getCurrentRotationId()
   if currentRotationId ~= contractState.lastRotationId then
-    log('I', logTag, 'Rotation changed since last save — regenerating pool')
+    log('I', logTag, 'Rotation changed since last save â€” regenerating pool')
     generatePool(currentRotationId)
   else
     -- Same rotation: generate pool for current rotation (pool is not persisted)
@@ -706,7 +706,7 @@ debugDumpPool = function()
     end
   end
   log('I', logTag, string.format(
-    'DEBUG: Distribution — standard=%d urgent=%d recovery=%d special=%d | CDL unlocked: %s',
+    'DEBUG: Distribution â€” standard=%d urgent=%d recovery=%d special=%d | CDL unlocked: %s',
     counts.standard, counts.urgent, counts.recovery, counts.special,
     tostring(contractState.cdlUnlocked)
   ))
@@ -765,7 +765,7 @@ M.onSaveCurrentSaveSlot = function(currentSavePath)
   saveContractData(currentSavePath)
 end
 
--- Called every frame — throttle rotation checks to every 30 real seconds
+-- Called every frame â€” throttle rotation checks to every 30 real seconds
 M.onUpdate = function(dtReal)
   if not isInitialized then return end
   updateTimer = updateTimer + dtReal
@@ -823,7 +823,7 @@ M.getCdlStatus = function()
   return contractState.cdlUnlocked
 end
 
--- Set CDL unlock status (called by Phase 65 CDL exam system)
+-- Set CDL unlock status (called by CDL exam system)
 M.setCdlUnlocked = function(val)
   contractState.cdlUnlocked = val and true or false
   -- Regenerate pool to apply CDL filter to new pool

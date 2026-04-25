@@ -705,7 +705,7 @@
   },
   {
     "baseCapacity":1,
-    "basePrice":200000,
+    "basePrice":350000,
     "center":[
       784.43646240234,
       -648.65502929688,
@@ -716,13 +716,13 @@
       -648.66876220703,
       184.95140327215
     ],
-    "description":"",
+    "description":"Just outside Fastello, overlooking a small island that looks straight out of a postcard, this garage offers something not everyone can afford: peace… and the perfect excuse to never finish that project car.\n\nBetween tools, engines and the distant sound of the sea, some say that if you look closely, you might even find a coin hidden somewhere around here.\n\nWe don’t confirm it. But we don’t deny it either.",
     "id":"bcm_Island_View",
     "isBackupGarage":false,
     "isStarterGarage":false,
     "mapName":"italy",
-    "maxCapacity":1,
-    "name":"Island View",
+    "maxCapacity":6,
+    "name":"Isola Vista Garage",
     "parkingSpots":[
       {
         "dir":[
@@ -745,46 +745,151 @@
           "ignoreOthers":true,
           "perfect":true
         }
+      },
+      {
+        "dir":[
+          0.45100090190009,
+          -0.85684875839803,
+          -0.24981671624827
+        ],
+        "normal":[
+          -0.0055234423644759,
+          -0.0074917408866233,
+          0.99995668176323
+        ],
+        "pos":[
+          790.98004150391,
+          -641.78686523438,
+          184.24551689625
+        ],
+        "tags":{
+          "forwards":true,
+          "ignoreOthers":true,
+          "perfect":true
+        }
+      },
+      {
+        "dir":[
+          0.65223832549111,
+          0.70074659265358,
+          -0.28903179694447
+        ],
+        "normal":[
+          -0.00012969970593657,
+          -7.6293944668571e-06,
+          0.99999999155989
+        ],
+        "pos":[
+          788.00012207031,
+          -645.98529052734,
+          184.25138956308
+        ],
+        "tags":{
+          "forwards":true,
+          "ignoreOthers":true,
+          "perfect":true
+        }
+      },
+      {
+        "dir":[
+          0.60154658355036,
+          0.52414655286818,
+          -0.60283671000968
+        ],
+        "normal":[
+          0.10728874211188,
+          0.064445911552173,
+          0.99213701185888
+        ],
+        "pos":[
+          796.75177001953,
+          -644.47698974609,
+          184.22042155266
+        ],
+        "tags":{
+          "forwards":true,
+          "ignoreOthers":true,
+          "perfect":true
+        }
+      },
+      {
+        "dir":[
+          0.62304086894156,
+          -0.74110910273145,
+          -0.25015469909065
+        ],
+        "normal":[
+          0.069227633360799,
+          -0.0090492146070789,
+          0.99755984607153
+        ],
+        "pos":[
+          791.24798583984,
+          -636.36401367188,
+          184.0947958827
+        ],
+        "tags":{
+          "forwards":true,
+          "ignoreOthers":true,
+          "perfect":true
+        }
+      },
+      {
+        "dir":[
+          0.62304086894156,
+          -0.74110910273145,
+          -0.25015469909065
+        ],
+        "normal":[
+          -0.083042033330902,
+          -0.24328668861047,
+          0.96639309178265
+        ],
+        "pos":[
+          786.00018310547,
+          -631.73040771484,
+          184.47186040878
+        ],
+        "tags":{
+          "forwards":true,
+          "ignoreOthers":true,
+          "perfect":true
+        }
       }
     ],
     "propsAngle":0,
-    "slotUpgradeBasePrice":20000,
+    "slotUpgradeBasePrice":35000,
     "slotUpgradeMultiplier":1.5,
     "tierUpgradeCosts":{
-      "t1":60000,
-      "t2":140000
+      "t1":105000,
+      "t2":244999
     },
     "type":"garage",
     "zoneVertices":[
       [
-        789.36871337891,
-        -654.66009521484,
-        184.24636417627
+        790.76770019531,
+        -653.44207763672,
+        184.25239378214
       ],
       [
-        799.79388427734,
-        -645.21826171875,
-        183.60427474976
+        774.39117431641,
+        -642.39685058594,
+        184.55739033222
       ],
       [
-        796.26300048828,
-        -640.86224365234,
-        183.72668230534
+        784.54150390625,
+        -628.29614257813,
+        184.90346050262
       ],
       [
-        788.77777099609,
-        -637.44195556641,
-        184.24714201689
+        801.51629638672,
+        -644.45953369141,
+        183.08882778883
       ],
       [
-        783.41839599609,
-        -644.12872314453,
-        184.25098764896
-      ],
-      [
-        782.89874267578,
-        -649.74542236328,
-        184.16856962442
+        799.716796875,
+        -647.67144775391,
+        183.21802568436
       ]
     ]
   },

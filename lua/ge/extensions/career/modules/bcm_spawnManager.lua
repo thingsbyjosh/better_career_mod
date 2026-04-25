@@ -1,16 +1,13 @@
--- BCM Spawn Manager
+﻿-- BCM Spawn Manager
 -- Handles player spawn on new career start and initial time setup
 -- Extension name: career_modules_bcm_spawnManager
 -- Auto-loaded by career core from /lua/ge/extensions/career/modules/
---
 -- KEY DESIGN: Career modules are loaded inside the startFreeroam callback,
 -- which fires AFTER onWorldReadyState(2). This means career modules never
 -- receive onWorldReadyState(2) on the initial career load.
---
 -- Solution: Use onCareerActive (which fires INSIDE the callback, after modules
 -- load) with a core_jobsystem delayed job. The world IS ready at this point
 -- because the startFreeroam callback only fires after the level loads.
---
 -- onWorldReadyState is kept ONLY as a fallback for level switches during
 -- an active career (not the initial load).
 
@@ -36,16 +33,16 @@ local INITIAL_TIME = 0.0
 local FALLBACK_POS = {-680, 520, 114}
 local FALLBACK_ROT = {0, 0, -0.40, 0.92}
 
--- Phase 79: Custom tutorial spawn position (player spawns on foot facing toward Miramar)
--- Player position from CONTEXT.md locked decision
+-- Custom tutorial spawn position (player spawns on foot facing toward Miramar)
+-- Player position
 local TUTORIAL_PLAYER_POS = vec3(-1179.03, 1877.92, 96.04)
 -- Direction vector toward Miramar at (-1174.78, 1873.62, 94.71):
--- Original angle was 180° off in-game. Rotated by π:
--- angle = atan2(-4.30, 4.25) + π = 2.351 rad
+-- Original angle was 180Â° off in-game. Rotated by Ï€:
+-- angle = atan2(-4.30, 4.25) + Ï€ = 2.351 rad
 -- half_angle = 1.175 rad -> sin=0.923, cos=0.386
 local TUTORIAL_PLAYER_ROT = quat(0, 0, 0.923, 0.386)
 
--- Miramar constants (grandfather's car — always granted on new career)
+-- Miramar constants (grandfather's car â€” always granted on new career)
 local MIRAMAR_MODEL  = "miramar"
 local MIRAMAR_CONFIG = "vehicles/miramar/mysummer_starter.pc"
 local MIRAMAR_POS    = vec3(-1174.78, 1873.62, 94.71)
@@ -63,8 +60,8 @@ local exitLoadingScreen
 local onCareerActive
 local onWorldReadyState
 
--- Plan 100.5-02: one-shot gate set by the career-load garage selector UI
--- (Plan 03) via setPendingStartGarageId before the career modules activate.
+-- one-shot gate set by the career-load garage selector UI
+-- via setPendingStartGarageId before the career modules activate.
 -- Consumed and cleared inside onCareerActive's existing-save branch.
 local pendingStartGarageId
 local setPendingStartGarageId
@@ -111,7 +108,7 @@ removeDefaultVehicle = function()
   return removed
 end
 
--- Plan 100.5-02: setter for the selector UI bridge. Plan 03's career.js
+-- setter for the selector UI bridge. 's career.js
 -- writes the chosen garage id here via bngApi.engineLua before the player
 -- clicks Load. Consumed once inside onCareerActive's existing-save branch.
 setPendingStartGarageId = function(garageId)
@@ -119,7 +116,7 @@ setPendingStartGarageId = function(garageId)
   log('I', logTag, 'pendingStartGarageId set to ' .. tostring(garageId))
 end
 
--- Plan 100.5-02: resolve pos/rot for an explicit garage id (player-chosen
+-- resolve pos/rot for an explicit garage id (player-chosen
 -- via the career-load selector, or auto-selected single-owned garage).
 -- Reuses the same resolution chain as the starter-garage fallback below:
 -- prefer freeroam_facilities parking spots, fall back to the BCM garage
@@ -152,16 +149,16 @@ end
 spawnAtStarterGarage = function()
   local pos, rot
 
-  -- Plan 100.5-02: one-shot pending id from the career-load selector UI
-  -- (Plan 03). Two write paths feed into one read path:
-  --   * `pendingStartGarageId` (module-local) — set via setPendingStartGarageId
-  --     from other lua modules, e.g. a future in-session map switch.
-  --   * `_G.bcm_pendingStartGarageId` — set by the Vue load card via
-  --     bngApi.engineLua BEFORE the career modules load. We can't call a
-  --     method on this module from there because the module global isn't
-  --     assigned until onCareerActive fires, so it fataled with
-  --     "attempt to index nil value". A bare lua global assignment is the
-  --     simplest write that always succeeds. Read and clear both here.
+  -- one-shot pending id from the career-load selector UI
+  --. Two write paths feed into one read path:
+  -- * `pendingStartGarageId` (module-local) â€” set via setPendingStartGarageId
+  -- from other lua modules, e.g. a future in-session map switch.
+  -- * `_G.bcm_pendingStartGarageId` â€” set by the Vue load card via
+  -- bngApi.engineLua BEFORE the career modules load. We can't call a
+  -- method on this module from there because the module global isn't
+  -- assigned until onCareerActive fires, so it fataled with
+  -- "attempt to index nil value". A bare lua global assignment is the
+  -- simplest write that always succeeds. Read and clear both here.
   do
     local pending = pendingStartGarageId or rawget(_G, 'bcm_pendingStartGarageId')
     pendingStartGarageId = nil
@@ -176,7 +173,7 @@ spawnAtStarterGarage = function()
     end
   end
 
-  -- Plan 100.5-02: auto-select-if-one. When the player owns exactly one
+  -- auto-select-if-one. When the player owns exactly one
   -- garage on the current map, use it directly so single-garage players
   -- never see the selector UI. This runs BEFORE the starter/rental chain
   -- so owned garages take precedence over the hardcoded starter.
@@ -193,7 +190,7 @@ spawnAtStarterGarage = function()
   -- Resolve starter garage: prefer BCM config, fall back to hardcoded.
   -- Only runs if neither the pending-id nor the auto-select-if-one path
   -- above resolved a position, so owned garages take precedence over the
-  -- hardcoded starter (Plan 100.5-02).
+  -- hardcoded starter.
   local starterGarageId = FALLBACK_STARTER_GARAGE_ID
   if not pos then
     if bcm_garages then
@@ -360,7 +357,7 @@ grantMiramarToGarage = function()
     -- the beat-up paintwork look. getVisualValueFromMileage would give 0.81 which
     -- is too clean for a neglected barn find.
     local visualValue = 0.25
-    -- initConditions → callback → addVehicle → removeVehicleObject (despawn physical)
+    -- initConditions â†’ callback â†’ addVehicle â†’ removeVehicleObject (despawn physical)
     vehObj:queueLuaCommand(string.format(
       "partCondition.initConditions(nil, %d, nil, %f) obj:queueGameEngineLua('bcm_tutorial.onMiramarSpawnFinished(%d)')",
       MIRAMAR_MILEAGE, visualValue, vehId
@@ -401,7 +398,7 @@ initializeNewCareer = function()
 
   -- 2. Spawn player: custom tutorial position for new career, starter garage otherwise
   if bcm_tutorial and not (bcm_settings and bcm_settings.getSetting("debugMode")) then
-    -- Phase 79: tutorial spawn at custom coordinates facing Miramar
+    -- tutorial spawn at custom coordinates facing Miramar
     gameplay_walk.setWalkingMode(true, TUTORIAL_PLAYER_POS, TUTORIAL_PLAYER_ROT)
     log("I", logTag, "Player spawned at tutorial position (facing Miramar)")
   else
@@ -412,11 +409,11 @@ initializeNewCareer = function()
   -- 3. Set initial time to mid-afternoon
   initializeTime()
 
-  -- 4. Starter garage is handled by bcm_garages.grantStarterGarageIfNeeded()
-  --    which runs during onCareerModulesActivated (before this delayed job).
-  --    Do NOT call purchaseDefaultGarage() here — it buys Sealbrick1058 (vanilla default).
+  -- 4. Starter garage is handled by bcm_garages.grantStarterGarageIfNeeded
+  -- which runs during onCareerModulesActivated (before this delayed job).
+  -- Do NOT call purchaseDefaultGarage here â€” it buys Sealbrick1058 (vanilla default).
 
-  -- 5. Spawn Miramar (grandfather's car — always on new career)
+  -- 5. Spawn Miramar (grandfather's car â€” always on new career)
   local hasTutorial = bcm_tutorial and not (bcm_settings and bcm_settings.getSetting("debugMode"))
   if hasTutorial then
     spawnMiramarAtLocation()  -- physical spawn at tutorial coords
@@ -425,7 +422,7 @@ initializeNewCareer = function()
   end
 
   -- 6. Exit career loading screen for walking mode (no vehicle to trigger
-  --    onVehicleGroupSpawned, so we handle it ourselves)
+  -- onVehicleGroupSpawned, so we handle it ourselves)
   -- Always exit loading screen to avoid getting stuck
   exitLoadingScreen()
 

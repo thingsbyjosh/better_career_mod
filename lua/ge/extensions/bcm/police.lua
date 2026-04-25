@@ -1,4 +1,4 @@
--- BCM Police Orchestrator
+﻿-- BCM Police Orchestrator
 -- Central police module: vehicle pool, damage tracking, 3-level escalation,
 -- pursuit lifecycle hooks, FMOD queue, recycling, interceptors, save/load.
 -- Uses vanilla gameplay_police for all core pursuit logic (no override).
@@ -57,7 +57,6 @@ local loadRadarSpots
 local spawnRadarCars
 local despawnRadarCars
 local onBeamNGTrigger
-local rotateRadarSpots
 local selectRadarSpots
 -- No-plate detection
 local checkNoPlate
@@ -157,22 +156,23 @@ local BCM_POLICE_GROUP_NAME = 'bcmPolice'
 -- Mobile radar (parked police cars at fixed spots)
 local RADAR_DEFAULT_SPEED_LIMIT = 80  -- km/h fallback when spot has no speedLimit
 local RADAR_FINE_COOLDOWN = 60        -- seconds between fines from same radar trigger
-local RADAR_ROTATION_HOURS = 8        -- game hours between spot rotations
 local RADAR_MAX_CARS = 2              -- number of radar cars active at once
 -- Max speed over the posted limit (km/h) before any radar issues a fine.
 -- Applies uniformly to all BCM radar spots. Raise for lenient maps, lower for
--- strict enforcement. Phase 4 decision 1.7 option Y — global not per-radar.
+-- strict enforcement. decision 1.7 option Y â€” global not per-radar.
 local RADAR_SPEED_TOLERANCE_KMH = 5
 
 -- Default radar spots (fallback if no devtool-exported JSON found)
--- Each spot has speedLimit in km/h — radar fines when player exceeds it
+-- Each spot has speedLimit in km/h â€” radar fines when player exceeds it.
+-- IDs are required: zone triggers are named <spot.id>_zone and the activation
+-- check pairs triggers to cars by id, not by array position.
 local DEFAULT_RADAR_SPOTS = {
-  { pos = {-760, 135, 51.5}, heading = 0.8, speedLimit = 80 },   -- Highway near town entrance
-  { pos = {-380, 640, 75.3}, heading = 2.1, speedLimit = 60 },   -- Industrial district road
-  { pos = {120, -290, 103.5}, heading = -0.5, speedLimit = 80 },  -- Mountain pass pullover
-  { pos = {-540, -480, 38.2}, heading = 1.5, speedLimit = 80 },   -- Coast highway shoulder
-  { pos = {380, 250, 119.0}, heading = 3.0, speedLimit = 60 },    -- Rural road by farm
-  { pos = {-190, 890, 52.1}, heading = -1.2, speedLimit = 60 },   -- Port area entrance
+  { id = "bcmRadarDefault_1", pos = {-760, 135, 51.5}, heading = 0.8, speedLimit = 80 },   -- Highway near town entrance
+  { id = "bcmRadarDefault_2", pos = {-380, 640, 75.3}, heading = 2.1, speedLimit = 60 },   -- Industrial district road
+  { id = "bcmRadarDefault_3", pos = {120, -290, 103.5}, heading = -0.5, speedLimit = 80 },  -- Mountain pass pullover
+  { id = "bcmRadarDefault_4", pos = {-540, -480, 38.2}, heading = 1.5, speedLimit = 80 },   -- Coast highway shoulder
+  { id = "bcmRadarDefault_5", pos = {380, 250, 119.0}, heading = 3.0, speedLimit = 60 },    -- Rural road by farm
+  { id = "bcmRadarDefault_6", pos = {-190, 890, 52.1}, heading = -1.2, speedLimit = 60 },   -- Port area entrance
 }
 
 -- Active radar spots (loaded from JSON or defaults)
@@ -188,7 +188,7 @@ local function getPoliceCurrentLevelIdentifier()
 end
 
 -- No-plate detection
-local NOPLATE_DETECTION_RADIUS = 80   -- meters — police must be relatively close
+local NOPLATE_DETECTION_RADIUS = 80   -- meters â€” police must be relatively close
 local NOPLATE_CHECK_INTERVAL = 3.0    -- seconds between checks
 local NOPLATE_COOLDOWN_HOURS = 1      -- game hours between repeated no-plate fines
 local NOPLATE_FINE_AMOUNT = 40000     -- $400
@@ -202,8 +202,8 @@ local SPIKE_STRIP_CONFIGS = {
 local SPIKE_STRIP_OFFSET = 4                                  -- meters ahead of roadblock position
 local SPIKE_STRIP_MAX = 2                                     -- max strips per roadblock
 
--- Vehicle pool — loaded per-country from gameplay/police/pools/<country>.json.
--- The current map's country is resolved via bcm_multimap.getCurrentMapInfo().country;
+-- Vehicle pool â€” loaded per-country from gameplay/police/pools/<country>.json.
+-- The current map's country is resolved via bcm_multimap.getCurrentMapInfo.country;
 -- maps without a curated pool fall back to vanilla BeamNG police (usingVanillaPoliceFallback).
 local usingVanillaPoliceFallback = false
 
@@ -224,13 +224,13 @@ local sirenState = {}
 
 -- BCM pursuit state (absorbed from override)
 local bcmPursuitActive = false
-local bcmPursuitReason = nil  -- e.g. 'no_plate' — reason BCM triggered the pursuit
+local bcmPursuitReason = nil  -- e.g. 'no_plate' â€” reason BCM triggered the pursuit
 local currentPursuitLevel = 0
 local pursuitDamageCost = 0
 local policeDamageSnapshot = {}
 local passiveScoreAccum = 0
 local levelEscalationTimer = 0  -- seconds at current level without damage escalation
-local LEVEL_ESCALATION_TIMEOUT = 180  -- 3 minutes → auto-escalate one level
+local LEVEL_ESCALATION_TIMEOUT = 180  -- 3 minutes â†’ auto-escalate one level
 local recycleCheckAccum = 0
 local damageCheckAccum = 0
 local damageCooldowns = {}
@@ -248,11 +248,10 @@ local poolSpawnRequested = false
 
 -- Mobile radar state
 local radarVehicleIds = {}        -- spawned radar car vehicle IDs
-local radarVehToSpotIdx = {}      -- { [vehId] = spotIndex } — maps radar car to its spot data
-local activeSpotIndices = {}      -- indices into RADAR_SPOTS currently in use
-local radarCooldowns = {}         -- radarVehId -> os.clock() last fine time
-local nextRadarRotation = 0       -- game time (days) for next rotation
-local radarSpawned = false        -- flag to prevent double-spawning
+local radarVehToSpotId = {}       -- { [vehId] = spotId } â€” maps radar car to its spot
+local activeSpotIds = {}          -- spot IDs currently in use (paired with trigger zone names)
+local radarCooldowns = {}         -- radarVehId -> os.clock last fine time
+local radarSpawned = false        -- flag to prevent double-spawning (set once per session)
 
 -- No-plate state
 local noplateCheckTimer = 0
@@ -265,15 +264,15 @@ local spikeStripsDeployed = false -- flag to prevent re-deployment
 
 -- Citizen report state (witness-triggered pursuit)
 local reportActive = false            -- true = player has been reported by witnesses
-local reportTimer = 0                 -- countdown timer (seconds) — resets on new infraction
+local reportTimer = 0                 -- countdown timer (seconds) â€” resets on new infraction
 local reportReason = nil              -- 'collision' or 'speeding' (most recent reason)
-local reportDamageSnapshot = {}       -- { [vehId] = damage } — tracks NPC damage outside pursuit
+local reportDamageSnapshot = {}       -- { [vehId] = damage } â€” tracks NPC damage outside pursuit
 local reportCheckTimer = 0            -- accumulator for report check interval
 local REPORT_DURATION = 120           -- seconds (2 minutes)
 local REPORT_CHECK_INTERVAL = 1.0     -- seconds between report checks
 local REPORT_SPEED_FACTOR = 2.0       -- double the speed limit
-local REPORT_TRAFFIC_PROXIMITY = 15   -- meters — must be near traffic to trigger speed report
-local REPORT_COLLISION_PROXIMITY = 15 -- meters — safety check: NPC must be nearby to trigger collision report
+local REPORT_TRAFFIC_PROXIMITY = 15   -- meters â€” must be near traffic to trigger speed report
+local REPORT_COLLISION_PROXIMITY = 15 -- meters â€” safety check: NPC must be nearby to trigger collision report
 local REPORT_DAMAGE_THRESHOLD = 30    -- minimum damage delta to count as collision
 local REPORT_VISIBLE_DAMAGE_THRESHOLD = 40000  -- player vehicle damage level (~80% of totaled) to trigger report
 local REPORT_VISIBLE_DAMAGE_COOLDOWN = 120   -- 2 min cooldown between visible damage reports
@@ -285,7 +284,7 @@ local allEverSpawnedPolice = {}     -- accumulates ALL police vehIds across resp
 local reserveVehIds = {}            -- vehicle IDs currently deactivated (reserve pool)
 local activeFlexVehIds = {}         -- vehicle IDs currently active in traffic
 local reinforcementTimer = 0        -- accumulator for next reserve activation
-local deactivatingVehIds = {}       -- { [vehId] = true } — vehicles driving away, pending deactivation
+local deactivatingVehIds = {}       -- { [vehId] = true } â€” vehicles driving away, pending deactivation
 local DEACTIVATE_DISTANCE = 30      -- meters from player before reserve is deactivated
 local REINFORCEMENT_INTERVAL_MIN = 1   -- seconds (heat 10)
 local REINFORCEMENT_INTERVAL_MAX = 8   -- seconds (heat 0)
@@ -300,7 +299,7 @@ local arrestPendingRelease = false      -- true between arrest and release
 local arrestPendingTimer = 0            -- safety timeout
 local ARREST_RELEASE_TIMEOUT = 15       -- seconds to wait for release before forcing unblock
 
--- Citizen report boost: doubles presence chance after a report
+-- Citizen report boost: raises presence chance after a report
 local citizenReportBoostTimer = 0       -- countdown, >0 means boosted
 local CITIZEN_REPORT_BOOST_DURATION = 120  -- 2 minutes
 
@@ -346,39 +345,6 @@ executeFmodAction = function(action)
       local obj = getObjectByID(action.vehId)
       if obj then
         obj:resetBrokenFlexMesh()
-      end
-    end)
-  elseif actionType == 'spawnRadarCar' then
-    pcall(function()
-      local configPath = action.config
-      local parts = split(configPath, '/')
-      local modelName = parts[1]
-      local configName = parts[2]
-      local spot = action.spot
-      local spawnOptions = {
-        config = configName,
-        pos = vec3(spot.pos[1], spot.pos[2], spot.pos[3]),
-        rot = quatFromAxisAngle(vec3(0, 0, 1), spot.heading or 0),
-        autoEnterVehicle = false,
-      }
-      local vehObj = core_vehicles.spawnNewVehicle(modelName, spawnOptions)
-      if vehObj then
-        local vehId = vehObj:getId()
-        table.insert(radarVehicleIds, vehId)
-        radarVehToSpotIdx[vehId] = action.spotIndex
-        -- Lights off, AI stopped
-        vehObj:queueLuaCommand('electrics.set_lightbar_signal(0)')
-        vehObj:queueLuaCommand('ai.setMode("stop")')
-        vehObj.playerUsable = false
-        -- Remove from player vehicle list so minimap doesn't show it
-        pcall(function()
-          if core_vehicle_manager and core_vehicle_manager.removePlayerVehicle then
-            core_vehicle_manager.removePlayerVehicle(vehId)
-          elseif core_vehicles and core_vehicles.removeVehicleFromList then
-            core_vehicles.removeVehicleFromList(vehId)
-          end
-        end)
-        log('I', logTag, 'Radar car spawned: vehId=' .. tostring(vehId) .. ' at spot index ' .. tostring(action.spotIndex))
       end
     end)
   elseif actionType == 'spawnSpikeStrip' then
@@ -427,7 +393,7 @@ end
 loadCountryPoolFromJson = function(country)
   if not country or country == "" then return nil end
   local slug = tostring(country):lower()
-  -- Defense-in-depth (T-100.5-06-02): only allow simple alphanumeric/dash country slugs
+  -- Defense-in-depth: only allow simple alphanumeric/dash country slugs
   if not slug:match("^[%w_%-]+$") then
     log('W', logTag, 'rejecting suspicious country slug for pool lookup: ' .. slug)
     return nil
@@ -444,7 +410,7 @@ loadCountryPoolFromJson = function(country)
 end
 
 -- Resolves the current map's curated police pool via mapInfo.country.
--- Returns nil when no pool exists for this map → caller flips the vanilla-fallback flag.
+-- Returns nil when no pool exists for this map â†’ caller flips the vanilla-fallback flag.
 getCurrentPoliceConfigs = function()
   local country = nil
   if bcm_multimap and bcm_multimap.getCurrentMapInfo then
@@ -564,7 +530,7 @@ spawnPolicePool = function()
     shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
   end
 
-  -- Build vehicle group — core_multiSpawn handles road positioning
+  -- Build vehicle group â€” core_multiSpawn handles road positioning
   local group = {}
   for i = 1, policeCount do
     local config = shuffled[((i - 1) % #shuffled) + 1]
@@ -680,6 +646,13 @@ loadRadarSpots = function()
   end)
 
   if data and type(data) == "table" and #data > 0 then
+    -- Defensive: ensure every spot carries an id. Pre-v0.5 exports lacked ids,
+    -- and detection pairs zones to spots by id (not by array position).
+    for i, r in ipairs(data) do
+      if not r.id or r.id == "" then
+        r.id = "bcmRadar_" .. i
+      end
+    end
     RADAR_SPOTS = data
     log('I', logTag, 'Loaded ' .. #data .. ' radar spots from ' .. jsonPath)
   else
@@ -696,11 +669,14 @@ selectRadarSpots = function()
     local j = math.random(1, i)
     indices[i], indices[j] = indices[j], indices[i]
   end
-  activeSpotIndices = {}
+  activeSpotIds = {}
   for i = 1, math.min(RADAR_MAX_CARS, #indices) do
-    table.insert(activeSpotIndices, indices[i])
+    local spot = RADAR_SPOTS[indices[i]]
+    if spot and spot.id then
+      table.insert(activeSpotIds, spot.id)
+    end
   end
-  log('I', logTag, 'Selected ' .. #activeSpotIndices .. ' radar spots from ' .. #RADAR_SPOTS .. ' total')
+  log('I', logTag, 'Selected ' .. #activeSpotIds .. ' radar spots from ' .. #RADAR_SPOTS .. ' total (ids: ' .. table.concat(activeSpotIds, ", ") .. ')')
 end
 
 spawnRadarCars = function()
@@ -709,7 +685,7 @@ spawnRadarCars = function()
     log('I', logTag, 'spawnRadarCars: vanilla-police fallback active, skipping radar car spawn')
     return
   end
-  if #activeSpotIndices == 0 then
+  if #activeSpotIds == 0 then
     selectRadarSpots()
   end
 
@@ -727,21 +703,63 @@ spawnRadarCars = function()
     table.insert(patrolConfigs, sourcePool[i])
   end
 
-  for _, spotIdx in ipairs(activeSpotIndices) do
-    local spot = RADAR_SPOTS[spotIdx]
-    if spot then
+  -- Build a quick idâ†’spot lookup so spawning stays O(N) overall
+  local spotById = {}
+  for _, s in ipairs(RADAR_SPOTS) do
+    if s.id then spotById[s.id] = s end
+  end
+
+  -- Spawn directly (no FMOD queue). These cars have lights off and AI stopped,
+  -- so there's no audio-critical operation that needs serialization â€” the old
+  -- queue-based approach was delaying spawns by 25â€“40s because the FMOD queue
+  -- was saturated with pool siren inits.
+  local spawned = 0
+  for _, spotId in ipairs(activeSpotIds) do
+    local spot = spotById[spotId]
+    if spot and spot.pos then
       local configIdx = math.random(1, #patrolConfigs)
-      queueFmodAction({
-        type = 'spawnRadarCar',
-        config = patrolConfigs[configIdx],
-        spot = spot,
-        spotIndex = spotIdx,
-      })
+      local configPath = patrolConfigs[configIdx]
+      local ok, err = pcall(function()
+        local parts = split(configPath, '/')
+        local modelName = parts[1]
+        local configName = parts[2]
+        local spawnOptions = {
+          config = configName,
+          pos = vec3(spot.pos[1], spot.pos[2], spot.pos[3]),
+          rot = quatFromAxisAngle(vec3(0, 0, 1), spot.heading or 0),
+          autoEnterVehicle = false,
+        }
+        local vehObj = core_vehicles.spawnNewVehicle(modelName, spawnOptions)
+        if vehObj then
+          local vehId = vehObj:getId()
+          table.insert(radarVehicleIds, vehId)
+          radarVehToSpotId[vehId] = spotId
+          vehObj:queueLuaCommand('electrics.set_lightbar_signal(0)')
+          vehObj:queueLuaCommand('ai.setMode("stop")')
+          vehObj.playerUsable = false
+          pcall(function()
+            if core_vehicle_manager and core_vehicle_manager.removePlayerVehicle then
+              core_vehicle_manager.removePlayerVehicle(vehId)
+            elseif core_vehicles and core_vehicles.removeVehicleFromList then
+              core_vehicles.removeVehicleFromList(vehId)
+            end
+          end)
+          spawned = spawned + 1
+          log('I', logTag, 'Radar car spawned: vehId=' .. tostring(vehId) .. ' at spot ' .. tostring(spotId))
+        else
+          log('W', logTag, 'Radar car spawn: spawnNewVehicle returned nil for spot ' .. tostring(spotId) .. ' model=' .. tostring(modelName) .. ' config=' .. tostring(configName))
+        end
+      end)
+      if not ok then
+        log('E', logTag, 'Radar car spawn error for ' .. tostring(spotId) .. ': ' .. tostring(err))
+      end
+    else
+      log('W', logTag, 'spawnRadarCars: no spot data or pos for active id=' .. tostring(spotId) .. ' (skipped)')
     end
   end
 
   radarSpawned = true
-  log('I', logTag, 'Radar cars queued for spawn at ' .. #activeSpotIndices .. ' spots')
+  log('I', logTag, 'Radar cars spawned: ' .. spawned .. '/' .. #activeSpotIds)
 end
 
 despawnRadarCars = function()
@@ -753,13 +771,15 @@ despawnRadarCars = function()
   end
   local count = #radarVehicleIds
   radarVehicleIds = {}
-  radarVehToSpotIdx = {}
+  radarVehToSpotId = {}
   radarCooldowns = {}
   radarSpawned = false
+  -- activeSpotIds is deliberately kept here so rotate/restart can rebuild the
+  -- set in selectRadarSpots; do not clear it mid-cycle.
   log('I', logTag, 'Radar cars despawned (' .. count .. ' removed)')
 end
 
--- checkMobileRadar removed — detection now uses BeamNGTrigger zones exported by devtool
+-- checkMobileRadar removed â€” detection now uses BeamNGTrigger zones exported by devtool
 -- The onBeamNGTrigger handler below processes radar zone triggers
 
 onBeamNGTrigger = function(data)
@@ -796,21 +816,26 @@ onBeamNGTrigger = function(data)
   local playerSpeedMs = math.sqrt(pvx*pvx + pvy*pvy + pvz*pvz)
   local playerSpeedKmh = playerSpeedMs * 3.6
 
-  -- Find which radar spot this trigger belongs to
-  -- triggerName format: bcmRadar_N_zone → extract N (1-based index matching export order)
-  local spotIdx = tonumber(string.match(triggerName, "bcmRadar_(%d+)_zone"))
-  if not spotIdx then return end
+  -- Find which radar spot this trigger belongs to.
+  -- Trigger name format: <spot.id>_zone (e.g. "bcmRadar_4_zone"). The id is the
+  -- WIP identifier from the devtool, not the array position â€” matching by
+  -- position would drift whenever spots are added/deleted out of order.
+  local spotId = string.match(triggerName, "^(.+)_zone$")
+  if not spotId then return end
 
   -- Only fine if this spot is in the active rotation (has a police car there)
   local isActiveSpot = false
-  for _, idx in ipairs(activeSpotIndices) do
-    if idx == spotIdx then isActiveSpot = true break end
+  for _, id in ipairs(activeSpotIds) do
+    if id == spotId then isActiveSpot = true break end
   end
   if not isActiveSpot then return end
 
   local spotSpeedLimit = RADAR_DEFAULT_SPEED_LIMIT
-  if RADAR_SPOTS[spotIdx] then
-    spotSpeedLimit = RADAR_SPOTS[spotIdx].speedLimit or RADAR_DEFAULT_SPEED_LIMIT
+  for _, s in ipairs(RADAR_SPOTS) do
+    if s.id == spotId then
+      spotSpeedLimit = s.speedLimit or RADAR_DEFAULT_SPEED_LIMIT
+      break
+    end
   end
 
   local overSpeed = playerSpeedKmh - spotSpeedLimit
@@ -820,9 +845,9 @@ onBeamNGTrigger = function(data)
   log('I', logTag, string.format('[RADAR DEBUG] trigger=%s spotSpeedLimit=%d playerSpeed=%.1f overSpeed=%.1f playerPos=(%.0f,%.0f,%.0f)',
     triggerName, spotSpeedLimit, playerSpeedKmh, overSpeed, ppx, ppy, ppz))
 
-  -- License plate check — radar camera cannot identify vehicle without plate
+  -- License plate check â€” radar camera cannot identify vehicle without plate
   if not hasLicensePlate(playerVehId) then
-    log('I', logTag, 'No license plate — radar cannot identify vehicle at ' .. triggerName)
+    log('I', logTag, 'No license plate â€” radar cannot identify vehicle at ' .. triggerName)
     return
   end
 
@@ -868,24 +893,10 @@ onBeamNGTrigger = function(data)
   radarCooldowns[triggerName] = now
 end
 
-rotateRadarSpots = function()
-  pcall(function()
-    local currentGameTime = 0
-    if bcm_timeSystem and bcm_timeSystem.getGameTimeDays then
-      currentGameTime = bcm_timeSystem.getGameTimeDays()
-    else
-      return  -- Cannot rotate without time system
-    end
-
-    if nextRadarRotation > 0 and currentGameTime >= nextRadarRotation then
-      log('I', logTag, 'Rotating radar spots (game time ' .. string.format('%.3f', currentGameTime) .. ')')
-      despawnRadarCars()
-      selectRadarSpots()
-      spawnRadarCars()
-      nextRadarRotation = currentGameTime + (RADAR_ROTATION_HOURS / 24)
-    end
-  end)
-end
+-- Radar spots used to rotate every few in-game hours, but game-time pacing is
+-- variable (sleep/fast-forward) and the rotation was firing way too often.
+-- Current design: pick once per session in onTrafficStarted and keep them for
+-- the whole session. Per-session randomness already gives enough variety.
 
 -- ============================================================================
 -- No-plate detection subsystem
@@ -897,7 +908,7 @@ hasLicensePlate = function(vehId)
   end
   local hasPlate = false
   local ok, err = pcall(function()
-    -- Convert vehId → inventoryId (vanilla pattern)
+    -- Convert vehId â†’ inventoryId (vanilla pattern)
     local inventoryId = nil
     if career_modules_inventory and career_modules_inventory.getInventoryIdFromVehicleId then
       inventoryId = career_modules_inventory.getInventoryIdFromVehicleId(vehId)
@@ -1075,7 +1086,7 @@ checkCitizenReports = function(dtSim)
     local ppx, ppy, ppz = be:getObjectPositionXYZ(playerVehId)
     local playerPos = vec3(ppx, ppy, ppz)
 
-    -- Player speed (m/s) — read directly from physics, not traffic data (more accurate)
+    -- Player speed (m/s) â€” read directly from physics, not traffic data (more accurate)
     local pvx, pvy, pvz = be:getObjectVelocityXYZ(playerVehId)
     local playerSpeed = math.sqrt(pvx*pvx + pvy*pvy + pvz*pvz)
 
@@ -1084,7 +1095,7 @@ checkCitizenReports = function(dtSim)
 
     local triggered = false
 
-    -- Check 1: Collision with traffic NPC — verify actual physical contact via objectCollisions API
+    -- Check 1: Collision with traffic NPC â€” verify actual physical contact via objectCollisions API
     for vehId, tData in pairs(trafficData) do
       if vehId ~= playerVehId then
         local role = tData.role and tData.role.name
@@ -1137,7 +1148,7 @@ checkCitizenReports = function(dtSim)
       end
     end
 
-    -- Check 3: Visible vehicle damage — heavily damaged car near traffic triggers report
+    -- Check 3: Visible vehicle damage â€” heavily damaged car near traffic triggers report
     -- Uses cooldown to prevent repeated reports for the same damage
     if not triggered then
       reportVisibleDamageCooldown = math.max(0, reportVisibleDamageCooldown - REPORT_CHECK_INTERVAL)
@@ -1204,14 +1215,14 @@ checkCitizenReports = function(dtSim)
   end)
 end
 
--- Check if any police officer can see the reported player — triggers instant pursuit
+-- Check if any police officer can see the reported player â€” triggers instant pursuit
 checkReportedSighting = function(dtSim)
   if not reportActive then return end
 
   -- Count down timer
   reportTimer = reportTimer - dtSim
   if reportTimer <= 0 then
-    log('I', logTag, '[CITIZEN REPORT] Report expired — no police sighting in 2 minutes')
+    log('I', logTag, '[CITIZEN REPORT] Report expired â€” no police sighting in 2 minutes')
     reportActive = false
     reportTimer = 0
     reportReason = nil
@@ -1477,7 +1488,7 @@ end
 updateReserveDeactivation = function(dt)
   if not isFlexibleMode() then return end
   if bcmPursuitActive then return end  -- don't deactivate during pursuit
-  if arrestPendingRelease then return end  -- wait for vanilla to finish arrest→release cycle
+  if arrestPendingRelease then return end  -- wait for vanilla to finish arrestâ†’release cycle
 
   -- Check if we have more active units than target minimum
   local flexMin = 1
@@ -1521,7 +1532,7 @@ updateReserveDeactivation = function(dt)
   end)
   local playerPos = vec3(px, py, pz)
 
-  -- Mark excess active units as "deactivating" — keep AI alive so they drive away naturally
+  -- Mark excess active units as "deactivating" â€” keep AI alive so they drive away naturally
   for i, vehId in ipairs(activeFlexVehIds) do
     if i > flexMin and not deactivatingVehIds[vehId] then
       deactivatingVehIds[vehId] = true
@@ -1538,7 +1549,7 @@ updateReserveDeactivation = function(dt)
     end
   end
 
-  -- Check distance of deactivating units — deactivate when far enough
+  -- Check distance of deactivating units â€” deactivate when far enough
   local toDeactivate = {}
   for vehId, _ in pairs(deactivatingVehIds) do
     local obj = be:getObjectByID(vehId)
@@ -1583,7 +1594,7 @@ updatePresenceCycle = function(dt)
   if cycleInterval == 0 then
     if not presenceActive then
       presenceActive = true
-      log('D', logTag, 'Presence cycle Always — patrol on')
+      log('D', logTag, 'Presence cycle Always â€” patrol on')
     end
     return
   end
@@ -1592,8 +1603,8 @@ updatePresenceCycle = function(dt)
   if presenceCycleTimer < cycleInterval then return end
   presenceCycleTimer = 0
 
-  -- Roll dice: 50% base chance, 70% if citizen report boost active
-  local chance = citizenReportBoostTimer > 0 and 0.7 or 0.5
+  -- Roll dice: 20% base chance, 50% if citizen report boost active
+  local chance = citizenReportBoostTimer > 0 and 0.5 or 0.2
   local roll = math.random() < chance
 
   if presenceActive and not roll then
@@ -1681,7 +1692,7 @@ resetBcmPursuitState = function()
   cleanupSpikeStrips()
   -- Reset no-plate cooldown
   lastNoplateFineTime = 0
-  -- Reset flexible spawn reinforcement state (but DON'T deactivate reserves here —
+  -- Reset flexible spawn reinforcement state (but DON'T deactivate reserves here â€”
   -- that happens gradually in updateReserveDeactivation)
   reinforcementTimer = 0
   deactivatingVehIds = {}
@@ -2292,7 +2303,7 @@ onPursuitAction = function(vehId, action, pursuitData)
     resetBcmPursuitState()
 
   elseif action == 'roadblock' then
-    -- Vanilla just placed a roadblock — deploy spike strips at the roadblock position
+    -- Vanilla just placed a roadblock â€” deploy spike strips at the roadblock position
     log('I', logTag, 'Pursuit event: roadblock placed')
     if pursuitData and pursuitData.roadblockPos and currentPursuitLevel >= 3 then
       -- Clean up previous spike strips so new ones can deploy at the new roadblock
@@ -2342,7 +2353,7 @@ onPursuitAction = function(vehId, action, pursuitData)
 
   elseif action == 'release' then
     arrestPendingRelease = false
-    log('I', logTag, 'PURSUIT EVENT: action=release — deactivation unblocked')
+    log('I', logTag, 'PURSUIT EVENT: action=release â€” deactivation unblocked')
   end
 
   -- Detect level change (synthesize level_change event)
@@ -2386,7 +2397,7 @@ onPursuitAction = function(vehId, action, pursuitData)
     pcall(function()
       if bcm_policeDamage then bcm_policeDamage.onPursuitEvent(levelChangeData) end
     end)
-    -- Breaking news: pursuit escalation (no email — news only)
+    -- Breaking news: pursuit escalation (no email â€” news only)
     pcall(function()
       if bcm_breakingNews and bcm_breakingNews.onEvent then
         -- unitCount: interceptors + base vanilla units (approximate via level * 2)
@@ -2674,7 +2685,7 @@ onCareerModulesActivated = function(alreadyInLevel)
     end
   end)
 
-  log('I', logTag, 'BCM Police activated — stats: pursuits=' .. policeStats.totalPursuits .. ' evasions=' .. policeStats.totalEvasions .. ' arrests=' .. policeStats.totalArrests)
+  log('I', logTag, 'BCM Police activated â€” stats: pursuits=' .. policeStats.totalPursuits .. ' evasions=' .. policeStats.totalEvasions .. ' arrests=' .. policeStats.totalArrests)
 end
 
 onSaveCurrentSaveSlot = function(currentSavePath, oldSaveIdentifier, forceSyncSave)
@@ -2696,15 +2707,15 @@ onSettingChanged = function(key, value)
     end
     -- Also despawn radar cars (these are stationary, not in the flex pool)
     despawnRadarCars()
-    log('I', logTag, 'Police disabled — deactivated ' .. #toDeactivate .. ' pool units + radar cars (reserve=' .. #reserveVehIds .. ')')
+    log('I', logTag, 'Police disabled â€” deactivated ' .. #toDeactivate .. ' pool units + radar cars (reserve=' .. #reserveVehIds .. ')')
   elseif key == 'policeEnabled' and value == true then
-    -- Reset any active pursuit state first — police should start fresh in patrol mode
+    -- Reset any active pursuit state first â€” police should start fresh in patrol mode
     resetPursuit()
 
-    -- Re-enable: spawn fresh pool (don't reuse reserves — they may have stale AI state)
+    -- Re-enable: spawn fresh pool (don't reuse reserves â€” they may have stale AI state)
     poolSpawnRequested = false
     spawnPolicePool()
-    log('I', logTag, 'Police re-enabled — spawning fresh pool + reset pursuit state')
+    log('I', logTag, 'Police re-enabled â€” spawning fresh pool + reset pursuit state')
 
     -- Also re-spawn radar cars
     despawnRadarCars()
@@ -2717,11 +2728,11 @@ onSettingChanged = function(key, value)
         activateReserveUnit()
       end
       deactivatingVehIds = {}
-      log('I', logTag, 'Switched to static mode — all reserves activated')
+      log('I', logTag, 'Switched to static mode â€” all reserves activated')
     elseif value == 'flexible' and not bcmPursuitActive then
       -- Switching to flexible during idle: deactivate excess
       -- This will happen naturally via updateReserveDeactivation on next tick
-      log('I', logTag, 'Switched to flexible mode — excess units will deactivate')
+      log('I', logTag, 'Switched to flexible mode â€” excess units will deactivate')
     end
   elseif key == 'policePresenceCycle' then
     presenceCycleTimer = 0
@@ -2736,18 +2747,12 @@ onTrafficStarted = function()
   pcall(function()
     spawnPolicePool()
   end)
-  -- Spawn mobile radar cars
+  -- Spawn mobile radar cars (once per session â€” no rotation)
   pcall(function()
-    if #activeSpotIndices == 0 then
+    if #activeSpotIds == 0 then
       selectRadarSpots()
     end
     spawnRadarCars()
-    -- Set initial rotation time
-    if nextRadarRotation == 0 then
-      if bcm_timeSystem and bcm_timeSystem.getGameTimeDays then
-        nextRadarRotation = bcm_timeSystem.getGameTimeDays() + (RADAR_ROTATION_HOURS / 24)
-      end
-    end
   end)
 end
 
@@ -2805,7 +2810,7 @@ end
 -- ============================================================================
 
 spawnPolice = function()
-  log('I', logTag, 'Debug: spawnPolice — forcing traffic respawn')
+  log('I', logTag, 'Debug: spawnPolice â€” forcing traffic respawn')
   pcall(function()
     if career_modules_playerDriving and career_modules_playerDriving.setupTraffic then
       career_modules_playerDriving.ensureTraffic = true
@@ -2923,10 +2928,10 @@ printStatus = function()
 end
 
 -- Debug: force presence on/off or set cycle interval
--- Usage: bcm_police.setPresence(true)   — force patrol on
---        bcm_police.setPresence(false)  — force patrol off
---        bcm_police.setPresence(30)     — set cycle to 30s
---        bcm_police.setPresence(0)      — disable cycle (always on)
+-- Usage: bcm_police.setPresence(true) â€” force patrol on
+-- bcm_police.setPresence(false) â€” force patrol off
+-- bcm_police.setPresence(30) â€” set cycle to 30s
+-- bcm_police.setPresence(0) â€” disable cycle (always on)
 setPresence = function(value)
   if type(value) == 'boolean' then
     presenceActive = value
@@ -2945,7 +2950,7 @@ setPresence = function(value)
 end
 
 -- ============================================================================
--- onUpdate — main tick
+-- onUpdate â€” main tick
 -- ============================================================================
 local function onUpdate(dtReal, dtSim, dtRaw)
   if not activated then return end
@@ -2976,12 +2981,12 @@ local function onUpdate(dtReal, dtSim, dtRaw)
     citizenReportBoostTimer = citizenReportBoostTimer - dtReal
   end
 
-  -- Safety timeout for arrest→release cycle
+  -- Safety timeout for arrestâ†’release cycle
   if arrestPendingRelease then
     arrestPendingTimer = arrestPendingTimer + dtReal
     if arrestPendingTimer >= ARREST_RELEASE_TIMEOUT then
       arrestPendingRelease = false
-      log('W', logTag, 'Arrest release timeout — forcing unblock after ' .. ARREST_RELEASE_TIMEOUT .. 's')
+      log('W', logTag, 'Arrest release timeout â€” forcing unblock after ' .. ARREST_RELEASE_TIMEOUT .. 's')
     end
   end
 
@@ -3020,11 +3025,6 @@ local function onUpdate(dtReal, dtSim, dtRaw)
     end)
   end
 
-  -- Radar car rotation (detection now handled by BeamNGTrigger zones, not distance)
-  pcall(function()
-    rotateRadarSpots()
-  end)
-
   -- No-plate detection (always active, passive patrol)
   pcall(function()
     checkNoPlate(dtSim)
@@ -3057,7 +3057,7 @@ local function onUpdate(dtReal, dtSim, dtRaw)
           recycleCooldowns = {}
           interceptorTimer = 0
           interceptorVehIds = {}
-          log('I', logTag, 'BCM pursuit detected via traffic data — level ' .. currentPursuitLevel)
+          log('I', logTag, 'BCM pursuit detected via traffic data â€” level ' .. currentPursuitLevel)
         end
         -- Update level if vanilla escalated
         if pt.pursuit.mode > currentPursuitLevel then
@@ -3065,7 +3065,7 @@ local function onUpdate(dtReal, dtSim, dtRaw)
           applyLevelAggression(currentPursuitLevel)
         end
       elseif bcmPursuitActive then
-        log('I', logTag, 'BCM pursuit ended (traffic mode=0) — damageCost=$' .. pursuitDamageCost)
+        log('I', logTag, 'BCM pursuit ended (traffic mode=0) â€” damageCost=$' .. pursuitDamageCost)
         resetBcmPursuitState()
       end
     end
@@ -3196,7 +3196,7 @@ M.deactivateAllUnits = function()
 end
 
 -- Tutorial API: reactivate units from reserve based on current spawn mode
--- Note: does NOT check policeEnabled — the tutorial temporarily deactivated
+-- Note: does NOT check policeEnabled â€” the tutorial temporarily deactivated
 -- units and must restore them regardless. If the player had police disabled
 -- before the tutorial, there would be no units in the pool to reactivate.
 M.reactivatePool = function()
@@ -3220,7 +3220,7 @@ M.reactivatePool = function()
     while #reserveVehIds > 0 do
       if not activateReserveUnit() then break end
     end
-    log('I', logTag, 'Tutorial end: static mode — activated all (active=' .. #activeFlexVehIds .. ')')
+    log('I', logTag, 'Tutorial end: static mode â€” activated all (active=' .. #activeFlexVehIds .. ')')
   else
     -- Flexible mode: activate up to flexMin
     local flexMin = bcm_settings and bcm_settings.getSetting('policeFlexMin') or 1
@@ -3228,7 +3228,7 @@ M.reactivatePool = function()
     for i = 1, toActivate do
       if not activateReserveUnit() then break end
     end
-    log('I', logTag, 'Tutorial end: flexible mode — reactivated to flexMin (active=' .. #activeFlexVehIds .. ' reserve=' .. #reserveVehIds .. ')')
+    log('I', logTag, 'Tutorial end: flexible mode â€” reactivated to flexMin (active=' .. #activeFlexVehIds .. ' reserve=' .. #reserveVehIds .. ')')
   end
 
   -- Re-spawn radar cars

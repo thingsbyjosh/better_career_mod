@@ -2,10 +2,118 @@
   "cameraWizardStep":0,
   "cameras":{},
   "deletedGarageIds":{},
-  "deliveryFacilities":{},
+  "deliveryFacilities":[
+    {
+      "associatedOrganization":"belascoCityConstruction",
+      "center":[
+        -903.90289306641,
+        612.30902099609,
+        264.45352315903
+      ],
+      "description":"",
+      "id":"ut_delivery_1",
+      "images":{
+        "preview":""
+      },
+      "logisticGenerators":[
+        {
+          "interval":120,
+          "logisticTypes":[
+            "parcel"
+          ],
+          "max":1,
+          "min":1,
+          "type":"parcelReceiver"
+        },
+        {
+          "interval":120,
+          "logisticTypes":[
+            "industrial"
+          ],
+          "max":1,
+          "min":1,
+          "type":"parcelReceiver"
+        },
+        {
+          "capacity":3000,
+          "interval":270,
+          "logisticTypes":[
+            "sand"
+          ],
+          "materialType":"sand",
+          "rate":200,
+          "target":1500,
+          "type":"materialReceiver",
+          "variance":1000
+        },
+        {
+          "capacity":2000,
+          "interval":360,
+          "logisticTypes":[
+            "gravel"
+          ],
+          "materialType":"gravel",
+          "rate":200,
+          "target":300,
+          "type":"materialReceiver",
+          "variance":500
+        },
+        {
+          "capacity":6000,
+          "interval":360,
+          "logisticTypes":[
+            "water"
+          ],
+          "materialType":"water",
+          "rate":300,
+          "target":1000,
+          "type":"materialReceiver",
+          "variance":2000
+        }
+      ],
+      "logisticMaxItems":8,
+      "name":"Construction Site",
+      "parkingSpots":[
+        {
+          "dir":[
+            -0.94878449853288,
+            -0.31507448477293,
+            -0.023152632437548
+          ],
+          "isInspectSpot":true,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "industrial",
+            "parcel",
+            "sand",
+            "gravel",
+            "water"
+          ],
+          "normal":[
+            0.0099854670496299,
+            -0.013517377854808,
+            0.99985877549969
+          ],
+          "pos":[
+            -903.90289306641,
+            612.30902099609,
+            264.45352315903
+          ],
+          "scl":[
+            3.25,
+            8,
+            4
+          ],
+          "spotSize":"truck"
+        }
+      ],
+      "preset":"custom",
+      "tags":{}
+    }
+  ],
   "deliveryTemplates":{},
-  "deliveryWizardStep":0,
-  "devtoolMode":"garages",
+  "deliveryWizardStep":5,
+  "devtoolMode":"props",
   "garages":[
     {
       "baseCapacity":2,
@@ -150,22 +258,22 @@
       ]
     },
     {
-      "baseCapacity":2,
+      "baseCapacity":4,
       "basePrice":100000,
       "center":[
-        -790.62976074219,
-        -76.059135437012,
-        296.62423753738
+        624.14440917969,
+        -550.11480712891,
+        136.18128967285
       ],
       "computerPoint":[
-        -790.62957763672,
-        -76.059181213379,
-        296.6242389679
+        624.14440917969,
+        -550.11480712891,
+        136.18128967285
       ],
       "description":"",
       "id":"ut_garage_2",
       "images":{
-        "preview":""
+        "preview":"ut_garage_2.png"
       },
       "isBackupGarage":true,
       "isStarterGarage":false,
@@ -174,9 +282,9 @@
       "parkingSpots":[
         {
           "dir":[
-            -0.34729556972009,
-            -0.9340558748823,
-            -0.08321904740294
+            -0.15138233768086,
+            -0.98818185906874,
+            0.024083215020581
           ],
           "normal":[
             0,
@@ -184,9 +292,9 @@
             1
           ],
           "pos":[
-            -782.16900634766,
-            -81.120079040527,
-            296.62424468994
+            611.02423095703,
+            -548.79498291016,
+            135.20455992222
           ],
           "tags":{
             "forwards":true,
@@ -196,9 +304,9 @@
         },
         {
           "dir":[
-            -0.34729556972009,
-            -0.9340558748823,
-            -0.08321904740294
+            -0.15138233768086,
+            -0.98818185906874,
+            0.024083215020581
           ],
           "normal":[
             0,
@@ -206,9 +314,9 @@
             1
           ],
           "pos":[
-            -785.88720703125,
-            -79.70344543457,
-            296.62423944473
+            610.98455810547,
+            -557.68896484375,
+            135.20456039906
           ],
           "tags":{
             "forwards":true,
@@ -218,9 +326,9 @@
         },
         {
           "dir":[
-            -0.34729556972009,
-            -0.9340558748823,
-            -0.08321904740294
+            -0.15138233768086,
+            -0.98818185906874,
+            0.024083215020581
           ],
           "normal":[
             0,
@@ -228,9 +336,31 @@
             1
           ],
           "pos":[
-            -788.90014648438,
-            -78.568580627441,
-            296.62424468994
+            610.43634033203,
+            -563.52233886719,
+            135.20455920696
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            0.99691419877887,
+            -0.010722919708007,
+            0.077763097070632
+          ],
+          "normal":[
+            0,
+            0,
+            1
+          ],
+          "pos":[
+            608.98937988281,
+            -570.42987060547,
+            135.20456051826
           ],
           "tags":{
             "forwards":true,
@@ -239,28 +369,373 @@
           }
         }
       ],
-      "props":{},
+      "props":[
+        {
+          "class":"TSStatic",
+          "position":[
+            624.11448974609,
+            -549.93696289063,
+            136.22830810547
+          ],
+          "rotationMatrix":[
+            -0.70710678118655,
+            -0.70710678118655,
+            0,
+            0.70710678118655,
+            -0.70710678118655,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae",
+          "useInstanceRenderData":true
+        }
+      ],
       "propsAngle":0,
       "zoneVertices":[
         [
-          -788.09558105469,
-          -67.101905822754,
-          296.62424468994
+          624.30676269531,
+          -551.65502929688,
+          135.32830810547
         ],
         [
-          -776.93957519531,
-          -71.15495300293,
-          296.60961341858
+          618.08880615234,
+          -569.64245605469,
+          135.47230601311
         ],
         [
-          -782.68347167969,
-          -98.696701049805,
-          296.60749483109
+          600.61206054688,
+          -576.24395751953,
+          135.20456123352
         ],
         [
-          -795.68719482422,
-          -94.525909423828,
-          296.62424325943
+          601.30383300781,
+          -547.69146728516,
+          135.20455980301
+        ],
+        [
+          612.10070800781,
+          -541.32879638672,
+          135.20456147194
+        ],
+        [
+          628.51989746094,
+          -544.17218017578,
+          135.20455920696
+        ]
+      ]
+    },
+    {
+      "baseCapacity":2,
+      "basePrice":750000,
+      "center":[
+        -324.85934448242,
+        -524.28466796875,
+        131.24264526367
+      ],
+      "computerPoint":[
+        -324.85934448242,
+        -524.28466796875,
+        131.24264526367
+      ],
+      "description":"What used to be an airstrip is now a place where engines come to prove how far they can go… and where they fail.\nWith a runway that never seems to end and hangars filled with tools, parts and questionable projects, this is the perfect place to test ideas that would be a bad decision anywhere else.\nNo one’s going to stop you here. That part is on you.",
+      "id":"ut_garage_3",
+      "images":{
+        "preview":""
+      },
+      "isBackupGarage":false,
+      "isStarterGarage":false,
+      "maxCapacity":10,
+      "name":"Dust Run Airfield",
+      "parkingSpots":[
+        {
+          "dir":[
+            -0.16887859040445,
+            -0.98560603101558,
+            0.0077957250280628
+          ],
+          "normal":[
+            -0.70244033922054,
+            -0.70859603871231,
+            0.066852253192892
+          ],
+          "pos":[
+            -322.90777587891,
+            -529.08062744141,
+            130.38307189941
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.29611382051782,
+            -0.95171101805684,
+            0.081010761060253
+          ],
+          "normal":[
+            -0.68172154923398,
+            -0.72692339257259,
+            0.082692869346632
+          ],
+          "pos":[
+            -319.14859008789,
+            -530.10046386719,
+            130.38307189941
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.22251058107674,
+            -0.97182402833171,
+            0.077763097070629
+          ],
+          "normal":[
+            -0.7203718544516,
+            -0.68951339638553,
+            0.075071083106948
+          ],
+          "pos":[
+            -327.8369140625,
+            -528.33850097656,
+            130.38307189941
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.22251058107674,
+            -0.97182402833171,
+            0.077763097070629
+          ],
+          "normal":[
+            -0.72058536319109,
+            -0.68913098767947,
+            0.076519384306671
+          ],
+          "pos":[
+            -329.04690551758,
+            -533.74945068359,
+            130.38307189941
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.22251058107674,
+            -0.97182402833171,
+            0.077763097070629
+          ],
+          "normal":[
+            -0.70378855727211,
+            -0.70728897292373,
+            0.066512971917821
+          ],
+          "pos":[
+            -324.29925537109,
+            -534.79095458984,
+            130.38307189941
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.16679235203357,
+            -0.98304789866951,
+            0.076138953398161
+          ],
+          "normal":[
+            -0.69255571083967,
+            -0.71764447852579,
+            0.073164129358674
+          ],
+          "pos":[
+            -321.59750366211,
+            -535.33666992188,
+            130.38307189941
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.20740612174777,
+            -0.963394211601,
+            0.1698655165572
+          ],
+          "normal":[
+            -0.036185990682175,
+            -0.019689996615138,
+            0.99915107872215
+          ],
+          "pos":[
+            -325.32485961914,
+            -542.919921875,
+            130.11801314354
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.92734544362643,
+            0.33343085410629,
+            0.1698655165572
+          ],
+          "normal":[
+            0.0015640237365066,
+            0.00054168626971693,
+            0.99999863020193
+          ],
+          "pos":[
+            -318.58953857422,
+            -555.75793457031,
+            129.66118609905
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.92734544362643,
+            0.33343085410629,
+            0.1698655165572
+          ],
+          "normal":[
+            -0.0095654891511923,
+            0.016697652114801,
+            0.9998148277712
+          ],
+          "pos":[
+            -327.47583007813,
+            -553.87811279297,
+            129.6592284441
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            -0.92734544362643,
+            0.33343085410629,
+            0.1698655165572
+          ],
+          "normal":[
+            -0.0096198549317329,
+            0.0087272910720876,
+            0.99991564283275
+          ],
+          "pos":[
+            -333.89431762695,
+            -552.15148925781,
+            129.66238427162
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        },
+        {
+          "dir":[
+            0.5642944593231,
+            -0.8063828516485,
+            -0.17697022276215
+          ],
+          "normal":[
+            0.029919071425767,
+            -0.10935204570259,
+            0.99355270583179
+          ],
+          "pos":[
+            -320.07479858398,
+            -546.51031494141,
+            129.93201470375
+          ],
+          "tags":{
+            "forwards":true,
+            "ignoreOthers":true,
+            "perfect":true
+          }
+        }
+      ],
+      "props":[
+        {
+          "class":"TSStatic",
+          "position":[
+            -324.90386962891,
+            -524.36511230469,
+            131.24264526367
+          ],
+          "rotationMatrix":[
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1
+          ],
+          "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae",
+          "useInstanceRenderData":true
+        }
+      ],
+      "propsAngle":0,
+      "zoneVertices":[
+        [
+          -315.43356323242,
+          -524.50494384766,
+          130.38307189941
+        ],
+        [
+          -314.67892456055,
+          -563.37731933594,
+          129.69269537926
+        ],
+        [
+          -343.24780273438,
+          -560.69812011719,
+          129.60833370686
+        ],
+        [
+          -330.45944213867,
+          -523.09771728516,
+          130.53607177734
         ]
       ]
     }
@@ -268,7 +743,7 @@
   "gasStationWizardStep":0,
   "gasStations":{},
   "globalDaePacks":{},
-  "lastSaved":1776425645,
+  "lastSaved":1776882802,
   "levelName":"utah",
   "mapInfo":{
     "continent":"america",
@@ -283,24 +758,27 @@
     ]
   },
   "radarSpots":{},
+  "selectedDeliveryIdx":1,
   "selectedIdx":2,
-  "travelNodeWizardStep":0,
+  "selectedTravelNodeIdx":2,
+  "travelNodeWizardStep":4,
   "travelNodes":[
     {
       "center":[
-        -856.44342041016,
-        -23.684438705444,
-        293.91473388672
+        -812.08544921875,
+        -39.77791595459,
+        293.37531709671
       ],
       "connections":{},
       "id":"utah_road_1",
-      "name":"Broken Bridge",
+      "name":"Jefferson Valley Route",
       "nodeType":"road",
+      "preview":"bcm_travel_utah_road_1.png",
       "rotation":[
         0,
-        0,
-        0.85733252829981,
-        0.51476299004401
+        -0,
+        -0.55039740537514,
+        0.834902806413
       ],
       "triggerSize":[
         8,
@@ -310,55 +788,33 @@
     },
     {
       "center":[
-        -896.07092285156,
-        -906.51159667969,
-        135.49859774113
+        -257.43154907227,
+        -889.21069335938,
+        131.0930249691
       ],
       "connections":[
         {
           "connectionType":"road",
           "targetMap":"west_coast_usa",
           "targetNode":"wc_road_1",
-          "toll":0
+          "toll":200
+        },
+        {
+          "connectionType":"road",
+          "targetMap":"east_coast_usa",
+          "targetNode":"ec_travel_2",
+          "toll":200
         }
       ],
       "id":"utah_road_3",
-      "name":"Utah Tunnel exit",
+      "name":"Coast Route",
       "nodeType":"road",
+      "preview":"bcm_travel_utah_road_3.png",
       "rotation":[
         0,
-        0,
-        -0.77832445812034,
-        0.62786227621325
-      ],
-      "triggerSize":[
-        8,
-        8,
-        4
-      ]
-    },
-    {
-      "center":[
-        -892.27697753906,
-        -926.66925048828,
-        135.22650969028
-      ],
-      "connections":[
-        {
-          "connectionType":"road",
-          "targetMap":"west_coast_usa",
-          "targetNode":"wc_road_1",
-          "toll":0
-        }
-      ],
-      "id":"utah_road_2",
-      "name":"Utah Tunnel Enter",
-      "nodeType":"road",
-      "rotation":[
-        0,
-        0,
-        0.66243589955046,
-        0.74911860141554
+        -0,
+        -0.66982206698369,
+        0.74252164856097
       ],
       "triggerSize":[
         8,
@@ -367,5 +823,5 @@
       ]
     }
   ],
-  "wizardStep":6
+  "wizardStep":2
 }

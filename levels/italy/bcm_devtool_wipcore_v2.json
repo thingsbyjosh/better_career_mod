@@ -177,6 +177,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential",
@@ -300,6 +301,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential",
@@ -367,7 +369,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358939
+          "touchedAt":1776868098
         },
         "bcm_Bianco_Auto_1":{
           "baseline":{
@@ -402,6 +404,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehRepairFinished",
@@ -413,6 +416,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -500,6 +504,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehRepairFinished",
@@ -511,6 +516,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -566,7 +572,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358907
+          "touchedAt":1776868099
         },
         "bcm_Carlino_AutoRepair_142":{
           "baseline":{
@@ -601,6 +607,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehRepairFinished",
@@ -612,6 +619,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -699,6 +707,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehRepairFinished",
@@ -710,6 +719,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -765,7 +775,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358907
+          "touchedAt":1776868099
         },
         "bcm_CittaVecchia_60":{
           "baseline":{
@@ -5094,6 +5104,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehRepairFinished",
@@ -5105,6 +5116,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -5192,6 +5204,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehRepairFinished",
@@ -5203,6 +5216,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -5258,7 +5272,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358939
+          "touchedAt":1776868098
         },
         "bcm_ConcaAzzurra_14":{
           "baseline":{
@@ -9451,6 +9465,7 @@
             },
             "logisticGenerators":[
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehLargeTruckNeedsRepair",
@@ -9501,6 +9516,7 @@
             },
             "logisticGenerators":[
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehLargeTruckNeedsRepair",
@@ -9542,7 +9558,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358906
+          "touchedAt":1776868098
         },
         "bcm_Farm_171":{
           "baseline":{
@@ -10139,6 +10155,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":120,
                 "logisticTypes":[
                   "vehLargeTruck"
@@ -10148,6 +10165,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryConstructionMaterials",
@@ -10156,6 +10174,141 @@
                 "max":10,
                 "min":1,
                 "type":"trailerOfferProvider"
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSand",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSoil",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGravel",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmCement",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmRock",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWoodchips",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmFertilizer",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmLime",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmAsh",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGasoline",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmDiesel",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWater",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmChemicals",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmHazardousFluid",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmMysteriousWaste",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
               }
             ],
             "logisticMaxItems":8,
@@ -10174,7 +10327,37 @@
                   "industrial",
                   "trailerDeliveryConstructionMaterials",
                   "trailerDeliveryResidential",
-                  "vehLargeTruck"
+                  "vehLargeTruck",
+                  "sand",
+                  "soil",
+                  "gravel",
+                  "cement",
+                  "rock",
+                  "woodchips",
+                  "fertilizer",
+                  "lime",
+                  "ash",
+                  "gasoline",
+                  "diesel",
+                  "water",
+                  "chemicals",
+                  "hazardousFluid",
+                  "mysteriousWaste",
+                  "bcmChemicals",
+                  "bcmSoil",
+                  "bcmGravel",
+                  "bcmMysteriousWaste",
+                  "bcmHazardousFluid",
+                  "bcmSand",
+                  "bcmDiesel",
+                  "bcmFertilizer",
+                  "bcmWater",
+                  "bcmGasoline",
+                  "bcmAsh",
+                  "bcmCement",
+                  "bcmRock",
+                  "bcmWoodchips",
+                  "bcmLime"
                 ],
                 "logisticTypesReceived":[
                   "trailerDeliveryConstructionMaterials",
@@ -10225,6 +10408,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":120,
                 "logisticTypes":[
                   "vehLargeTruck"
@@ -10234,6 +10418,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryConstructionMaterials",
@@ -10242,6 +10427,141 @@
                 "max":10,
                 "min":1,
                 "type":"trailerOfferProvider"
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSand",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSoil",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGravel",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmCement",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmRock",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWoodchips",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmFertilizer",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmLime",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmAsh",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGasoline",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmDiesel",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWater",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmChemicals",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmHazardousFluid",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmMysteriousWaste",
+                "rate":80,
+                "target":1500,
+                "type":"materialProvider",
+                "variance":0.2
               }
             ],
             "logisticMaxItems":8,
@@ -10260,7 +10580,37 @@
                   "industrial",
                   "trailerDeliveryConstructionMaterials",
                   "trailerDeliveryResidential",
-                  "vehLargeTruck"
+                  "vehLargeTruck",
+                  "sand",
+                  "soil",
+                  "gravel",
+                  "cement",
+                  "rock",
+                  "woodchips",
+                  "fertilizer",
+                  "lime",
+                  "ash",
+                  "gasoline",
+                  "diesel",
+                  "water",
+                  "chemicals",
+                  "hazardousFluid",
+                  "mysteriousWaste",
+                  "bcmChemicals",
+                  "bcmSoil",
+                  "bcmGravel",
+                  "bcmMysteriousWaste",
+                  "bcmHazardousFluid",
+                  "bcmSand",
+                  "bcmDiesel",
+                  "bcmFertilizer",
+                  "bcmWater",
+                  "bcmGasoline",
+                  "bcmAsh",
+                  "bcmCement",
+                  "bcmRock",
+                  "bcmWoodchips",
+                  "bcmLime"
                 ],
                 "logisticTypesReceived":[
                   "trailerDeliveryConstructionMaterials",
@@ -10282,7 +10632,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358907
+          "touchedAt":1777033692
         },
         "bcm_Lucera_100":{
           "baseline":{
@@ -14609,6 +14959,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"fleetVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehForPrivate"
@@ -14618,6 +14969,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -14697,6 +15049,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"fleetVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehForPrivate"
@@ -14706,6 +15059,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"mediumFurnitureTrailers",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential"
@@ -14755,7 +15109,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358939
+          "touchedAt":1776868098
         },
         "bcm_Monastery_56":{
           "baseline":{
@@ -14953,6 +15307,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential",
@@ -14961,6 +15316,141 @@
                 "max":10,
                 "min":1,
                 "type":"trailerOfferProvider"
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSand",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSoil",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGravel",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmCement",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmRock",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWoodchips",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmFertilizer",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmLime",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmAsh",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGasoline",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmDiesel",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWater",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmChemicals",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmHazardousFluid",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmMysteriousWaste",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
               }
             ],
             "logisticMaxItems":6,
@@ -15003,7 +15493,22 @@
                   "vehForPrivate",
                   "vehRepairFinished",
                   "trailerDeliveryResidential",
-                  "trailerDeliveryConstructionMaterials"
+                  "trailerDeliveryConstructionMaterials",
+                  "bcmChemicals",
+                  "bcmSoil",
+                  "bcmGravel",
+                  "bcmMysteriousWaste",
+                  "bcmHazardousFluid",
+                  "bcmSand",
+                  "bcmDiesel",
+                  "bcmFertilizer",
+                  "bcmWater",
+                  "bcmGasoline",
+                  "bcmAsh",
+                  "bcmCement",
+                  "bcmRock",
+                  "bcmWoodchips",
+                  "bcmLime"
                 ],
                 "pos":[
                   438.23785400391,
@@ -15076,6 +15581,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryResidential",
@@ -15084,6 +15590,141 @@
                 "max":10,
                 "min":1,
                 "type":"trailerOfferProvider"
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSand",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmSoil",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGravel",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmCement",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmRock",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWoodchips",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmFertilizer",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmLime",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmAsh",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmGasoline",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmDiesel",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmWater",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmChemicals",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmHazardousFluid",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
+              },
+              {
+                "capacity":2000,
+                "interval":120,
+                "materialType":"bcmMysteriousWaste",
+                "rate":80,
+                "target":500,
+                "type":"materialReceiver",
+                "variance":0.2
               }
             ],
             "logisticMaxItems":6,
@@ -15126,7 +15767,22 @@
                   "vehForPrivate",
                   "vehRepairFinished",
                   "trailerDeliveryResidential",
-                  "trailerDeliveryConstructionMaterials"
+                  "trailerDeliveryConstructionMaterials",
+                  "bcmChemicals",
+                  "bcmSoil",
+                  "bcmGravel",
+                  "bcmMysteriousWaste",
+                  "bcmHazardousFluid",
+                  "bcmSand",
+                  "bcmDiesel",
+                  "bcmFertilizer",
+                  "bcmWater",
+                  "bcmGasoline",
+                  "bcmAsh",
+                  "bcmCement",
+                  "bcmRock",
+                  "bcmWoodchips",
+                  "bcmLime"
                 ],
                 "pos":[
                   438.23785400391,
@@ -15143,7 +15799,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358907
+          "touchedAt":1777033692
         },
         "bcm_PortinoCLose_10":{
           "baseline":{
@@ -16162,6 +16818,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehLargeTruck",
@@ -16173,6 +16830,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":200,
                 "logisticTypes":[
                   "trailerDeliveryConstructionMaterials"
@@ -16259,6 +16917,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":200,
                 "logisticTypes":[
                   "vehLargeTruck",
@@ -16270,6 +16929,7 @@
                 "type":"vehOfferProvider"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":200,
                 "logisticTypes":[
                   "trailerDeliveryConstructionMaterials"
@@ -16325,7 +16985,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358939
+          "touchedAt":1776868099
         },
         "bcm_Radar_Tower_4":{
           "baseline":{
@@ -16348,6 +17008,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryConstructionMaterials",
@@ -16358,6 +17019,7 @@
                 "type":"trailerOfferProvider"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":120,
                 "logisticTypes":[
                   "vehLargeTruckNeedsRepair",
@@ -16427,6 +17089,7 @@
                 "type":"parcelReceiver"
               },
               {
+                "filter":"bigConstructionMaterials",
                 "interval":120,
                 "logisticTypes":[
                   "trailerDeliveryConstructionMaterials",
@@ -16437,6 +17100,7 @@
                 "type":"trailerOfferProvider"
               },
               {
+                "filter":"largeVehFilter",
                 "interval":120,
                 "logisticTypes":[
                   "vehLargeTruckNeedsRepair",
@@ -16486,7 +17150,7 @@
             "tags":{}
           },
           "origin":"production",
-          "touchedAt":1776358906
+          "touchedAt":1776868098
         },
         "bcm_Usato_Garage_55":{
           "baseline":{
@@ -20512,7 +21176,122 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  -108.78881835938,
+                  861.78460693359,
+                  210.75804698467
+                ],
+                "rotationMatrix":[
+                  -0.99966761163037,
+                  0.025781122109802,
+                  0,
+                  -0.025781122109802,
+                  -0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  -108.89239188111,
+                  861.49217997589,
+                  211.53004698467
+                ],
+                "rotationMatrix":[
+                  -0.63169476832524,
+                  -0.7751718581518,
+                  0,
+                  0.7751718581518,
+                  -0.63169476832524,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  -96.144729614258,
+                  874.84399414063,
+                  210.70556664467
+                ],
+                "rotationMatrix":[
+                  0.027483755217636,
+                  -0.99964318294036,
+                  0,
+                  0.99964318294036,
+                  0.027483755217636,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  -108.68163288402,
+                  862.06193575264,
+                  211.50504698467
+                ],
+                "rotationMatrix":[
+                  -0.99966761163037,
+                  0.025781122109802,
+                  0,
+                  -0.025781122109802,
+                  -0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  -96.271797180176,
+                  873.96484375,
+                  210.70994609594
+                ],
+                "rotationMatrix":[
+                  0.99966761163037,
+                  -0.025781122109802,
+                  0,
+                  0.025781122109802,
+                  0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  -109.0144170808,
+                  861.5703519059,
+                  210.76204698467
+                ],
+                "rotationMatrix":[
+                  -0.99966761163037,
+                  0.025781122109802,
+                  0,
+                  -0.025781122109802,
+                  -0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -20643,7 +21422,122 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  -108.78881835938,
+                  861.78460693359,
+                  210.75804698467
+                ],
+                "rotationMatrix":[
+                  -0.99966761163037,
+                  0.025781122109802,
+                  0,
+                  -0.025781122109802,
+                  -0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  -108.89239188111,
+                  861.49217997589,
+                  211.53004698467
+                ],
+                "rotationMatrix":[
+                  -0.63169476832524,
+                  -0.7751718581518,
+                  0,
+                  0.7751718581518,
+                  -0.63169476832524,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  -96.144729614258,
+                  874.84399414063,
+                  210.70556664467
+                ],
+                "rotationMatrix":[
+                  0.027483755217636,
+                  -0.99964318294036,
+                  0,
+                  0.99964318294036,
+                  0.027483755217636,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  -108.68163288402,
+                  862.06193575264,
+                  211.50504698467
+                ],
+                "rotationMatrix":[
+                  -0.99966761163037,
+                  0.025781122109802,
+                  0,
+                  -0.025781122109802,
+                  -0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  -96.271797180176,
+                  873.96484375,
+                  210.70994609594
+                ],
+                "rotationMatrix":[
+                  0.99966761163037,
+                  -0.025781122109802,
+                  0,
+                  0.025781122109802,
+                  0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  -109.0144170808,
+                  861.5703519059,
+                  210.76204698467
+                ],
+                "rotationMatrix":[
+                  -0.99966761163037,
+                  0.025781122109802,
+                  0,
+                  -0.025781122109802,
+                  -0.99966761163037,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -20684,12 +21578,12 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776340449
+          "touchedAt":1776681687
         },
         "bcm_Island_View":{
           "baseline":{
             "baseCapacity":1,
-            "basePrice":200000,
+            "basePrice":350000,
             "center":[
               784.43646240234,
               -648.65502929688,
@@ -20700,15 +21594,15 @@
               -648.66876220703,
               184.95140327215
             ],
-            "description":"",
+            "description":"Just outside Fastello, overlooking a small island that looks straight out of a postcard, this garage offers something not everyone can afford: peace… and the perfect excuse to never finish that project car.\n\nBetween tools, engines and the distant sound of the sea, some say that if you look closely, you might even find a coin hidden somewhere around here.\n\nWe don’t confirm it. But we don’t deny it either.",
             "id":"bcm_Island_View",
             "images":{
               "preview":"bcm_Island_View.png"
             },
             "isBackupGarage":false,
             "isStarterGarage":false,
-            "maxCapacity":1,
-            "name":"Island View",
+            "maxCapacity":6,
+            "name":"Isola Vista Garage",
             "parkingSpots":[
               {
                 "dir":[
@@ -20731,47 +21625,343 @@
                   "ignoreOthers":true,
                   "perfect":true
                 }
+              },
+              {
+                "dir":[
+                  0.45100090190009,
+                  -0.85684875839803,
+                  -0.24981671624827
+                ],
+                "normal":[
+                  -0.0055234423644759,
+                  -0.0074917408866233,
+                  0.99995668176323
+                ],
+                "pos":[
+                  790.98004150391,
+                  -641.78686523438,
+                  184.24551689625
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.65223832549111,
+                  0.70074659265358,
+                  -0.28903179694447
+                ],
+                "normal":[
+                  -0.00012969970593657,
+                  -7.6293944668571e-06,
+                  0.99999999155989
+                ],
+                "pos":[
+                  788.00012207031,
+                  -645.98529052734,
+                  184.25138956308
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.60154658355036,
+                  0.52414655286818,
+                  -0.60283671000968
+                ],
+                "normal":[
+                  0.10728874211188,
+                  0.064445911552173,
+                  0.99213701185888
+                ],
+                "pos":[
+                  796.75177001953,
+                  -644.47698974609,
+                  184.22042155266
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.62304086894156,
+                  -0.74110910273145,
+                  -0.25015469909065
+                ],
+                "normal":[
+                  0.069227633360799,
+                  -0.0090492146070789,
+                  0.99755984607153
+                ],
+                "pos":[
+                  791.24798583984,
+                  -636.36401367188,
+                  184.0947958827
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.62304086894156,
+                  -0.74110910273145,
+                  -0.25015469909065
+                ],
+                "normal":[
+                  -0.083042033330902,
+                  -0.24328668861047,
+                  0.96639309178265
+                ],
+                "pos":[
+                  786.00018310547,
+                  -631.73040771484,
+                  184.47186040878
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  784.29931640625,
+                  -648.99560546875,
+                  184.25140100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  784.1844006462,
+                  -648.70744688725,
+                  185.02340100718
+                ],
+                "rotationMatrix":[
+                  -0.036089697882921,
+                  0.99931337612719,
+                  0,
+                  -0.99931337612719,
+                  -0.036089697882921,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  784.40156240944,
+                  -649.2747931383,
+                  184.99840100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  785.41081531386,
+                  -650.14828416569,
+                  184.23640100718
+                ],
+                "rotationMatrix":[
+                  -0.76864193615096,
+                  -0.63967927431652,
+                  0,
+                  0.63967927431652,
+                  -0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  781.45984501464,
+                  -644.90052705482,
+                  184.76240100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+              },
+              {
+                "position":[
+                  782.73472580835,
+                  -646.43243043357,
+                  185.51440100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+              },
+              {
+                "position":[
+                  782.11423691227,
+                  -645.6868477555,
+                  184.76240100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+              },
+              {
+                "position":[
+                  781.68454883248,
+                  -645.48631557831,
+                  185.51840100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/plastic_can_big.DAE"
+              },
+              {
+                "position":[
+                  784.32768819185,
+                  -648.68577480245,
+                  184.25540100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  784.84885285503,
+                  -649.77161429052,
+                  184.24140100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
-                789.36871337891,
-                -654.66009521484,
-                184.24636417627
+                790.76770019531,
+                -653.44207763672,
+                184.25239378214
               ],
               [
-                799.79388427734,
-                -645.21826171875,
-                183.60427474976
+                774.39117431641,
+                -642.39685058594,
+                184.55739033222
               ],
               [
-                796.26300048828,
-                -640.86224365234,
-                183.72668230534
+                784.54150390625,
+                -628.29614257813,
+                184.90346050262
               ],
               [
-                788.77777099609,
-                -637.44195556641,
-                184.24714201689
+                801.51629638672,
+                -644.45953369141,
+                183.08882778883
               ],
               [
-                783.41839599609,
-                -644.12872314453,
-                184.25098764896
-              ],
-              [
-                782.89874267578,
-                -649.74542236328,
-                184.16856962442
+                799.716796875,
+                -647.67144775391,
+                183.21802568436
               ]
             ]
           },
           "conflicted":false,
           "edited":{
             "baseCapacity":1,
-            "basePrice":200000,
+            "basePrice":350000,
             "center":[
               784.43646240234,
               -648.65502929688,
@@ -20782,15 +21972,15 @@
               -648.66876220703,
               184.95140327215
             ],
-            "description":"",
+            "description":"Just outside Fastello, overlooking a small island that looks straight out of a postcard, this garage offers something not everyone can afford: peace… and the perfect excuse to never finish that project car.\n\nBetween tools, engines and the distant sound of the sea, some say that if you look closely, you might even find a coin hidden somewhere around here.\n\nWe don’t confirm it. But we don’t deny it either.",
             "id":"bcm_Island_View",
             "images":{
               "preview":"bcm_Island_View.png"
             },
             "isBackupGarage":false,
             "isStarterGarage":false,
-            "maxCapacity":1,
-            "name":"Island View",
+            "maxCapacity":6,
+            "name":"Isola Vista Garage",
             "parkingSpots":[
               {
                 "dir":[
@@ -20813,45 +22003,341 @@
                   "ignoreOthers":true,
                   "perfect":true
                 }
+              },
+              {
+                "dir":[
+                  0.45100090190009,
+                  -0.85684875839803,
+                  -0.24981671624827
+                ],
+                "normal":[
+                  -0.0055234423644759,
+                  -0.0074917408866233,
+                  0.99995668176323
+                ],
+                "pos":[
+                  790.98004150391,
+                  -641.78686523438,
+                  184.24551689625
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.65223832549111,
+                  0.70074659265358,
+                  -0.28903179694447
+                ],
+                "normal":[
+                  -0.00012969970593657,
+                  -7.6293944668571e-06,
+                  0.99999999155989
+                ],
+                "pos":[
+                  788.00012207031,
+                  -645.98529052734,
+                  184.25138956308
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.60154658355036,
+                  0.52414655286818,
+                  -0.60283671000968
+                ],
+                "normal":[
+                  0.10728874211188,
+                  0.064445911552173,
+                  0.99213701185888
+                ],
+                "pos":[
+                  796.75177001953,
+                  -644.47698974609,
+                  184.22042155266
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.62304086894156,
+                  -0.74110910273145,
+                  -0.25015469909065
+                ],
+                "normal":[
+                  0.069227633360799,
+                  -0.0090492146070789,
+                  0.99755984607153
+                ],
+                "pos":[
+                  791.24798583984,
+                  -636.36401367188,
+                  184.0947958827
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
+              },
+              {
+                "dir":[
+                  0.62304086894156,
+                  -0.74110910273145,
+                  -0.25015469909065
+                ],
+                "normal":[
+                  -0.083042033330902,
+                  -0.24328668861047,
+                  0.96639309178265
+                ],
+                "pos":[
+                  786.00018310547,
+                  -631.73040771484,
+                  184.47186040878
+                ],
+                "tags":{
+                  "forwards":true,
+                  "ignoreOthers":true,
+                  "perfect":true
+                }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  784.29931640625,
+                  -648.99560546875,
+                  184.25140100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  784.1844006462,
+                  -648.70744688725,
+                  185.02340100718
+                ],
+                "rotationMatrix":[
+                  -0.036089697882921,
+                  0.99931337612719,
+                  0,
+                  -0.99931337612719,
+                  -0.036089697882921,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  784.40156240944,
+                  -649.2747931383,
+                  184.99840100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  785.41081531386,
+                  -650.14828416569,
+                  184.23640100718
+                ],
+                "rotationMatrix":[
+                  -0.76864193615096,
+                  -0.63967927431652,
+                  0,
+                  0.63967927431652,
+                  -0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  781.45984501464,
+                  -644.90052705482,
+                  184.76240100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+              },
+              {
+                "position":[
+                  782.73472580835,
+                  -646.43243043357,
+                  185.51440100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+              },
+              {
+                "position":[
+                  782.11423691227,
+                  -645.6868477555,
+                  184.76240100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/cbbox_new_b.DAE"
+              },
+              {
+                "position":[
+                  781.68454883248,
+                  -645.48631557831,
+                  185.51840100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/plastic_can_big.DAE"
+              },
+              {
+                "position":[
+                  784.32768819185,
+                  -648.68577480245,
+                  184.25540100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  784.84885285503,
+                  -649.77161429052,
+                  184.24140100718
+                ],
+                "rotationMatrix":[
+                  0.76864193615096,
+                  0.63967927431652,
+                  0,
+                  -0.63967927431652,
+                  0.76864193615096,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
-                789.36871337891,
-                -654.66009521484,
-                184.24636417627
+                790.76770019531,
+                -653.44207763672,
+                184.25239378214
               ],
               [
-                799.79388427734,
-                -645.21826171875,
-                183.60427474976
+                774.39117431641,
+                -642.39685058594,
+                184.55739033222
               ],
               [
-                796.26300048828,
-                -640.86224365234,
-                183.72668230534
+                784.54150390625,
+                -628.29614257813,
+                184.90346050262
               ],
               [
-                788.77777099609,
-                -637.44195556641,
-                184.24714201689
+                801.51629638672,
+                -644.45953369141,
+                183.08882778883
               ],
               [
-                783.41839599609,
-                -644.12872314453,
-                184.25098764896
-              ],
-              [
-                782.89874267578,
-                -649.74542236328,
-                184.16856962442
+                799.716796875,
+                -647.67144775391,
+                183.21802568436
               ]
             ]
           },
           "origin":"production",
-          "touchedAt":1776340449
+          "touchedAt":1776868140
         },
         "bcm_Mansion":{
           "baseline":{
@@ -21010,7 +22496,179 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  324.42993164063,
+                  242.57777404785,
+                  184.53123438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  324.2402707293,
+                  242.82327300654,
+                  185.30323438358
+                ],
+                "rotationMatrix":[
+                  -0.30924679799587,
+                  0.95094485009873,
+                  0,
+                  -0.95094485009873,
+                  -0.30924679799587,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  327.02560424805,
+                  244.9712677002,
+                  184.53434962034
+                ],
+                "rotationMatrix":[
+                  -0.51854116781583,
+                  -0.8550771352809,
+                  0,
+                  0.8550771352809,
+                  -0.51854116781583,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  324.6049457069,
+                  242.33741998276,
+                  185.27823438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  328.04873657227,
+                  245.02659606934,
+                  184.53213608265
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  324.37209052114,
+                  242.88347717982,
+                  184.53523438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  327.52993774414,
+                  245.42623901367,
+                  184.5222055316
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/italy_clutter_big_dustbin.DAE"
+              },
+              {
+                "position":[
+                  324.78588706166,
+                  242.48032283835,
+                  184.53023438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
+              },
+              {
+                "position":[
+                  326.18655395508,
+                  243.96510314941,
+                  184.53822851181
+                ],
+                "rotationMatrix":[
+                  0.82623693512862,
+                  -0.56332275564659,
+                  0,
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21197,7 +22855,179 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  324.42993164063,
+                  242.57777404785,
+                  184.53123438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  324.2402707293,
+                  242.82327300654,
+                  185.30323438358
+                ],
+                "rotationMatrix":[
+                  -0.30924679799587,
+                  0.95094485009873,
+                  0,
+                  -0.95094485009873,
+                  -0.30924679799587,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  327.02560424805,
+                  244.9712677002,
+                  184.53434962034
+                ],
+                "rotationMatrix":[
+                  -0.51854116781583,
+                  -0.8550771352809,
+                  0,
+                  0.8550771352809,
+                  -0.51854116781583,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  324.6049457069,
+                  242.33741998276,
+                  185.27823438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  328.04873657227,
+                  245.02659606934,
+                  184.53213608265
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  324.37209052114,
+                  242.88347717982,
+                  184.53523438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  327.52993774414,
+                  245.42623901367,
+                  184.5222055316
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/italy_clutter_big_dustbin.DAE"
+              },
+              {
+                "position":[
+                  324.78588706166,
+                  242.48032283835,
+                  184.53023438358
+                ],
+                "rotationMatrix":[
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  -0.82623693512862,
+                  0.56332275564659,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
+              },
+              {
+                "position":[
+                  326.18655395508,
+                  243.96510314941,
+                  184.53822851181
+                ],
+                "rotationMatrix":[
+                  0.82623693512862,
+                  -0.56332275564659,
+                  0,
+                  0.56332275564659,
+                  0.82623693512862,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21228,7 +23058,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776340449
+          "touchedAt":1776681687
         },
         "bcm_Mariner_View":{
           "baseline":{
@@ -21277,7 +23107,84 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  1482.3460693359,
+                  1593.3806152344,
+                  138.58390808105
+                ],
+                "rotationMatrix":[
+                  -0.090582787670994,
+                  -0.99588892883582,
+                  0,
+                  0.99588892883582,
+                  -0.090582787670994,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  1482.6311606223,
+                  1593.2582879748,
+                  139.35590808105
+                ],
+                "rotationMatrix":[
+                  0.73255594583409,
+                  -0.68065518158839,
+                  0,
+                  0.68065518158839,
+                  0.73255594583409,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  1482.0762787146,
+                  1593.5055673078,
+                  139.33090808105
+                ],
+                "rotationMatrix":[
+                  -0.090582787670994,
+                  -0.99588892883582,
+                  0,
+                  0.99588892883582,
+                  -0.090582787670994,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  1482.545236687,
+                  1593.1415914567,
+                  138.58790808105
+                ],
+                "rotationMatrix":[
+                  -0.090582787670994,
+                  -0.99588892883582,
+                  0,
+                  0.99588892883582,
+                  -0.090582787670994,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21349,7 +23256,84 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  1482.3460693359,
+                  1593.3806152344,
+                  138.58390808105
+                ],
+                "rotationMatrix":[
+                  -0.090582787670994,
+                  -0.99588892883582,
+                  0,
+                  0.99588892883582,
+                  -0.090582787670994,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  1482.6311606223,
+                  1593.2582879748,
+                  139.35590808105
+                ],
+                "rotationMatrix":[
+                  0.73255594583409,
+                  -0.68065518158839,
+                  0,
+                  0.68065518158839,
+                  0.73255594583409,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  1482.0762787146,
+                  1593.5055673078,
+                  139.33090808105
+                ],
+                "rotationMatrix":[
+                  -0.090582787670994,
+                  -0.99588892883582,
+                  0,
+                  0.99588892883582,
+                  -0.090582787670994,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  1482.545236687,
+                  1593.1415914567,
+                  138.58790808105
+                ],
+                "rotationMatrix":[
+                  -0.090582787670994,
+                  -0.99588892883582,
+                  0,
+                  0.99588892883582,
+                  -0.090582787670994,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21375,7 +23359,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776340449
+          "touchedAt":1776681687
         },
         "bcm_Mountain_View":{
           "baseline":{
@@ -21490,7 +23474,122 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  -1770.4117431641,
+                  -96.12720489502,
+                  152.53914731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  -1770.5126924568,
+                  -96.420548107482,
+                  153.31114731741
+                ],
+                "rotationMatrix":[
+                  -0.62472406856399,
+                  -0.78080056874778,
+                  0,
+                  0.78080056874778,
+                  -0.62472406856399,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  -1770.3070467872,
+                  -95.848926852999,
+                  153.28614731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  -1770.6354131592,
+                  -96.34347263019,
+                  152.54314731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  -1770.5258548434,
+                  -95.776235488035,
+                  152.53814731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
+              },
+              {
+                "position":[
+                  -1770.3218051311,
+                  -95.180583983444,
+                  152.52914731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21628,7 +23727,122 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  -1770.4117431641,
+                  -96.12720489502,
+                  152.53914731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  -1770.5126924568,
+                  -96.420548107482,
+                  153.31114731741
+                ],
+                "rotationMatrix":[
+                  -0.62472406856399,
+                  -0.78080056874778,
+                  0,
+                  0.78080056874778,
+                  -0.62472406856399,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  -1770.3070467872,
+                  -95.848926852999,
+                  153.28614731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  -1770.6354131592,
+                  -96.34347263019,
+                  152.54314731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  -1770.5258548434,
+                  -95.776235488035,
+                  152.53814731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
+              },
+              {
+                "position":[
+                  -1770.3218051311,
+                  -95.180583983444,
+                  152.52914731741
+                ],
+                "rotationMatrix":[
+                  -0.99985847796971,
+                  0.01682331810606,
+                  0,
+                  -0.01682331810606,
+                  -0.99985847796971,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21654,7 +23868,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776340449
+          "touchedAt":1776772758
         },
         "bcm_Seaview":{
           "baseline":{
@@ -21703,7 +23917,122 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  1827.8142089844,
+                  -812.40460205078,
+                  153.27690547705
+                ],
+                "rotationMatrix":[
+                  0.73504479858084,
+                  -0.67801854257775,
+                  0,
+                  0.67801854257775,
+                  0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  1828.0847887551,
+                  -812.25285361529,
+                  154.04890547705
+                ],
+                "rotationMatrix":[
+                  0.9859281652197,
+                  0.16695910585087,
+                  0,
+                  -0.16695910585087,
+                  0.9859281652197,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  1828.6830418077,
+                  -811.64557996609,
+                  153.28590547705
+                ],
+                "rotationMatrix":[
+                  0.98370784765508,
+                  0.17989085708232,
+                  0,
+                  -0.17989085708232,
+                  0.98370784765508,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  1827.5508593126,
+                  -812.54261274013,
+                  154.02390547705
+                ],
+                "rotationMatrix":[
+                  0.73504479858084,
+                  -0.67801854257775,
+                  0,
+                  0.67801854257775,
+                  0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  1827.3026123047,
+                  -813.31420898438,
+                  153.27366149426
+                ],
+                "rotationMatrix":[
+                  -0.73504479858084,
+                  0.67801854257775,
+                  0,
+                  -0.67801854257775,
+                  -0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  1828.1250829194,
+                  -812.39205627446,
+                  153.28090547705
+                ],
+                "rotationMatrix":[
+                  0.73504479858084,
+                  -0.67801854257775,
+                  0,
+                  0.67801854257775,
+                  0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21785,7 +24114,122 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  1827.8142089844,
+                  -812.40460205078,
+                  153.27690547705
+                ],
+                "rotationMatrix":[
+                  0.73504479858084,
+                  -0.67801854257775,
+                  0,
+                  0.67801854257775,
+                  0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  1828.0847887551,
+                  -812.25285361529,
+                  154.04890547705
+                ],
+                "rotationMatrix":[
+                  0.9859281652197,
+                  0.16695910585087,
+                  0,
+                  -0.16695910585087,
+                  0.9859281652197,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  1828.6830418077,
+                  -811.64557996609,
+                  153.28590547705
+                ],
+                "rotationMatrix":[
+                  0.98370784765508,
+                  0.17989085708232,
+                  0,
+                  -0.17989085708232,
+                  0.98370784765508,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  1827.5508593126,
+                  -812.54261274013,
+                  154.02390547705
+                ],
+                "rotationMatrix":[
+                  0.73504479858084,
+                  -0.67801854257775,
+                  0,
+                  0.67801854257775,
+                  0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  1827.3026123047,
+                  -813.31420898438,
+                  153.27366149426
+                ],
+                "rotationMatrix":[
+                  -0.73504479858084,
+                  0.67801854257775,
+                  0,
+                  -0.67801854257775,
+                  -0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  1828.1250829194,
+                  -812.39205627446,
+                  153.28090547705
+                ],
+                "rotationMatrix":[
+                  0.73504479858084,
+                  -0.67801854257775,
+                  0,
+                  0.67801854257775,
+                  0.73504479858084,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -21821,7 +24265,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776340449
+          "touchedAt":1776681687
         },
         "bcm_it_fbx":{
           "baseline":{
@@ -26009,7 +28453,160 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  584.85778808594,
+                  1380.8046875,
+                  148.00414657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  584.95541436931,
+                  1381.0991533024,
+                  148.77614657593
+                ],
+                "rotationMatrix":[
+                  0.61585635779444,
+                  0.78781383369688,
+                  0,
+                  -0.78781383369688,
+                  0.61585635779444,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  584.98811509072,
+                  1381.9509858346,
+                  148.01314657593
+                ],
+                "rotationMatrix":[
+                  0.60550065834573,
+                  0.79587109681335,
+                  0,
+                  -0.79587109681335,
+                  0.60550065834573,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  584.75624463014,
+                  1380.5252435403,
+                  148.75114657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  584.96597441188,
+                  1379.2070662311,
+                  147.98914657593
+                ],
+                "rotationMatrix":[
+                  -0.99998477694193,
+                  0.0055177789363569,
+                  0,
+                  -0.0055177789363569,
+                  -0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  585.07899864823,
+                  1381.0234702396,
+                  148.00814657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  584.97586055432,
+                  1380.4550306794,
+                  148.00314657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
+              },
+              {
+                "position":[
+                  584.77855835801,
+                  1379.8571102471,
+                  147.99414657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -26113,7 +28710,160 @@
                 }
               }
             ],
-            "props":{},
+            "props":[
+              {
+                "position":[
+                  584.85778808594,
+                  1380.8046875,
+                  148.00414657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/race/rally/rally_assets/s_rally_fold_table_01.dae"
+              },
+              {
+                "position":[
+                  584.95541436931,
+                  1381.0991533024,
+                  148.77614657593
+                ],
+                "rotationMatrix":[
+                  0.61585635779444,
+                  0.78781383369688,
+                  0,
+                  -0.78781383369688,
+                  0.61585635779444,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae"
+              },
+              {
+                "position":[
+                  584.98811509072,
+                  1381.9509858346,
+                  148.01314657593
+                ],
+                "rotationMatrix":[
+                  0.60550065834573,
+                  0.79587109681335,
+                  0,
+                  -0.79587109681335,
+                  0.60550065834573,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_big_toolbox_02.dae"
+              },
+              {
+                "position":[
+                  584.75624463014,
+                  1380.5252435403,
+                  148.75114657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_wrench_collection.dae"
+              },
+              {
+                "position":[
+                  584.96597441188,
+                  1379.2070662311,
+                  147.98914657593
+                ],
+                "rotationMatrix":[
+                  -0.99998477694193,
+                  0.0055177789363569,
+                  0,
+                  -0.0055177789363569,
+                  -0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/levels/west_coast_usa/art/shapes/objects/airCompressor.dae"
+              },
+              {
+                "position":[
+                  585.07899864823,
+                  1381.0234702396,
+                  148.00814657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_metal_stool.dae"
+              },
+              {
+                "position":[
+                  584.97586055432,
+                  1380.4550306794,
+                  148.00314657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/Clutter/clutter_workshop_fire_extinguisher.dae"
+              },
+              {
+                "position":[
+                  584.77855835801,
+                  1379.8571102471,
+                  147.99414657593
+                ],
+                "rotationMatrix":[
+                  0.99998477694193,
+                  -0.0055177789363569,
+                  0,
+                  0.0055177789363569,
+                  0.99998477694193,
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "shapeName":"/art/shapes/garage_and_dealership/garage/s_small_toolbox_02.dae"
+              }
+            ],
             "propsAngle":0,
             "zoneVertices":[
               [
@@ -26149,7 +28899,7 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776340449
+          "touchedAt":1776681687
         },
         "it_garage_1":{
           "baseline":{
@@ -27035,6 +29785,26 @@
         }
       }
     },
+    "props":{
+      "deleted":{},
+      "items":{
+        "bcm_props":{
+          "baseline":{
+            "added":{},
+            "id":"bcm_props",
+            "removed":{}
+          },
+          "conflicted":false,
+          "edited":{
+            "added":{},
+            "id":"bcm_props",
+            "removed":{}
+          },
+          "origin":"production",
+          "touchedAt":1776781263
+        }
+      }
+    },
     "radarSpots":{
       "deleted":{},
       "items":{}
@@ -27060,6 +29830,7 @@
             "id":"it_port1",
             "name":"Italy port",
             "nodeType":"road",
+            "preview":"",
             "rotation":[
               0,
               0,
@@ -27090,6 +29861,7 @@
             "id":"it_port1",
             "name":"Italy port",
             "nodeType":"road",
+            "preview":"",
             "rotation":[
               0,
               0,
@@ -27103,13 +29875,13 @@
             ]
           },
           "origin":"production",
-          "touchedAt":1776337922
+          "touchedAt":1776868113
         }
       }
     }
   },
   "lastExport":{
-    "timestamp":1776410869
+    "timestamp":1777033701
   },
   "schemaLevel":"italy",
   "version":2

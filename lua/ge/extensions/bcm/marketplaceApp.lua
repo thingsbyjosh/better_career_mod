@@ -1,7 +1,7 @@
--- BCM Marketplace App Extension
+﻿-- BCM Marketplace App Extension
 -- Vue bridge for marketplace data: serves filtered/sorted listings, handles
 -- favorites, triggers population on first load, and regenerates text on
--- language change. Sends listing data to Vue via guihooks.trigger().
+-- language change. Sends listing data to Vue via guihooks.trigger.
 -- Extension name: bcm_marketplaceApp
 
 local M = {}
@@ -41,11 +41,11 @@ local sendInsuranceOptionsForCheckout
 local getInsuranceClassForConfig
 local buildReceiptEmailBody
 local formatCentsForEmail
--- Phase 52: Defect integration
+-- Defect integration
 local requestTestDrive
 local debugSpawnScammer
 local debugClearScammers
--- Phase 50: Sell flow
+-- Sell flow
 local computeVehicleMarketValue
 local getSellPreconditions
 local getVehicleSellData
@@ -66,23 +66,23 @@ local openSellPage
 local openMyListingsPage
 
 -- ============================================================================
--- Transaction fees (economy balance — closes friction-free flip exploit)
+-- Transaction fees (economy balance â€” closes friction-free flip exploit)
 -- ============================================================================
 local SELLER_LISTING_FEE_RATE  = 0.02   -- 2% upfront fee when creating a listing (non-refundable)
 local SELLER_COMMISSION_RATE   = 0.03   -- 3% commission on final sale price
 
 -- Pending vehicle deletion: waits for partConditions capture before removing from world.
 -- Vanilla pattern: addVehicle queues partCondition.getConditions asynchronously;
--- deleting immediately causes partConditions=nil → crash on Retrieve.
+-- deleting immediately causes partConditions=nil â†’ crash on Retrieve.
 -- We wait for onAddedVehiclePartsToInventory callback, then delete.
 local pendingPurchaseDelete = {} -- { [inventoryId] = vehId }
 
 -- Pending purchase context: stores all post-purchase data needed after async initConditions completes.
 -- Keyed by vehicle object ID (vehId) since we don't have inventoryId until addVehicle is called.
-local pendingPurchaseContext = {} -- { [vehId] = { listing, targetGarageId, prevVehId, ... } }
+local pendingPurchaseContext = {} -- { [vehId] = { listing, targetGarageId, prevVehId,... } }
 
--- Visual condition from mileage — matches vanilla vehicleShopping.getVisualValueFromMileage exactly.
--- Input: mileage in METERS (BeamNG internal unit). Output: 0.75–1.0 visual factor.
+-- Visual condition from mileage â€” matches vanilla vehicleShopping.getVisualValueFromMileage exactly.
+-- Input: mileage in METERS (BeamNG internal unit). Output: 0.75â€“1.0 visual factor.
 local function getVisualValueFromMileage(mileage)
   local function rescale(val, lo, hi, outLo, outHi)
     return outLo + (val - lo) / (hi - lo) * (outHi - outLo)
@@ -130,7 +130,7 @@ local function getMarketplace()
     -- Fallback: extension registry survives _G clearing
     mod = extensions['career_modules_bcm_marketplace']
     if mod then
-      log('W', 'bcm_marketplaceApp', '_G global nil but extensions registry alive — caching reference')
+      log('W', 'bcm_marketplaceApp', '_G global nil but extensions registry alive â€” caching reference')
     end
   end
   if mod then _marketplace = mod end
@@ -470,7 +470,7 @@ sendListingsToUI = function(listings, filters)
       priceDropPercent = (listing.marketValueCents and listing.marketValueCents > 0 and listing.priceCents < listing.marketValueCents)
         and math.floor((1 - listing.priceCents / listing.marketValueCents) * 100)
         or 0,
-      -- Phase 52: discovered defects (safe — only what player has found)
+      -- discovered defects (safe â€” only what player has found)
       discoveredDefects = bcm_defects and bcm_defects.getDiscoveredDefects and bcm_defects.getDiscoveredDefects(listing.id) or {},
       -- Do NOT expose: isGem, isScam, scamType, actualMileageKm, revealData, honesty, singleOwnerIsLie, defects
     })
@@ -523,7 +523,7 @@ requestListingDetail = function(listingId)
   local state = mp.getMarketplaceState()
   local favs = state and state.favorites or {}
 
-  -- Build detail table — same sanitization as sendListingsToUI
+  -- Build detail table â€” same sanitization as sendListingsToUI
   local detail = {
     id = listing.id,
     vehicleBrand = listing.vehicleBrand,
@@ -565,11 +565,11 @@ requestListingDetail = function(listingId)
     priceDropPercent = (listing.marketValueCents and listing.marketValueCents > 0 and listing.priceCents < listing.marketValueCents)
       and math.floor((1 - listing.priceCents / listing.marketValueCents) * 100)
       or 0,
-    -- Price history (visible to player — they see past drops)
+    -- Price history (visible to player â€” they see past drops)
     priceHistory = state.priceHistory and state.priceHistory[listing.id] or {},
-    -- Negotiation enabled (Phase 47)
+    -- Negotiation enabled
     contactDisabled = false,
-    -- Phase 52: discovered defects (safe — only what player has found)
+    -- discovered defects (safe â€” only what player has found)
     discoveredDefects = bcm_defects and bcm_defects.getDiscoveredDefects and bcm_defects.getDiscoveredDefects(listing.id) or {},
   }
 
@@ -610,7 +610,7 @@ requestListingStats = function()
 end
 
 -- ============================================================================
--- Negotiation API (Phase 47)
+-- Negotiation API
 -- ============================================================================
 
 sanitizeSession = function(session)
@@ -639,12 +639,12 @@ sanitizeSession = function(session)
     pendingResponse = session.pendingResponse ~= nil,
     vehicleName = session.vehicleName,
     language = session.language,
-    -- Player-first flow fields (Phase 49.1)
+    -- Player-first flow fields
     awaitingPlayerInit = session.awaitingPlayerInit or false,
     awaitingGreeting = session.awaitingGreeting or false,
     sellerHasResponded = session.sellerHasResponded or false,
     pendingGreeting = session.pendingGreeting,
-    -- v2 (Phase 49.4): negotiation panel fields
+    -- v2: negotiation panel fields
     isThinking = session.isThinking or false,
     lastPlayerOfferCents = session.lastPlayerOfferCents,
     -- v3: Frame-based typing state (must match fireSessionUpdate payload)
@@ -720,7 +720,7 @@ requestAllNegotiations = function()
   local negotiations = mp.getNegotiations()
   if not negotiations then return end
   for listingId, session in pairs(negotiations) do
-    -- Don't push dismissed sessions to Vue — they should stay hidden
+    -- Don't push dismissed sessions to Vue â€” they should stay hidden
     if not session.dismissed then
       guihooks.trigger('BCMNegotiationUpdate', sanitizeSession(session))
     end
@@ -728,7 +728,7 @@ requestAllNegotiations = function()
 end
 
 -- ============================================================================
--- Player-first message flow (Phase 49.1)
+-- Player-first message flow
 -- ============================================================================
 
 sendPlayerInitMessage = function(listingId)
@@ -746,7 +746,7 @@ deliverSellerGreeting = function(listingId)
 end
 
 -- ============================================================================
--- Checkout data API (Phase 49.3)
+-- Checkout data API
 -- ============================================================================
 
 requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
@@ -770,7 +770,7 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
     priceCents = session.dealPriceCents
   end
 
-  -- Compute taxes (linear rates — replaces fixed fee tiers)
+  -- Compute taxes (linear rates â€” replaces fixed fee tiers)
   local REGISTRATION_TAX_RATE = 0.025  -- 2.5%
   local SALES_TAX_RATE = 0.07
   local registrationTaxCents = math.floor(priceCents * REGISTRATION_TAX_RATE)
@@ -807,7 +807,7 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
   local defaultInsuranceId = -1
   local insurancePremiumCents = 0
   -- "No insurance" is always the first option
-  table.insert(insuranceOptions, { id = -1, name = "Sin seguro / No Insurance", premium = 0 })
+  table.insert(insuranceOptions, { id = -1, name = "No insurance", premium = 0 })
 
   -- Determine which insurance class applies to this vehicle
   local applicableClassId = nil
@@ -825,7 +825,7 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
     end)
     if playerInsurances then
       for id, _ in pairs(playerInsurances) do
-        -- playerInsurances has player stats, not provider info — get name from availableInsurances
+        -- playerInsurances has player stats, not provider info â€” get name from availableInsurances
         local providerInfo = career_modules_insurance_insurance.getInsuranceDataById(id)
         -- Filter: only show insurances matching the vehicle's class
         if providerInfo and (not applicableClassId or providerInfo.class == applicableClassId) then
@@ -871,7 +871,7 @@ requestCheckoutData = function(listingId, selectedGarageId, selectedInsuranceId)
     hasDeal = (session and session.dealReached) and true or false,
     registrationTaxCents = registrationTaxCents,
     salesTaxCents = salesTaxCents,
-    tradeInCreditCents = 0,  -- Phase 51 placeholder
+    tradeInCreditCents = 0,  -- placeholder
     insurancePremiumCents = insurancePremiumCents,
     totalCents = totalCents,
     balanceCents = balanceCents,
@@ -887,7 +887,7 @@ end
 -- ============================================================================
 -- Insurance class helper: determines which insurance class a vehicle config
 -- belongs to (dailyDriver / commercial / prestige) using vanilla's own logic.
--- Returns the class object (with .id field) or nil.
+-- Returns the class object (with.id field) or nil.
 -- ============================================================================
 
 getInsuranceClassForConfig = function(configKey)
@@ -917,7 +917,7 @@ getInsuranceClassForConfig = function(configKey)
 end
 
 -- ============================================================================
--- Vanilla insurance popup bridge (Phase 49.3)
+-- Vanilla insurance popup bridge
 -- ============================================================================
 
 sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsuranceId, vehicleConfigKey)
@@ -972,14 +972,14 @@ sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsu
         -- (mirrors getInsuranceSanitizedData + getSanitizedInsuranceDataForPurchase)
         local premium = career_modules_insurance_insurance.calculateAddVehiclePrice(id, vehValueDollars) or 0
 
-        -- baseDeductibledData: InsuranceCard reads .price from coverageOptions.deductible.choices[2].value
+        -- baseDeductibledData: InsuranceCard reads.price from coverageOptions.deductible.choices[2].value
         local baseDeductiblePrice = 0
         if raw.coverageOptions and raw.coverageOptions.deductible and raw.coverageOptions.deductible.choices then
           local choice = raw.coverageOptions.deductible.choices[2]
           if choice then baseDeductiblePrice = choice.value or 0 end
         end
 
-        -- Convert perks table from {perkId = {value, intro, ...}} to array if needed
+        -- Convert perks table from {perkId = {value, intro,...}} to array if needed
         -- InsuranceCard uses InsurancePerks which iterates the perks
         local perksArray = {}
         if raw.perks then
@@ -1054,7 +1054,7 @@ sendInsuranceOptionsForCheckout = function(vehValueDollars, vehName, currentInsu
 end
 
 -- ============================================================================
--- Email receipt builder (Phase 49.3)
+-- Email receipt builder
 -- ============================================================================
 
 buildReceiptEmailBody = function(data, lang)
@@ -1066,7 +1066,7 @@ buildReceiptEmailBody = function(data, lang)
            "Impuesto de ventas: " .. formatCentsForEmail(data.salesTaxCents) .. "\n" ..
            "Total: " .. formatCentsForEmail(data.totalCents) .. "\n\n" ..
            "Tu vehiculo ha sido enviado a: " .. (data.garageName or "") .. "\n\n" ..
-           "eBoy Motors — Buy. Sell. Regret."
+           "eBoy Motors â€” Buy. Sell. Regret."
   else
     return "Thank you for your purchase at eBoy Motors.\n\n" ..
            "Vehicle: " .. (data.vehicleTitle or "") .. "\n" ..
@@ -1075,12 +1075,12 @@ buildReceiptEmailBody = function(data, lang)
            "Sales tax: " .. formatCentsForEmail(data.salesTaxCents) .. "\n" ..
            "Total: " .. formatCentsForEmail(data.totalCents) .. "\n\n" ..
            "Your vehicle has been delivered to: " .. (data.garageName or "") .. "\n\n" ..
-           "eBoy Motors — Buy. Sell. Regret."
+           "eBoy Motors â€” Buy. Sell. Regret."
   end
 end
 
 -- ============================================================================
--- Purchase pipeline (Phase 49)
+-- Purchase pipeline
 -- ============================================================================
 
 confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
@@ -1113,7 +1113,7 @@ confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
     priceCents = session.dealPriceCents
   end
 
-  -- Compute taxes (linear rates — Phase 49.3)
+  -- Compute taxes (linear rates â€” )
   local REGISTRATION_TAX_RATE = 0.025  -- 2.5%
   local SALES_TAX_RATE = 0.07
   local registrationTaxCents = math.floor(priceCents * REGISTRATION_TAX_RATE)
@@ -1181,7 +1181,7 @@ confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
     return
   end
 
-  -- Debit bank BEFORE spawn (prevents race conditions) — total includes taxes
+  -- Debit bank BEFORE spawn (prevents race conditions) â€” total includes taxes
   local removedOk = bcm_banking.removeFunds(personalAccount.id, totalCents, "vehicle_purchase", "eBoy Motors: " .. (listing.title or "Vehicle"))
   if not removedOk then
     guihooks.trigger('BCMPurchaseResult', { success = false, error = "insufficient_funds" })
@@ -1256,7 +1256,7 @@ confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
 
       -- Initialize odometer + part condition from listing data, THEN callback to finish purchase.
       -- This matches vanilla vehicleShopping.spawnVehicle pattern exactly.
-      -- Adjust visualValue based on listing condition — mileage alone doesn't capture poor/fair condition
+      -- Adjust visualValue based on listing condition â€” mileage alone doesn't capture poor/fair condition
       local mileageMeters = math.floor((listing.actualMileageKm or listing.mileageKm or 0) * 1000)
       local visualValue = getVisualValueFromMileage(mileageMeters)
       local cond = listing.conditionLabel or "good"
@@ -1274,7 +1274,7 @@ confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
         mileageMeters, visualValue, vehId
       ))
     else
-      -- Spawn failed — refund and un-sold
+      -- Spawn failed â€” refund and un-sold
       bcm_banking.addFunds(personalAccount.id, totalCents, "refund", "eBoy Motors: spawn failed refund")
       if mp.markListingUnsold then
         mp.markListingUnsold(listingId)
@@ -1282,7 +1282,7 @@ confirmPurchase = function(listingId, selectedGarageId, selectedInsuranceId)
       guihooks.trigger('BCMPurchaseResult', { success = false, error = "spawn_failed" })
     end
   else
-    -- No inventory module — refund
+    -- No inventory module â€” refund
     bcm_banking.addFunds(personalAccount.id, totalCents, "refund", "eBoy Motors: inventory unavailable")
     if mp.markListingUnsold then
       mp.markListingUnsold(listingId)
@@ -1427,7 +1427,7 @@ onBCMPurchaseVehicleReady = function(vehId)
     })
   end
 
-  -- Phase 52: Post-purchase defect/gem reveal
+  -- Post-purchase defect/gem reveal
   if bcm_defects and bcm_defects.revealPostPurchase then
     bcm_defects.revealPostPurchase(ctx.listingId, listing, inventoryId)
   end
@@ -1499,7 +1499,7 @@ regenerateListingText = function(language)
   local listings = state.listings or {}
   local gen = getListingGenerator()
 
-  -- Build curated lookup once (avoids O(n²) per-listing scan)
+  -- Build curated lookup once (avoids O(nÂ²) per-listing scan)
   local curatedById = nil
 
   for _, listing in ipairs(listings) do
@@ -1572,7 +1572,7 @@ onCareerModulesActivated = function()
   -- Old saves may have: (a) invVehs entries without insuranceId, and
   -- (b) empty plInsurancesData (providers never initialized).
   -- insurance.lua's onCareerModulesActivated does `invVehs = {}` and repopulates
-  -- from JSON — any in-memory fix via getInvVehs() gets discarded.
+  -- from JSON â€” any in-memory fix via getInvVehs gets discarded.
   -- Fix: patch the JSON FILE on disk before insurance reads it.
   -- If plInsurancesData is empty, wipe invVehs to force isFirstLoadEver=true
   -- so vanilla reinitializes all providers correctly.
@@ -1582,11 +1582,11 @@ onCareerModulesActivated = function()
     local data = jsonReadFile(insuranceJsonPath)
     if data then
       local patched = false
-      -- Check if plInsurancesData is empty/missing — sign of deep corruption.
+      -- Check if plInsurancesData is empty/missing â€” sign of deep corruption.
       -- Wipe invVehs so insurance.lua triggers isFirstLoadEver and reinitializes.
       local plEmpty = not data.plInsurancesData or (type(data.plInsurancesData) == "table" and not next(data.plInsurancesData))
       if plEmpty and data.invVehs and next(data.invVehs) then
-        log('W', logTag, 'Insurance save corrupted: plInsurancesData empty but invVehs present — forcing reinit')
+        log('W', logTag, 'Insurance save corrupted: plInsurancesData empty but invVehs present â€” forcing reinit')
         data.invVehs = nil
         patched = true
       elseif data.invVehs then
@@ -1601,7 +1601,7 @@ onCareerModulesActivated = function()
       end
       if patched then
         jsonWriteFile(insuranceJsonPath, data, true)
-        log('W', logTag, 'Insurance JSON patched on disk — insurance.lua will read corrected data')
+        log('W', logTag, 'Insurance JSON patched on disk â€” insurance.lua will read corrected data')
       end
     end
   end
@@ -1718,7 +1718,7 @@ end
 -- Deferred vehicle deletion callback (vanilla pattern)
 -- ============================================================================
 -- Called by inventory.lua AFTER partCondition.getConditions has finished on the
--- vehicle-side Lua.  At this point partConditions are safely captured, so we
+-- vehicle-side Lua. At this point partConditions are safely captured, so we
 -- can remove the vehicle from the world without losing them.
 local function onAddedVehiclePartsToInventory(inventoryId, newParts)
   local info = pendingPurchaseDelete[inventoryId]
@@ -1726,7 +1726,7 @@ local function onAddedVehiclePartsToInventory(inventoryId, newParts)
   pendingPurchaseDelete[inventoryId] = nil
 
   -- Initialise originalParts & changedSlots on the inventory vehicle BEFORE
-  -- firing onVehicleAddedToInventory — valueCalculator.getInventoryVehicleValue
+  -- firing onVehicleAddedToInventory â€” valueCalculator.getInventoryVehicleValue
   -- needs originalParts to compute the part-difference value adjustment.
   -- (Vanilla vehicleShopping does the same init in its own onAddedVehiclePartsToInventory.)
   local vehicle = career_modules_inventory.getVehicles()[inventoryId]
@@ -1752,13 +1752,13 @@ local function onAddedVehiclePartsToInventory(inventoryId, newParts)
   log('I', logTag, 'Fired onVehicleAddedToInventory hook for inv=' .. tostring(inventoryId) .. ' insuranceId=' .. tostring(selectedInsuranceId))
 
   -- SAFETY: vanilla insurance.changeInvVehInsurance does early-return when
-  -- inventoryVehNeedsRepair() is true, leaving insuranceId = nil. This causes
+  -- inventoryVehNeedsRepair is true, leaving insuranceId = nil. This causes
   -- 'attempt to compare number with nil' spam every frame (insurance.lua:745).
   -- Fix: temporarily clear partConditions so changeInvVehInsurance succeeds,
   -- then restore them. Vehicles bought via eBoy may have defect-related damage.
   if career_modules_insurance_insurance and career_modules_insurance_insurance.inventoryVehNeedsRepair then
     if career_modules_insurance_insurance.inventoryVehNeedsRepair(inventoryId) then
-      log('W', logTag, 'Purchased vehicle needs repair — patching insurance init to avoid nil insuranceId')
+      log('W', logTag, 'Purchased vehicle needs repair â€” patching insurance init to avoid nil insuranceId')
       local veh = career_modules_inventory.getVehicles()[inventoryId]
       local savedConditions = veh and veh.partConditions
       if veh then veh.partConditions = {} end
@@ -1769,7 +1769,7 @@ local function onAddedVehiclePartsToInventory(inventoryId, newParts)
 
   -- Force save so insurance.json stays in sync with inventory.
   -- Without this, an autosave between addVehicle (sync) and this callback (async)
-  -- can persist the vehicle in inventory but NOT in insurance → repairScreen crash.
+  -- can persist the vehicle in inventory but NOT in insurance â†’ repairScreen crash.
   if career_saveSystem and career_saveSystem.saveCurrent then
     career_saveSystem.saveCurrent()
   end
@@ -1784,7 +1784,7 @@ local function onAddedVehiclePartsToInventory(inventoryId, newParts)
 end
 
 -- ============================================================================
--- Sell Flow (Phase 50)
+-- Sell Flow
 -- ============================================================================
 
 -- Compute market value for selling.
@@ -1800,7 +1800,7 @@ computeVehicleMarketValue = function(inventoryId)
   local pe = getPricingEngine()
   local lg = getListingGenerator()
 
-  -- Extract params — prefer inventory-level fields, fallback to model/config pool
+  -- Extract params â€” prefer inventory-level fields, fallback to model/config pool
   local vehicleClass = "Economy"
   local yearMade = vehicleData.year or 2020
   local powerHP = nil
@@ -1809,9 +1809,9 @@ computeVehicleMarketValue = function(inventoryId)
   local mileageKm = 0
   local conditionLabel = "good"
 
-  -- Best source: config pool entry (has aggregates, Power, Weight, Value — same as listingGenerator)
+  -- Best source: config pool entry (has aggregates, Power, Weight, Value â€” same as listingGenerator)
   -- Pool keys are short names (e.g. "2door_utility_late_3M"), inventory stores full path
-  -- (e.g. "vehicles/burnside/2door_utility_late_3M.pc") — extract short key to match
+  -- (e.g. "vehicles/burnside/2door_utility_late_3M.pc") â€” extract short key to match
   local configFilename = vehicleData.config and vehicleData.config.partConfigFilename
   local configShortKey = nil
   if configFilename then
@@ -1893,7 +1893,7 @@ computeVehicleMarketValue = function(inventoryId)
     end
   end
 
-  -- Apply price overrides (same JSON as listing generator — consistent buy/sell values)
+  -- Apply price overrides (same JSON as listing generator â€” consistent buy/sell values)
   if configShortKey and lg.applyPriceOverride then
     local adjustedValue, forcedClass = lg.applyPriceOverride(configShortKey, configBaseValue)
     if adjustedValue ~= configBaseValue then
@@ -1961,7 +1961,7 @@ computeVehicleMarketValue = function(inventoryId)
 
     -- Use vanilla's valueCalculator for part valuation (50% of depreciated value, same as vanilla)
     -- Safety: parts purchased via BCM before fix stored value in cents instead of dollars.
-    -- Detect by comparing part value to vehicle configBaseValue — if a single part exceeds
+    -- Detect by comparing part value to vehicle configBaseValue â€” if a single part exceeds
     -- the vehicle's base value, it's almost certainly in cents and needs /100.
     local baseValue = configBaseValue or 0
     local addedValueDollars = 0
@@ -2025,7 +2025,7 @@ getSellPreconditions = function(inventoryId)
 
   result.vehicleInfo = vehicleData
 
-  -- Block selling damaged vehicles — vanilla insurance can't handle them
+  -- Block selling damaged vehicles â€” vanilla insurance can't handle them
   -- (changeInvVehInsurance early-returns on needsRepair, leaving insuranceId=nil).
   -- Players must repair first.
   if career_modules_insurance_insurance and career_modules_insurance_insurance.inventoryVehNeedsRepair then
@@ -2117,7 +2117,7 @@ getVehicleSellData = function(inventoryId)
     end
   end
 
-  -- paidPriceCents: informational "you paid X" from stored BCM purchase price — NOT used for sell calculations
+  -- paidPriceCents: informational "you paid X" from stored BCM purchase price â€” NOT used for sell calculations
   local paidPriceCents = vehicleData and vehicleData.bcmListingPriceCents or nil
 
   local payload = {
@@ -2269,7 +2269,7 @@ confirmInstantSell = function(inventoryId)
   end
 
   if not removed then
-    log('E', logTag, 'Failed to remove vehicle from inventory after bank credit! inv=' .. tostring(inventoryId) .. ' — player keeps money + car (safe failure)')
+    log('E', logTag, 'Failed to remove vehicle from inventory after bank credit! inv=' .. tostring(inventoryId) .. ' â€” player keeps money + car (safe failure)')
   end
 
   -- Step 6: Record transaction
@@ -2345,13 +2345,13 @@ createPlayerListing = function(inventoryId, priceCents, description)
 
   -- Auto-generate description if empty
   if not description or description == "" then
-    description = niceName .. " — Well maintained."
+    description = niceName .. " â€” Well maintained."
   end
 
   local seed = pe.lcg(inventoryId * 7777 + os.time())
   local listingId = "player_listing_" .. tostring(seed)
 
-  -- Compute market variables for living market (Phase 50.1)
+  -- Compute market variables for living market
   local vehicleClass = "Economy"
   local yearMade = 2020
   local mileageKm = 100000
@@ -2425,7 +2425,7 @@ createPlayerListing = function(inventoryId, priceCents, description)
     soldGameDay = nil,
     buyerName = nil,
     salePriceCents = nil,
-    -- Market variables (Phase 50.1)
+    -- Market variables
     vehicleClass = vehicleClass,
     marketSigma = marketSigma,
     liquidity = liquidity,
@@ -2535,7 +2535,7 @@ requestPlayerListings = function()
   local vehicles = career_modules_inventory and career_modules_inventory.getVehicles and career_modules_inventory.getVehicles() or {}
 
   -- Safety: only run stale cleanup if inventory is actually loaded (has at least 1 vehicle).
-  -- If getVehicles() returns empty/nil (module not ready, loading), skip cleanup to avoid
+  -- If getVehicles returns empty/nil (module not ready, loading), skip cleanup to avoid
   -- deleting ALL valid listings.
   local vehicleCount = 0
   for _ in pairs(vehicles) do vehicleCount = vehicleCount + 1 end
@@ -2544,10 +2544,10 @@ requestPlayerListings = function()
     local toRemove = {}
     for _, listing in ipairs(listings) do
       if not listing.isSold and listing.inventoryId then
-        -- tonumber() to handle string/number key mismatch (Lua tables are type-sensitive)
+        -- tonumber to handle string/number key mismatch (Lua tables are type-sensitive)
         local invId = tonumber(listing.inventoryId)
         if invId and not vehicles[invId] then
-          -- Vehicle no longer in inventory — sold through other means (garage, instant sell, etc.)
+          -- Vehicle no longer in inventory â€” sold through other means (garage, instant sell, etc.)
           local activeSessions = 0
           local buyerSessions = mp.getBuyerSessionsForListing(listing.id) or {}
           for _, s in pairs(buyerSessions) do
@@ -2581,7 +2581,7 @@ requestPlayerListings = function()
   listings = mp.getPlayerListings()
   log('I', logTag, 'requestPlayerListings: sending ' .. tostring(#listings) .. ' player listings to Vue (inventory vehicles=' .. tostring(vehicleCount) .. ', cleaned ' .. #soldToRemove .. ' old sold)')
   guihooks.trigger('BCMPlayerListings', { listings = listings })
-  -- Send buyer sessions to Vue — filter out sessions that shouldn't be visible yet
+  -- Send buyer sessions to Vue â€” filter out sessions that shouldn't be visible yet
   local rawSessions = mp.getBuyerSessions() or {}
   local filteredSessions = {}
   for listingId, buyerMap in pairs(rawSessions) do
@@ -2600,7 +2600,7 @@ requestPlayerListings = function()
   guihooks.trigger('BCMBuyerSessions', { sessions = filteredSessions })
 end
 
--- NPC buyer interaction stubs (full implementation in Plan 50-03)
+-- NPC buyer interaction stubs (full implementation in )
 respondToBuyer = function(listingId, buyerId, counterCents)
   log('I', logTag, 'respondToBuyer called: listing=' .. tostring(listingId) .. ' buyer=' .. tostring(buyerId) .. ' counter=' .. tostring(counterCents))
   local nego = extensions.bcm_negotiation
@@ -2616,7 +2616,7 @@ respondToBuyer = function(listingId, buyerId, counterCents)
 end
 
 acceptBuyerOffer = function(listingId, buyerId)
-  -- Direct deal acceptance — bypass counter-offer flow entirely.
+  -- Direct deal acceptance â€” bypass counter-offer flow entirely.
   -- Sets dealReached + dealPriceCents so the player can confirm the sale.
   local mp = getMarketplace()
   if not mp then return end
@@ -2745,7 +2745,7 @@ openMyListingsPage = function()
 end
 
 -- ============================================================================
--- Phase 52: Test drive request + debug commands
+-- Test drive request + debug commands
 -- ============================================================================
 
 requestTestDrive = function(listingId)
@@ -2881,7 +2881,7 @@ debugSpawnScammer = function()
   }
 
   -- Recalculate realValueCents using the overridden defect data
-  -- (generateListing computed it too, but with its own random defects — we just overwrote them)
+  -- (generateListing computed it too, but with its own random defects â€” we just overwrote them)
   local pe = getPricingEngine()
   local realPower = cheapConfig.Power or expensiveConfig.Power or nil
   local realWeight = cheapConfig.Weight or expensiveConfig.Weight or nil
@@ -2968,11 +2968,11 @@ M.toggleFavorite       = toggleFavorite
 M.requestFavorites     = requestFavorites
 M.requestListingStats  = requestListingStats
 
--- Dealer overlay + contact registration (Phase 48)
+-- Dealer overlay + contact registration
 M.registerSellerContacts = registerSellerContacts
 M.openDealerOverlay     = openDealerOverlay
 
--- Negotiation API (Phase 47)
+-- Negotiation API
 M.startNegotiation     = startNegotiation
 M.sendOffer            = sendOffer
 M.useLeverage          = useLeverage
@@ -2981,20 +2981,20 @@ M.callBluff            = callBluff
 M.requestNegotiation      = requestNegotiation
 M.requestAllNegotiations  = requestAllNegotiations
 
--- Player-first message flow (Phase 49.1)
+-- Player-first message flow
 M.sendPlayerInitMessage    = sendPlayerInitMessage
 M.deliverSellerGreeting    = deliverSellerGreeting
 
--- Checkout data API (Phase 49.3)
+-- Checkout data API
 M.requestCheckoutData      = requestCheckoutData
 M.sendInsuranceOptionsForCheckout = sendInsuranceOptionsForCheckout
 
--- Purchase pipeline (Phase 49)
+-- Purchase pipeline
 M.confirmPurchase          = confirmPurchase
 M.onBCMPurchaseVehicleReady = onBCMPurchaseVehicleReady
 M.onPurchaseVehicleSpawned = onPurchaseVehicleSpawned
 
--- Sell flow (Phase 50)
+-- Sell flow
 M.getSellPreconditions       = getSellPreconditions
 M.getVehicleSellData         = getVehicleSellData
 M.requestSellConfirmData     = requestSellConfirmData
@@ -3040,7 +3040,7 @@ end
 M.openSellPage               = openSellPage
 M.openMyListingsPage         = openMyListingsPage
 
--- Phase 52: Test drive + defect integration
+-- Test drive + defect integration
 M.requestTestDrive           = requestTestDrive
 M.navigateToTestDrive        = function()
   if bcm_defects then bcm_defects.navigateToTestDrive() end
@@ -3064,7 +3064,7 @@ end
 M.ensureMarketplacePopulated = ensureMarketplacePopulated
 
 -- Debug: wipe all marketplace listings and repopulate from scratch.
--- Usage: extensions.bcm_marketplaceApp.debugResetListings()
+-- Usage: extensions.bcm_marketplaceApp.debugResetListings
 M.debugResetListings = function()
   local mp = getMarketplace()
   if not mp then log('E', logTag, 'debugResetListings: marketplace not loaded') return end
@@ -3214,7 +3214,7 @@ local function flushAllBuyerDeliveries()
   end
 end
 
--- Debug: advance marketplace N days (rotation, fatigue, arrivals — NO buyer interest)
+-- Debug: advance marketplace N days (rotation, fatigue, arrivals â€” NO buyer interest)
 M.debugAdvanceDays = function(n)
   n = n or 1
   local timeSystem = extensions.bcm_timeSystem
@@ -3222,7 +3222,7 @@ M.debugAdvanceDays = function(n)
     if timeSystem and timeSystem.advanceTime then
       timeSystem.advanceTime(1)
     end
-    -- advanceTime doesn't fire onBCMNewGameDay — call it explicitly
+    -- advanceTime doesn't fire onBCMNewGameDay â€” call it explicitly
     onBCMNewGameDay({ gameDay = getCurrentGameDay() })
     flushAllBuyerDeliveries()
   end
@@ -3241,7 +3241,7 @@ M.debugAdvanceDaysWithOffers = function(n)
   if timeSystem and timeSystem.advanceTime then
     for i = 1, n do
       timeSystem.advanceTime(1)
-      -- advanceTime doesn't fire onBCMNewGameDay — call it explicitly
+      -- advanceTime doesn't fire onBCMNewGameDay â€” call it explicitly
       onBCMNewGameDay({ gameDay = getCurrentGameDay() })
       flushAllBuyerDeliveries()
     end
@@ -3259,8 +3259,8 @@ M.debugAdvanceDaysWithOffers = function(n)
 end
 
 -- Debug: visually fast-forward N days at turbo speed. Time passes naturally (offers arrive, etc.)
--- Usage: extensions.bcm_marketplaceApp.debugFastForward(3)     -- 3 days at x20
---        extensions.bcm_marketplaceApp.debugFastForward(5, 30) -- 5 days at x30
+-- Usage: extensions.bcm_marketplaceApp.debugFastForward(3) -- 3 days at x20
+-- extensions.bcm_marketplaceApp.debugFastForward(5, 30) -- 5 days at x30
 M.debugFastForward = function(days, speed)
   local timeSystem = extensions.bcm_timeSystem
   if not timeSystem or not timeSystem.debugFastForward then
@@ -3281,7 +3281,7 @@ end
 
 -- Midday rotation: run a lighter rotation pass at noon for 12h listing turnover.
 -- This doesn't run the full processNewDay pipeline (no Poisson arrivals, no buyer
--- interest, no fatigue drops) — just rotates expired listings and replenishes.
+-- interest, no fatigue drops) â€” just rotates expired listings and replenishes.
 M.onBCMMidday = function(data)
   local mp = getMarketplace()
   if not mp then return end
@@ -3323,7 +3323,7 @@ M.onBCMMidday = function(data)
   for i = #listings, 1, -1 do
     local listing = listings[i]
     if not listing.isSold and not listing.isPlayerListing and not hasActiveNego[listing.id] then
-      -- Check expiry (NPC listings only — player listings are never auto-rotated)
+      -- Check expiry (NPC listings only â€” player listings are never auto-rotated)
       if listing.expiresGameDay and gameDay >= listing.expiresGameDay then
         listing.isSold = true
         listing.soldGameDay = gameDay
@@ -3401,11 +3401,11 @@ M.onCareerActive           = onCareerActive
 -- A duplicate call here caused timers to advance at 2x speed. Removed.
 -- If negotiation.onUpdate ever stops being called, re-enable ONE of these.
 -- M.onUpdate = function(dtReal, dtSim, dtRaw)
---   local nego = extensions.bcm_negotiation
---   if nego then
---     if nego.tickPendingTimers then nego.tickPendingTimers(dtReal) end
---     if nego.tickBuyerTimers then nego.tickBuyerTimers(dtReal) end
---   end
+-- local nego = extensions.bcm_negotiation
+-- if nego then
+-- if nego.tickPendingTimers then nego.tickPendingTimers(dtReal) end
+-- if nego.tickBuyerTimers then nego.tickBuyerTimers(dtReal) end
+-- end
 -- end
 
 return M

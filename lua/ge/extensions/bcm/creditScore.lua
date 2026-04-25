@@ -1,6 +1,6 @@
--- BCM Credit Score Extension
+﻿-- BCM Credit Score Extension
 -- FICO-inspired 5-factor credit score calculation engine with event-driven updates and persistence.
--- Feeds Phase 13 loan offers and Phase 12 Plan 02 Vue UI.
+-- Feeds loan offers and Vue UI.
 
 local M = {}
 
@@ -30,7 +30,7 @@ local onIncomeEvent
 local onLoanPaymentEvent
 
 -- Private state
-local currentScore = 550  -- Starting score per user decision
+local currentScore = 550  -- Starting score
 local previousScore = 550
 local factorHistory = {
   payments = {},        -- { loanId, amount, timestamp, onTime }
@@ -41,7 +41,7 @@ local factorHistory = {
 local activated = false
 local DECAY_WINDOW = 30 * 86400  -- 30 in-game days in seconds
 
--- Score tier configuration (used by Phase 13 loan system and by UI)
+-- Score tier configuration (used by loan system and by UI)
 -- NOTE: maxLoan values are in integer CENTS (matching banking.lua convention)
 local TIERS = {
   { min = 300, max = 499, label = "Poor", maxLoan = 1000000, minRate = 25, maxRate = 30 },
@@ -88,7 +88,7 @@ end
 
 -- Debt Ratio Score: 30% weight, 165 max points
 -- Uses real loan data from bcm_loans for debt-to-income ratio
--- Mortgage principal discounted 80% — secured debt impacts credit less than unsecured
+-- Mortgage principal discounted 80% â€” secured debt impacts credit less than unsecured
 getDebtRatioScore = function()
   local maxScore = 165
 
@@ -324,7 +324,7 @@ generateTips = function()
     table.insert(tips, "Your account is still new. Score improves with time")
   end
 
-  -- Debt ratio tips (Phase 13)
+  -- Debt ratio tips
   if factors.debtRatio.percent < 70 then
     table.insert(tips, "Lower your debt-to-income ratio for better offers")
   end
@@ -371,7 +371,7 @@ getTierForScore = function(score)
   return getCurrentTier(score)
 end
 
--- Get offer parameters for a given score (Phase 13 convenience)
+-- Get offer parameters for a given score
 getOfferParams = function(score)
   local tier = getCurrentTier(score)
   return {
@@ -410,7 +410,7 @@ recalculateAndNotify = function()
     local delta = math.abs(currentScore - previousScore)
 
     if delta >= 20 or (oldTier and newTier and oldTier.label ~= newTier.label) then
-      -- Fire notification event for Phase 8 notification system
+      -- Fire notification event for notification system
       if bcm_notifications then
         local direction = currentScore > previousScore and "up" or "down"
         local icon = direction == "up" and "trending_up" or "trending_down"
@@ -539,7 +539,7 @@ loadScoreData = function()
 
     log('I', 'bcm_creditScore', 'Loaded credit score data: score=' .. currentScore)
   else
-    -- No save exists (new career or first Phase 12 load)
+    -- No save exists (new career or first load)
     currentScore = 550
     previousScore = 550
     factorHistory = {
@@ -582,7 +582,7 @@ onSaveCurrentSaveSlot = function(currentSavePath)
   saveScoreData(currentSavePath)
 end
 
--- Lifecycle: Before save slot change — reset state to prevent data bleed
+-- Lifecycle: Before save slot change â€” reset state to prevent data bleed
 onBeforeSetSaveSlot = function()
   currentScore = 550
   previousScore = 550

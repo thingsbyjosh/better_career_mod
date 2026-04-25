@@ -1,4 +1,4 @@
--- BCM Garage Manager App Extension
+﻿-- BCM Garage Manager App Extension
 -- Garage management data bridge for Vue: dashboard data, tier upgrades, capacity upgrades.
 -- Extension name: bcm_garageManagerApp
 -- Loaded by bcm_extensionManager after bcm_garages.
@@ -14,7 +14,7 @@ local upgradeCapacity
 local transferVehicle
 local onComputerAddFunctions
 local onComputerMenuOpened
-local pendingGateContext    -- { computerFunctions, mode, garageId } — set in addFunctions, applied in menuOpened
+local pendingGateContext    -- { computerFunctions, mode, garageId } â€” set in addFunctions, applied in menuOpened
 local isAtOwnedGarage
 local getTierUpgradeCost
 local buildTierBenefits
@@ -29,7 +29,7 @@ local sendGarageModeToVue
 -- ============================================================================
 local logTag = 'bcm_garageManagerApp'
 
--- Fixed tier upgrade costs per CONTEXT.md user decision (in dollars)
+-- Fixed tier upgrade costs (in dollars)
 local TIER_UPGRADE_COSTS = {
   [0] = 10000,  -- T0 -> T1
   [1] = 50000,  -- T1 -> T2
@@ -54,21 +54,21 @@ isAtOwnedGarage = function(computerId)
 end
 
 -- ============================================================================
--- Phase 102: Tri-state capability gate (owned / paidRental / backup / none)
+-- Tri-state capability gate (owned / paidRental / backup / none)
 -- ============================================================================
 -- Derives a garage's operational mode from existing data sources only; no new
 -- state. Consumers (Vue layer, action-gating logic) branch on this instead of
 -- the previous binary isAtOwnedGarage check so the free backup, a paid rental,
--- and a fully owned garage each unlock the correct set of features (D-10, D-11).
+-- and a fully owned garage each unlock the correct set of features.
 getGarageMode = function(garageId)
   if not garageId then return 'none' end
   if bcm_properties then
     local rec = bcm_properties.getOwnedProperty(garageId)
-    -- Owned garage with NO paidRentalMode flag → fully owned (top tier)
+    -- Owned garage with NO paidRentalMode flag â†’ fully owned (top tier)
     if rec and rec.type == 'garage' and not rec.paidRentalMode then return 'owned' end
     -- Backup garage upgraded to paid-rental mode (hybrid data model, Pitfall 6)
     if rec and rec.type == 'backup' and rec.paidRentalMode then return 'paidRental' end
-    -- Backup garage without paid-rental upgrade → backup mode (same caps as freeRental)
+    -- Backup garage without paid-rental upgrade â†’ backup mode (same caps as freeRental)
     if rec and rec.type == 'backup' and not rec.paidRentalMode then return 'backup' end
     -- Legacy: owned garage with paidRentalMode flag (pre-migration saves)
     if rec and rec.type == 'garage' and rec.paidRentalMode then return 'paidRental' end
@@ -248,8 +248,8 @@ sendGarageData = function(garageId)
   end
 
   -- Count other owned garages (not the current one)
-  -- TODO(102-02): audit for type="rental" — once Plan 03 lands this must use
-  -- bcm_properties.getOwnedGarages() so rentals don't inflate the "other garages"
+  -- TODO(102-02): audit for type="rental" â€” once lands this must use
+  -- bcm_properties.getOwnedGarages so rentals don't inflate the "other garages"
   -- count and accidentally allow selling the only real garage.
   local allProperties = bcm_properties.getAllOwnedProperties()
   local otherGarageCount = 0
@@ -628,7 +628,7 @@ transferVehicle = function(vehicleId, fromGarageId, toGarageId)
   log('I', logTag, 'transferVehicle: Started transfer of veh=' .. tostring(vehicleId) .. ' from ' .. fromGarageId .. ' to ' .. toGarageId .. ' (delay=' .. delaySec .. 's)')
 end
 
--- Check for completed transfers — called from onUpdate
+-- Check for completed transfers â€” called from onUpdate
 local function checkCompletedTransfers()
   if not bcm_properties or not bcm_properties.getVehicleTransfers then return end
   local transfers = bcm_properties.getVehicleTransfers()
@@ -668,10 +668,10 @@ end
 -- ============================================================================
 
 -- Add "Garage Manager" to computer functions when at an owned / paid-rental /
--- free-backup garage. Phase 102 widens the gate from a binary "owned or not"
+-- free-backup garage. widens the gate from a binary "owned or not"
 -- check to the tri-state getGarageMode helper: the UI opens for any non-"none"
 -- mode and the Vue layer uses the BCMGarageModeUpdate payload to decide which
--- tabs and actions to disable per capability table (D-10, D-11).
+-- tabs and actions to disable per capability table.
 onComputerAddFunctions = function(menuData, computerFunctions)
   if not computerFunctions.general then
     computerFunctions.general = {}
@@ -686,7 +686,7 @@ onComputerAddFunctions = function(menuData, computerFunctions)
   local mode = getGarageMode(garageId)
   local gateOpen = mode ~= 'none'
 
-  -- Option A — auto-update vehicle location on garage computer open.
+  -- Option A â€” auto-update vehicle location on garage computer open.
   -- The player is here with whatever vehicle they drove in. Update its
   -- location (+ any coupled trailers) to this garage so My Vehicles reflects
   -- the last place the player actually went with each vehicle.
@@ -714,7 +714,7 @@ onComputerAddFunctions = function(menuData, computerFunctions)
     end
   end
 
-  -- Phase 102 Pack 2: Check if rental at this garage is expiring — fire renewal prompt.
+  -- Pack 2: Check if rental at this garage is expiring â€” fire renewal prompt.
   if garageId and bcm_rentals and bcm_rentals.shouldShowRenewalPrompt then
     if bcm_rentals.shouldShowRenewalPrompt(garageId) then
       local rental = bcm_rentals.getActiveRental(garageId)
@@ -747,7 +747,7 @@ onComputerAddFunctions = function(menuData, computerFunctions)
   }
 
   -- Stash context for the onComputerMenuOpened hook. BCM can't guarantee it runs
-  -- after vanilla modules in the same onComputerAddFunctions hook chain — depends
+  -- after vanilla modules in the same onComputerAddFunctions hook chain â€” depends
   -- on extension load order. onComputerMenuOpened fires AFTER all add-functions
   -- hooks have populated the computerFunctions table, so we apply the gate there.
   pendingGateContext = {
@@ -760,7 +760,7 @@ end
 -- Capability-gate vanilla computer functions based on BCM garage mode. Runs in
 -- onComputerMenuOpened so we're guaranteed to run after every extension's
 -- onComputerAddFunctions (tuning, partShop, partInventory, painting, etc.) has
--- populated their entries. D-10/D-11 hard enforcement.
+-- populated their entries. / hard enforcement.
 onComputerMenuOpened = function()
   local ctx = pendingGateContext
   pendingGateContext = nil
@@ -773,8 +773,8 @@ onComputerMenuOpened = function()
     partInventory  = caps.partsInstall,
     painting       = caps.paint,
   }
-  local reasonLabel = (ctx.mode == 'paidRental' and 'Locked — reserved for owned garages')
-                  or (ctx.mode == 'backup' and 'Locked — backup garage has limited capabilities')
+  local reasonLabel = (ctx.mode == 'paidRental' and 'Locked â€” reserved for owned garages')
+                  or (ctx.mode == 'backup' and 'Locked â€” backup garage has limited capabilities')
                   or 'Not available at this garage mode'
 
   if ctx.computerFunctions.general then
@@ -821,8 +821,8 @@ getImportableVehicles = function(toGarageId)
     return
   end
 
-  -- TODO(102-02): audit for type="rental" — rentals are valid vehicle sources
-  -- today so iterating all properties is acceptable. Plan 03/04 must audit the
+  -- TODO(102-02): audit for type="rental" â€” rentals are valid vehicle sources
+  -- today so iterating all properties is acceptable. /04 must audit the
   -- transfer delay + display name paths for rental sources before shipping.
   local allProperties = bcm_properties.getAllOwnedProperties()
   local allVehicles = career_modules_inventory and career_modules_inventory.getVehicles and career_modules_inventory.getVehicles() or {}
@@ -1006,7 +1006,7 @@ end
 local function onCareerModulesActivated()
   patchSpawnVehicleAndTeleportToGarage()
   deliveryWatchlist = {}
-  log('I', logTag, 'garageManagerApp activated — spawn override patched')
+  log('I', logTag, 'garageManagerApp activated â€” spawn override patched')
 end
 
 -- ============================================================================
@@ -1105,7 +1105,7 @@ M.onComputerMenuOpened = onComputerMenuOpened
 M.onCareerModulesActivated = onCareerModulesActivated
 M._reteleportCheck = _reteleportCheck
 
--- Phase 102 — tri-state capability gate exports
+-- â€” tri-state capability gate exports
 M.getGarageMode = getGarageMode
 M.getCapabilitiesForMode = getCapabilitiesForMode
 M.sendGarageModeToVue = sendGarageModeToVue

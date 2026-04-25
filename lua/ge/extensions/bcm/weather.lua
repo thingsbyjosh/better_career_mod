@@ -1,4 +1,4 @@
--- BCM Weather System
+﻿-- BCM Weather System
 -- Core weather state machine with seasonal probability tables, smooth transitions,
 -- and scenetree control (rain, fog, clouds, wind, sound).
 -- Weather regenerates fresh each session from season probabilities (no persistence).
@@ -30,10 +30,10 @@ local updateRainSound
 local broadcastWeatherUpdate
 local onUpdate
 local onCareerActive
--- Plan 01 (settings): Weather control API forward declarations
+-- (settings): Weather control API forward declarations
 local setWeatherEnabled
 local setSeasonLock
--- Plan 03: Physics integration forward declarations
+-- Physics integration forward declarations
 local updateGroundmodel
 local applyGroundmodel
 local updateWindEffect
@@ -207,7 +207,7 @@ local sunskyObject = nil
 local rainSoundEmitter = nil
 local weatherObjectsInitialized = false
 
--- Plan 03: Physics integration constants
+-- Physics integration constants
 local RAIN_THRESHOLD_DRY_TO_WET = 400       -- numDrops threshold for wet groundmodel
 local RAIN_THRESHOLD_WET_TO_STORM = 1500     -- numDrops threshold for storm groundmodel
 local MIN_GROUNDMODEL_CHANGE_INTERVAL = 60   -- seconds (debounce)
@@ -366,7 +366,7 @@ initWeatherObjects = function()
   if fogObject then
     log('I', logTag, 'Found fog object: theLevelInfo')
   else
-    log('W', logTag, 'theLevelInfo not found — fog effects disabled')
+    log('W', logTag, 'theLevelInfo not found â€” fog effects disabled')
   end
 
   -- Find sunsky for lightning flash and brightness control
@@ -400,7 +400,7 @@ initWeatherObjects = function()
     end
   end
   if not cloudsObject then
-    log('W', logTag, 'No CloudLayer found — cloud effects disabled')
+    log('W', logTag, 'No CloudLayer found â€” cloud effects disabled')
   end
 
   -- Find ForestWind
@@ -412,7 +412,7 @@ initWeatherObjects = function()
     end
   end
   if not windObject then
-    log('D', logTag, 'No ForestWind found — wind visual effects disabled')
+    log('D', logTag, 'No ForestWind found â€” wind visual effects disabled')
   end
 
   -- Delete any existing BCM rain/sound objects from previous session
@@ -474,7 +474,7 @@ initWeatherObjects = function()
   end
 
   weatherObjectsInitialized = true
-  log('I', logTag, 'Weather objects initialized — clouds:' .. tostring(cloudsObject ~= nil) .. ' fog:' .. tostring(fogObject ~= nil) .. ' rain:' .. tostring(rainObject ~= nil) .. ' wind:' .. tostring(windObject ~= nil))
+  log('I', logTag, 'Weather objects initialized â€” clouds:' .. tostring(cloudsObject ~= nil) .. ' fog:' .. tostring(fogObject ~= nil) .. ' rain:' .. tostring(rainObject ~= nil) .. ' wind:' .. tostring(windObject ~= nil))
 end
 
 -- Cleanup weather objects when career deactivates
@@ -568,8 +568,8 @@ local function postApplyObj(obj)
 end
 
 -- Apply values to scenetree objects
--- commitMode: if true, calls postApply() to commit changes (use for instant/final only)
---             if false/nil, just sets properties (use for per-frame interpolation)
+-- commitMode: if true, calls postApply to commit changes (use for instant/final only)
+-- if false/nil, just sets properties (use for per-frame interpolation)
 applyScenetreeValues = function(values, commitMode)
   if cloudsObject then
     pcall(function() cloudsObject.coverage = values.cloudsCoverage end)
@@ -793,7 +793,7 @@ selectAndApplyWeather = function()
     dateInfo = extensions.bcm_timeSystem.getDateInfo()
   end
 
-  -- Guard: if timeSystem hasn't loaded yet (gameTimeDays still 0 → Jan 1),
+  -- Guard: if timeSystem hasn't loaded yet (gameTimeDays still 0 â†’ Jan 1),
   -- fall back to OS date so weather matches the real calendar date
   if dateInfo and dateInfo.totalGameDays == 0 then
     local ok, now = pcall(os.date, "*t")
@@ -841,7 +841,7 @@ selectAndApplyWeather = function()
     weatherState.scheduledDuration = 999999  -- Never auto-change while disabled
     weatherState.timeInCurrentState = 0
     broadcastWeatherUpdate()
-    log('I', logTag, 'Weather disabled — forced sunny')
+    log('I', logTag, 'Weather disabled â€” forced sunny')
     return
   end
 
@@ -895,7 +895,7 @@ broadcastWeatherUpdate = function()
 end
 
 -- ============================================================================
--- Physics integration (Plan 03)
+-- Physics integration
 -- ============================================================================
 
 -- Determine target groundmodel based on interpolated rain intensity
@@ -934,7 +934,7 @@ updateGroundmodel = function(dtReal)
 end
 
 -- Apply a specific groundmodel to all terrain materials (MK Dynamic Weather pattern)
--- Uses vanilla BeamNG groundmodel names — no custom JSON file needed
+-- Uses vanilla BeamNG groundmodel names â€” no custom JSON file needed
 applyGroundmodel = function(gmType)
   local targetName = gmTargetName[gmType]
   if not targetName then return end
@@ -1014,7 +1014,7 @@ updateThunderLightning = function(dtReal)
       lightningActive = false
 
       -- Note: BeamNG has no built-in thunder sound asset
-      -- Thunder audio would require shipping a custom .ogg file
+      -- Thunder audio would require shipping a custom.ogg file
     end
     return
   end
@@ -1097,7 +1097,7 @@ onUpdate = function(dtReal, dtSim, dtRaw)
       if #demoQueue == 0 then
         demoActive = false
         TRANSITION_DURATION = demoOrigTransition
-        log('I', logTag, 'Demo complete — restored normal settings')
+        log('I', logTag, 'Demo complete â€” restored normal settings')
       end
     end
   end
@@ -1173,9 +1173,9 @@ onCareerActive = function(active)
         updateRainSound(0, false)
         weatherState.temperature = generateTemperature(weatherState.season, "sunny")
         broadcastWeatherUpdate()
-        -- Keep existing scheduledDuration — next change uses seasonal flow
+        -- Keep existing scheduledDuration â€” next change uses seasonal flow
       end
-      log('I', logTag, 'Forced sunny start — seasonal cycle will take over')
+      log('I', logTag, 'Forced sunny start â€” seasonal cycle will take over')
     end
     -- Set initial traffic speed
     updateTrafficSpeed()
@@ -1290,7 +1290,7 @@ end
 
 -- Debug: cycle through all states with smooth transitions (total ~5 min)
 -- Each state: ~15s hold + ~15s transition to next = ~30s per step
--- Usage: bcm_weather.demoAllStates()
+-- Usage: bcm_weather.demoAllStates
 M.demoAllStates = function()
   local states = {"sunny", "overcast", "drizzle", "storm", "drizzle", "overcast", "snow", "blizzard", "snow", "overcast", "sunny"}
 
@@ -1334,7 +1334,7 @@ M.demoStop = function()
 end
 
 -- Debug: force next chain step (simulates natural progression)
--- Usage: bcm_weather.nextWeather()
+-- Usage: bcm_weather.nextWeather
 M.nextWeather = function()
   ensureActive()
   local current = weatherState.currentState
@@ -1346,7 +1346,7 @@ M.nextWeather = function()
 end
 
 -- ============================================================================
--- Settings API (Plan 01: Options Menu backend)
+-- Settings API
 -- ============================================================================
 
 -- Enable or disable the weather system
@@ -1374,7 +1374,7 @@ setWeatherEnabled = function(enabled)
     weatherState.scheduledDuration = 999999
     weatherState.timeInCurrentState = 0
     broadcastWeatherUpdate()
-    log('I', logTag, 'Weather disabled — forced sunny')
+    log('I', logTag, 'Weather disabled â€” forced sunny')
 
   elseif weatherState.weatherEnabled and activated then
     -- Re-enable: select fresh weather based on current season
@@ -1385,7 +1385,7 @@ end
 
 -- Lock weather probability tables to a specific season
 -- season: "auto" (follows game calendar), "spring", "summer", "autumn", "winter"
--- This affects what weather types can occur — it does not freeze current weather
+-- This affects what weather types can occur â€” it does not freeze current weather
 setSeasonLock = function(season)
   local valid = {auto = true, spring = true, summer = true, autumn = true, winter = true}
   if not valid[season] then
@@ -1425,7 +1425,7 @@ M.onBCMSleepComplete = function(data)
   while remaining > 0 and steps < maxSteps do
     local timeLeft = weatherState.scheduledDuration - weatherState.timeInCurrentState
     if remaining >= timeLeft then
-      -- This state expires during sleep — advance to next
+      -- This state expires during sleep â€” advance to next
       remaining = remaining - timeLeft
 
       -- Update season info
@@ -1440,7 +1440,7 @@ M.onBCMSleepComplete = function(data)
       end
 
       local newState = selectNextWeather(weatherState.currentState, weatherState.month)
-      -- Snap directly (no smooth transition — player was asleep)
+      -- Snap directly (no smooth transition â€” player was asleep)
       weatherState.previousState = weatherState.currentState
       weatherState.currentState = newState
       weatherState.transitioning = false
@@ -1448,7 +1448,7 @@ M.onBCMSleepComplete = function(data)
       scheduleNextWeatherChange()
       steps = steps + 1
     else
-      -- Sleep ends mid-state — advance the clock
+      -- Sleep ends mid-state â€” advance the clock
       weatherState.timeInCurrentState = weatherState.timeInCurrentState + remaining
       remaining = 0
     end

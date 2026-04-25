@@ -1,8 +1,7 @@
--- BCM Devtool V2 — WIP Core
+﻿-- BCM Devtool V2 â€” WIP Core
 -- Generic baseline/edited/deleted model shared by all devtool modules (garages,
 -- delivery, travel, cameras, radar, gas). Handles persistence, drift detection,
 -- atomic export, ID generation, undo stack, and snapshots.
---
 -- Extension name: bcm_devtoolV2_wipCore
 -- Path: bcm/devtoolV2/wipCore.lua
 
@@ -60,7 +59,7 @@ local ensureBcmAreasParent
 local wipPath = nil
 local snapshotDir = nil
 local schemas = {}     -- [kindName] = schema table
-local state = {        -- matches bcm_devtool_wip_v2.json structure (spec §5)
+local state = {        -- matches bcm_devtool_wip_v2.json structure (spec Â§5)
   version = 2,
   schemaLevel = nil,
   kinds = {},          -- [kindName] = { items = {[id] = {baseline, edited, origin, touchedAt, conflicted}}, deleted = {} }
@@ -71,10 +70,10 @@ local undoStack = {}   -- capacity 50
 local redoStack = {}
 local UNDO_CAPACITY = 50
 
-local observers = {}   -- list of fn()
+local observers = {}   -- list of fn
 
 -- ============================================================================
--- Filesystem helpers (local copies of the orchestrator's helpers — wipCore
+-- Filesystem helpers (local copies of the orchestrator's helpers â€” wipCore
 -- doesn't have access to devtoolV2.lua's locals, so we duplicate the small
 -- routines rather than plumb them through setters)
 -- ============================================================================
@@ -178,7 +177,7 @@ local function assignInPlace(target, source)
 end
 
 -- Deep structural equality. Key ordering in tables is ignored (Lua tables are
--- unordered). For floats, uses exact equality — drift detection is meant to
+-- unordered). For floats, uses exact equality â€” drift detection is meant to
 -- catch edits, not floating-point noise, so callers should round explicitly if
 -- they care.
 deepEquals = function(a, b)
@@ -194,8 +193,8 @@ deepEquals = function(a, b)
 end
 
 -- Register a kind's schema. Called once per module at init time. Schema shape:
---   { name, idPrefix, exports = {...}, hydrate, serialize, validate, defaults,
---     [writeTargetDirect] }
+-- { name, idPrefix, exports = {...}, hydrate, serialize, validate, defaults,
+-- [writeTargetDirect] }
 -- After registration, the kind's bucket is created in state.kinds if not already
 -- present. Re-registering the same kind overwrites the schema (used for hot
 -- reload during development).
@@ -221,7 +220,7 @@ registerKind = function(schema)
 end
 
 -- Atomic WIP persistence. Writes to <wipPath>.tmp then renames. On failure,
--- leaves the old file intact and logs the error. The .tmp file is cleaned up
+-- leaves the old file intact and logs the error. The.tmp file is cleaned up
 -- on failure. Windows rename fails if target exists, so we remove target first.
 saveWip = function()
   if not wipPath then
@@ -258,7 +257,7 @@ saveWip = function()
 end
 
 -- Load WIP from disk into `state`. If file missing or malformed, resets state
--- to empty but keeps registered schemas. Does NOT trigger hydration — caller
+-- to empty but keeps registered schemas. Does NOT trigger hydration â€” caller
 -- must call hydrateAll after this.
 loadWip = function()
   if not wipPath then
@@ -352,7 +351,7 @@ local function getLevelShortCode(levelName)
 end
 
 -- ============================================================================
--- ID generation (stub — replaced with full impl in Task 7)
+-- ID generation (stub â€” replaced with full impl in Task 7)
 -- ============================================================================
 
 -- Scans WIP items, WIP deleted[], and production (via schema.hydrate) for the
@@ -407,7 +406,7 @@ end
 -- ============================================================================
 
 -- Apply value at a dot-separated path inside a table. Creates nested tables if
--- missing. Supports numeric array indices ("parkingSpots.0.pos.x") — 0-indexed
+-- missing. Supports numeric array indices ("parkingSpots.0.pos.x") â€” 0-indexed
 -- for consistency with JS/Vue path strings, converted to Lua 1-indexed on walk.
 -- Returns the previous value at that path.
 applyFieldPath = function(tbl, path, value)
@@ -505,7 +504,7 @@ updateField = function(kind, id, fieldPath, value)
     log('W', logTag, 'updateField: no item ' .. kind .. '/' .. tostring(id))
     return false
   end
-  -- Capture baseline snapshot on first edit (spec §5 invariant 2)
+  -- Capture baseline snapshot on first edit (spec Â§5 invariant 2)
   if entry.origin == "production" and entry.baseline == nil then
     entry.baseline = deepCopy(entry.edited)
   end
@@ -529,7 +528,7 @@ end
 -- If explicitBefore is provided, it's used as the "before" snapshot in the
 -- undo op. This is needed when the caller has already mutated entry.edited
 -- in-place (e.g., via a shared reference from the orchestrator's legacy
--- garages[] mirror) — the internal deepCopy of entry.edited would capture
+-- garages[] mirror) â€” the internal deepCopy of entry.edited would capture
 -- the ALREADY-mutated state, making before==after and the undo useless.
 replaceItem = function(kind, id, newEdited, explicitBefore)
   local entry = get(kind, id)
@@ -818,20 +817,19 @@ end
 -- Walks each kind, validates every item via schema.validate, classifies each
 -- item as toWrite / skipped / invalid. Drifted items are SKIPPED (not written)
 -- until the user explicitly resolves them via resolveConflict (keepMine or
--- takeProd). Writing drifted items silently overwrites external changes — this
+-- takeProd). Writing drifted items silently overwrites external changes â€” this
 -- cost us real work when prod JSONs were hand-edited while an older WIP was
 -- still loaded. To export a drifted item, resolve it first so its driftStatus
 -- drops back to "safe".
---
 -- Plan shape:
---   kinds[kindName] = {
---     toWrite  = { entry, ... },             -- raw WIP entries (unchanged ref for executeExport)
---     toDelete = { id, ... },
---     itemMeta = { [id] = { drift, changedFields, name, skipped } },
---     conflicts = { { id, name }, ... },     -- drift items (all live in `skipped`, NOT toWrite)
---     skipped  = { { id, name, reason } },   -- items intentionally excluded from write
---     invalid  = { { id, errors }, ... },
---   }
+-- kinds[kindName] = {
+-- toWrite = { entry,... }, -- raw WIP entries (unchanged ref for executeExport)
+-- toDelete = { id,... },
+-- itemMeta = { [id] = { drift, changedFields, name, skipped } },
+-- conflicts = { { id, name },... }, -- drift items (all live in `skipped`, NOT toWrite)
+-- skipped = { { id, name, reason } }, -- items intentionally excluded from write
+-- invalid = { { id, errors },... },
+-- }
 buildExportPlan = function(levelName)
   levelName = levelName or getCurrentLevelIdentifier()
   local plan = {
@@ -867,7 +865,7 @@ buildExportPlan = function(levelName)
           }
           kindPlan.itemMeta[id] = meta
           if isDrift then
-            -- Hold back drifted items — prod stays untouched until the user
+            -- Hold back drifted items â€” prod stays untouched until the user
             -- explicitly resolves via keepMine/takeProd.
             table.insert(kindPlan.conflicts, { id = id, name = meta.name, status = driftStatus })
             table.insert(kindPlan.skipped,   { id = id, name = meta.name, reason = "drift" })
@@ -895,10 +893,10 @@ end
 
 -- Resolves a single conflicted item by re-capturing the current production
 -- snapshot as the new baseline. Strategy controls what happens to `edited`:
---   "keepMine" → baseline := currentProd, edited unchanged (your edits ride
---                on top of the new prod state in the next export).
---   "takeProd" → baseline := currentProd, edited := currentProd (your edits
---                are discarded; item effectively returns to prod state).
+-- "keepMine" â†’ baseline:= currentProd, edited unchanged (your edits ride
+-- on top of the new prod state in the next export).
+-- "takeProd" â†’ baseline:= currentProd, edited:= currentProd (your edits
+-- are discarded; item effectively returns to prod state).
 -- Returns true on success, false + error string on failure.
 resolveConflict = function(kind, id, strategy, levelName)
   levelName = levelName or getCurrentLevelIdentifier()
@@ -935,7 +933,7 @@ end
 
 -- Bulk resolution: runs resolveConflict for every currently-drifting item.
 -- kind = nil applies across all kinds; kind = "delivery" limits scope.
--- Returns { resolved = N, failed = {{id, err}, ...} }.
+-- Returns { resolved = N, failed = {{id, err},...} }.
 resolveAllConflicts = function(strategy, kind, levelName)
   levelName = levelName or getCurrentLevelIdentifier()
   if not levelName then return { resolved = 0, failed = {} } end
@@ -965,8 +963,8 @@ end
 -- ============================================================================
 
 -- Groups writes by destination file, serializes each entry via schema.serialize,
--- stages every target to .tmp, then renames all atomically. On stage failure,
--- rolls back all .tmp files. Supports the __placeInto / __extra / __skipCoreWrite
+-- stages every target to.tmp, then renames all atomically. On stage failure,
+-- rolls back all.tmp files. Supports the __placeInto / __extra / __skipCoreWrite
 -- serialize protocol so complex kinds (like garages) can direct where entries
 -- land inside their target files, or take over a target file entirely.
 executeExport = function(plan, levelName)
@@ -997,7 +995,7 @@ executeExport = function(plan, levelName)
         local resolvedSubPath = target.path:gsub("<level>", levelName)
         local writePath = getModLevelsPath(levelName) .. "/" .. resolvedSubPath
         local readPath = "/levels/" .. levelName .. "/" .. resolvedSubPath
-        -- Check first entry — if serialize returns __skipCoreWrite, delegate to writeTargetDirect.
+        -- Check first entry â€” if serialize returns __skipCoreWrite, delegate to writeTargetDirect.
         -- If there are no entries but there are deletions, probe against schema.defaults so
         -- we still detect the delegate path for pure-delete operations.
         local delegateDirect = false
@@ -1055,7 +1053,7 @@ executeExport = function(plan, levelName)
     end
   end
 
-  -- Phase B: stage writes to .tmp
+  -- Phase B: stage writes to.tmp
   local stagedTmpFiles = {}
   local stageErrors = {}
 
@@ -1088,7 +1086,7 @@ executeExport = function(plan, levelName)
             if type(v) ~= "table" or (type(v) == "table" and v[1] == nil and next(v) == nil) then
               applied[k] = v
             elseif type(v) == "table" and v[1] == nil then
-              -- Object (non-array) — preserve
+              -- Object (non-array) â€” preserve
               applied[k] = v
             end
           end
@@ -1169,7 +1167,7 @@ executeExport = function(plan, levelName)
       -- id/garageId/name (whichever is present). If found, DEEP-MERGE the new
       -- entry onto the existing one so fields v2 doesn't model (e.g. bot/top/
       -- color on zones) survive the round-trip. If not found, append as new.
-      -- This is the preserve-unknowns pattern — v2 only owns the fields it
+      -- This is the preserve-unknowns pattern â€” v2 only owns the fields it
       -- actively writes; everything else is passthrough.
       local function entryKey(e)
         if type(e) ~= "table" then return nil end
@@ -1181,10 +1179,10 @@ executeExport = function(plan, levelName)
         local out = deepCopy(base)
         for k, v in pairs(overlay) do
           if type(v) == "table" and type(out[k]) == "table" and v[1] == nil and out[k][1] == nil then
-            -- both are non-array objects → recurse
+            -- both are non-array objects â†’ recurse
             out[k] = deepMerge(out[k], v)
           else
-            -- scalar, array, or type mismatch → overlay wins
+            -- scalar, array, or type mismatch â†’ overlay wins
             out[k] = deepCopy(v)
           end
         end
@@ -1281,10 +1279,10 @@ executeExport = function(plan, levelName)
   -- Phase B.5: cross-file integrity validation (defensive). Each schema can
   -- declare an `integrityCheck(stagedTmpFiles, plan, levelName, helpers)` hook
   -- that returns nil on success or a list of error strings. The hook receives
-  -- a tmpByFinal lookup so it can read its own .tmp files (and other kinds')
+  -- a tmpByFinal lookup so it can read its own.tmp files (and other kinds')
   -- to verify cross-file invariants such as "every facility manualAccessPoints
   -- psName exists in sites.json parkingSpots". Failure aborts the whole export
-  -- and rolls back ALL .tmp files — no destination is touched.
+  -- and rolls back ALL.tmp files â€” no destination is touched.
   local tmpByFinal = {}
   for _, f in ipairs(stagedTmpFiles) do
     tmpByFinal[f.final] = f
@@ -1316,7 +1314,7 @@ executeExport = function(plan, levelName)
     return { success = false, errors = integrityErrors, integrityFailed = true }
   end
 
-  -- Phase C: rename all .tmp → final
+  -- Phase C: rename all.tmp â†’ final
   local renameErrors = {}
   for _, f in ipairs(stagedTmpFiles) do
     if FS:fileExists(f.final) then FS:removeFile(f.final) end
@@ -1330,11 +1328,34 @@ executeExport = function(plan, levelName)
     return { success = false, errors = renameErrors }
   end
 
-  -- Phase D: post-export — update baselines, clear delete lists, clear undo stack
+  -- Phase D: post-export â€” update baselines, clear delete lists, clear undo stack.
+  -- Baseline must reflect what hydrate will see on the next checkDrift, NOT
+  -- what we held in `edited`. Some serializers transform data asymmetrically
+  -- (e.g. delivery's empty `associatedOrganization` â†’ `id` substitution, or
+  -- material types merged into manualAccessPoints), so `edited` no longer
+  -- matches the on-disk shape after we wrote it. Re-hydrating once per kind
+  -- and matching by id keeps the baseline aligned with prod.
   for kindName, kindPlan in pairs(plan.kinds) do
     local bucket = state.kinds[kindName]
+    local schema = schemas[kindName]
+    local prodById = {}
+    if schema and schema.hydrate and #kindPlan.toWrite > 0 then
+      local ok, prodItems = pcall(schema.hydrate, levelName)
+      if ok and type(prodItems) == "table" then
+        for _, prod in ipairs(prodItems) do
+          if prod.id then prodById[prod.id] = prod.data end
+        end
+      else
+        log('W', logTag, 'executeExport: post-export hydrate failed for kind ' .. kindName .. ', falling back to edited copy')
+      end
+    end
     for _, entry in ipairs(kindPlan.toWrite) do
-      entry.baseline = deepCopy(entry.edited)
+      local fresh = entry.edited and entry.edited.id and prodById[entry.edited.id]
+      if fresh then
+        entry.baseline = deepCopy(fresh)
+      else
+        entry.baseline = deepCopy(entry.edited)
+      end
       entry.conflicted = false
     end
     for _, id in ipairs(kindPlan.toDelete) do

@@ -1,6 +1,6 @@
--- BCM Banking Extension
+﻿-- BCM Banking Extension
 -- Core banking module: multi-account system with transaction ledger, integer cents storage, save/load.
--- Replaces simple wallet from Phase 10 with full banking foundation.
+-- Replaces simple wallet from with full banking foundation.
 
 local M = {}
 
@@ -42,7 +42,7 @@ local personalAccountId = nil
 local businessAccountId = nil
 local activated = false
 
--- Coalescing state (from Phase 10 phoneTransactions.lua)
+-- Coalescing state (from phoneTransactions.lua)
 local pending = nil
 local COALESCE_WINDOW = 1.0  -- seconds
 
@@ -51,7 +51,7 @@ dollarsToCents = function(dollars)
   return math.floor((dollars or 0) * 100)
 end
 
--- Helper: Format integer cents as dollars (no cents displayed per user decision)
+-- Helper: Format integer cents as dollars (no cents displayed )
 formatMoney = function(cents)
   local dollars = math.floor((cents or 0) / 100)
 
@@ -173,7 +173,7 @@ addTransaction = function(accountId, amountCents, categoryId, description)
 
   log('D', 'bcm_banking', 'Transaction added: ' .. categoryId .. ' (' .. amountCents .. ' cents) to account: ' .. accountId)
 
-  -- Send phone notification for all bank movements (Phase 13 fix for missing Phase 11 feature)
+  -- Send phone notification for all bank movements
   if activated and bcm_notifications then
     local isIncome = amountCents > 0
     local absDollars = math.floor(math.abs(amountCents) / 100)
@@ -302,7 +302,7 @@ addFunds = function(accountId, amountCents, categoryId, description)
   addTransaction(accountId, amountCents, categoryId or "income", description or "Deposit")
 
   -- Mirror to vanilla game money (with bcmPayment tag so onPlayerAttributesChanged skips double-recording)
-  -- Without this, syncBalance() claws back the funds because vanilla money didn't increase.
+  -- Without this, syncBalance claws back the funds because vanilla money didn't increase.
   if career_modules_playerAttributes then
     local amountDollars = amountCents / 100
     career_modules_playerAttributes.addAttributes({money = amountDollars}, {tags = {"bcmPayment"}, label = description or "BCM Deposit"})
@@ -535,8 +535,8 @@ end
 
 -- Resolve a vanilla i18n label (string or table) into a readable string.
 -- Vanilla sends labels as either plain strings or tables like:
---   {txt = "ui.career.milestones.claimedRewardsFor", context = {milestoneName = "Moneymaker"}}
---   {txt = "ui.career.milestones.claimedRewardsFor", context = {milestoneName = {txt = "ui.career.skillSemicolon", context = {branch = "ui.career.logistics.delivery.name"}}}}
+-- {txt = "ui.career.milestones.claimedRewardsFor", context = {milestoneName = "Moneymaker"}}
+-- {txt = "ui.career.milestones.claimedRewardsFor", context = {milestoneName = {txt = "ui.career.skillSemicolon", context = {branch = "ui.career.logistics.delivery.name"}}}}
 resolveLabel = function(label)
   if type(label) == 'string' then
     -- Translate known vanilla i18n keys to readable text
@@ -780,16 +780,16 @@ onPlayerAttributesChanged = function(change, reason)
   -- Note: playerAttributes converts tags array to lookup dict {bcmPayment=true}, so check key directly
   local tagsLookup = (reason and reason.tags) or {}
   if tagsLookup.bcmPayment then
-    log('D', 'bcm_banking', 'Skipping bcmPayment change — already recorded by removeFunds')
+    log('D', 'bcm_banking', 'Skipping bcmPayment change â€” already recorded by removeFunds')
     return
   end
 
-  -- Skip vanilla arrest charges — bcm_fines handles arrest fines via removeFunds
+  -- Skip vanilla arrest charges â€” bcm_fines handles arrest fines via removeFunds
   -- The vanilla career system fires its own money deduction on arrest with reason 'hitArrest'
   -- which would create a duplicate/miscategorized transaction
   local reasonStr = reason and reason.reason
   if reasonStr == 'hitArrest' then
-    log('D', 'bcm_banking', 'Skipping vanilla arrest charge — bcm_fines handles this')
+    log('D', 'bcm_banking', 'Skipping vanilla arrest charge â€” bcm_fines handles this')
     return
   end
 

@@ -1,10 +1,10 @@
--- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+﻿-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
 -- If a copy of the bCDDL was not distributed with this
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 
 -- BCM: linearTutorial stub override
 -- Neutralizes the entire tutorial system by returning safe defaults.
--- Combined with tutorialEnabled=false and boughtStarterVehicle=true (Phase 1),
+-- Combined with tutorialEnabled=false and boughtStarterVehicle=true,
 -- this fully eliminates all intro/tutorial flow.
 
 local M = {}

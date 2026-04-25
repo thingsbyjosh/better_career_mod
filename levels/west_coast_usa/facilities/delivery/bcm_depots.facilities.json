@@ -211,41 +211,6 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_62",
-      "description":"",
-      "id":"bcmFacility_62",
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "logisticTypesProvided":{},
-      "logisticTypesReceived":[
-        "shopSupplies",
-        "mechanicalParts",
-        "foodSupplies",
-        "food",
-        "parcel"
-      ],
-      "manualAccessPoints":[
-        {
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "psName":"bcmFacility_62_parking1"
-        }
-      ],
-      "name":"Gamusino Lane 139",
-      "preview":"",
-      "sitesFile":"bcm_depots.sites.json",
-      "tags":[
-        "residential"
-      ]
-    },
-    {
       "associatedOrganization":"bcmFacility_35",
       "description":"",
       "id":"bcmFacility_35",
@@ -351,9 +316,9 @@
       ]
     },
     {
-      "associatedOrganization":"freya_116",
+      "associatedOrganization":"bcmFacility_45",
       "description":"",
-      "id":"freya_116",
+      "id":"bcmFacility_45",
       "logisticGenerators":{},
       "logisticMaxItems":8,
       "logisticTypesProvided":{},
@@ -375,10 +340,10 @@
             "foodSupplies",
             "food"
           ],
-          "psName":"freya_116_parking1"
+          "psName":"bcmFacility_45_parking1"
         }
       ],
-      "name":"Gamusino Lane 116",
+      "name":"Gamusino Lane 201",
       "preview":"",
       "sitesFile":"bcm_depots.sites.json",
       "tags":[
@@ -1195,6 +1160,58 @@
       ]
     },
     {
+      "associatedOrganization":"dirt_track_b",
+      "description":"Receives Sand and Gravel.",
+      "id":"dirt_track_b",
+      "logisticGenerators":[
+        {
+          "capacity":3000,
+          "interval":270,
+          "logisticTypes":[
+            "sand"
+          ],
+          "materialType":"sand",
+          "rate":200,
+          "target":1500,
+          "type":"materialReceiver",
+          "variance":1000
+        },
+        {
+          "capacity":1000,
+          "interval":360,
+          "logisticTypes":[
+            "gravel"
+          ],
+          "materialType":"gravel",
+          "rate":100,
+          "target":200,
+          "type":"materialReceiver",
+          "variance":400
+        }
+      ],
+      "logisticMaxItems":8,
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "sand",
+        "gravel"
+      ],
+      "manualAccessPoints":[
+        {
+          "isInspectSpot":true,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "sand",
+            "gravel"
+          ],
+          "psName":"dirt_track_b_parking1"
+        }
+      ],
+      "name":"Derby Track B",
+      "preview":"previews/dirt_track_b.jpg",
+      "sitesFile":"bcm_depots.sites.json",
+      "tags":{}
+    },
+    {
       "associatedOrganization":"bcmFacility_47",
       "description":"",
       "id":"bcmFacility_47",
@@ -1979,41 +1996,6 @@
       "tags":{}
     },
     {
-      "associatedOrganization":"bcmFacility_17",
-      "description":"",
-      "id":"bcmFacility_17",
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "logisticTypesProvided":{},
-      "logisticTypesReceived":[
-        "shopSupplies",
-        "mechanicalParts",
-        "foodSupplies",
-        "food",
-        "parcel"
-      ],
-      "manualAccessPoints":[
-        {
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "psName":"bcmFacility_17_parking1"
-        }
-      ],
-      "name":"Gamusino Lane 152",
-      "preview":"",
-      "sitesFile":"bcm_depots.sites.json",
-      "tags":[
-        "residential"
-      ]
-    },
-    {
       "associatedOrganization":"wc_delivery_1",
       "description":"",
       "id":"wc_delivery_1",
@@ -2113,6 +2095,76 @@
       "preview":"wc_delivery_1.png",
       "sitesFile":"bcm_depots.sites.json",
       "tags":{}
+    },
+    {
+      "associatedOrganization":"bcmFacility_17",
+      "description":"",
+      "id":"bcmFacility_17",
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "shopSupplies",
+        "mechanicalParts",
+        "foodSupplies",
+        "food",
+        "parcel"
+      ],
+      "manualAccessPoints":[
+        {
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "psName":"bcmFacility_17_parking1"
+        }
+      ],
+      "name":"Gamusino Lane 152",
+      "preview":"",
+      "sitesFile":"bcm_depots.sites.json",
+      "tags":[
+        "residential"
+      ]
+    },
+    {
+      "associatedOrganization":"lasventas_7",
+      "description":"",
+      "id":"lasventas_7",
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "shopSupplies",
+        "mechanicalParts",
+        "foodSupplies",
+        "parcel",
+        "food"
+      ],
+      "manualAccessPoints":[
+        {
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food",
+            "parcel"
+          ],
+          "psName":"lasventas_7_parking1"
+        }
+      ],
+      "name":"Las Ventas St 207",
+      "preview":"",
+      "sitesFile":"bcm_depots.sites.json",
+      "tags":[
+        "residential"
+      ]
     },
     {
       "associatedOrganization":"bcmFacility_16",
@@ -2255,9 +2307,9 @@
       ]
     },
     {
-      "associatedOrganization":"lasventas_7",
+      "associatedOrganization":"freya_116",
       "description":"",
-      "id":"lasventas_7",
+      "id":"freya_116",
       "logisticGenerators":{},
       "logisticMaxItems":8,
       "logisticTypesProvided":{},
@@ -2265,24 +2317,24 @@
         "shopSupplies",
         "mechanicalParts",
         "foodSupplies",
-        "parcel",
-        "food"
+        "food",
+        "parcel"
       ],
       "manualAccessPoints":[
         {
           "isInspectSpot":false,
           "logisticTypesProvided":{},
           "logisticTypesReceived":[
+            "parcel",
             "shopSupplies",
             "mechanicalParts",
             "foodSupplies",
-            "food",
-            "parcel"
+            "food"
           ],
-          "psName":"lasventas_7_parking1"
+          "psName":"freya_116_parking1"
         }
       ],
-      "name":"Las Ventas St 207",
+      "name":"Gamusino Lane 116",
       "preview":"",
       "sitesFile":"bcm_depots.sites.json",
       "tags":[
@@ -2465,41 +2517,6 @@
       ]
     },
     {
-      "associatedOrganization":"bcmFacility_45",
-      "description":"",
-      "id":"bcmFacility_45",
-      "logisticGenerators":{},
-      "logisticMaxItems":8,
-      "logisticTypesProvided":{},
-      "logisticTypesReceived":[
-        "shopSupplies",
-        "mechanicalParts",
-        "foodSupplies",
-        "food",
-        "parcel"
-      ],
-      "manualAccessPoints":[
-        {
-          "isInspectSpot":false,
-          "logisticTypesProvided":{},
-          "logisticTypesReceived":[
-            "parcel",
-            "shopSupplies",
-            "mechanicalParts",
-            "foodSupplies",
-            "food"
-          ],
-          "psName":"bcmFacility_45_parking1"
-        }
-      ],
-      "name":"Gamusino Lane 201",
-      "preview":"",
-      "sitesFile":"bcm_depots.sites.json",
-      "tags":[
-        "residential"
-      ]
-    },
-    {
       "associatedOrganization":"bcmNeedle",
       "description":"",
       "id":"bcmNeedle",
@@ -2558,6 +2575,41 @@
       "preview":"bcmNeedle.png",
       "sitesFile":"bcm_depots.sites.json",
       "tags":{}
+    },
+    {
+      "associatedOrganization":"bcmFacility_62",
+      "description":"",
+      "id":"bcmFacility_62",
+      "logisticGenerators":{},
+      "logisticMaxItems":8,
+      "logisticTypesProvided":{},
+      "logisticTypesReceived":[
+        "shopSupplies",
+        "mechanicalParts",
+        "foodSupplies",
+        "food",
+        "parcel"
+      ],
+      "manualAccessPoints":[
+        {
+          "isInspectSpot":false,
+          "logisticTypesProvided":{},
+          "logisticTypesReceived":[
+            "parcel",
+            "shopSupplies",
+            "mechanicalParts",
+            "foodSupplies",
+            "food"
+          ],
+          "psName":"bcmFacility_62_parking1"
+        }
+      ],
+      "name":"Gamusino Lane 139",
+      "preview":"",
+      "sitesFile":"bcm_depots.sites.json",
+      "tags":[
+        "residential"
+      ]
     }
   ]
 }

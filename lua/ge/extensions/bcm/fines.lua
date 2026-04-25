@@ -1,4 +1,4 @@
--- BCM Fines System
+﻿-- BCM Fines System
 -- Economy layer for police pursuits: calculates per-type infraction fines with arrest surcharge,
 -- debits via bcm_banking, maintains a persistent fine ledger, and provides debug commands.
 -- Extension name: bcm_fines
@@ -49,7 +49,7 @@ local FINE_AMOUNTS = {
   intersection = 50000,   -- $500
   hitTraffic   = 20000,   -- $200
   hitPolice    = 80000,   -- $800
-  -- Phase 61 activation (data structure ready now):
+  -- activation (data structure ready now):
   speed_radar      = 50000,  -- base $500
   red_light_camera = 75000,  -- $750
   no_plate         = 40000,  -- $400
@@ -145,7 +145,7 @@ chargeFine = function(amountCents, categoryId, description)
   end)
 
   if not account then
-    log('W', logTag, 'No bank account available — fine recorded but not charged')
+    log('W', logTag, 'No bank account available â€” fine recorded but not charged')
     return false
   end
 
@@ -158,7 +158,7 @@ chargeFine = function(amountCents, categoryId, description)
     end)
     log('I', logTag, 'Charged fine: ' .. tostring(charge) .. ' cents under category ' .. tostring(categoryId))
   else
-    log('I', logTag, 'Player has no funds — fine recorded but $0 charged')
+    log('I', logTag, 'Player has no funds â€” fine recorded but $0 charged')
   end
 
   -- Fine always recorded regardless of balance
@@ -210,8 +210,8 @@ end
 -- DPS Contact Registration
 -- ============================================================================
 
--- Register (or recover) the DPS contact. Call once after loadFinesData().
--- Deduplication: only calls addContact() if dpsContactId is nil after load.
+-- Register (or recover) the DPS contact. Call once after loadFinesData.
+-- Deduplication: only calls addContact if dpsContactId is nil after load.
 ensureDpsContact = function()
   if dpsContactId then return dpsContactId end
   if not bcm_contacts then return nil end
@@ -259,15 +259,15 @@ buildFineEmailSubject = function(fineType, amountCents)
   local amountStr = '$' .. tostring(math.floor((amountCents or 0) / 100))
 
   if fineType == 'speed_camera' then
-    return 'Notice of Automated Speed Enforcement Citation — ' .. amountStr
+    return 'Notice of Automated Speed Enforcement Citation â€” ' .. amountStr
   elseif fineType == 'speed_radar' then
-    return 'Notice of Mobile Radar Enforcement Citation — ' .. amountStr
+    return 'Notice of Mobile Radar Enforcement Citation â€” ' .. amountStr
   elseif fineType == 'red_light_camera' then
-    return 'Notice of Red Light Enforcement Citation — ' .. amountStr
+    return 'Notice of Red Light Enforcement Citation â€” ' .. amountStr
   elseif fineType == 'arrest' then
-    return 'Notice of Arrest Fine Assessment — ' .. amountStr
+    return 'Notice of Arrest Fine Assessment â€” ' .. amountStr
   else
-    return 'Official Fine Notice — ' .. amountStr
+    return 'Official Fine Notice â€” ' .. amountStr
   end
 end
 
@@ -320,7 +320,7 @@ end
 registerFineCategories = function()
   pcall(function()
     if not bcm_transactionCategories or not bcm_transactionCategories.register then
-      log('W', logTag, 'bcm_transactionCategories not available — fine categories not registered')
+      log('W', logTag, 'bcm_transactionCategories not available â€” fine categories not registered')
       return
     end
 
@@ -354,7 +354,7 @@ onPursuitEvent = function(data)
   if not activated then return end
   if not data then return end
 
-  -- ARST-05 scene-transition guard: do not process events during loading
+  -- scene-transition guard: do not process events during loading
   if isLoading() then
     log('W', logTag, 'Ignoring pursuit event during scene transition (careerLoading=true)')
     return
@@ -455,7 +455,7 @@ onPursuitEvent = function(data)
 
     -- Format amount for log
     local formattedAmount = '$' .. tostring(math.floor(totalCents / 100))
-    log('I', logTag, 'ARREST FINE: ' .. formattedAmount .. ' — ' .. desc)
+    log('I', logTag, 'ARREST FINE: ' .. formattedAmount .. ' â€” ' .. desc)
   end
 end
 
@@ -540,7 +540,7 @@ onCareerModulesActivated = function()
   registerFineCategories()
   -- Register DPS contact only if not already loaded from save
   ensureDpsContact()
-  log('I', logTag, 'BCM Fines activated — ' .. #fines .. ' ledger records loaded')
+  log('I', logTag, 'BCM Fines activated â€” ' .. #fines .. ' ledger records loaded')
 end
 
 onSaveCurrentSaveSlot = function(currentSavePath)
@@ -549,7 +549,7 @@ onSaveCurrentSaveSlot = function(currentSavePath)
 end
 
 -- ============================================================================
--- Debug commands — callable from BeamNG console as bcm_fines.X()
+-- Debug commands â€” callable from BeamNG console as bcm_fines.X
 -- ============================================================================
 
 issueFine = function(fineType)
@@ -584,13 +584,13 @@ issueFine = function(fineType)
   notifyFine(amount, fineType)
 
   local formattedAmount = '$' .. tostring(math.floor(amount / 100))
-  log('I', logTag, 'DEBUG: Issued ' .. fineType .. ' fine — ' .. formattedAmount)
+  log('I', logTag, 'DEBUG: Issued ' .. fineType .. ' fine â€” ' .. formattedAmount)
 end
 
 printLedger = function()
   log('I', logTag, '========== BCM FINES LEDGER ==========')
   if #fines == 0 then
-    log('I', logTag, '(empty — 0 fine records)')
+    log('I', logTag, '(empty â€” 0 fine records)')
   else
     for i, record in ipairs(fines) do
       local formattedAmount = '$' .. tostring(math.floor((record.amount or 0) / 100))
@@ -629,7 +629,7 @@ getLedgerCount = function()
 end
 
 -- ============================================================================
--- Camera fine API (Phase 61 — used by overrides/career/modules/speedTraps.lua)
+-- Camera fine API
 -- ============================================================================
 
 issueCameraFine = function(fineType, amountCents, triggerName, overSpeedKmh)
@@ -690,7 +690,7 @@ issueCameraFine = function(fineType, amountCents, triggerName, overSpeedKmh)
     if bcm_breakingNews and bcm_breakingNews.onEvent then
       local eventType = fineType  -- speed_camera, speed_radar, red_light_camera all match directly
       if fineType == 'no_plate' then
-        -- no_plate has no breaking news template — skip
+        -- no_plate has no breaking news template â€” skip
         return
       end
       bcm_breakingNews.onEvent(eventType, {
@@ -723,7 +723,7 @@ issueCameraFine = function(fineType, amountCents, triggerName, overSpeedKmh)
   end)
 
   local formattedAmount = '$' .. tostring(math.floor(amountCents / 100))
-  log('I', logTag, 'CAMERA FINE: ' .. formattedAmount .. ' — ' .. desc)
+  log('I', logTag, 'CAMERA FINE: ' .. formattedAmount .. ' â€” ' .. desc)
 end
 
 -- ============================================================================
@@ -741,11 +741,11 @@ M.onPursuitEvent = onPursuitEvent
 M.getLedger = getLedger
 M.getLedgerCount = getLedgerCount
 
--- Camera fine API (Phase 61)
+-- Camera fine API
 M.issueCameraFine = issueCameraFine
 M.getSpeedFineTier = getSpeedFineTier
 
--- Debug commands — callable from BeamNG console as bcm_fines.X()
+-- Debug commands â€” callable from BeamNG console as bcm_fines.X
 M.issueFine = issueFine
 M.printLedger = printLedger
 M.clearFines = clearFines

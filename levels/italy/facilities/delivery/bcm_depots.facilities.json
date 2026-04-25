@@ -1137,6 +1137,7 @@
           "type":"parcelReceiver"
         },
         {
+          "filter":"bigConstructionMaterials",
           "interval":120,
           "logisticTypes":[
             "trailerDeliveryConstructionMaterials",
@@ -1147,6 +1148,7 @@
           "type":"trailerOfferProvider"
         },
         {
+          "filter":"largeVehFilter",
           "interval":120,
           "logisticTypes":[
             "vehLargeTruckNeedsRepair",
@@ -1473,6 +1475,7 @@
       "id":"bcm_Dam_Breakdown_Rec_59",
       "logisticGenerators":[
         {
+          "filter":"largeVehFilter",
           "interval":200,
           "logisticTypes":[
             "vehLargeTruckNeedsRepair",
@@ -2460,6 +2463,7 @@
           "type":"parcelReceiver"
         },
         {
+          "filter":"fleetVehFilter",
           "interval":200,
           "logisticTypes":[
             "vehForPrivate"
@@ -2469,6 +2473,7 @@
           "type":"vehOfferProvider"
         },
         {
+          "filter":"mediumFurnitureTrailers",
           "interval":120,
           "logisticTypes":[
             "trailerDeliveryResidential"
@@ -2777,6 +2782,7 @@
           "type":"parcelReceiver"
         },
         {
+          "filter":"largeVehFilter",
           "interval":200,
           "logisticTypes":[
             "vehRepairFinished",
@@ -2788,6 +2794,7 @@
           "type":"vehOfferProvider"
         },
         {
+          "filter":"mediumFurnitureTrailers",
           "interval":120,
           "logisticTypes":[
             "trailerDeliveryResidential"
@@ -3406,6 +3413,7 @@
           "type":"parcelReceiver"
         },
         {
+          "filter":"bigConstructionMaterials",
           "interval":120,
           "logisticTypes":[
             "trailerDeliveryResidential",
@@ -5768,6 +5776,7 @@
           "type":"parcelReceiver"
         },
         {
+          "filter":"largeVehFilter",
           "interval":200,
           "logisticTypes":[
             "vehLargeTruck",
@@ -5779,6 +5788,7 @@
           "type":"vehOfferProvider"
         },
         {
+          "filter":"bigConstructionMaterials",
           "interval":200,
           "logisticTypes":[
             "trailerDeliveryConstructionMaterials"
@@ -6095,6 +6105,7 @@
           "type":"parcelReceiver"
         },
         {
+          "filter":"largeVehFilter",
           "interval":200,
           "logisticTypes":[
             "vehRepairFinished",
@@ -6106,6 +6117,7 @@
           "type":"vehOfferProvider"
         },
         {
+          "filter":"mediumFurnitureTrailers",
           "interval":120,
           "logisticTypes":[
             "trailerDeliveryResidential"
@@ -6654,6 +6666,7 @@
           "type":"parcelReceiver"
         },
         {
+          "filter":"largeVehFilter",
           "interval":200,
           "logisticTypes":[
             "vehRepairFinished",
@@ -6665,6 +6678,7 @@
           "type":"vehOfferProvider"
         },
         {
+          "filter":"mediumFurnitureTrailers",
           "interval":120,
           "logisticTypes":[
             "trailerDeliveryResidential"
@@ -7646,31 +7660,179 @@
           "min":1,
           "type":"trailerOfferProvider"
         },
-        {"type":"materialProvider","materialType":"bcmSand",           "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmSoil",           "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmGravel",         "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmCement",         "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmRock",           "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmWoodchips",      "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmFertilizer",     "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmLime",           "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmAsh",            "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmGasoline",       "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmDiesel",         "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmWater",          "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmChemicals",      "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmHazardousFluid", "capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialProvider","materialType":"bcmMysteriousWaste","capacity":2000,"target":1500,"rate":80,"interval":120,"variance":0.2}
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmSand",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmSoil",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmGravel",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmCement",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmRock",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmWoodchips",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmFertilizer",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmLime",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmAsh",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmGasoline",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmDiesel",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmWater",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmChemicals",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmHazardousFluid",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmMysteriousWaste",
+          "rate":80,
+          "target":1500,
+          "type":"materialProvider",
+          "variance":0.2
+        }
       ],
       "logisticMaxItems":8,
       "logisticTypesProvided":[
-        "industrial",
+        "fertilizer",
         "vehLargeTruck",
-        "foodSupplies",
         "trailerDeliveryResidential",
+        "rock",
+        "bcmRock",
+        "bcmSoil",
+        "gravel",
+        "bcmAsh",
+        "bcmSand",
+        "bcmFertilizer",
+        "mysteriousWaste",
+        "bcmCement",
+        "bcmLime",
+        "ash",
+        "bcmGravel",
+        "foodSupplies",
+        "bcmDiesel",
+        "bcmWoodchips",
+        "soil",
+        "bcmChemicals",
+        "bcmGasoline",
+        "hazardousFluid",
+        "lime",
+        "cement",
+        "chemicals",
         "trailerDeliveryConstructionMaterials",
-        "sand","soil","gravel","cement","rock","woodchips","fertilizer","lime","ash",
-        "gasoline","diesel","water","chemicals","hazardousFluid","mysteriousWaste"
+        "bcmWater",
+        "bcmMysteriousWaste",
+        "industrial",
+        "woodchips",
+        "water",
+        "sand",
+        "diesel",
+        "bcmHazardousFluid",
+        "gasoline"
       ],
       "logisticTypesReceived":[
         "foodSupplies",
@@ -7686,8 +7848,36 @@
             "trailerDeliveryConstructionMaterials",
             "trailerDeliveryResidential",
             "vehLargeTruck",
-            "sand","soil","gravel","cement","rock","woodchips","fertilizer","lime","ash",
-            "gasoline","diesel","water","chemicals","hazardousFluid","mysteriousWaste"
+            "sand",
+            "soil",
+            "gravel",
+            "cement",
+            "rock",
+            "woodchips",
+            "fertilizer",
+            "lime",
+            "ash",
+            "gasoline",
+            "diesel",
+            "water",
+            "chemicals",
+            "hazardousFluid",
+            "mysteriousWaste",
+            "bcmChemicals",
+            "bcmSoil",
+            "bcmGravel",
+            "bcmMysteriousWaste",
+            "bcmHazardousFluid",
+            "bcmSand",
+            "bcmDiesel",
+            "bcmFertilizer",
+            "bcmWater",
+            "bcmGasoline",
+            "bcmAsh",
+            "bcmCement",
+            "bcmRock",
+            "bcmWoodchips",
+            "bcmLime"
           ],
           "logisticTypesReceived":[
             "trailerDeliveryConstructionMaterials",
@@ -7903,21 +8093,141 @@
           "min":1,
           "type":"trailerOfferProvider"
         },
-        {"type":"materialReceiver","materialType":"bcmSand",           "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmSoil",           "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmGravel",         "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmCement",         "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmRock",           "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmWoodchips",      "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmFertilizer",     "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmLime",           "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmAsh",            "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmGasoline",       "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmDiesel",         "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmWater",          "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmChemicals",      "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmHazardousFluid", "capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2},
-        {"type":"materialReceiver","materialType":"bcmMysteriousWaste","capacity":2000,"target":500,"rate":80,"interval":120,"variance":0.2}
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmSand",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmSoil",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmGravel",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmCement",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmRock",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmWoodchips",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmFertilizer",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmLime",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmAsh",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmGasoline",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmDiesel",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmWater",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmChemicals",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmHazardousFluid",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        },
+        {
+          "capacity":2000,
+          "interval":120,
+          "materialType":"bcmMysteriousWaste",
+          "rate":80,
+          "target":500,
+          "type":"materialReceiver",
+          "variance":0.2
+        }
       ],
       "logisticMaxItems":6,
       "logisticTypesProvided":[
@@ -7937,19 +8247,34 @@
       ],
       "logisticTypesReceived":[
         "vehNeedsRepair",
-        "vehForPrivate",
+        "bcmGravel",
         "vehLargeTruck",
         "foodSupplies",
         "trailerDeliveryResidential",
+        "bcmDiesel",
+        "vehRepairFinished",
+        "bcmWoodchips",
+        "bcmRock",
+        "bcmCement",
+        "tutorialParcel",
+        "bcmAsh",
+        "bcmGasoline",
+        "bcmChemicals",
+        "bcmSoil",
+        "bcmWater",
+        "vehForPrivate",
+        "bcmFertilizer",
+        "bcmSand",
+        "trailerDeliveryConstructionMaterials",
         "parcel",
         "shopSupplies",
         "mechanicalParts",
-        "trailerDeliveryConstructionMaterials",
-        "vehRepairFinished",
         "vehLargeTruckNeedsRepair",
+        "bcmMysteriousWaste",
+        "industrial",
         "officeSupplies",
-        "tutorialParcel",
-        "industrial"
+        "bcmHazardousFluid",
+        "bcmLime"
       ],
       "manualAccessPoints":[
         {
@@ -7983,7 +8308,22 @@
             "vehForPrivate",
             "vehRepairFinished",
             "trailerDeliveryResidential",
-            "trailerDeliveryConstructionMaterials"
+            "trailerDeliveryConstructionMaterials",
+            "bcmChemicals",
+            "bcmSoil",
+            "bcmGravel",
+            "bcmMysteriousWaste",
+            "bcmHazardousFluid",
+            "bcmSand",
+            "bcmDiesel",
+            "bcmFertilizer",
+            "bcmWater",
+            "bcmGasoline",
+            "bcmAsh",
+            "bcmCement",
+            "bcmRock",
+            "bcmWoodchips",
+            "bcmLime"
           ],
           "psName":"bcm_Port_57_parking1"
         }

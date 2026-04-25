@@ -1,4 +1,4 @@
--- BCM Override of career/modules/painting.lua
+﻿-- BCM Override of career/modules/painting.lua
 -- Only change: onComputerAddFunctions callback redirects to bcm_paintApp when available
 
 local M = {}
@@ -205,7 +205,7 @@ local function apply()
   career_modules_inventory.setVehicleDirty(inventoryId)
   career_saveSystem.saveCurrent({inventoryId})
 
-  -- Phase 60: Clear vehicle recognition on repaint (disguise mechanic)
+  -- Clear vehicle recognition on repaint (disguise mechanic)
   pcall(function()
     if bcm_heatSystem and bcm_heatSystem.clearRecognition then
       bcm_heatSystem.clearRecognition()
@@ -322,7 +322,7 @@ local function clearPaintingSession()
   originComputerId = nil
 end
 
--- BCM: prepare vanilla painting state so close() can do the spawn.
+-- BCM: prepare vanilla painting state so close can do the spawn.
 -- Sets the minimum state needed for close(true) to work without side effects.
 local function preparePaintingSession(_inventoryId, _originComputerId)
   paintingActive = true

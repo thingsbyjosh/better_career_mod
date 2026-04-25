@@ -1,4 +1,4 @@
--- BCM Real Estate App Extension
+﻿-- BCM Real Estate App Extension
 -- Handles property purchase flow, sell system, property taxes, and Vue bridge.
 -- Bridges between the belascorealty.com IE website and the BCM property/garage system.
 -- Extension name: bcm_realEstateApp
@@ -26,7 +26,7 @@ local onDayAdvanced
 local onSaveCurrentSaveSlot
 local loadTaxData
 local saveTaxData
--- Phase 102 cross-map + rentals bridges
+-- cross-map + rentals bridges
 local sendCrossMapDefinitionsToVue
 local sendActiveRentalsToVue
 local requestStartRental
@@ -80,11 +80,16 @@ sendDefinitionsToVue = function()
     return
   end
 
-  -- Get all garage definitions and convert to array
+  -- Get all garage definitions and convert to array. Backup garages are
+  -- excluded from the Realty catalogue â€” they're not purchaseable property,
+  -- they're the free-tier fallback lodging grant for maps where the player
+  -- owns nothing, so surfacing them as "for sale" would be misleading.
   local allDefs = bcm_garages.getAllDefinitions() or {}
   local defsArray = {}
   for _, def in pairs(allDefs) do
-    table.insert(defsArray, def)
+    if not (def.isBackupGarage or def.type == "backup") then
+      table.insert(defsArray, def)
+    end
   end
 
   -- Get owned property IDs (garage type only)
@@ -340,13 +345,13 @@ requestSell = function(garageId)
   local finalPercent = math.min(95, basePercent)
   local grossSellPriceCents = math.floor(priceCents * finalPercent / 100)
 
-  -- Check for active mortgage — auto-payoff from sale proceeds
+  -- Check for active mortgage â€” auto-payoff from sale proceeds
   local mortgagePayoffCents = 0
   local activeMortgage = bcm_loans and bcm_loans.getMortgageForProperty and bcm_loans.getMortgageForProperty(garageId)
   if activeMortgage then
     local remaining = (activeMortgage.remainingCents or 0) + (activeMortgage.carryForwardCents or 0)
     if grossSellPriceCents < remaining then
-      -- Sale proceeds don't cover mortgage — block sale
+      -- Sale proceeds don't cover mortgage â€” block sale
       guihooks.trigger('BCMPropertySellResult', {
         success = false, reason = 'mortgageExceedsSalePrice', garageId = garageId,
         mortgageRemaining = remaining,
@@ -422,7 +427,7 @@ end
 
 -- Force sell: sells vehicles first, then sells the garage
 requestSellForced = function(garageId)
-  -- For now, just proceed with the sell — vehicle handling is TBD
+  -- For now, just proceed with the sell â€” vehicle handling is TBD
   requestSell(garageId)
 end
 
@@ -695,15 +700,15 @@ loadTaxData = function()
     lastProcessedMonth = data.lastProcessedMonth or 0
     log('I', logTag, 'Tax data loaded')
   else
-    log('I', logTag, 'No saved tax data found — starting fresh')
+    log('I', logTag, 'No saved tax data found â€” starting fresh')
   end
 end
 
 -- ============================================================================
--- Phase 102 — Cross-map feed + rentals action bridges
+-- â€” Cross-map feed + rentals action bridges
 -- ============================================================================
 
--- Phase 102 hotfix BUG #13 — debounce guard.
+-- hotfix BUG #13 â€” debounce guard.
 -- The Realty site triggers sendCrossMapDefinitionsToVue from several places
 -- (store init, map filter change, rental start/cancel, purchase result,
 -- onMounted). Opening the site therefore fired the function ~12 times in the
@@ -714,7 +719,7 @@ local _lastCrossMapSendAt = 0
 
 -- Build the complete Realty catalogue across every discovered map and push it
 -- to Vue. The Realty site uses this to render listings from any map the player
--- has discovered — not just the currently-loaded one (D-16, D-18). Owned ids
+-- has discovered â€” not just the currently-loaded one. Owned ids
 -- and active rental ids are included so the Vue layer can render badges
 -- ("OWNED", "RENTED") without extra round-trips.
 sendCrossMapDefinitionsToVue = function()
@@ -742,13 +747,19 @@ sendCrossMapDefinitionsToVue = function()
     for mapName, _ in pairs(discoveredMaps) do
       local defs = bcm_garages.getGaragesForMap(mapName) or {}
       for _, def in ipairs(defs) do
-        table.insert(allDefs, def)
+        -- Exclude backup garages from the cross-map Realty feed (same rule as
+        -- sendDefinitionsToVue above â€” backup is the free-tier fallback, not
+        -- a purchaseable listing). getGaragesForMap doesn't surface the type
+        -- field, so we gate on isBackupGarage.
+        if not def.isBackupGarage then
+          table.insert(allDefs, def)
+        end
       end
     end
   end
 
   -- Owned garage ids (filter by type="garage" via the dedicated helper so
-  -- type="rental" shells do not leak into the "owned" set — Pitfall 3).
+  -- type="rental" shells do not leak into the "owned" set â€” Pitfall 3).
   local ownedIds = {}
   if bcm_properties and bcm_properties.getOwnedGarages then
     for _, p in ipairs(bcm_properties.getOwnedGarages() or {}) do
@@ -790,11 +801,11 @@ sendActiveRentalsToVue = function()
   end
 end
 
--- Vue → Lua entry for "Rent this garage" CTAs in the Realty Rentals tab and
+-- Vue â†’ Lua entry for "Rent this garage" CTAs in the Realty Rentals tab and
 -- the lodging warning on the destination picker. Resolves the garage's source
 -- map cross-map, enumerates the player's driven vehicle + any coupled trailers
 -- (vanilla core_trailerRespawn.getVehicleTrain) so both end up associated with
--- the rental (D-12), then delegates to bcm_rentals.startRental.
+-- the rental, then delegates to bcm_rentals.startRental.
 requestStartRental = function(garageId, mapNameHint, termDays)
   if not garageId then return false end
   if not bcm_rentals or not bcm_rentals.startRental then
@@ -825,10 +836,10 @@ requestStartRental = function(garageId, mapNameHint, termDays)
 
   -- Associated vehicles: the currently driven vehicle + every coupled trailer.
   -- Vanilla API: core_trailerRespawn.getVehicleTrain(vehId) returns the full
-  -- train (tractor + trailers) as an array of BeamNG vehicle ids — that is the
+  -- train (tractor + trailers) as an array of BeamNG vehicle ids â€” that is the
   -- canonical enumeration surface (vanilla has no getAttachedTrailers helper).
   -- We filter out the tractor vehId itself because the loop already captures
-  -- it from career_modules_inventory.getCurrentVehicle().
+  -- it from career_modules_inventory.getCurrentVehicle.
   local assocVehIds = {}
   if career_modules_inventory and career_modules_inventory.getCurrentVehicle then
     local currentInvId = career_modules_inventory.getCurrentVehicle()
@@ -867,7 +878,7 @@ requestStartRental = function(garageId, mapNameHint, termDays)
   return true
 end
 
--- Vue → Lua entry for "Cancel rental" CTAs. Thin wrapper that delegates to
+-- Vue â†’ Lua entry for "Cancel rental" CTAs. Thin wrapper that delegates to
 -- bcm_rentals.cancelRental (which already handles vehicle migration, hybrid
 -- model cleanup and notifications) and refreshes the Realty listing.
 requestCancelRental = function(garageId)
@@ -884,10 +895,10 @@ requestCancelRental = function(garageId)
   return ok and true or false
 end
 
--- Vue → Lua entry for "Buy this garage" CTAs across every map. Resolves the
+-- Vue â†’ Lua entry for "Buy this garage" CTAs across every map. Resolves the
 -- target garage's definition cross-map (via the new bcm_garages.getGaragesForMap
--- feed) and delegates to the existing purchaseBcmGarage path. Per D-17 prices
--- are uniform across maps — the target map's JSON basePrice is used as-is with
+-- feed) and delegates to the existing purchaseBcmGarage path. Per prices
+-- are uniform across maps â€” the target map's JSON basePrice is used as-is with
 -- no cost-of-living multiplier. Vanilla garage-manager sync for the target map
 -- is deferred to syncAllPurchasedGaragesWithVanilla which runs idempotently on
 -- each map load (Pitfall 4).
@@ -913,7 +924,7 @@ requestCrossMapPurchase = function(garageId, mapName)
     return false
   end
 
-  -- D-17: uniform pricing — use the target map JSON basePrice as-is (no
+  --: uniform pricing â€” use the target map JSON basePrice as-is (no
   -- per-map multiplier). purchaseBcmGarage already looks up basePrice from
   -- its own bcmGarageConfig for the current-level code path; for cross-map
   -- the price lookup happens through the same definition resolution so a
@@ -934,7 +945,7 @@ requestCrossMapPurchase = function(garageId, mapName)
   end
 
   -- Delegate to the canonical purchase path. purchaseBcmGarage uses its own
-  -- (current-map) bcmGarageConfig to finalize the record — if the garage
+  -- (current-map) bcmGarageConfig to finalize the record â€” if the garage
   -- belongs to a different map the local config will not contain it and
   -- purchase will abort. In that case we fall back to creating the ownership
   -- record directly via bcm_properties.purchaseProperty, and vanilla sync
@@ -957,7 +968,7 @@ requestCrossMapPurchase = function(garageId, mapName)
         account.id,
         priceCents,
         'property_purchase',
-        'Belasco Realty — ' .. (def.name or garageId)
+        'Belasco Realty â€” ' .. (def.name or garageId)
       )
     end
   end
@@ -1082,7 +1093,7 @@ M.onCareerModulesActivated = onCareerModulesActivated
 M.onDayAdvanced = onDayAdvanced
 M.onSaveCurrentSaveSlot = onSaveCurrentSaveSlot
 
--- Phase 102 — Cross-map feed + rentals action bridges
+-- â€” Cross-map feed + rentals action bridges
 M.sendCrossMapDefinitionsToVue = sendCrossMapDefinitionsToVue
 M.sendActiveRentalsToVue = sendActiveRentalsToVue
 M.requestStartRental = requestStartRental

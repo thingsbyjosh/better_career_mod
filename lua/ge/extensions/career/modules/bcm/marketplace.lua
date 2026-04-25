@@ -1,11 +1,11 @@
--- BCM Marketplace
+﻿-- BCM Marketplace
 -- Stateful career module that holds marketplace persistence (supply/demand counters,
 -- daily seed, transaction log) and survives save/load from day one.
 -- Extension name: career_modules_bcm_marketplace
 -- Auto-loaded by career core from /lua/ge/extensions/career/modules/
 -- Save path: /career/bcm/marketplace.json
 -- Uses versionMigration v1 for future-proof schema evolution.
--- v2 (Phase 49.3.1): Schema v4, seller fatigue, Poisson arrivals, relist logic.
+-- v2: Schema v4, seller fatigue, Poisson arrivals, relist logic.
 
 local M = {}
 
@@ -54,7 +54,7 @@ local initializeListingsIfNeeded
 local poissonSample
 local addPoissonArrivals
 local relistExpiredListing
--- Phase 50: Player listing CRUD
+-- Player listing CRUD
 local addPlayerListing
 local removePlayerListing
 local getPlayerListings
@@ -63,7 +63,7 @@ local getPlayerListingByInventoryId
 local updatePlayerListingPrice
 local updatePlayerListingDescription
 local markPlayerListingSold
--- Phase 50: Buyer session management
+-- Buyer session management
 local getBuyerSessions
 local getBuyerSessionsForListing
 local cancelBuyerSessionsForListing
@@ -118,19 +118,19 @@ getDefaultState = function()
     supplyDemand     = {},       -- brand string -> { soldByPlayer = 0, purchasedByPlayer = 0 }
     dailySeed        = 0,        -- for listing rotation (0 = uninitialized)
     transactionLog   = {},       -- array of { type, brand, amount, gameDay }
-    -- Phase 46 listing state
+    -- listing state
     listings         = {},       -- array of listing tables (from listingGenerator)
     favorites        = {},       -- set of listing IDs { ["listing_123"] = true }
     lastProcessedDay = 0,        -- last game day we ran rotation
-    priceHistory     = {},       -- { listingId = { {day, priceCents}, ... } }
-    -- Phase 47 negotiation state
+    priceHistory     = {},       -- { listingId = { {day, priceCents},... } }
+    -- negotiation state
     negotiations     = {},       -- { listingId = session table } (from bcm_negotiation)
-    -- Phase 49.3.1 relist tracking
+    -- relist tracking
     relistHistory    = {},       -- { listingId = { origPriceCents, count } }
-    -- Phase 50 player sell flow
+    -- player sell flow
     playerListings   = {},       -- array of player listing tables
     buyerSessions    = {},       -- { playerListingId -> { buyerId -> session } }
-    -- Phase 50.2: Distributed buyer tick system (replaces daily batch)
+    -- Distributed buyer tick system (replaces daily batch)
     lastBuyerTickGameHours = 0,  -- continuous game hours when last buyer tick ran
   }
 end
@@ -178,7 +178,7 @@ loadMarketplaceData = function()
         return d
       end,
       [4] = function(d)
-        -- Phase 49.3.1: set defaults for all new listing fields
+        -- set defaults for all new listing fields
         d.relistHistory = d.relistHistory or {}
         for _, listing in ipairs(d.listings or {}) do
           listing.conditionLabel    = listing.conditionLabel or "fair"
@@ -196,7 +196,7 @@ loadMarketplaceData = function()
         return d
       end,
       [5] = function(d)
-        -- Phase 49.3.1: pricing engine v2 overhaul — wipe listings to regenerate
+        -- pricing engine v2 overhaul â€” wipe listings to regenerate
         -- with new depreciation curves, curated diversity, and organic pricing
         d.listings = {}
         d.lastProcessedDay = 0
@@ -213,7 +213,7 @@ loadMarketplaceData = function()
         return d
       end,
       [7] = function(d)
-        -- Phase 50.1: Living Market — clear old buyer sessions (incompatible archetypes)
+        -- Living Market â€” clear old buyer sessions (incompatible archetypes)
         d.buyerSessions = {}
         -- Player listings without market variables are nil-safe (functions handle nil)
         log('I', logTag, 'Migration v7: cleared buyer sessions for Living Market overhaul')
@@ -260,7 +260,7 @@ resetMarketplace = function()
 end
 
 -- ============================================================================
--- Supply / Demand tracking (public API for Phase 46+)
+-- Supply / Demand tracking (public API for +)
 -- ============================================================================
 
 ensureBrandEntry = function(brand)
@@ -327,7 +327,7 @@ generateDailySeed = function(gameDay)
 end
 
 -- ============================================================================
--- Poisson arrival system (Phase 49.3.1)
+-- Poisson arrival system
 -- ============================================================================
 
 -- Poisson sample using LCG (no external math library needed)
@@ -366,7 +366,7 @@ addPoissonArrivals = function(gameDay)
     forceAdd = MIN_ACTIVE - activeCount
   end
 
-  -- Poisson sample for natural daily arrivals — no cap, marketplace grows/shrinks organically
+  -- Poisson sample for natural daily arrivals â€” no cap, marketplace grows/shrinks organically
   local poissonSeed = gameDay * 997 + 42
   local naturalArrivals = poissonSample(10, poissonSeed)  -- lambda=10, ~10 new listings/day
 
@@ -460,7 +460,7 @@ rotateDailyListings = function(gameDay)
     if not listing.isSold then
       -- Guard: don't rotate listings with active player negotiations or test drive
       if hasActiveNego[listing.id] or listing.id == testDriveListingId then
-        -- skip — player is negotiating or test-driving this one
+        -- skip â€” player is negotiating or test-driving this one
       else
         local age = gameDay - (listing.postedGameDay or 0)
         local survivalRoll = pricingEngine.lcgFloat(listing.seed + gameDay * 100)
@@ -671,7 +671,7 @@ removeSoldListings = function(gameDay)
 
   for _, listing in ipairs(listings) do
     if listing.isSold and listing.soldGameDay and listing.soldGameDay < gameDay then
-      -- SOLD for more than 1 day — try relist before removing
+      -- SOLD for more than 1 day â€” try relist before removing
       -- Only relist if it was expired/rotated out (not actually purchased by player)
       if not listing.purchasedByPlayer then
         local relistEntry = relistExpiredListing(listing, gameDay)
@@ -713,7 +713,7 @@ processNewDay = function(gameDay)
   applySellerFatigueDrop(gameDay)  -- v2: replaces applyPriceDrops
   removeSoldListings(gameDay)      -- includes relist logic
   addPoissonArrivals(gameDay)      -- v2: Poisson daily arrivals
-  applyBuyerInterestDecay(gameDay)   -- Phase 50.2: daily decay only, generation via distributed ticks
+  applyBuyerInterestDecay(gameDay)   -- daily decay only, generation via distributed ticks
   marketplaceState.lastProcessedDay = gameDay
 
   saveMarketplaceData()
@@ -845,7 +845,7 @@ initializeListingsIfNeeded = function(gameDay)
 end
 
 -- ============================================================================
--- Player Listing CRUD (Phase 50)
+-- Player Listing CRUD
 -- ============================================================================
 
 addPlayerListing = function(listing)
@@ -919,7 +919,7 @@ markPlayerListingSold = function(listingId, buyerName, salePriceCents, gameDay)
 end
 
 -- ============================================================================
--- Buyer Session Management (Phase 50)
+-- Buyer Session Management
 -- ============================================================================
 
 getBuyerSessions = function()
@@ -978,9 +978,9 @@ generateTickBuyer = function(listing, tickIndex)
   local liquidity = listing.liquidity or 0.50
 
   -- Per-tick probability (48 ticks/day) to match daily target volumes
-  -- chollo: ~10-15/day → ~0.21-0.31 per tick
-  -- reasonable: ~4-6/day → ~0.08-0.12 per tick
-  -- overpriced: ~0-1/day → ~0.005-0.02 per tick
+  -- chollo: ~10-15/day â†’ ~0.21-0.31 per tick
+  -- reasonable: ~4-6/day â†’ ~0.08-0.12 per tick
+  -- overpriced: ~0-1/day â†’ ~0.005-0.02 per tick
   local tickProb, maxBuyers
   if zone == "chollo" then
     tickProb = 0.21 + liquidity * 0.10
@@ -1072,7 +1072,7 @@ generateTickBuyer = function(listing, tickIndex)
     hasUnread = true,
     messages = {},
     awaitingInit = true,
-    -- Living Market attributes (Phase 50.1)
+    -- Living Market attributes
     buyerTarget = latent.buyerTarget,
     buyerMax = latent.buyerMax,
     fitScore = latent.fitScore,
@@ -1121,7 +1121,7 @@ applyBuyerInterestDecay = function(gameDay)
   end
 end
 
--- Legacy wrapper (kept for backward compatibility — now a no-op for generation, only does decay)
+-- Legacy wrapper (kept for backward compatibility â€” now a no-op for generation, only does decay)
 generateBuyerInterest = function(gameDay)
   applyBuyerInterestDecay(gameDay)
 end
@@ -1161,7 +1161,7 @@ M.getMarketplaceState     = getMarketplaceState
 M.getNegotiations         = getNegotiations
 M.getSupplyDemandData     = getSupplyDemandData
 
--- Phase 46 listing lifecycle
+-- listing lifecycle
 M.generateDailySeed       = generateDailySeed
 M.processNewDay           = processNewDay
 M.getActiveListings       = getActiveListings
@@ -1174,7 +1174,7 @@ M.getFavoritedListings    = getFavoritedListings
 M.getListingStats         = getListingStats
 M.initializeListingsIfNeeded = initializeListingsIfNeeded
 
--- Phase 50: Player listing CRUD
+-- Player listing CRUD
 M.addPlayerListing              = addPlayerListing
 M.removePlayerListing           = removePlayerListing
 M.getPlayerListings             = getPlayerListings
@@ -1184,7 +1184,7 @@ M.updatePlayerListingPrice      = updatePlayerListingPrice
 M.updatePlayerListingDescription = updatePlayerListingDescription
 M.markPlayerListingSold         = markPlayerListingSold
 
--- Phase 50: Buyer session management
+-- Buyer session management
 M.getBuyerSessions              = getBuyerSessions
 M.getBuyerSessionsForListing    = getBuyerSessionsForListing
 M.cancelBuyerSessionsForListing = cancelBuyerSessionsForListing

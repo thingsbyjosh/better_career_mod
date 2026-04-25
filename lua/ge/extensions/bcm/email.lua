@@ -1,4 +1,4 @@
--- BCM Email Extension
+﻿-- BCM Email Extension
 -- Email engine for Outlook Express 6: storage, delivery, folder management,
 -- read/unread tracking, sender blocking, inbox pruning, and save/load persistence.
 -- Fires guihook events consumed by emailStore.js.
@@ -63,8 +63,8 @@ end
 local emails = {}              -- keyed by email ID string (e.g., "em_1", "em_2")
 local nextId = 1
 local blockedSenders = {}      -- keyed by spam_sender_key, value = { unblock_gameday = N }
-local lastSpamGameDay = -1     -- Track last day spam was generated (used by Plan 02)
-local spamInteractionPenalty = 0  -- Increases when player clicks spam (used by Plan 02)
+local lastSpamGameDay = -1     -- Track last day spam was generated (used by )
+local spamInteractionPenalty = 0  -- Increases when player clicks spam (used by )
 local activated = false
 
 -- ============================================================================
@@ -357,7 +357,7 @@ onSpamClicked = function(emailId)
 end
 
 -- ============================================================================
--- Email Update (Phase 31 — FIX-01)
+-- Email Update
 -- ============================================================================
 
 -- Update an existing email's subject, body, or metadata in-place
@@ -462,7 +462,7 @@ pruneFolder = function(folder, maxCount)
 
   -- Sort: unread first (they get pruned first if overflow), then by oldest timestamp
   table.sort(folderEmails, function(a, b)
-    -- Unread before read (unread gets pruned first — oldest unread removed)
+    -- Unread before read (unread gets pruned first â€” oldest unread removed)
     if a.is_read ~= b.is_read then
       return not a.is_read  -- unread (false) comes first
     end
@@ -482,7 +482,7 @@ pruneFolder = function(folder, maxCount)
 end
 
 -- ============================================================================
--- Spam State Accessors (for spamEngine / Plan 02)
+-- Spam State Accessors (for spamEngine / )
 -- ============================================================================
 
 M.getLastSpamGameDay = function()
@@ -552,7 +552,7 @@ loadEmailData = function()
 
   local currentSaveSlot = career_saveSystem.getCurrentSaveSlot()
   if not currentSaveSlot then
-    log('I', logTag, 'No save slot active — starting with empty inbox')
+    log('I', logTag, 'No save slot active â€” starting with empty inbox')
     guihooks.trigger('BCMEmailUpdate', { emails = emails })
     return
   end
@@ -560,7 +560,7 @@ loadEmailData = function()
   local autosavePath = career_saveSystem.getAutosave(currentSaveSlot)
   if not autosavePath then
     -- No autosave = brand new career, start empty
-    log('I', logTag, 'No autosave (new career) — starting with empty inbox')
+    log('I', logTag, 'No autosave (new career) â€” starting with empty inbox')
     guihooks.trigger('BCMEmailUpdate', { emails = emails })
     return
   end
@@ -576,7 +576,7 @@ loadEmailData = function()
     spamInteractionPenalty = data.spamInteractionPenalty or 0
     log('I', logTag, 'Loaded ' .. tableSize(emails) .. ' emails')
   else
-    log('I', logTag, 'No email data found — starting with empty inbox')
+    log('I', logTag, 'No email data found â€” starting with empty inbox')
   end
 
   guihooks.trigger('BCMEmailUpdate', { emails = emails })
@@ -586,19 +586,19 @@ end
 -- Lifecycle Hooks
 -- ============================================================================
 
--- Career modules activated — load existing emails
+-- Career modules activated â€” load existing emails
 onCareerModulesActivated = function()
   loadEmailData()
   activated = true
   log('I', logTag, 'Email module activated')
 end
 
--- Save hook — persist emails to disk
+-- Save hook â€” persist emails to disk
 onSaveCurrentSaveSlot = function(currentSavePath)
   saveEmailData(currentSavePath)
 end
 
--- Before save slot change — clean up state
+-- Before save slot change â€” clean up state
 onBeforeSetSaveSlot = function()
   emails = {}
   nextId = 1
@@ -614,7 +614,7 @@ end
 -- Spam Generation (Day Tick + Event Hooks)
 -- ============================================================================
 
--- Called when the game day changes — generate daily spam
+-- Called when the game day changes â€” generate daily spam
 onDayChanged = function(currentGameDay)
   if currentGameDay <= lastSpamGameDay then return end
   lastSpamGameDay = currentGameDay
@@ -624,7 +624,7 @@ onDayChanged = function(currentGameDay)
   local penaltyCount = math.min(spamInteractionPenalty, 5)  -- Cap bonus at 5
 
   if daysSinceStart == 1 and penaltyCount == 0 then
-    -- Odd day with no penalty — no spam today
+    -- Odd day with no penalty â€” no spam today
     return
   end
 
@@ -635,8 +635,8 @@ onDayChanged = function(currentGameDay)
   spamInteractionPenalty = math.max(0, spamInteractionPenalty - 1)
 
   -- Generate and deliver spam
-  -- Spam from unblocked senders → inbox (user must manually move to junk)
-  -- Spam from blocked senders → junk automatically
+  -- Spam from unblocked senders â†’ inbox (user must manually move to junk)
+  -- Spam from blocked senders â†’ junk automatically
   cleanExpiredBlocks()
   local spamEmails = spamEngine.generateDailySpam(totalCount)
   for _, emailData in ipairs(spamEmails) do
@@ -672,7 +672,7 @@ onGameEvent = function(eventType, eventData)
   end
 end
 
--- Frame update — detect game day changes for spam generation
+-- Frame update â€” detect game day changes for spam generation
 onUpdate = function(dtReal, dtSim, dtRaw)
   if not activated then return end
 

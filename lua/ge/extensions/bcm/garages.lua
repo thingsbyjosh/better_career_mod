@@ -1,8 +1,8 @@
--- BCM Garages Extension
+﻿-- BCM Garages Extension
 -- Feature layer module: bridges bcm_properties (data layer) with vanilla garage facility system.
 -- Responsibilities: JSON config loading, vanilla sync via addPurchasedGarage,
 -- capacity/tier query APIs, starter garage grant, and dev discovery command.
--- Addresses: PROP-06 (vanilla sync).
+-- Addresses: (vanilla sync).
 
 local M = {}
 
@@ -33,6 +33,7 @@ local getGaragesForMap
 local isOvercapacity
 local getMapDisplayName
 local resolveTravelDestGarage
+local pickGarageForPosition
 
 -- ============================================================================
 -- Private state
@@ -41,7 +42,7 @@ local resolveTravelDestGarage
 -- BCM garage definitions keyed by garageId, loaded from JSON at activation time
 local bcmGarageConfig = {}
 
--- Guard flag — prevents double-loading
+-- Guard flag â€” prevents double-loading
 local configLoaded = false
 
 -- ============================================================================
@@ -53,7 +54,7 @@ local configLoaded = false
 loadGarageConfig = function()
   local levelName = getCurrentLevelIdentifier()
   if not levelName then
-    log('W', 'bcm_garages', 'loadGarageConfig: getCurrentLevelIdentifier() returned nil — skipping config load')
+    log('W', 'bcm_garages', 'loadGarageConfig: getCurrentLevelIdentifier() returned nil â€” skipping config load')
     return
   end
 
@@ -85,7 +86,7 @@ loadGarageConfig = function()
 end
 
 -- ============================================================================
--- Vanilla sync (PROP-06)
+-- Vanilla sync
 -- ============================================================================
 
 -- Register a single BCM garage with vanilla's garageManager using check-first pattern.
@@ -121,11 +122,11 @@ syncAllPurchasedGaragesWithVanilla = function()
     end
   end
 
-  -- Phase 102 (W-1): also sync type="rental" shells whose sourceMapName matches the
-  -- current level. These are non-backup paid rentals (Plan 03 hybrid data model,
+  -- also sync type="rental" shells whose sourceMapName matches the
+  -- current level. These are non-backup paid rentals (hybrid data model,
   -- Pitfall 6). Without this second pass, a rented non-backup garage would never
   -- register with vanilla on the target map and the player could not enter it on
-  -- arrival. We do NOT count these toward the owned-garage count — property tax
+  -- arrival. We do NOT count these toward the owned-garage count â€” property tax
   -- stays scoped to type=="garage" records only.
   local currentMap = nil
   if getCurrentLevelIdentifier then
@@ -234,7 +235,7 @@ getGarageDefinition = function(garageId)
   return bcmGarageConfig[garageId]
 end
 
--- Returns the full bcmGarageConfig table (read-only intent — Lua does not enforce this).
+-- Returns the full bcmGarageConfig table (read-only intent â€” Lua does not enforce this).
 getAllDefinitions = function()
   return bcmGarageConfig
 end
@@ -272,7 +273,7 @@ end
 
 -- Returns an array of vehicleInventoryIds assigned to the given garage.
 -- Reads vehicle.location directly from career inventory (single source of truth).
--- Excludes non-owned vehicles (loaners) — they don't occupy garage slots.
+-- Excludes non-owned vehicles (loaners) â€” they don't occupy garage slots.
 getVehiclesInGarage = function(garageId)
   local result = {}
   local vehicles = career_modules_inventory and career_modules_inventory.getVehicles and career_modules_inventory.getVehicles()
@@ -287,9 +288,9 @@ getVehiclesInGarage = function(garageId)
 end
 
 -- Returns the number of free vehicle slots in a garage.
--- Clamped to 0 (Phase 102 Pitfall 5): a soft-lockout overflow (vehicles > capacity)
+-- Clamped to 0: a soft-lockout overflow (vehicles > capacity)
 -- must report zero free slots, not a negative, so downstream "can I store one more?"
--- checks behave correctly. Use isOvercapacity() to detect overflow explicitly.
+-- checks behave correctly. Use isOvercapacity to detect overflow explicitly.
 getFreeSlots = function(garageId)
   local capacity = getCurrentCapacity(garageId)
   local vehicles = getVehiclesInGarage(garageId)
@@ -297,8 +298,8 @@ getFreeSlots = function(garageId)
 end
 
 -- Returns true if the given owned garage has more vehicles stored than its current
--- capacity (Phase 102 soft-lockout signal). The UI layer uses this to render the
--- "storage locked — free a slot" banner when rental eviction overflows the backup.
+-- capacity. The UI layer uses this to render the
+-- "storage locked â€” free a slot" banner when rental eviction overflows the backup.
 isOvercapacity = function(garageId)
   if not garageId then return false end
   local capacity = getCurrentCapacity(garageId)
@@ -308,13 +309,13 @@ isOvercapacity = function(garageId)
 end
 
 -- ============================================================================
--- Cross-map garage definition feed (Phase 102 — Pitfall 3 mitigation)
+-- Cross-map garage definition feed
 -- ============================================================================
 -- Reads the target map's garages_<mapName>.json directly without touching the
 -- bcmGarageConfig global state. Mirrors bcm/multimapApp.lua getGaragesForMap so
 -- every cross-map consumer (Belasco Realty filter, rentals module, destination
--- picker) sees the same shape. NEVER call loadGarageConfig here — that helper is
--- hardcoded to getCurrentLevelIdentifier() and would clobber the in-memory config.
+-- picker) sees the same shape. NEVER call loadGarageConfig here â€” that helper is
+-- hardcoded to getCurrentLevelIdentifier and would clobber the in-memory config.
 getGaragesForMap = function(mapName)
   local garages = {}
   if not mapName then return garages end
@@ -407,7 +408,7 @@ end
 -- This converts the starter garage system into a BCM-owned garage on first career load.
 grantStarterGarageIfNeeded = function()
   if getGarageCount() > 0 then
-    log('D', 'bcm_garages', 'grantStarterGarageIfNeeded: Player already has garages — skipping')
+    log('D', 'bcm_garages', 'grantStarterGarageIfNeeded: Player already has garages â€” skipping')
     return
   end
 
@@ -434,7 +435,7 @@ end
 
 -- Auto-grant backup garages on the current map. Backup garages are free temporary
 -- lodging that gives the player a spawn point and computer access on maps without
--- owned garages. Tuning, parts orders, and vehicle sales are blocked (Phase 102
+-- owned garages. Tuning, parts orders, and vehicle sales are blocked (
 -- adds paid rental with full features).
 grantBackupGaragesIfNeeded = function()
   -- Guard early: if the properties module is unavailable the entire loop is
@@ -463,7 +464,7 @@ isBackupGarage = function(garageId)
 end
 
 -- ============================================================================
--- Per-map owned garages query (Phase 100.5-02)
+-- Per-map owned garages query
 -- ============================================================================
 
 -- Returns an array of {id, displayName, isStarterGarage, isBackupGarage} entries for
@@ -471,13 +472,12 @@ end
 -- on the given level. Filtering is done via the garage definition's `mapName`
 -- field (every BCM garage JSON carries it), with a file-path fallback if a
 -- hypothetical future config omits mapName. Sorted alphabetically by display
--- name. Keeps the selector UI (Plan 03) and the recoveryPrompt taxi override
+-- name. Keeps the selector UI and the recoveryPrompt taxi override
 -- on the same source of truth so "owned here" always means the same thing.
---
 -- Parameters:
---   levelId  string|nil  Optional level id. Defaults to the current level.
+-- levelId string|nil Optional level id. Defaults to the current level.
 -- Returns:
---   array    May be empty — never nil — even in bootstrap edge cases.
+-- array May be empty â€” never nil â€” even in bootstrap edge cases.
 getOwnedGaragesOnCurrentMap = function(levelId)
   levelId = levelId or (getCurrentLevelIdentifier and getCurrentLevelIdentifier()) or nil
   if not levelId or levelId == "" then
@@ -492,7 +492,7 @@ getOwnedGaragesOnCurrentMap = function(levelId)
   end
 
   local owned = bcm_properties.getAllOwnedProperties() or {}
-  local ownedSet = {}    -- id → 'owned' | 'rental' | 'backup'
+  local ownedSet = {}    -- id â†’ 'owned' | 'rental' | 'backup'
   for _, p in ipairs(owned) do
     if p and p.id then
       if p.type == "garage" then
@@ -512,7 +512,7 @@ getOwnedGaragesOnCurrentMap = function(levelId)
         if not ownedSet[garageId] then
           ownedSet[garageId] = 'paidRental'
         elseif ownedSet[garageId] == 'owned' then
-          -- backup garage with paidRentalMode — upgrade to paidRental for priority
+          -- backup garage with paidRentalMode â€” upgrade to paidRental for priority
           local isPaid = bcm_properties.isPaidRental and bcm_properties.isPaidRental(garageId)
           if isPaid then
             ownedSet[garageId] = 'paidRental'
@@ -559,7 +559,76 @@ getOwnedGaragesOnCurrentMap = function(levelId)
 end
 
 -- ============================================================================
--- Map display name (canonical — reads from BeamNG core_levels info.json)
+-- Position-based garage picker
+-- ============================================================================
+-- Given a world-space position and a map id, return the single garage entry
+-- the position should be associated with, applying BCM's ownership filter:
+-- 1. Prefer the nearest non-backup entry (owned, paidRental, rental) on the
+-- map. Distance is to the garage's center point (falls back to the first
+-- parking spot if center is missing).
+-- 2. If there are no non-backup entries, fall back to the nearest backup.
+-- 3. If the map has no owned/rental/backup entries at all, return nil â€” the
+-- caller must leave the existing association untouched instead of
+-- snapping to an unrelated garage.
+-- Consumers: bcm_properties.onSaveCurrentSaveSlotAsyncStart (per-vehicle
+-- auto-associate + player home-garage stash for ProfileCard.vue selector).
+-- Accepts either vec3 or a plain {x,y,z} / [x,y,z] table for the position.
+pickGarageForPosition = function(pos, levelId)
+  if not pos then return nil end
+  local list = getOwnedGaragesOnCurrentMap(levelId) or {}
+  if #list == 0 then return nil end
+
+  local px, py, pz
+  if pos.x ~= nil and pos.y ~= nil and pos.z ~= nil then
+    px, py, pz = pos.x, pos.y, pos.z
+  elseif pos[1] ~= nil and pos[2] ~= nil and pos[3] ~= nil then
+    px, py, pz = pos[1], pos[2], pos[3]
+  else
+    return nil
+  end
+
+  local function garagePoint(id)
+    local def = bcmGarageConfig[id]
+    if not def then return nil end
+    if def.center and def.center[1] ~= nil then
+      return def.center[1], def.center[2], def.center[3]
+    end
+    if def.parkingSpots and def.parkingSpots[1] and def.parkingSpots[1].pos then
+      local p = def.parkingSpots[1].pos
+      if p[1] ~= nil then return p[1], p[2], p[3] end
+    end
+    return nil
+  end
+
+  local function nearestOf(entries)
+    local best, bestDist
+    for _, e in ipairs(entries) do
+      local gx, gy, gz = garagePoint(e.id)
+      if gx then
+        local dx, dy, dz = px - gx, py - gy, pz - gz
+        local d = dx*dx + dy*dy + dz*dz
+        if not bestDist or d < bestDist then
+          bestDist, best = d, e
+        end
+      end
+    end
+    return best
+  end
+
+  local nonBackup, backups = {}, {}
+  for _, entry in ipairs(list) do
+    if entry.mode == "backup" then
+      table.insert(backups, entry)
+    else
+      table.insert(nonBackup, entry)
+    end
+  end
+
+  return nearestOf(nonBackup) or nearestOf(backups) or nil
+end
+
+-- ============================================================================
+-- Map display name (canonical â€” reads from BeamNG core_levels info.json)
 -- ============================================================================
 
 getMapDisplayName = function(mapId)
@@ -607,13 +676,13 @@ resolveTravelDestGarage = function(mapName)
 
     if gMapName and tostring(gMapName) == tostring(mapName) then
       if prop.type == 'garage' then
-        -- paidRentalMode on an owned garage → paid rental upgrade
+        -- paidRentalMode on an owned garage â†’ paid rental upgrade
         if prop.paidRentalMode and not paidOnMap then paidOnMap = prop.id end
         if not ownedOnMap then ownedOnMap = prop.id end
       elseif prop.type == 'rental' then
         if not paidOnMap then paidOnMap = prop.id end
       elseif prop.type == 'backup' then
-        -- paidRentalMode on a backup → paid rental upgrade of the backup
+        -- paidRentalMode on a backup â†’ paid rental upgrade of the backup
         if prop.paidRentalMode and not paidOnMap then paidOnMap = prop.id end
         if not backupOnMap then backupOnMap = prop.id end
       end
@@ -628,7 +697,7 @@ end
 -- ============================================================================
 
 -- Mark all BCM garages as discovered (for testing/dev purposes).
--- Does NOT purchase them — only marks them as seen.
+-- Does NOT purchase them â€” only marks them as seen.
 discoverAllGarages = function()
   if not bcm_properties then
     log('W', 'bcm_garages', 'discoverAllGarages: bcm_properties not available')
@@ -651,7 +720,7 @@ end
 -- Called when BCM career modules are fully activated (career loaded).
 -- Only loads config and marks garage names here. Sync and grant are called by
 -- garageManager.onCareerModulesActivated AFTER it loads purchasedGarages from disk,
--- to avoid the race condition where loadPurchasedGarages() overwrites BCM additions.
+-- to avoid the race condition where loadPurchasedGarages overwrites BCM additions.
 onCareerModulesActivated = function()
   -- Reset config for fresh load
   bcmGarageConfig = {}
@@ -660,7 +729,7 @@ onCareerModulesActivated = function()
   -- 1. Load garage definitions from JSON (level-specific)
   loadGarageConfig()
 
-  -- Steps 2-3 (sync, grant) are called by garageManager after loadPurchasedGarages()
+  -- Steps 2-3 (sync, grant) are called by garageManager after loadPurchasedGarages
   -- because they depend on bcm_properties data being loaded from disk first.
   log('I', 'bcm_garages', 'Garages config loaded (sync deferred to garageManager)')
 end
@@ -695,6 +764,7 @@ M.getGaragesForMap = getGaragesForMap
 M.isOvercapacity = isOvercapacity
 M.getMapDisplayName = getMapDisplayName
 M.resolveTravelDestGarage = resolveTravelDestGarage
+M.pickGarageForPosition = pickGarageForPosition
 
 -- Starter, backup, and dev
 M.grantStarterGarageIfNeeded = grantStarterGarageIfNeeded

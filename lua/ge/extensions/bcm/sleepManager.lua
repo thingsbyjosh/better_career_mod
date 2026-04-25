@@ -1,4 +1,4 @@
--- BCM Sleep Manager
+﻿-- BCM Sleep Manager
 -- Central sleep logic module for BCM career mode.
 -- Handles sleep state machine, validation, time advance coordination, and loan payment processing.
 -- Extension name: bcm_sleepManager
@@ -90,7 +90,7 @@ requestSleep = function(targetTod)
     return false
   end
 
-  -- Phase 1: Enter sleeping state, notify UI
+  -- Enter sleeping state, notify UI
   currentState = STATE.SLEEPING
 
   -- Pause time during sleep animation
@@ -101,7 +101,7 @@ requestSleep = function(targetTod)
   guihooks.trigger('BCMSleepStarted', {})
   log('I', logTag, 'Sleep started. Target hours: ' .. tostring(gameHours))
 
-  -- Phase 2: After delay, advance time and show summary
+  -- After delay, advance time and show summary
   -- Store captured values for the timer callback
   local capturedGameDaysAdvance = gameDaysAdvance
   local capturedGameHours = gameHours

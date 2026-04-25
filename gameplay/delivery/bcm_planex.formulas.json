@@ -1,0 +1,92 @@
+{
+  "_comment": "Constantes de la fórmula de pago de PlanEx v1 (Classic mode). F1 hotfix — modelo realista de 8 componentes. Todos los valores editables.",
+  "_version": 2,
+
+  "line_haul": {
+    "_comment": "Pago por distancia. Moneda de juego ~ USD; valores en cents (100 = $1).",
+    "base_rate_per_km_cents": 12000,
+    "distance_decay": {
+      "_comment": "Rutas largas pagan marginalmente menos por km (economies of scale). Lineal hasta threshold, luego decay hasta max.",
+      "threshold_km": 30,
+      "scale_km": 100,
+      "max_reduction": 0.25
+    }
+  },
+
+  "stops": {
+    "_comment": "Primeras N paradas incluidas en tarifa base. Resto paga per-stop.",
+    "free_stops": 2,
+    "charge_per_stop_cents": 2500
+  },
+
+  "weight": {
+    "_comment": "Peso por encima del baseline paga extra; con cap para que camiones gigantes no escalen infinito.",
+    "base_weight_kg": 500,
+    "cap_kg": 15000,
+    "per_kg_cents": 5
+  },
+
+  "minimum_charge": {
+    "_comment": "Suelo por tier de pack. Evita que rutas cortas paguen miseria.",
+    "by_tier_cents": {
+      "1": 80000,
+      "2": 150000,
+      "3": 250000,
+      "4": 400000,
+      "5": 600000
+    }
+  },
+
+  "zone_mult": {
+    "_comment": "Derivado de tags de facilities. Promedio entre zona de origen y destino. En F1 usamos aproximación por tier del pack hasta que F2 tenga zone tags completas.",
+    "rural": 0.95,
+    "highway": 1.00,
+    "industrial": 1.03,
+    "urban": 1.10,
+    "default": 1.00
+  },
+
+  "fuel_surcharge": {
+    "_comment": "Multiplicador semanal. 52 valores (1 por semana ISO). Rango recomendado 0.90-1.25. Puede ser seeded, estacional o manual.",
+    "weekly_table": [
+      1.00, 1.02, 1.05, 1.03, 0.98, 0.95, 0.93, 0.95, 0.98, 1.00,
+      1.02, 1.05, 1.08, 1.10, 1.12, 1.08, 1.05, 1.02, 1.00, 0.98,
+      0.95, 0.93, 0.95, 0.98, 1.00, 1.03, 1.05, 1.08, 1.10, 1.15,
+      1.18, 1.20, 1.22, 1.18, 1.15, 1.12, 1.10, 1.08, 1.05, 1.02,
+      1.00, 0.98, 0.95, 0.98, 1.00, 1.02, 1.05, 1.08, 1.10, 1.12,
+      1.15, 1.10
+    ]
+  },
+
+  "cargo_mult": {
+    "_comment": "Multiplicadores por tipo de parcel. Se aplican como promedio ponderado por slots del manifest.",
+    "fragile_bonus": 1.35,
+    "urgent_bonus": 1.55,
+    "hazmat_bonus": 1.70
+  },
+
+  "capacity_mult": {
+    "_comment": "Bonus por tamaño de vehículo. Logarítmico con floor y cap. F1 tuning A: coef 0.70, cap 2.80 — 256 slots → 2.50× (antes 1.97×), mejor spread entre vans y camiones.",
+    "base_slots": 30,
+    "log_coefficient": 0.70,
+    "floor": 0.70,
+    "cap": 2.80
+  },
+
+  "zone_by_tier_approx": {
+    "_comment": "Aproximación rápida en F1 hasta que F2 etiquete zonas por facility. Usa el tier del pack para deducir zona probable.",
+    "1": "rural",
+    "2": "highway",
+    "3": "industrial",
+    "4": "urban",
+    "5": "urban"
+  },
+
+  "legacy_fallback": {
+    "_comment": "Si el JSON no carga, estos valores evitan divisions-by-zero. NO es la fórmula vieja.",
+    "base_rate_per_km_cents": 10000,
+    "charge_per_stop_cents": 2000,
+    "per_kg_cents": 4,
+    "minimum_tier1_cents": 70000
+  }
+}

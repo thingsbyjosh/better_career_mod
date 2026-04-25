@@ -1,8 +1,8 @@
--- BCM FIXD Pro Terminal App Extension
+﻿-- BCM FIXD Pro Terminal App Extension
 -- Parts installer app: install/remove parts from BCM inventory onto vehicle.
 -- Thin wrapper over vanilla career_modules_partShopping (same pattern as partsShopApp.lua).
 -- No cart, no pricing, no banking -- free install from owned inventory.
--- Adds cascade detection + root/core slot protection from Phase 84 safe removal algorithm.
+-- Adds cascade detection + root/core slot protection from safe removal algorithm.
 -- Extension name: bcm_fixdProApp
 -- Loaded by bcm_extensionManager.
 
@@ -208,7 +208,7 @@ exitFixdPro = function(inventoryId, revert)
   currentInventoryId = nil
 
   -- Always try to revert -- cancelShopping restores vehicle to pre-shopping config.
-  -- Intercept closeMenu effects: cancelShopping → endShopping → closeMenu
+  -- Intercept closeMenu effects: cancelShopping â†’ endShopping â†’ closeMenu
   -- which would closeAllMenus or reopen computer, killing the UI.
   if career_modules_partShopping then
     local origCloseAll = career_career.closeAllMenus
@@ -242,9 +242,9 @@ applyFixdPro = function(inventoryId)
   end
 
   -- Check if any changes were made before calling applyShopping.
-  -- Vanilla's getBuyingLabel() crashes on empty cart (partsInList[0] = nil),
+  -- Vanilla's getBuyingLabel crashes on empty cart (partsInList[0] = nil),
   -- and endShopping(true) inside applyShopping sets closeMenuAfterSaving
-  -- which later triggers closeMenu() and kills the computer interface.
+  -- which later triggers closeMenu and kills the computer interface.
   local cart = career_modules_partShopping.getShoppingCart and career_modules_partShopping.getShoppingCart()
   local hasChanges = cart and cart.partsIn and next(cart.partsIn) ~= nil
 
@@ -270,7 +270,7 @@ applyFixdPro = function(inventoryId)
     end
   else
     -- No changes: end session without revert.
-    -- Intercept closeMenu effects (same pattern as startFixdPro) —
+    -- Intercept closeMenu effects (same pattern as startFixdPro) â€”
     -- endShopping calls closeMenu which would closeAllMenus or reopen computer.
     local origCloseAll = career_career.closeAllMenus
     local origOpenMenu = career_modules_computer and career_modules_computer.openMenu
@@ -300,7 +300,7 @@ end
 
 -- ============================================================================
 -- checkCascade
--- Phase 84 algorithm for cascade detection on a target slot.
+-- algorithm for cascade detection on a target slot.
 -- Returns root/core/children data via guihook event.
 -- ============================================================================
 checkCascade = function(inventoryId, slotPath)
@@ -348,7 +348,7 @@ checkCascade = function(inventoryId, slotPath)
   -- Step 1: Check root slot
   local isRoot = isRootSlot(targetNode, partsTree)
 
-  -- Step 2: Core slot check — jbeamIO is vehicle-side only (not available in GE Lua).
+  -- Step 2: Core slot check â€” jbeamIO is vehicle-side only (not available in GE Lua).
   -- Default to false; root slot protection is the critical safety guard.
   local isCore = false
 
@@ -378,7 +378,7 @@ M.installPart = function(partShopId)
     if not ok then
       log('E', logTag, 'installPart FAILED for id=' .. tostring(id) .. ': ' .. tostring(err))
     end
-    -- Don't call sendShoppingDataToUI here — vehicle reload is async.
+    -- Don't call sendShoppingDataToUI here â€” vehicle reload is async.
     -- onVehicleSpawned will refresh data after reload completes.
   end
 end
@@ -394,7 +394,7 @@ M.removePart = function(slot)
     if not ok then
       log('E', logTag, 'removePart FAILED for slot=' .. tostring(slot) .. ': ' .. tostring(err))
     end
-    -- Don't call sendShoppingDataToUI here — vehicle reload is async.
+    -- Don't call sendShoppingDataToUI here â€” vehicle reload is async.
     -- onVehicleSpawned will refresh data after reload completes.
   end
 end
@@ -457,7 +457,7 @@ end
 
 -- ============================================================================
 -- Guard: sanitize partConditions before vanilla repair to prevent crash.
--- Vanilla insurance.lua repairPartConditions() assumes every partPath in
+-- Vanilla insurance.lua repairPartConditions assumes every partPath in
 -- partConditions has a matching entry in partInventory. Orphan entries
 -- (parts physically on the vehicle but missing from inventory) cause a
 -- FATAL nil-index at insurance.lua:371. We strip them here so vanilla

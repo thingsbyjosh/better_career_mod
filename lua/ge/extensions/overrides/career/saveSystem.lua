@@ -1,4 +1,4 @@
--- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+﻿-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
 -- If a copy of the bCDDL was not distributed with this
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 
@@ -154,7 +154,7 @@ setSaveSlot = function(slotName, specificAutosave)
     -- BCM: Log corruption flag but don't block loading.
     -- The corrupted flag means save was interrupted, but data may still be usable.
     -- Blocking here breaks loading when a non-critical extension (e.g., gameplay_statistic)
-    -- fails to save, since saveFailed() prevents the flag from being cleared.
+    -- fails to save, since saveFailed prevents the flag from being cleared.
     if data.corrupted == true then
       log("W", logTag, "Save has corruption flag set (save may have been interrupted): " .. slotName)
       -- Don't block - let the game try to load. The autosave rotation provides backup safety.
@@ -190,9 +190,9 @@ saveFailed = function()
 end
 
 -- Atomic write: write to temp file then rename (file-level safety)
--- NOTE: Does NOT call saveFailed() on error. Individual extension save failures
+-- NOTE: Does NOT call saveFailed on error. Individual extension save failures
 -- (e.g., gameplay_statistic passing nil) should not abort the entire save process.
--- Only critical failures (info.json) should call saveFailed() explicitly.
+-- Only critical failures (info.json) should call saveFailed explicitly.
 jsonWriteFileSafe = function(filename, obj, pretty, numberPrecision, tempFileName)
   tempFileName = tempFileName or filename..".tmp"
   if jsonWriteFile(tempFileName, obj, pretty, numberPrecision) then
@@ -247,9 +247,9 @@ end
 setCareerModulesReady = function(ready)
   careerModulesReady = ready
   if ready then
-    log("I", logTag, "Career modules ready — saves enabled")
+    log("I", logTag, "Career modules ready â€” saves enabled")
   else
-    log("I", logTag, "Career modules not ready — saves blocked")
+    log("I", logTag, "Career modules not ready â€” saves blocked")
   end
 end
 
@@ -283,9 +283,9 @@ saveCurrentActual = function(vehiclesThumbnailUpdate)
   -- BCM: extensions.hook auto-dispatches onSaveCurrentSaveSlot to every loaded
   -- extension that exports it. No explicit per-module call is needed here.
   -- Modules currently persisting through this hook:
-  --   bcm_properties.onSaveCurrentSaveSlot  -> bcm/properties.json
-  --   bcm_realEstateApp.onSaveCurrentSaveSlot -> bcm/propertyTaxes.json
-  --   bcm_rentals.onSaveCurrentSaveSlot     -> bcm/rentals.json  (Phase 102-03)
+  -- bcm_properties.onSaveCurrentSaveSlot -> bcm/properties.json
+  -- bcm_realEstateApp.onSaveCurrentSaveSlot -> bcm/propertyTaxes.json
+  -- bcm_rentals.onSaveCurrentSaveSlot -> bcm/rentals.json
   extensions.hook("onSaveCurrentSaveSlot", oldestSave, oldSaveDate, vehiclesThumbnailUpdate)
   syncSaveExtensionsDone = true
   if tableIsEmpty(asyncSaveExtensions) then

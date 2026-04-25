@@ -1,6 +1,6 @@
--- BCM Transaction Categories Extension
+﻿-- BCM Transaction Categories Extension
 -- Provides registry for transaction categories (extensible).
--- Pattern mirrors bcm/appRegistry.lua from Phase 9.
+-- Pattern mirrors bcm/appRegistry.lua from
 
 local M = {}
 

@@ -1,4 +1,4 @@
--- BCM Parts Shop App Extension
+﻿-- BCM Parts Shop App Extension
 -- Thin wrapper over vanilla career_modules_partShopping.
 -- Vanilla handles: session lifecycle, part install/remove for preview, vehicle revert, tether.
 -- BCM handles: half-screen mode (orbit camera), checkout via bcm_banking + bcm_partsOrders,
@@ -49,6 +49,15 @@ local currentGarageId = nil
 -- { [partOriginName] = massKg }
 local cachedPartMasses = {}
 
+-- Originals captured the first time we monkey-patch vanilla, restored on exit.
+-- Patches must persist for the whole session because vanilla startShopping
+-- defers setupTether to an async insurance-repair callback when the vehicle
+-- has broken parts; restoring before the callback fires re-exposes the fatal
+-- in setupTether (computerPos = nil when originComputerId is nil/empty, which
+-- happens for any BCM session not tied to a physical computer facility).
+local vanillaSetupTether = nil
+local vanillaGuihooksTrigger = nil
+
 -- ============================================================================
 -- Cart persistence
 -- ============================================================================
@@ -90,24 +99,28 @@ startPartsShop = function(inventoryId, originComputerId)
 
   -- Let vanilla set up the entire shopping session:
   -- snapshot vehicle, generate parts data, setup tether, freeze vehicle.
-  -- CRITICAL: vanilla's startShopping calls openUIState() which fires ChangeState -> "partShopping".
+  -- CRITICAL: vanilla's startShopping calls openUIState which fires ChangeState -> "partShopping".
   -- That would navigate BeamNG away from our computer UI, unmounting OReallyCatalog.
   -- We intercept and swallow that specific ChangeState event.
-  -- Intercept ChangeState AND setupTether during startShopping:
-  -- 1) Swallow ChangeState "partShopping" — BCM handles its own UI
-  -- 2) Skip setupTether — BCM uses suspendTether from computer, no walking tether needed
-  local originalTrigger = guihooks.trigger
-  local originalSetupTether = career_modules_partShopping.setupTether
+  -- Patches stay live for the whole session and get restored in exitPartsShop:
+  -- 1) Swallow ChangeState "partShopping" â€” BCM handles its own UI
+  -- 2) Skip setupTether â€” BCM uses suspendTether from computer, no walking tether needed
+  -- Re-entry guard: only capture originals on first patch, never overwrite stored ones.
+  if vanillaGuihooksTrigger == nil then
+    vanillaGuihooksTrigger = guihooks.trigger
+  end
+  if vanillaSetupTether == nil then
+    vanillaSetupTether = career_modules_partShopping.setupTether
+  end
+  local triggerToWrap = vanillaGuihooksTrigger
   guihooks.trigger = function(name, data)
     if name == 'ChangeState' and data and data.state == 'partShopping' then
       return -- swallow
     end
-    return originalTrigger(name, data)
+    return triggerToWrap(name, data)
   end
   career_modules_partShopping.setupTether = function() end  -- no-op
   career_modules_partShopping.startShopping(inventoryId, originComputerId)
-  guihooks.trigger = originalTrigger
-  career_modules_partShopping.setupTether = originalSetupTether
 
   currentInventoryId = inventoryId
   sessionActive = true
@@ -121,7 +134,7 @@ startPartsShop = function(inventoryId, originComputerId)
   end
 
   -- Ask vanilla to send shop data to Vue.
-  -- Vanilla fires 'partShoppingData' event — our Vue store listens for it.
+  -- Vanilla fires 'partShoppingData' event â€” our Vue store listens for it.
   -- NOTE: startShopping already called generatePartShop internally, but
   -- sendShoppingDataToUI re-generates and sends the full payload to Vue.
   career_modules_partShopping.sendShoppingDataToUI()
@@ -150,7 +163,7 @@ startPartsShop = function(inventoryId, originComputerId)
     spawnedVehicles = spawnedList,
   })
 
-  -- Resolve garage ID from computer (for order destination — D-17)
+  -- Resolve garage ID from computer (for order destination â€” )
   currentGarageId = nil
   if originComputerId and freeroam_facilities then
     local comp = freeroam_facilities.getFacility("computer", originComputerId)
@@ -172,8 +185,20 @@ exitPartsShop = function(inventoryId, revert)
   sessionActive = false
   currentInventoryId = nil
 
-  -- Always try to revert — cancelShopping restores vehicle to pre-shopping config
-  -- Don't guard with isShoppingSessionActive() — if session got out of sync, still revert
+  -- Restore vanilla functions monkey-patched in startPartsShop. Done before
+  -- cancelShopping so any internal trigger/tether call during cleanup hits
+  -- vanilla again rather than our session shims.
+  if vanillaGuihooksTrigger ~= nil then
+    guihooks.trigger = vanillaGuihooksTrigger
+    vanillaGuihooksTrigger = nil
+  end
+  if vanillaSetupTether ~= nil and career_modules_partShopping then
+    career_modules_partShopping.setupTether = vanillaSetupTether
+    vanillaSetupTether = nil
+  end
+
+  -- Always try to revert â€” cancelShopping restores vehicle to pre-shopping config
+  -- Don't guard with isShoppingSessionActive â€” if session got out of sync, still revert
   if career_modules_partShopping then
     pcall(function()
       career_modules_partShopping.cancelShopping()
@@ -264,30 +289,38 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents, p
     end
   end
 
-  -- Create order records for ALL delivery types (purchase history)
-  for _, item in ipairs(cartItems) do
-    if bcm_partsOrders then
+  --: ONE order per checkout, N parts inside.
+  -- Build partsArray from cartItems with per-part fields. Shared bcmMeta carries TOTAL
+  -- purchasePrice (cents). Single createOrder call replaces the old per-item loop.
+  if bcm_partsOrders and #cartItems > 0 then
+    local partsArray = {}
+    local totalPurchasePrice = 0
+    for _, item in ipairs(cartItems) do
       local partMass = cachedPartMasses[item.partName] or nil
       if partMass then
         partMass = math.floor(partMass * 10) / 10  -- round to 1 decimal
       end
-      bcm_partsOrders.createOrder(
-        {
-          partName = item.partName or '',
-          vehicleModel = vehicleModel,
-          value = math.floor((item.price or 0) / 200),  -- cents→dollars, halved for resale margin
-          slot = item.slot or '',
-          partCondition = {},
-          description = item.partLabel or item.partName or '',
-          partPath = (item.slot or '') .. (item.partName or ''),
-          mass = partMass,
-          garageId = currentGarageId,
-        },
-        deliveryType or 'pickup',
-        { purchasePrice = item.price or 0 },
-        { pickupNow = pickupNow }
-      )
+      local pricePer = item.price or 0
+      totalPurchasePrice = totalPurchasePrice + pricePer
+      table.insert(partsArray, {
+        partName = item.partName or '',
+        vehicleModel = vehicleModel,
+        value = math.floor(pricePer / 200),       -- per-part dollars (cents/200, halved for resale margin)
+        purchasePrice = pricePer,                  -- per-part cents (createOrder usa este para parts[i].purchasePrice)
+        slot = item.slot or '',
+        partCondition = {},
+        description = item.partLabel or item.partName or '',
+        partPath = (item.slot or '') .. (item.partName or ''),
+        mass = partMass,
+        garageId = currentGarageId,
+      })
     end
+    bcm_partsOrders.createOrder(
+      partsArray,
+      deliveryType or 'pickup',
+      { purchasePrice = totalPurchasePrice },     -- TOTAL cents (sum of partsArray)
+      { pickupNow = pickupNow }
+    )
   end
 
   -- Clear BCM cart for this vehicle
@@ -296,7 +329,7 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents, p
   if deliveryType == 'fullservice' then
     -- Full Service: use vanilla's applyShopping which does:
     -- vehicles[currentVehicle] = previewVehicle (commits the preview state)
-    -- updateInventory() (updates partInventory)
+    -- updateInventory (updates partInventory)
     -- endShopping(true) (closes session + saves)
     -- pays via playerAttributes
     -- pcall because getBuyingLabel may crash if partsInList is empty (cosmetic)
@@ -327,7 +360,7 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents, p
     guihooks.trigger('BCMExitPartsShopMode', {})
     guihooks.trigger('BCMPartsShopCheckoutComplete', { ordersCreated = #cartItems, deliveryType = deliveryType })
 
-    -- Notify tutorial FSM of fullservice checkout completion (Phase 93)
+    -- Notify tutorial FSM of fullservice checkout completion
     -- Note: fullservice uses vanilla applyShopping which is synchronous (no async replaceVehicle).
     -- The tutorial call fires immediately after the synchronous checkout completes.
     if extensions.isExtensionLoaded('bcm_tutorial') then
@@ -339,7 +372,7 @@ applyCheckout = function(inventoryId, cartItemsJson, deliveryType, totalCents, p
 
     log('I', logTag, 'applyCheckout FULLSERVICE: ' .. #cartItems .. ' parts, applyShopping=' .. tostring(applyOk) .. ', total=' .. totalCents)
   else
-    -- Pickup / Delivery: parts UNINSTALL — vanilla cancelShopping reverts vehicle
+    -- Pickup / Delivery: parts UNINSTALL â€” vanilla cancelShopping reverts vehicle
     exitPartsShop(inventoryId, true)
     -- Notify Vue (exitPartsShop already fired BCMExitPartsShopMode)
     guihooks.trigger('BCMPartsShopCheckoutComplete', { ordersCreated = #cartItems, deliveryType = deliveryType })

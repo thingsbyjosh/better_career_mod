@@ -1,4 +1,4 @@
--- bcm/transitJournal.lua
+﻿-- bcm/transitJournal.lua
 -- Transit journal and vehicle serialization system for map switching.
 -- Handles full vehicle state capture (model, config, partConditions, fuel, odometer, beamstate),
 -- two-phase journal persistence (DEPARTING/ARRIVED), crash recovery detection,
@@ -64,7 +64,7 @@ getJournalPath = function()
 
   -- Use the slot's base directory (stable), NOT the autosave path (rotates between autosave1/2/3).
   -- The autosave slot changes during level switch, so a journal written in autosave3
-  -- would be looked for in autosave2 after the switch — causing "journal not found".
+  -- would be looked for in autosave2 after the switch â€” causing "journal not found".
   local journalPath = 'settings/cloud/saves/' .. slotName .. '/career/bcm/' .. JOURNAL_FILENAME
   log('D', logTag, 'getJournalPath: ' .. journalPath)
   return journalPath
@@ -277,7 +277,7 @@ end
 -- Uses getVehicleTrain (unordered set) + getTrailerData (chain links) to walk the chain.
 -- CRITICAL: getVehicleTrain returns {id=true,...} SET. We do NOT iterate it for ordering.
 -- @param tractorId number The tractor's object ID
--- @return table Ordered array: {tractorId, trailer1Id, trailer2Id, ...}
+-- @return table Ordered array: {tractorId, trailer1Id, trailer2Id,...}
 buildOrderedTrainList = function(tractorId)
   local trainSet = core_trailerRespawn and core_trailerRespawn.getVehicleTrain and core_trailerRespawn.getVehicleTrain(tractorId)
   if not trainSet then return {tractorId} end
@@ -290,7 +290,7 @@ buildOrderedTrainList = function(tractorId)
   local trailerData = core_trailerRespawn.getTrailerData()
   if not trailerData then return {tractorId} end
 
-  -- Walk the chain: tractor -> trailer1 -> trailer2 -> ...
+  -- Walk the chain: tractor -> trailer1 -> trailer2 ->...
   local trainList = {}
   local currentId = tractorId
   table.insert(trainList, currentId)
@@ -329,7 +329,7 @@ serializeTrain = function(tractorId, callback)
       local partConditions = vehData and vehData.partConditions or nil
 
       -- Inventory ID: ALL vehicles in the train may have one (tractor AND owned trailers).
-      -- D-04 was wrong — player-owned trailers ARE in career inventory with their own IDs.
+      -- was wrong â€” player-owned trailers ARE in career inventory with their own IDs.
       local inventoryId = nil
       if career_modules_inventory and career_modules_inventory.getInventoryIdFromVehicleId then
         inventoryId = career_modules_inventory.getInventoryIdFromVehicleId(vehId)
@@ -487,7 +487,7 @@ spawnAndCoupleTrailer = function(job, trailerEntry, anchorId, trailerIndex, node
 
   -- fifthwheel_v2 won't auto-couple (collision-based), but attemptReCouple still calls
   -- placeTrailer which positions the trailer right next to the coupler. When the timeout
-  -- fires, activateFallback leaves it in place — player just reverses half a meter.
+  -- fires, activateFallback leaves it in place â€” player just reverses half a meter.
   -- So we DON'T skip fifthwheel_v2, we let it go through the normal path.
 
   -- Attempt re-coupling with callbacks that set flags for coroutine polling
@@ -532,7 +532,7 @@ spawnAndCoupleTrailer = function(job, trailerEntry, anchorId, trailerIndex, node
     }, "trailer_" .. trailerIndex)
   end
 
-  -- Restore fuel/odometer/beamstate regardless of coupling result (per D-01)
+  -- Restore fuel/odometer/beamstate regardless of coupling result (per )
   restoreFuelLevel(trailerVeh, trailerEntry.fuelData)
   restoreOdometer(trailerVeh, trailerEntry.odometer)
   restoreBeamstate(trailerVeh, trailerEntry.beamstate)
@@ -566,7 +566,7 @@ writeJournal = function(phase, originMap, originNode, destMap, destNode, vehicle
     destMap = destMap,
     destNode = destNode,
     vehicle = vehicleData,
-    train = trainData or nil,  -- D-06: nil means solo vehicle (backward compatible)
+    train = trainData or nil,  --: nil means solo vehicle (backward compatible)
     tollPaid = tollPaid or 0,
     timestamp = os.time(),
   }
@@ -819,7 +819,7 @@ restoreVehicleAtDestination = function(journal)
       -- Update the vehicle's garage location to the best destination on arrival map
       -- (paidRental > owned > backup). Without this, the vehicle's location still
       -- points to the origin garage after cross-map travel, causing it to appear in
-      -- the wrong garage in My Vehicles. (Phase 102: travel-aware vehicle location)
+      -- the wrong garage in My Vehicles.
       if vehicleData and vehicleData.inventoryId and bcm_garages and bcm_garages.resolveTravelDestGarage then
         local destGarageId = bcm_garages.resolveTravelDestGarage(journal.destMap)
         if destGarageId and bcm_properties and bcm_properties.assignVehicleToGarage then
@@ -832,7 +832,7 @@ restoreVehicleAtDestination = function(journal)
       log('I', logTag, 'restoreVehicleAtDestination: no vehicle to position, player arrives on foot')
     end
 
-    -- === TRAIN RESTORATION (Phase 99) ===
+    -- === TRAIN RESTORATION ===
     -- After tractor is positioned and restored, spawn and couple each trailer
     if journal.train and #journal.train > 0 then
       -- Update journal to "restoring" phase (for crash recovery of partial restoration)
@@ -855,11 +855,11 @@ restoreVehicleAtDestination = function(journal)
 
         if trailerId then
           if success then
-            -- Per D-12/D-21: use this trailer as anchor for the next one in the chain
+            -- Per /: use this trailer as anchor for the next one in the chain
             anchorId = trailerId
             coupledCount = coupledCount + 1
           else
-            -- Per D-13/D-14: fallback for this trailer, but continue with next
+            -- Per /: fallback for this trailer, but continue with next
             -- Anchor stays the same (failed trailer is not in the coupled chain)
             fallbackCount = fallbackCount + 1
           end
@@ -965,9 +965,8 @@ end
 --- Test the full train serialization + journal write pipeline from the console.
 -- Discovers the current player vehicle's train, serializes all vehicles,
 -- and logs the results. Writes a DEBUG-phase journal (won't trigger real recovery).
---
 -- Usage from BeamNG console:
---   bcm_transitJournal.debugTestTrainTravel()
+-- bcm_transitJournal.debugTestTrainTravel
 debugTestTrainTravel = function()
   local tractorId = be:getPlayerVehicleID(0)
   if not tractorId or tractorId < 0 then
@@ -1041,9 +1040,8 @@ end
 
 --- Read and log the current transit journal contents for debugging.
 -- Does not modify the journal, just reads and prints its contents.
---
 -- Usage from BeamNG console:
---   bcm_transitJournal.debugTestTrainRestore()
+-- bcm_transitJournal.debugTestTrainRestore
 debugTestTrainRestore = function()
   local journal = readJournal()
   if not journal then

@@ -1,6 +1,6 @@
--- BCM Garage Dev Tool V2
+﻿-- BCM Garage Dev Tool V2
 -- Standalone extension: NOT loaded via career extensionManager.
--- Activation: extensions.load("bcm_devtoolV2"); bcm_devtoolV2.start()
+-- Activation: extensions.load("bcm_devtoolV2"); bcm_devtoolV2.start
 -- Works in career AND freeroam. Console-activatable dev tool for placing garage locations.
 
 local M = {}
@@ -29,7 +29,7 @@ local updateGarageField
 local updateParkingSpotTag
 local loadWip
 local saveWip
--- discardWip removed (dangerous — WIP is single source of truth)
+-- discardWip removed (dangerous â€” WIP is single source of truth)
 local loadExistingGarages
 local exportAll
 local triggerUIUpdate
@@ -52,6 +52,7 @@ local scanDaeFiles
 local addCustomProp
 local captureGarageImage
 local captureDeliveryImage
+local captureTravelImage
 local goToStep
 
 -- Delivery hook testing forward declarations
@@ -152,6 +153,15 @@ local createShareZip
 local importShareZip
 
 -- ============================================================================
+-- Props mode forward declarations
+-- ============================================================================
+-- Only the two functions referenced by onUpdate need forward-decls; the rest
+-- are defined in dependency order further down (callees before callers) and
+-- resolved at runtime via the module chunk upvalues.
+local propsUpdateGhost
+local propsUpdateRemoveHover
+
+-- ============================================================================
 -- Wall Props Template
 -- ============================================================================
 -- Extracted from bcmGarage_23 prefab (tent excluded).
@@ -227,7 +237,7 @@ local garages = {}                -- array of garage WIP objects
 local selectedGarageIdx = nil     -- 1-based index into garages
 local wizardStep = 0              -- current wizard step for selected garage
 local deletedGarageIds = {}       -- set of existing garage IDs that were explicitly deleted
-local wipFilePath = nil           -- resolved at start()
+local wipFilePath = nil           -- resolved at start
 local lastPlaceTime = 0           -- debounce for marker placement
 local customExportPath = nil      -- override for export base path (set via setExportPath)
 local spawnedPropIds = {}          -- IDs of live-spawned TSStatic preview objects
@@ -278,7 +288,24 @@ local knownTravelNodes = {}         -- {nodeId = mapName} from all maps' bcm_tra
 local gasStations = {}
 local selectedGasStationIdx = nil
 local gasStationWizardStep = 0
-local vanillaGasStations = {}  -- loaded from facilities.facilities.json for D-13(a)
+local vanillaGasStations = {}  -- loaded from facilities.facilities.json for
+
+-- ============================================================================
+-- Props mode state
+-- ============================================================================
+local propsState = {
+  mode = "none",           -- "none" | "placeCursor" | "placeAtPlayer" | "remove"
+  catalog = {},            -- array of DAE paths (populated by scanDaeFiles)
+  ghostObjId = nil,        -- TSStatic ghost id when placeCursor active
+  ghostShapeName = nil,
+  rotationZDeg = 0,
+  heightOffset = 0,
+  snapToGround = true,
+  hoveredRemoveTarget = nil,  -- { objId, persistentId, shapeName, name, position } when remove mode + ray hits
+}
+
+-- Index of an added prop to highlight (pulsing cylinder). Upvalue captured by onUpdate.
+local propsHighlightIdx = nil
 
 -- Organization cache (loaded once from vanilla files)
 local cachedOrganizations
@@ -403,7 +430,7 @@ start = function()
   loadExistingGarages()
   loadExistingTravelNodes()
 
-  -- Phase 3: init v2 wipCore + garages module
+  -- init v2 wipCore + garages module
   local wipCore = extensions.bcm_devtoolV2_wipCore
   if wipCore then
     wipCore.setWipPath(modLevels .. "/bcm_devtool_wipcore_v2.json")
@@ -482,6 +509,9 @@ end
 stop = function()
   saveWip()
   despawnLiveProps()
+  -- Best-effort cleanup: if user stops the devtool mid-prop-session, pop the
+  -- props action map so their custom Commit/Cancel key bindings don't linger.
+  if M.propsCancelMode then pcall(M.propsCancelMode) end
   isActive = false
   guihooks.trigger('BCMDevToolV2Close', {})
   log('I', logTag, 'Dev tool stopped')
@@ -507,6 +537,27 @@ onUpdate = function(dtReal, dtSim, dtRaw)
   end
   if devtoolMode == "gasStations" and #gasStations > 0 then
     drawAllGasStationMarkers()
+  end
+  if devtoolMode == "props" then
+    propsUpdateGhost()
+    if propsUpdateRemoveHover then propsUpdateRemoveHover() end
+
+    -- Commit placeCursor / remove via the "bcm_devtoolV2_commit" input action
+    -- (default Normal action map â€” see core/input/actions/bcm_devtoolV2.json).
+    -- The user binds a key in BeamNG's keyboard settings; pressing it calls
+    -- bcm_devtoolV2.propsHotkeyCommit which routes to the right handler.
+
+    if propsHighlightIdx then
+      local wipCore = extensions.bcm_devtoolV2_wipCore
+      local hlEntry = wipCore and wipCore.get("props", "bcm_props")
+      if hlEntry and hlEntry.edited.added and hlEntry.edited.added[propsHighlightIdx] then
+        local p = hlEntry.edited.added[propsHighlightIdx].position
+        local pulse = 0.5 + 0.5 * math.sin(os.clock() * 4)
+        if debugDrawer then
+          debugDrawer:drawCylinder(vec3(p[1], p[2], p[3]), vec3(p[1], p[2], p[3] + 3), 0.5, ColorF(1, 1, 0, pulse))
+        end
+      end
+    end
   end
 end
 
@@ -696,7 +747,7 @@ local function dropToTerrain(pos)
       droppedPos = {pos[1], pos[2], closeOrigin.z - closeHit}
       log('D', logTag, 'dropToTerrain: roof detected, used close-probe fallback')
     else
-      -- No valid hit from inside — keep the raw position
+      -- No valid hit from inside â€” keep the raw position
       droppedPos = pos
       log('D', logTag, 'dropToTerrain: roof detected but no fallback hit, using raw pos')
     end
@@ -797,7 +848,7 @@ placeMarkerFromUI = function()
     table.insert(garage.zoneVertices, getPlacementPosition())
     log('I', logTag, 'Placed zone vertex #' .. #garage.zoneVertices .. ' for ' .. (garage.name or garage.id))
   elseif wizardStep == 4 then
-    -- Parking spot — drop to terrain and capture surface normal for ground alignment
+    -- Parking spot â€” drop to terrain and capture surface normal for ground alignment
     local rawPos = getPlacementPosition()
     local droppedPos, surfaceNormal = dropToTerrain(rawPos)
     table.insert(garage.parkingSpots, {
@@ -1086,7 +1137,7 @@ saveWip = function()
 end
 
 -- ============================================================================
--- discardWip removed — WIP is single source of truth, deleting it destroys data
+-- discardWip removed â€” WIP is single source of truth, deleting it destroys data
 -- that only exists there (propsAnchor, propsAngle, images.preview, etc.)
 
 -- ============================================================================
@@ -1271,7 +1322,7 @@ triggerUIUpdate = function()
 end
 
 -- (Delivery facility mode: goToDeliveryStep and adjustDeliveryMarkerZ defined here,
---  full CRUD/wizard/export/markers implemented in the Delivery section below.)
+-- full CRUD/wizard/export/markers implemented in the Delivery section below.)
 
 goToDeliveryStep = function(n)
   n = tonumber(n) or 0
@@ -1443,6 +1494,7 @@ exportAll = function()
   local wipCoreModes = {
     garages = true, delivery = true, travelNodes = true,
     cameras = true, radarSpots = true, gasStations = true,
+    props = true,
   }
   if wipCoreModes[devtoolMode] then
     local wipCore = extensions.bcm_devtoolV2_wipCore
@@ -1451,7 +1503,7 @@ exportAll = function()
       return
     end
     local plan = wipCore.buildExportPlan(levelName)
-    log('I', logTag, 'exportAll (' .. devtoolMode .. '): plan — '
+    log('I', logTag, 'exportAll (' .. devtoolMode .. '): plan â€” '
       .. plan.summary.totalToWrite .. ' toWrite, '
       .. plan.summary.totalToDelete .. ' toDelete, '
       .. plan.summary.totalConflicts .. ' drift, '
@@ -1464,10 +1516,10 @@ end
 
 -- Called from Vue when user confirms the dry-run export modal. Handles any
 -- mode that routes through the wipCore export path (garages, delivery, and
--- future Phase 4 kinds). Defined directly on M to avoid the 200-local limit
+-- future kinds). Defined directly on M to avoid the 200-local limit
 -- of the main chunk.
 M.confirmExportAndExecute = function()
-  if devtoolMode ~= "garages" and devtoolMode ~= "delivery" and devtoolMode ~= "travelNodes" and devtoolMode ~= "cameras" and devtoolMode ~= "radarSpots" and devtoolMode ~= "gasStations" then
+  if devtoolMode ~= "garages" and devtoolMode ~= "delivery" and devtoolMode ~= "travelNodes" and devtoolMode ~= "cameras" and devtoolMode ~= "radarSpots" and devtoolMode ~= "gasStations" and devtoolMode ~= "props" then
     log('W', logTag, 'confirmExportAndExecute: mode ' .. tostring(devtoolMode) .. ' not wired to wipCore yet')
     return
   end
@@ -1495,7 +1547,7 @@ M.confirmExportAndExecute = function()
     end
     guihooks.trigger('BCMDevToolV2ExportDone', { success = true, filesWritten = result.filesWritten })
   else
-    local title = result.integrityFailed and 'Integrity check failed — export aborted, no files touched'
+    local title = result.integrityFailed and 'Integrity check failed â€” export aborted, no files touched'
                                           or 'Export failed'
     log('E', logTag, 'confirmExportAndExecute: ' .. title)
     if result.errors then
@@ -1515,9 +1567,9 @@ M.cancelExport = function()
   guihooks.trigger('BCMDevToolV2ExportDone', { cancelled = true })
 end
 
--- Conflict resolution — called from the export modal when user picks a
+-- Conflict resolution â€” called from the export modal when user picks a
 -- strategy per-item ("keepMine" / "takeProd") or for all conflicts at once.
--- After resolving, Vue refreshes the plan via exportAll().
+-- After resolving, Vue refreshes the plan via exportAll.
 M.resolveConflict = function(kind, id, strategy)
   local wipCore = extensions.bcm_devtoolV2_wipCore
   if not wipCore then return end
@@ -1542,7 +1594,7 @@ M.resolveAllConflicts = function(strategy, kind)
   triggerUIUpdate()
 end
 
--- Undo / Redo — pops the top op from wipCore's stack and re-syncs the orchestrator's
+-- Undo / Redo â€” pops the top op from wipCore's stack and re-syncs the orchestrator's
 -- legacy `garages` mirror so the Vue panel sees the updated list.
 M.undo = function()
   local wipCore = extensions.bcm_devtoolV2_wipCore
@@ -1571,7 +1623,7 @@ M.redo = function()
   triggerUIUpdate()
 end
 
--- Manual snapshot — wipCore writes a labelled snapshot file to the history dir.
+-- Manual snapshot â€” wipCore writes a labelled snapshot file to the history dir.
 M.saveSnapshotNow = function(label)
   local wipCore = extensions.bcm_devtoolV2_wipCore
   if not wipCore then
@@ -1587,7 +1639,7 @@ end
 -- ============================================================================
 
 setDevtoolMode = function(mode)
-  if mode ~= "garages" and mode ~= "delivery" and mode ~= "cameras" and mode ~= "radarSpots" and mode ~= "travelNodes" and mode ~= "gasStations" then
+  if mode ~= "garages" and mode ~= "delivery" and mode ~= "cameras" and mode ~= "radarSpots" and mode ~= "travelNodes" and mode ~= "gasStations" and mode ~= "props" then
     log('W', logTag, 'setDevtoolMode: invalid mode "' .. tostring(mode) .. '"')
     return
   end
@@ -1640,12 +1692,12 @@ placeDeliveryMarkerFromUI = function()
   if not facility then return end
 
   if deliveryWizardStep == 2 then
-    -- Center marker — drop to terrain
+    -- Center marker â€” drop to terrain
     local cPos = dropToTerrain(getPlacementPosition())
     facility.center = cPos
     log('I', logTag, 'Placed delivery center for ' .. (facility.name ~= "" and facility.name or facility.id))
   elseif deliveryWizardStep == 3 then
-    -- Parking spot — drop to terrain with normal
+    -- Parking spot â€” drop to terrain with normal
     local sPos, sNormal = dropToTerrain(getPlacementPosition())
     table.insert(facility.parkingSpots, {
       pos = sPos,
@@ -1931,16 +1983,16 @@ validateDeliveryFacility = function(facility)
   -- Generator validations
   local gens = facility.logisticGenerators
   if not gens or (type(gens) == "table" and next(gens) == nil) then
-    table.insert(warnings, "No generators — vanilla delivery won't create any cargo here")
+    table.insert(warnings, "No generators â€” vanilla delivery won't create any cargo here")
   else
     if type(gens) == "table" then
       -- Check for decimal min/max
       for i, gen in ipairs(gens) do
         if gen.min and gen.min ~= math.floor(gen.min) then
-          table.insert(warnings, "Generator #" .. i .. ": min=" .. gen.min .. " is decimal — Lua truncates to " .. math.floor(gen.min))
+          table.insert(warnings, "Generator #" .. i .. ": min=" .. gen.min .. " is decimal â€” Lua truncates to " .. math.floor(gen.min))
         end
         if gen.max and gen.max ~= math.floor(gen.max) then
-          table.insert(warnings, "Generator #" .. i .. ": max=" .. gen.max .. " is decimal — Lua truncates to " .. math.floor(gen.max))
+          table.insert(warnings, "Generator #" .. i .. ": max=" .. gen.max .. " is decimal â€” Lua truncates to " .. math.floor(gen.max))
         end
         if gen.min and gen.max and gen.min > gen.max then
           table.insert(warnings, "Generator #" .. i .. ": min (" .. gen.min .. ") > max (" .. gen.max .. ")")
@@ -1961,7 +2013,7 @@ validateDeliveryFacility = function(facility)
         food=true,
       }
       local PARCEL_TYPES = {parcel=true, shopSupplies=true, officeSupplies=true, mechanicalParts=true, foodSupplies=true, industrial=true}
-      -- Short logistic name derived from a material id ("bcmLime" → "lime").
+      -- Short logistic name derived from a material id ("bcmLime" â†’ "lime").
       -- The spot uses the short form in logisticTypesProvided/Received.
       local function materialIdToLogisticType(mid)
         if type(mid) ~= "string" or #mid == 0 then return nil end
@@ -2008,7 +2060,7 @@ validateDeliveryFacility = function(facility)
         for _, lt in ipairs(spot.logisticTypesReceived or {}) do spotReceives[lt] = true end
       end
 
-      -- Veh/trailer types don't need local generators — they are destination-only
+      -- Veh/trailer types don't need local generators â€” they are destination-only
       -- (jobs created by vehOfferProvider/trailerOfferProvider at OTHER facilities)
       local NO_LOCAL_GEN_NEEDED = {}
       for k, _ in pairs(VEH_TYPES) do NO_LOCAL_GEN_NEEDED[k] = true end
@@ -2017,21 +2069,21 @@ validateDeliveryFacility = function(facility)
       -- Provides always needs a local generator (you're the origin)
       for lt, _ in pairs(spotProvides) do
         if not genTypes[lt] then
-          table.insert(warnings, "Spot provides '" .. lt .. "' but no generator handles it — cargo won't be created")
+          table.insert(warnings, "Spot provides '" .. lt .. "' but no generator handles it â€” cargo won't be created")
         end
       end
       -- Receives: veh/trailer types are destination-only (job created at origin facility)
       -- Parcel/material types need a local receiver generator to create demand
       for lt, _ in pairs(spotReceives) do
         if not genTypes[lt] and not NO_LOCAL_GEN_NEEDED[lt] then
-          table.insert(warnings, "Spot receives '" .. lt .. "' but no generator handles it — no demand will be created")
+          table.insert(warnings, "Spot receives '" .. lt .. "' but no generator handles it â€” no demand will be created")
         end
       end
 
       -- Check: generator types not in any spot
       for lt, _ in pairs(genTypes) do
         if not spotProvides[lt] and not spotReceives[lt] then
-          table.insert(warnings, "Generator creates '" .. lt .. "' but no spot provides or receives it — cargo has no pickup/dropoff")
+          table.insert(warnings, "Generator creates '" .. lt .. "' but no spot provides or receives it â€” cargo has no pickup/dropoff")
         end
       end
 
@@ -2047,10 +2099,10 @@ validateDeliveryFacility = function(facility)
         end
       end
       if hasProvider and not hasReceiver then
-        table.insert(warnings, "Has provider but no receiver — this facility creates cargo but never requests deliveries")
+        table.insert(warnings, "Has provider but no receiver â€” this facility creates cargo but never requests deliveries")
       end
       if hasReceiver and not hasProvider then
-        table.insert(warnings, "Has receiver but no provider — this facility requests deliveries but never creates cargo to send")
+        table.insert(warnings, "Has receiver but no provider â€” this facility requests deliveries but never creates cargo to send")
       end
     end
   end
@@ -2132,7 +2184,7 @@ cloneDeliveryFacilityConfig = function(sourceId, sourceMap)
     return
   end
 
-  -- Migrate legacy facilityType → tags (for exported facilities from old disk format)
+  -- Migrate legacy facilityType â†’ tags (for exported facilities from old disk format)
   if source.facilityType and not source.tags then
     if source.facilityType == "custom" or source.facilityType == "" then
       source.tags = {}
@@ -2218,10 +2270,25 @@ drawAllDeliveryMarkers = function()
     if facility.parkingSpots then
       for j, spot in ipairs(facility.parkingSpots) do
         local p = vec3(spot.pos[1], spot.pos[2], spot.pos[3])
-        local rawDir = vec3(spot.dir[1], spot.dir[2], spot.dir[3]):normalized()
         local a = alphaMultiplier
         local col = ColorF(1, 0, 1, a)
         local colFaint = ColorF(1, 0, 1, a * 0.4)
+
+        -- spot.dir stored shape: delivery hydrates it as a 4-component quaternion
+        -- from sites.json rot; garages emit it as a 3-vector direction. Detect
+        -- and convert quaternions to forward vector by rotating canonical (0,1,0).
+        -- Without this, extracting (x,y,z) from a quaternion treats the rotation
+        -- axis as a direction â€” produces vertical/diagonal boxes at random.
+        local rawDir
+        if spot.dir and #spot.dir == 4 then
+          local q = quat(spot.dir[1], spot.dir[2], spot.dir[3], spot.dir[4])
+          rawDir = vec3(0, 1, 0):rotated(q)
+        elseif spot.dir and #spot.dir >= 3 then
+          rawDir = vec3(spot.dir[1], spot.dir[2], spot.dir[3])
+        else
+          rawDir = vec3(0, 1, 0)
+        end
+        if rawDir:length() > 0.001 then rawDir = rawDir:normalized() else rawDir = vec3(0, 1, 0) end
 
         -- Use stored normal or default up
         local up = vec3(0, 0, 1)
@@ -2435,6 +2502,11 @@ despawnLiveProps = function()
   spawnedPropIds = {}
 end
 
+local function quatFromZDeg(deg)
+  local rad = math.rad(deg)
+  return quatFromEuler(0, 0, -rad)  -- sign matches WALL_PROPS template convention
+end
+
 spawnLiveProps = function(props)
   despawnLiveProps()
   if not props or #props == 0 then return end
@@ -2446,8 +2518,8 @@ spawnLiveProps = function(props)
       obj.useInstanceRenderData = true
       obj.canSave = false
 
-      -- Compute Z rotation from column-major rotationMatrix → quaternion
-      -- File convention: [cos(θ), sin(θ), 0, -sin(θ), cos(θ), ...]
+      -- Compute Z rotation from column-major rotationMatrix â†’ quaternion
+      -- File convention: [cos(Î¸), sin(Î¸), 0, -sin(Î¸), cos(Î¸),...]
       -- quatFromEuler convention is SIGN-INVERTED for Z rotations
       -- So we pass -theta to match the file's visual orientation
       local rot = prop.rotationMatrix
@@ -2481,12 +2553,12 @@ end
 -- ============================================================================
 
 -- Places the standard wall props template at the current position.
--- User faces the wall → camera forward = into wall.
+-- User faces the wall â†’ camera forward = into wall.
 -- Props are placed along the wall to the user's right.
 -- Internal: compute and place props given anchor + angle (degrees)
 local function computeWallProps(garage, anchor, angleDeg)
   local angleRad = math.rad(angleDeg)
-  -- Original template faces -X (angle = 180°). Delta from original:
+  -- Original template faces -X (angle = 180Â°). Delta from original:
   local delta = angleRad - math.pi
   local cos_d = math.cos(delta)
   local sin_d = math.sin(delta)
@@ -2562,14 +2634,14 @@ placeWallProps = function()
 
   garage.props = computeWallProps(garage, anchor, angleDeg)
   spawnLiveProps(garage.props)
-  -- Sync entire garage to wipCore — wall prop mutations touch multiple fields
+  -- Sync entire garage to wipCore â€” wall prop mutations touch multiple fields
   local wc = extensions.bcm_devtoolV2_wipCore
   if wc and garage.id then
     wc.replaceItem("garages", garage.id, garage)
   end
   saveWip()
   triggerUIUpdate()
-  log('I', logTag, 'Placed ' .. #garage.props .. ' wall props at angle ' .. string.format("%.1f", angleDeg) .. '° for ' .. (garage.name or garage.id))
+  log('I', logTag, 'Placed ' .. #garage.props .. ' wall props at angle ' .. string.format("%.1f", angleDeg) .. 'Â° for ' .. (garage.name or garage.id))
 end
 
 -- Rotate existing wall props to a new angle (called from slider)
@@ -2585,7 +2657,7 @@ rotateWallProps = function(angleDeg)
   garage.propsAngle = angleDeg
   garage.props = computeWallProps(garage, garage.propsAnchor, angleDeg)
   spawnLiveProps(garage.props)
-  -- Sync entire garage to wipCore — wall prop mutations touch multiple fields
+  -- Sync entire garage to wipCore â€” wall prop mutations touch multiple fields
   local wc = extensions.bcm_devtoolV2_wipCore
   if wc and garage.id then
     wc.replaceItem("garages", garage.id, garage)
@@ -2596,7 +2668,7 @@ end
 
 -- ============================================================================
 -- DAE Packs (user-defined reusable prop packs for garages)
--- Cloned from wall props pattern — original wall props code is NOT modified
+-- Cloned from wall props pattern â€” original wall props code is NOT modified
 -- ============================================================================
 
 -- globalDaePacks is declared in the forward declarations section at the top
@@ -2620,7 +2692,7 @@ saveDaePack = function(packName)
     end
   end
 
-  -- Collect existing pack positions for deduplication (D-15)
+  -- Collect existing pack positions for deduplication
   local existingPositions = {}
   for _, pack in ipairs(globalDaePacks) do
     for _, asset in ipairs(pack.assets or {}) do
@@ -2734,7 +2806,7 @@ deleteDaePack = function(packIdx)
 end
 
 -- ============================================================================
--- Sync props from World Editor (userdata → mod)
+-- Sync props from World Editor (userdata â†’ mod)
 -- ============================================================================
 
 -- After placing props in World Editor (F11) and saving (Ctrl+S),
@@ -2895,6 +2967,69 @@ captureDeliveryImage = function()
 end
 
 -- ============================================================================
+-- Travel node screenshot capture
+-- ============================================================================
+
+captureTravelImage = function()
+  if not selectedTravelNodeIdx then
+    log('W', logTag, 'captureTravelImage: No travel node selected')
+    return
+  end
+  local node = travelNodes[selectedTravelNodeIdx]
+  if not node or not node.id or node.id == "" then
+    log('W', logTag, 'captureTravelImage: selected travel node has no id')
+    return
+  end
+
+  if not render_renderViews then
+    extensions.load('render_renderViews')
+  end
+  if not render_renderViews or type(render_renderViews.takeScreenshot) ~= 'function' then
+    log('E', logTag, 'captureTravelImage: render_renderViews.takeScreenshot unavailable')
+    guihooks.trigger('BCMDevToolV2CaptureResult', { success = false, error = 'render_renderViews unavailable' })
+    return
+  end
+
+  local modMount = customExportPath or MOD_MOUNT
+  local lvl = getCurrentLevelIdentifier() or "west_coast_usa"
+  local outDir = modMount .. "/levels/" .. lvl .. "/facilities"
+  local filename = "bcm_travel_" .. node.id .. ".png"
+  local outPath = outDir .. "/" .. filename
+
+  ensureModDir(outDir)
+
+  local camPos = core_camera.getPosition()
+  local camRot = core_camera.getQuat()
+
+  local captureOptions = {
+    screenshotDelay = 5,
+    resolution = vec3(640, 360, 0),
+    filename = outPath,
+    pos = camPos,
+    rot = camRot
+  }
+
+  suppressMarkers = true
+  guihooks.trigger('BCMDevToolV2HideUI', true)
+
+  render_renderViews.takeScreenshot(captureOptions, function()
+    suppressMarkers = false
+    guihooks.trigger('BCMDevToolV2HideUI', false)
+    log('I', logTag, 'Captured travel node image: ' .. outPath)
+    -- travelNodes[i] is the same table as the wipCore entry's edited field
+    -- (see refreshTravelNodesFromWipCore in devtoolV2.lua). Mutating here
+    -- propagates to wipCore; saveWip serializes to disk. Matches the
+    -- delivery/garage capture pattern.
+    node.preview = filename
+    saveWip()
+    triggerUIUpdate()
+    guihooks.trigger('BCMDevToolV2CaptureResult', { success = true, path = filename })
+  end)
+
+  log('I', logTag, 'captureTravelImage: capture initiated for ' .. outPath)
+end
+
+-- ============================================================================
 -- Camera placement mode: CRUD, markers, export
 -- ============================================================================
 
@@ -2929,7 +3064,7 @@ selectCamera = function(idx)
 end
 
 placeCameraMarkerFromUI = function()
-  -- placeCameraMarkerFromUI is a v1 position-placement helper (dropped in v2 —
+  -- placeCameraMarkerFromUI is a v1 position-placement helper (dropped in v2 â€”
   -- cameras no longer have a separate pole position). Kept as a no-op stub so
   -- any Vue button wired to it doesn't error at runtime.
   log('W', logTag, 'placeCameraMarkerFromUI: no-op in v2 (position field removed)')
@@ -3089,7 +3224,7 @@ end
 
 -- ============================================================================
 -- Radar spot placement mode: CRUD, markers, export
--- Delegated to bcm_devtoolV2_radar (Phase 4 port).
+-- Delegated to bcm_devtoolV2_radar.
 -- ============================================================================
 
 addNewRadarSpot = function()
@@ -3133,7 +3268,11 @@ placeRadarSpotMarkerFromUI = function()
 
   local pos = getPlacementPosition()
   local dir = getPlacementDirection()
-  local heading = math.atan2(dir[2], dir[1])
+  -- BeamNG vehicles default to facing +Y (north) at identity rotation, and
+  -- police.lua spawns with quatFromAxisAngle(Z-up, heading) applied to that
+  -- default. To end up facing `dir` we need heading = atan2(-dx, dy) so that
+  -- rotating +Y by `heading` around Z lands on dir.
+  local heading = math.atan2(-dir[1], dir[2])
   mod.updateRadarField(spot.id, "position", pos)
   mod.updateRadarField(spot.id, "heading", heading)
   radarSpots = {}
@@ -3259,7 +3398,7 @@ drawAllRadarSpotMarkers = function()
         local lineDir = le - ls
         local lineLen = lineDir:length()
         if lineLen > 0.01 then
-          local halfWidth = 2  -- 4m total width → 2m each side
+          local halfWidth = 2  -- 4m total width â†’ 2m each side
           local halfHeight = 2 -- 4m tall
           -- Perpendicular direction (horizontal)
           local perp = vec3(-lineDir.y, lineDir.x, 0):normalized() * halfWidth
@@ -3409,11 +3548,11 @@ loadExistingTravelNodes = function()
 
   for _, entry in ipairs(entries) do
     if entry and entry.type == "travelNode" and entry.id and not wipIds[entry.id] then
-      -- Map production entry → WIP schema. The export pipeline rewrites the
+      -- Map production entry â†’ WIP schema. The export pipeline rewrites the
       -- WIP node.type (road/port/airport/border/restStop) with "travelNode"
       -- as the file discriminator, so the original category is preserved in
       -- the separate `nodeType` field. Legacy files written before that fix
-      -- have no `nodeType` — fall back to "road" for those.
+      -- have no `nodeType` â€” fall back to "road" for those.
       local wipNode = {
         id           = entry.id,
         name         = entry.name or "",
@@ -3432,7 +3571,7 @@ loadExistingTravelNodes = function()
       -- session had left a parcial mapInfo in the WIP (e.g. the atlas picker
       -- writing just `worldMapPos` without the rest). Merging field by field
       -- keeps the user's unexported edits while backfilling anything they
-      -- never touched — so exporting can never silently drop a production
+      -- never touched â€” so exporting can never silently drop a production
       -- field that existed on disk.
       if not mapInfo then
         mapInfo = {}
@@ -3680,7 +3819,7 @@ updateMapInfoField = function(field, value)
 
   -- plan 100.5-04: worldMapPos is stored as an array [x, y] in 0-100 percentage format
   -- (matches Italy's shipped [54.2, 25.5] and WorldMap.vue:186-187 which divides by 100).
-  -- D-09 corrected: NOT [0.0-1.0] normalized. Zero JSON migration needed.
+  -- corrected: NOT [0.0-1.0] normalized. Zero JSON migration needed.
   local function clampPct(n)
     n = tonumber(n) or 0
     if n < 0 then n = 0 end
@@ -3723,6 +3862,27 @@ updateMapInfoField = function(field, value)
   triggerUIUpdate()
 end
 
+-- Given node.rotation (quaternion {x,y,z,w} OR a number = yaw in radians around Z),
+-- return a unit forward vector in BeamNG's Y-forward convention.
+-- Falls back to +Y when rotation is missing or malformed.
+-- Vanilla defines forward as `quat * vec3(0, 1, 0)` â€” see LuaQuat:toDirUp in
+-- mathlib.lua. We mirror that instead of hand-deriving the matrix column so the
+-- arrow always matches quatFromDir(getPlacementDirection), used on placement.
+local function travelNodeForwardVec(rotation)
+  if type(rotation) == "number" then
+    -- Yaw around Z. cos/sin order matches Y-forward: yaw=0 â†’ (0,1,0).
+    local s = math.sin(rotation)
+    local c = math.cos(rotation)
+    return vec3(-s, c, 0)
+  end
+  if type(rotation) == "table" and rotation[4] then
+    local q = quat(rotation[1] or 0, rotation[2] or 0, rotation[3] or 0, rotation[4] or 1)
+    local fwd = q * vec3(0, 1, 0)
+    if fwd:length() > 0.001 then return fwd:normalized() end
+  end
+  return vec3(0, 1, 0)
+end
+
 drawAllTravelNodeMarkers = function()
   local pulseAlpha = 0.5 + 0.5 * math.sin(os.clock() * 4)
 
@@ -3732,54 +3892,82 @@ drawAllTravelNodeMarkers = function()
       local a = isSelected and pulseAlpha or 0.8
       local pos = vec3(node.center[1], node.center[2], node.center[3])
 
-      -- Blue sphere for travel node
+      -- Drop to terrain so the box visually sits on the ground, same scheme as
+      -- delivery parking spots (grounded bottom rectangle, height extends up).
+      -- If the raycast misses we fall back to node.center unchanged.
+      local groundPos, groundNormal = dropToTerrain({ pos.x, pos.y, pos.z })
+      local basePos = groundPos and vec3(groundPos[1], groundPos[2], groundPos[3]) or pos
+      local up = vec3(0, 0, 1)
+      if groundNormal then
+        up = vec3(groundNormal[1], groundNormal[2], groundNormal[3]):normalized()
+      end
+
+      -- Blue sphere at node center (player position when placed)
       debugDrawer:drawSphere(pos, 2.0, ColorF(0.2, 0.6, 1.0, a))
 
       -- Label
-      local label = (node.name ~= "" and node.name or node.id or "Node") .. " [" .. (node.type or "?") .. "]"
+      local label = (node.name ~= "" and node.name or node.id or "Node") .. " [" .. (node.nodeType or node.type or "?") .. "]"
       debugDrawer:drawTextAdvanced(pos + vec3(0, 0, 3), label,
         ColorF(0.2, 0.6, 1.0, 1), true, false, ColorI(0, 0, 0, 180))
 
-      -- Trigger box wireframe
-      if node.triggerSize then
-        local sz = node.triggerSize
-        local half = vec3(sz[1]/2, sz[2]/2, sz[3]/2)
-        local c1 = pos - half
-        local c2 = pos + half
-        local boxColor = ColorF(0.2, 0.6, 1.0, isSelected and 0.4 or 0.2)
-        -- 8 corners
-        local corners = {
-          vec3(c1.x, c1.y, c1.z),
-          vec3(c2.x, c1.y, c1.z),
-          vec3(c2.x, c2.y, c1.z),
-          vec3(c1.x, c2.y, c1.z),
-          vec3(c1.x, c1.y, c2.z),
-          vec3(c2.x, c1.y, c2.z),
-          vec3(c2.x, c2.y, c2.z),
-          vec3(c1.x, c2.y, c2.z),
-        }
-        -- 12 edges (wireframe)
-        local edges = {
-          {1,2},{2,3},{3,4},{4,1}, -- bottom
-          {5,6},{6,7},{7,8},{8,5}, -- top
-          {1,5},{2,6},{3,7},{4,8}, -- verticals
-        }
-        for _, e in ipairs(edges) do
-          debugDrawer:drawLine(corners[e[1]], corners[e[2]], boxColor)
-        end
-      end
+      -- Build fwd/right from rotation, terrain-aligned like parking spots.
+      local rawFwd = travelNodeForwardVec(node.rotation)
+      local fwd = (rawFwd - up * rawFwd:dot(up))
+      if fwd:length() > 0.001 then fwd = fwd:normalized() else fwd = rawFwd end
+      local right = fwd:cross(up)
+      if right:length() < 0.001 then right = vec3(1, 0, 0) end
+      right = right:normalized()
 
-      -- Direction arrow from quaternion rotation
-      if node.rotation then
-        local qx, qy, qz, qw = node.rotation[1], node.rotation[2], node.rotation[3], node.rotation[4]
-        -- BeamNG Y-forward convention: extract forward direction from quaternion
-        local fwd = vec3(
-          2 * (qx*qz + qw*qy),
-          1 - 2 * (qx*qx + qz*qz),
-          2 * (qy*qz - qw*qx)
-        )
-        debugDrawer:drawLine(pos, pos + fwd * 3, ColorF(0.2, 0.6, 1.0, 0.6))
-      end
+      -- Box dims from triggerSize [X, Y, Z] = [width, length, height].
+      local sz = node.triggerSize or {8, 8, 4}
+      local halfWid = sz[1] / 2
+      local halfLen = sz[2] / 2
+      local height  = sz[3]
+
+      local boxAlpha = isSelected and (0.7 + 0.3 * pulseAlpha) or 0.8
+      local col      = ColorF(0.2, 0.6, 1.0, boxAlpha)
+      local colFaint = ColorF(0.2, 0.6, 1.0, boxAlpha * 0.4)
+
+      -- 4 corners on ground plane
+      local fl = basePos + fwd * halfLen - right * halfWid
+      local fr = basePos + fwd * halfLen + right * halfWid
+      local bl = basePos - fwd * halfLen - right * halfWid
+      local br = basePos - fwd * halfLen + right * halfWid
+
+      -- 4 corners on top
+      local flT = fl + up * height
+      local frT = fr + up * height
+      local blT = bl + up * height
+      local brT = br + up * height
+
+      -- Bottom rectangle (solid, grounded)
+      debugDrawer:drawLine(fl, fr, col)
+      debugDrawer:drawLine(fr, br, col)
+      debugDrawer:drawLine(br, bl, col)
+      debugDrawer:drawLine(bl, fl, col)
+
+      -- Top rectangle (faint)
+      debugDrawer:drawLine(flT, frT, colFaint)
+      debugDrawer:drawLine(frT, brT, colFaint)
+      debugDrawer:drawLine(brT, blT, colFaint)
+      debugDrawer:drawLine(blT, flT, colFaint)
+
+      -- Vertical edges (faint)
+      debugDrawer:drawLine(fl, flT, colFaint)
+      debugDrawer:drawLine(fr, frT, colFaint)
+      debugDrawer:drawLine(bl, blT, colFaint)
+      debugDrawer:drawLine(br, brT, colFaint)
+
+      -- Direction arrow on the front face, slightly above ground so it renders
+      -- over the terrain. Same scheme as parking spots.
+      local arrowColor = ColorF(1.0, 0.9, 0.1, isSelected and 1.0 or 0.85)
+      local frontCenter = basePos + fwd * halfLen + up * 0.1
+      local tip = frontCenter + fwd * math.min(halfLen * 0.4, 2.5)
+      debugDrawer:drawLine(frontCenter, tip, arrowColor)
+      local headBase = tip - fwd * 0.8
+      local sideLen = 0.6
+      debugDrawer:drawLine(tip, headBase + right * sideLen, arrowColor)
+      debugDrawer:drawLine(tip, headBase - right * sideLen, arrowColor)
     end
   end
 end
@@ -3988,14 +4176,14 @@ goToGasStationStep = function(step)
   end
 end
 
--- Validation — delegates to gas module
+-- Validation â€” delegates to gas module
 validateGasStation = function(station)
   local gas = extensions.bcm_devtoolV2_gas
   if gas then return gas.validate(station) end
   return false, {"gas module not loaded"}
 end
 
--- D-13(a): Vanilla gas station override — delegates to gas module
+--: Vanilla gas station override â€” delegates to gas module
 importVanillaStation = function(vanillaId)
   local gas = extensions.bcm_devtoolV2_gas
   if not gas then log('E', logTag, 'importVanillaStation: bcm_devtoolV2_gas not loaded'); return end
@@ -4149,7 +4337,7 @@ createShareZip = function(configJson)
   end
   manifest.itemTypes = typeCounts
 
-  -- Write to user path (not mod folder — mod may be read-only in production)
+  -- Write to user path (not mod folder â€” mod may be read-only in production)
   local sharePath = FS:getUserPath() .. "bcm_share/"
   FS:directoryCreate(sharePath, true)
 
@@ -4263,7 +4451,7 @@ M.deleteGarage = deleteGarage
 M.updateGarageField = updateGarageField
 M.updateParkingSpotTag = updateParkingSpotTag
 M.saveWip = saveWip
--- M.discardWip removed (dangerous — destroys WIP data that isn't in exports)
+-- M.discardWip removed (dangerous â€” destroys WIP data that isn't in exports)
 M.exportAll = exportAll
 -- M.confirmExportAndExecute / M.cancelExport / M.saveSnapshotNow defined
 -- directly on M above (near exportAll) to avoid the 200-local limit.
@@ -4319,7 +4507,7 @@ adjustPropPos = function(propIdx, axis, delta)
 
   prop.position[axis] = prop.position[axis] + delta
   spawnLiveProps(garage.props)
-  -- Sync entire garage to wipCore — wall prop mutations touch multiple fields
+  -- Sync entire garage to wipCore â€” wall prop mutations touch multiple fields
   local wc = extensions.bcm_devtoolV2_wipCore
   if wc and garage.id then
     wc.replaceItem("garages", garage.id, garage)
@@ -4358,7 +4546,7 @@ adjustPropRot = function(propIdx, deltaDeg)
   }
 
   spawnLiveProps(garage.props)
-  -- Sync entire garage to wipCore — wall prop mutations touch multiple fields
+  -- Sync entire garage to wipCore â€” wall prop mutations touch multiple fields
   local wc = extensions.bcm_devtoolV2_wipCore
   if wc and garage.id then
     wc.replaceItem("garages", garage.id, garage)
@@ -4381,7 +4569,7 @@ deleteProp = function(propIdx)
   log('I', logTag, 'Deleted prop #' .. propIdx .. ': ' .. (removed.shapeName or '?'))
 
   spawnLiveProps(garage.props)
-  -- Sync entire garage to wipCore — wall prop mutations touch multiple fields
+  -- Sync entire garage to wipCore â€” wall prop mutations touch multiple fields
   local wc = extensions.bcm_devtoolV2_wipCore
   if wc and garage.id then
     wc.replaceItem("garages", garage.id, garage)
@@ -4404,7 +4592,7 @@ movePropToPlayer = function(propIdx)
   prop.position = {pos[1], pos[2], pos[3]}
 
   spawnLiveProps(garage.props)
-  -- Sync entire garage to wipCore — wall prop mutations touch multiple fields
+  -- Sync entire garage to wipCore â€” wall prop mutations touch multiple fields
   local wc = extensions.bcm_devtoolV2_wipCore
   if wc and garage.id then
     wc.replaceItem("garages", garage.id, garage)
@@ -4422,7 +4610,7 @@ M.movePropToPlayer = movePropToPlayer
 -- DAE file scanner & custom prop placement
 -- ============================================================================
 
--- Scan all .dae files in the game VFS and send the list to the UI
+-- Scan all.dae files in the game VFS and send the list to the UI
 scanDaeFiles = function()
   local paths = {}
   -- Scan common art directories
@@ -4491,10 +4679,752 @@ addCustomProp = function(shapeName)
   log('I', logTag, 'Added custom prop: ' .. shapeName)
 end
 
+-- ============================================================================
+-- Props mode
+-- ============================================================================
+
+-- Props functions defined directly on M (avoids the 200-local limit of the main chunk).
+-- Intra-props calls go through M.xxx for the same reason.
+
+-- Hotkey-based commit: BeamNG doesn't dispatch raw mouse clicks to extensions
+-- during gameplay, so we expose two input actions (Commit / Cancel) in the
+-- default "Normal" action map via core/input/actions/bcm_devtoolV2.json.
+-- The user binds a key in Options â†’ Controls and the action calls into
+-- M.propsHotkeyCommit / M.propsCancelMode directly. No push/pop needed.
+
+M.propsCancelMode = function()
+  -- Despawn ghost if any
+  if propsState.ghostObjId then
+    local obj = scenetree.findObjectById(propsState.ghostObjId)
+    if obj then pcall(function() obj:delete() end) end
+    propsState.ghostObjId = nil
+    propsState.ghostShapeName = nil
+  end
+  propsState.hoveredRemoveTarget = nil
+  propsState.mode = "none"
+  triggerUIUpdate()
+end
+
+M.enterPropsMode = function()
+  devtoolMode = "props"
+  propsState.mode = "none"
+  log('I', logTag, 'Props mode entered')
+  triggerUIUpdate()
+end
+
+M.exitPropsMode = function()
+  M.propsCancelMode()
+  propsState.mode = "none"
+end
+
+M.propsEnterPlaceCursor = function(shapeName)
+  if not shapeName or shapeName == "" then
+    log('W', logTag, 'propsEnterPlaceCursor: empty shapeName')
+    return
+  end
+
+  -- Despawn previous ghost if any
+  M.propsCancelMode()
+
+  -- Spawn ghost
+  local ok, err = pcall(function()
+    local obj = createObject("TSStatic")
+    obj.shapeName = shapeName
+    obj.useInstanceRenderData = true
+    obj.canSave = false
+    obj:setPosRot(0, 0, 0, 0, 0, 0, 1)
+    obj:registerObject("bcm_props_ghost")
+    if scenetree.MissionGroup then
+      scenetree.MissionGroup:addObject(obj)
+    end
+    propsState.ghostObjId = obj:getId()
+    propsState.ghostShapeName = shapeName
+  end)
+
+  if not ok then
+    log('W', logTag, 'propsEnterPlaceCursor: failed to spawn ghost: ' .. tostring(err))
+    return
+  end
+
+  propsState.mode = "placeCursor"
+  triggerUIUpdate()
+end
+
+propsUpdateGhost = function()
+  if propsState.mode ~= "placeCursor" or not propsState.ghostObjId then return end
+  local obj = scenetree.findObjectById(propsState.ghostObjId)
+  if not obj then return end
+
+  -- Camera mouse ray
+  local ray = getCameraMouseRay()
+  if not ray or not ray.pos or not ray.dir then return end
+
+  -- castRayStatic returns distance along ray
+  local dist = castRayStatic(ray.pos, ray.dir, 1000)
+  if not dist or dist <= 0 then return end
+
+  local hit = ray.pos + ray.dir * dist
+
+  local z = hit.z
+  if propsState.snapToGround then
+    z = hit.z + propsState.heightOffset
+  else
+    -- keep last Y, just follow X/Z
+    z = (obj:getPosition().z) + 0  -- no-op for v1; could add free-Y mode later
+  end
+
+  local q = quatFromZDeg(propsState.rotationZDeg)
+  obj:setPosRot(hit.x, hit.y, z, q.x, q.y, q.z, q.w)
+end
+
+M.propsCommitPlaceAtCursor = function()
+  if propsState.mode ~= "placeCursor" or not propsState.ghostObjId then return end
+  local obj = scenetree.findObjectById(propsState.ghostObjId)
+  if not obj then return end
+
+  local pos = obj:getPosition()
+  local c = math.cos(math.rad(propsState.rotationZDeg))
+  local s = math.sin(math.rad(propsState.rotationZDeg))
+  local rotMatrix = {c, s, 0, -s, c, 0, 0, 0, 1}
+
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  if not wipCore then return end
+
+  local entry = wipCore.get("props", "bcm_props")
+  if not entry then
+    wipCore.createNew("props", { id = "bcm_props" })
+    entry = wipCore.get("props", "bcm_props")
+  end
+
+  local newProp = {
+    persistentId   = "bcm-props-" .. tostring(os.time()) .. "-" .. tostring(math.random(1000, 9999)),
+    shapeName      = propsState.ghostShapeName,
+    position       = {pos.x, pos.y, pos.z},
+    rotationMatrix = rotMatrix,
+  }
+
+  -- Spawn a live TSStatic at the committed position so the user sees the
+  -- placement stay in the world (ghost continues following cursor for next
+  -- placement). canSave=false â€” this is session preview only; persistence
+  -- happens via the WIP -> export pipeline.
+  local qCommit = quatFromZDeg(propsState.rotationZDeg)
+  local okSpawn = pcall(function()
+    local placed = createObject("TSStatic")
+    placed.shapeName = propsState.ghostShapeName
+    placed.useInstanceRenderData = true
+    placed.canSave = false
+    placed:setPosRot(pos.x, pos.y, pos.z, qCommit.x, qCommit.y, qCommit.z, qCommit.w)
+    placed:registerObject("bcm_props_live_" .. newProp.persistentId)
+    if scenetree.MissionGroup then scenetree.MissionGroup:addObject(placed) end
+  end)
+  if not okSpawn then
+    log('W', logTag, 'propsCommitPlaceAtCursor: failed to spawn live preview prop')
+  end
+
+  entry.edited.added = entry.edited.added or {}
+  table.insert(entry.edited.added, newProp)
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+
+  log('I', logTag, 'Placed prop at cursor: ' .. propsState.ghostShapeName)
+  triggerUIUpdate()
+  -- Ghost stays for next placement (like World Editor chain placement)
+end
+
+M.propsCommitPlaceAtPlayer = function(shapeName)
+  shapeName = shapeName or propsState.ghostShapeName
+  if not shapeName or shapeName == "" then
+    log('W', logTag, 'propsCommitPlaceAtPlayer: no shapeName')
+    return
+  end
+
+  local pos = getPlacementPosition()
+  -- Rotation from camera forward, atan2(forward.x, forward.y)
+  local fwd = core_camera.getForward()
+  local theta = math.atan2(fwd.x, fwd.y)
+  local c = math.cos(theta)
+  local s = math.sin(theta)
+  local rotMatrix = {c, s, 0, -s, c, 0, 0, 0, 1}
+
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  if not wipCore then return end
+
+  local entry = wipCore.get("props", "bcm_props")
+  if not entry then
+    wipCore.createNew("props", { id = "bcm_props" })
+    entry = wipCore.get("props", "bcm_props")
+  end
+
+  local newProp = {
+    persistentId   = "bcm-props-" .. tostring(os.time()) .. "-" .. tostring(math.random(1000, 9999)),
+    shapeName      = shapeName,
+    position       = {pos[1], pos[2], pos[3] + propsState.heightOffset},
+    rotationMatrix = rotMatrix,
+  }
+
+  -- Spawn live TSStatic so the user sees the placement in the world.
+  local qPlayer = quatFromEuler(0, 0, -theta)
+  local okSpawn = pcall(function()
+    local placed = createObject("TSStatic")
+    placed.shapeName = shapeName
+    placed.useInstanceRenderData = true
+    placed.canSave = false
+    placed:setPosRot(newProp.position[1], newProp.position[2], newProp.position[3], qPlayer.x, qPlayer.y, qPlayer.z, qPlayer.w)
+    placed:registerObject("bcm_props_live_" .. newProp.persistentId)
+    if scenetree.MissionGroup then scenetree.MissionGroup:addObject(placed) end
+  end)
+  if not okSpawn then
+    log('W', logTag, 'propsCommitPlaceAtPlayer: failed to spawn live preview prop')
+  end
+
+  entry.edited.added = entry.edited.added or {}
+  table.insert(entry.edited.added, newProp)
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+
+  log('I', logTag, 'Placed prop at player: ' .. shapeName)
+  triggerUIUpdate()
+end
+
+M.propsSetRotation = function(deg)
+  propsState.rotationZDeg = tonumber(deg) or 0
+end
+
+M.propsSetHeightOffset = function(h)
+  propsState.heightOffset = tonumber(h) or 0
+end
+
+M.propsSetSnapToGround = function(val)
+  propsState.snapToGround = (val == true or val == "true" or val == 1)
+end
+
+M.propsEnterRemoveMode = function()
+  M.propsCancelMode()
+  propsState.mode = "remove"
+  propsState.hoveredRemoveTarget = nil
+  log('I', logTag, 'Props: entered remove mode')
+  triggerUIUpdate()
+end
+
+-- Dispatched by the "bcm_devtoolV2_commit" input action (see
+-- core/input/actions/bcm_devtoolV2.json). Routes to the right commit handler
+-- based on the current prop mode.
+M.propsHotkeyCommit = function()
+  log('I', logTag, 'propsHotkeyCommit: fired (mode=' .. tostring(propsState.mode) .. ', devtoolMode=' .. tostring(devtoolMode) .. ')')
+  if propsState.mode == "placeCursor" then
+    M.propsCommitPlaceAtCursor()
+  elseif propsState.mode == "remove" then
+    if propsState.hoveredRemoveTarget and propsState.hoveredRemoveTarget.removable then
+      M.propsCommitRemove()
+    else
+      log('W', logTag, 'propsHotkeyCommit: remove mode has no removable target hovered')
+    end
+  else
+    log('W', logTag, 'propsHotkeyCommit: no-op because propsState.mode is "' .. tostring(propsState.mode) .. '"')
+  end
+end
+
+-- Helper: read TSStatic persistentId via every available path (field lookup can
+-- return nil on some engine paths even when getOrCreatePersistentID returns a
+-- valid UUID). Returns first non-empty string found, or "" if none.
+local function readTSStaticPersistentId(obj)
+  if not obj then return "" end
+  -- Direct dynamic field
+  local pid = obj.persistentId
+  if type(pid) == "string" and pid ~= "" then return pid end
+  -- getField API
+  if type(obj.getField) == "function" then
+    local ok, val = pcall(function() return obj:getField("persistentId") end)
+    if ok and type(val) == "string" and val ~= "" then return val end
+  end
+  -- getOrCreatePersistentID (used by world editor) â€” this creates one if missing
+  if type(obj.getOrCreatePersistentID) == "function" then
+    local ok, val = pcall(function() return obj:getOrCreatePersistentID() end)
+    if ok and type(val) == "string" and val ~= "" then return val end
+  end
+  return ""
+end
+
+-- Classes that the Props tab treats as removable. TSStatic is the common case
+-- (trees, buildings, decorative meshes). Prefab/PrefabInstance wrap grouped
+-- scene content (e.g. vanilla village setups). StaticShape covers legacy
+-- placements. ForestItemData/Forest are data assets without getPosition â€”
+-- removed from this list because they break the pivot-scan (see 5020 error).
+local REMOVABLE_CLASSES = {
+  "TSStatic",
+  "Prefab",
+  "PrefabInstance",
+  "StaticShape",
+  "TSStaticObject",
+}
+
+-- Safe getPosition: some SimObjects in the REMOVABLE_CLASSES don't implement
+-- getPosition (data assets, forest containers). pcall so a single bad
+-- object doesn't nuke the whole hover scan.
+local function safeGetPosition(o)
+  if not o then return nil end
+  local ok, p = pcall(function() return o:getPosition() end)
+  if ok and p then return p end
+  return nil
+end
+
+-- Remove-hover detection: cast a ray from the camera/mouse, find the nearest
+-- removable pivot within PROXIMITY_TOL of the hit point, and mark it as the
+-- hover target.
+-- Design notes (from regression of fc2fb149):
+-- - The earlier AABB slab test relied on `rayDir[axis]` / `rayPos[axis]`
+-- dynamic string indexing on Point3F userdata. That index form isn't
+-- reliable on the engine's vector types (field access via `.x` works,
+-- dynamic `["x"]` can silently return nil), so the slab test would
+-- always miss and the whole hover would fail intermittently. We also
+-- iterated worldBoxes for every TSStatic in the map, which scales
+-- poorly.
+-- - Solution: single strategy â€” nearest pivot within 5m of the ray hit
+-- across every class in REMOVABLE_CLASSES. The runtime applier
+-- (propsRemover.lua) already has three matching strategies
+-- (persistentId â†’ name â†’ shapeName+position within 0.5m), so we can
+-- safely mark any detected object as `removable = true`. If the target
+-- has a stable id or name we tag it `id`; otherwise `position`.
+-- Scan throttle + cache for the remove-hover scan.
+-- HOVER_SCAN_INTERVAL â€” seconds between full scans. 10Hz is plenty for
+-- cursor-hover UX (perceived as smooth); 60Hz was melting frame time.
+-- CLASS_LIST_TTL â€” how long to reuse the scenetree.findClassObjects
+-- result. Scene topology doesn't change during normal gameplay, so a
+-- few seconds is fine. Rebuilt on mode entry and on timeout.
+local HOVER_SCAN_INTERVAL = 0.1
+local CLASS_LIST_TTL = 3.0
+local propsHoverLastScan = 0
+local propsClassListCache = {}
+
+local function getCachedClassNames(className, now)
+  local cached = propsClassListCache[className]
+  if cached and (now - cached.builtAt) < CLASS_LIST_TTL then
+    return cached.names
+  end
+  local names = scenetree.findClassObjects(className) or {}
+  propsClassListCache[className] = { names = names, builtAt = now }
+  return names
+end
+
+propsUpdateRemoveHover = function()
+  if propsState.mode ~= "remove" then
+    propsState.hoveredRemoveTarget = nil
+    return
+  end
+
+  -- Throttle scans to 10Hz using real time. Between scans we keep drawing
+  -- the highlight for the last detected target so the visual stays smooth.
+  local now = os.clock()
+  if now - propsHoverLastScan < HOVER_SCAN_INTERVAL then
+    local last = propsState.hoveredRemoveTarget
+    if last and last.objId and debugDrawer then
+      local obj = scenetree.findObjectById(last.objId)
+      if obj then
+        local p = safeGetPosition(obj)
+        if p then
+          local color = last.matchTier == "id"
+            and ColorF(0.2, 1, 0.2, 0.18)
+            or  ColorF(1, 0.9, 0.2, 0.22)
+          local radius = last.highlightRadius or 1.5
+          local topZ = last.highlightTopZ or (p.z + 120)
+          debugDrawer:drawCylinder(vec3(p.x, p.y, p.z - 0.2), vec3(p.x, p.y, topZ), radius, color)
+          if last.label then
+            debugDrawer:drawTextAdvanced(vec3(p.x, p.y, (last.labelZ or p.z + 3)), last.label,
+              ColorF(1, 1, 1, 1), true, false, ColorI(0, 0, 0, 200))
+          end
+        end
+      end
+    end
+    return
+  end
+  propsHoverLastScan = now
+
+  local ray = getCameraMouseRay()
+  if not ray or not ray.pos or not ray.dir then
+    propsState.hoveredRemoveTarget = nil
+    return
+  end
+  local dist = castRayStatic(ray.pos, ray.dir, 1000)
+  local hitV = nil
+  if dist and dist > 0 then
+    local hit = ray.pos + ray.dir * dist
+    hitV = vec3(hit.x, hit.y, hit.z)
+  end
+  local PROXIMITY_TOL = 15.0
+  local PROXIMITY_TOL_SQ = PROXIMITY_TOL * PROXIMITY_TOL
+  local rayOrigin = vec3(ray.pos.x, ray.pos.y, ray.pos.z)
+  local rayDir = vec3(ray.dir.x, ray.dir.y, ray.dir.z)
+  rayDir:normalize()
+  local RAY_PERP_TOL = 10.0
+  local RAY_PERP_TOL_SQ = RAY_PERP_TOL * RAY_PERP_TOL
+  local RAY_MAX_FWD = 300.0
+  local WORLDBOX_PAD = 0.5
+  -- Broadphase cull: objects beyond 350m from ray origin can't be picked.
+  local BROADPHASE_SQ = 350 * 350
+
+  local bestObj, bestDist = nil, math.huge
+  local selectedBy = nil
+
+  local function getWorldBox(o)
+    if not o or not o.getWorldBox then return nil end
+    local ok, b = pcall(function() return o:getWorldBox() end)
+    if not ok or not b then return nil end
+    return b
+  end
+
+  local function pointInBox(b, pt)
+    if not b or not pt then return false end
+    if b.minExtents and b.maxExtents then
+      return pt.x >= b.minExtents.x - WORLDBOX_PAD and pt.x <= b.maxExtents.x + WORLDBOX_PAD
+         and pt.y >= b.minExtents.y - WORLDBOX_PAD and pt.y <= b.maxExtents.y + WORLDBOX_PAD
+         and pt.z >= b.minExtents.z - WORLDBOX_PAD and pt.z <= b.maxExtents.z + WORLDBOX_PAD
+    end
+    return false
+  end
+
+  -- Single-pass scan. We track FOUR candidate strategies per scan:
+  -- tightBest â€” pivot within TIGHT_PERP_TOL of ray, NEAREST along ray
+  -- boxBest â€” worldBox containing hit point, smallest volume
+  -- proxBest â€” pivot nearest to the raw hit point (within PROXIMITY_TOL)
+  -- lineBest â€” pivot nearest to the ray line (perpendicular, within
+  -- RAY_PERP_TOL). Last-resort fallback for far aim.
+  -- Priority at selection: tight â†’ box â†’ prox â†’ wide-line.
+  -- Why tight wins first: when aiming at a small prop in front of a wall, the
+  -- ray often passes through the prop (no/thin collision), the worldBox hit
+  -- lands on the wall, and boxBest would pick the wall. Checking "is a prop's
+  -- pivot almost on my ray line, and the NEAREST such prop ahead of me" fixes
+  -- that case without regressing the fallbacks.
+  local TIGHT_PERP_TOL = 2.5
+  local TIGHT_PERP_TOL_SQ = TIGHT_PERP_TOL * TIGHT_PERP_TOL
+  local proxBest, proxBestDistSq = nil, math.huge
+  local boxBest, boxBestVol = nil, math.huge
+  local lineBest, lineBestPerpSq, lineBestFwd = nil, math.huge, math.huge
+  local tightBest, tightBestFwd = nil, math.huge
+
+  for _, className in ipairs(REMOVABLE_CLASSES) do
+    local objNames = getCachedClassNames(className, now)
+    for i = 1, #objNames do
+      local name = objNames[i]
+      -- Skip our own added-props live preview objects: they are tracked in
+      -- the Added list (dedicated Delete button). Hovering them in remove mode
+      -- would let a user blacklist their own placements by accident.
+      if not (name and name:sub(1, 16) == "bcm_props_live_") then
+        local o = scenetree.findObject(name)
+        if o then
+          local p = safeGetPosition(o)
+          if p then
+            local pvx, pvy, pvz = p.x, p.y, p.z
+            local odx = pvx - rayOrigin.x
+            local ody = pvy - rayOrigin.y
+            local odz = pvz - rayOrigin.z
+            local originDistSq = odx*odx + ody*ody + odz*odz
+            if originDistSq < BROADPHASE_SQ then
+              -- Hit-proximity (squared, no sqrt in hot loop)
+              if hitV then
+                local hx, hy, hz = pvx - hitV.x, pvy - hitV.y, pvz - hitV.z
+                local hsq = hx*hx + hy*hy + hz*hz
+                if hsq < PROXIMITY_TOL_SQ and hsq < proxBestDistSq then
+                  proxBestDistSq = hsq
+                  proxBest = o
+                end
+              end
+              -- Ray-line perpendicular: track BOTH the tight "nearest along
+              -- the ray within 2.5m perp" and the wide "smallest perp" pivot.
+              local fwd = odx * rayDir.x + ody * rayDir.y + odz * rayDir.z
+              if fwd > 0 and fwd < RAY_MAX_FWD then
+                local projX = rayOrigin.x + rayDir.x * fwd
+                local projY = rayOrigin.y + rayDir.y * fwd
+                local projZ = rayOrigin.z + rayDir.z * fwd
+                local px, py, pz = pvx - projX, pvy - projY, pvz - projZ
+                local perpSq = px*px + py*py + pz*pz
+                if perpSq < TIGHT_PERP_TOL_SQ and fwd < tightBestFwd then
+                  tightBestFwd = fwd
+                  tightBest = o
+                end
+                if perpSq < RAY_PERP_TOL_SQ and perpSq < lineBestPerpSq then
+                  lineBestPerpSq = perpSq
+                  lineBestFwd = fwd
+                  lineBest = o
+                end
+              end
+              -- WorldBox (only bother if hit point exists)
+              if hitV then
+                local b = getWorldBox(o)
+                if b and pointInBox(b, hitV) then
+                  local vol = 0
+                  if b.minExtents and b.maxExtents then
+                    vol = (b.maxExtents.x - b.minExtents.x)
+                        * (b.maxExtents.y - b.minExtents.y)
+                        * (b.maxExtents.z - b.minExtents.z)
+                  end
+                  if vol > 0 and vol < boxBestVol then
+                    boxBestVol = vol
+                    boxBest = o
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  if tightBest then
+    bestObj = tightBest
+    bestDist = tightBestFwd
+    selectedBy = "ray-tight"
+  elseif boxBest then
+    bestObj = boxBest
+    local p = safeGetPosition(boxBest)
+    bestDist = (p and hitV) and math.sqrt((p.x-hitV.x)^2 + (p.y-hitV.y)^2 + (p.z-hitV.z)^2) or 0
+    selectedBy = "worldbox"
+  elseif proxBest then
+    bestObj = proxBest
+    bestDist = math.sqrt(proxBestDistSq)
+    selectedBy = "hit-proximity"
+  elseif lineBest then
+    bestObj = lineBest
+    bestDist = lineBestFwd
+    selectedBy = "ray-line"
+  end
+
+  if bestObj then
+    local p = safeGetPosition(bestObj)
+    local className = (bestObj.getClassName and bestObj:getClassName()) or "TSStatic"
+    local persistentId = readTSStaticPersistentId(bestObj)
+    local objName = (bestObj.getName and bestObj:getName()) or ""
+    local shapeName = bestObj.shapeName or ""
+    local strong = (persistentId ~= "" or objName ~= "")
+
+    -- Envelope sizing from worldBox: wraps the whole object, reaches the
+    -- sky, stays translucent so geometry reads through it. Cached on the
+    -- hoveredRemoveTarget so the between-scan redraw path (tick rate)
+    -- doesn't recompute worldBox every frame.
+    local radius = 1.5
+    local boxTopZ = (p and p.z or 0) + 3
+    local wb = getWorldBox(bestObj)
+    if wb and wb.minExtents and wb.maxExtents then
+      local dx = wb.maxExtents.x - wb.minExtents.x
+      local dy = wb.maxExtents.y - wb.minExtents.y
+      local halfDiag = math.sqrt(dx*dx + dy*dy) * 0.5
+      if halfDiag > radius then radius = halfDiag end
+      if wb.maxExtents.z > boxTopZ then boxTopZ = wb.maxExtents.z end
+    end
+    local skyTopZ = boxTopZ + 120
+    local displayName = (shapeName ~= "" and shapeName) or objName
+    if displayName == "" then displayName = "?" end
+    local tierLabel = strong and "REMOVABLE (by ID)" or "REMOVABLE (by position)"
+    local label = string.format("%s [%s]\n%s", displayName, className, tierLabel)
+
+    propsState.hoveredRemoveTarget = {
+      objId           = bestObj:getId(),
+      persistentId    = persistentId,
+      name            = objName,
+      className       = className,
+      shapeName       = shapeName ~= "" and shapeName or nil,
+      position        = p and {p.x, p.y, p.z} or nil,
+      removable       = true,
+      matchTier       = strong and "id" or "position",
+      highlightRadius = radius,
+      highlightTopZ   = skyTopZ,
+      label           = label,
+      labelZ          = boxTopZ + 1.5,
+    }
+
+    -- Draw once now; between-scan ticks redraw using the cached values above.
+    if debugDrawer and p then
+      local color = strong
+        and ColorF(0.2, 1, 0.2, 0.18)
+        or  ColorF(1, 0.9, 0.2, 0.22)
+      debugDrawer:drawCylinder(vec3(p.x, p.y, p.z - 0.2), vec3(p.x, p.y, skyTopZ), radius, color)
+      debugDrawer:drawTextAdvanced(vec3(p.x, p.y, boxTopZ + 1.5), label, ColorF(1, 1, 1, 1), true, false, ColorI(0, 0, 0, 200))
+    end
+  else
+    propsState.hoveredRemoveTarget = nil
+  end
+end
+
+M.propsCommitRemove = function()
+  if propsState.mode ~= "remove" then return end
+  local t = propsState.hoveredRemoveTarget
+  if not t or not t.removable then
+    log('W', logTag, 'propsCommitRemove: no removable target hovered')
+    return
+  end
+
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  if not wipCore then return end
+
+  local entry = wipCore.get("props", "bcm_props")
+  if not entry then
+    wipCore.createNew("props", { id = "bcm_props" })
+    entry = wipCore.get("props", "bcm_props")
+  end
+
+  entry.edited.removed = entry.edited.removed or {}
+  table.insert(entry.edited.removed, {
+    persistentId      = t.persistentId,
+    name              = t.name,
+    className         = t.className or "TSStatic",
+    shapeName         = t.shapeName,
+    lastKnownPosition = t.position,
+    removedAt         = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+  })
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+
+  -- Delete from scene immediately (feedback). Prefab / PrefabInstance may
+  -- refuse hard delete during gameplay â€” fall back to hide so the user still
+  -- sees the removal acknowledged; the runtime applier will apply the right
+  -- strategy on next load.
+  local obj = scenetree.findObjectById(t.objId)
+  if obj then
+    local cls = (obj.getClassName and obj:getClassName()) or "TSStatic"
+    if cls == "TSStatic" or cls == "Forest" then
+      pcall(function() obj:delete() end)
+    else
+      pcall(function()
+        obj.hidden = true
+        if obj.collidable ~= nil then obj.collidable = false end
+      end)
+    end
+  end
+
+  propsState.hoveredRemoveTarget = nil
+  log('I', logTag, 'Removed vanilla object ['
+    .. tostring(t.className or "TSStatic") .. ']: '
+    .. tostring(t.shapeName or t.name or '?'))
+  triggerUIUpdate()
+end
+
+-- ============================================================================
+-- Props list API (delete / highlight / move / restore)
+-- ============================================================================
+
+M.propsDeleteAdded = function(idx)
+  idx = tonumber(idx)
+  if not idx then return end
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  local entry = wipCore and wipCore.get("props", "bcm_props")
+  if not entry or not entry.edited.added or not entry.edited.added[idx] then return end
+  table.remove(entry.edited.added, idx)
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+  log('I', logTag, 'Deleted added prop ' .. idx)
+  triggerUIUpdate()
+end
+
+-- Draws a pulsing bbox at an added prop's position for N seconds.
+-- For v1, persists as long as props mode is active and idx matches.
+-- (propsHighlightIdx is declared at module scope so onUpdate can capture it as upvalue)
+
+M.propsHighlightAdded = function(idx)
+  propsHighlightIdx = tonumber(idx)
+  triggerUIUpdate()
+end
+
+M.propsMoveAdded = function(idx)
+  idx = tonumber(idx)
+  if not idx then return end
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  local entry = wipCore and wipCore.get("props", "bcm_props")
+  if not entry or not entry.edited.added or not entry.edited.added[idx] then return end
+
+  local existing = entry.edited.added[idx]
+  -- Remove from list; user will commit at new position
+  table.remove(entry.edited.added, idx)
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+
+  -- Enter place mode with this shapeName
+  M.propsEnterPlaceCursor(existing.shapeName)
+end
+
+-- Relocate the live scene object for an added prop. Helper used by nudge/rotate.
+-- Our commit code names the spawn "bcm_props_live_<persistentId>"; we recreate
+-- the quat from the rotation matrix's top-left 2x2 (Z-only rotation).
+-- Forward declared via local usage below â€” only referenced inside the module.
+local function propsRespawnLive(prop)
+  if not prop or not prop.persistentId or not prop.position then return end
+  local name = "bcm_props_live_" .. prop.persistentId
+  local obj = scenetree.findObject(name)
+  if not obj then return end
+  local m = prop.rotationMatrix or {1,0,0,0,1,0,0,0,1}
+  local theta = math.atan2(m[2] or 0, m[1] or 1)  -- s = m[2], c = m[1] in {c,s,0,-s,c,0,0,0,1}
+  local q = quatFromEuler(0, 0, -theta)
+  pcall(function()
+    obj:setPosRot(prop.position[1], prop.position[2], prop.position[3], q.x, q.y, q.z, q.w)
+  end)
+end
+
+M.propsNudgeAdded = function(idx, dx, dy, dz)
+  idx = tonumber(idx)
+  dx, dy, dz = tonumber(dx) or 0, tonumber(dy) or 0, tonumber(dz) or 0
+  if not idx then return end
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  local entry = wipCore and wipCore.get("props", "bcm_props")
+  if not entry or not entry.edited.added or not entry.edited.added[idx] then return end
+  local p = entry.edited.added[idx]
+  p.position = p.position or {0,0,0}
+  p.position[1] = (p.position[1] or 0) + dx
+  p.position[2] = (p.position[2] or 0) + dy
+  p.position[3] = (p.position[3] or 0) + dz
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+  propsRespawnLive(p)
+  triggerUIUpdate()
+end
+
+M.propsRotateAdded = function(idx, degDelta)
+  idx = tonumber(idx)
+  degDelta = tonumber(degDelta) or 0
+  if not idx or degDelta == 0 then return end
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  local entry = wipCore and wipCore.get("props", "bcm_props")
+  if not entry or not entry.edited.added or not entry.edited.added[idx] then return end
+  local p = entry.edited.added[idx]
+  local m = p.rotationMatrix or {1,0,0,0,1,0,0,0,1}
+  -- Matrix layout in the commit code: {c, s, 0, -s, c, 0, 0, 0, 1}
+  -- â†’ m[1]=c, m[2]=s â†’ theta = atan2(s, c)
+  local theta = math.atan2(m[2] or 0, m[1] or 1)
+  theta = theta + math.rad(degDelta)
+  local c = math.cos(theta)
+  local s = math.sin(theta)
+  p.rotationMatrix = { c, s, 0, -s, c, 0, 0, 0, 1 }
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+  propsRespawnLive(p)
+  triggerUIUpdate()
+end
+
+M.propsRestoreRemoved = function(idx)
+  idx = tonumber(idx)
+  if not idx then return end
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  local entry = wipCore and wipCore.get("props", "bcm_props")
+  if not entry or not entry.edited.removed or not entry.edited.removed[idx] then return end
+
+  local removed = entry.edited.removed[idx]
+  table.remove(entry.edited.removed, idx)
+  wipCore.replaceItem("props", "bcm_props", entry.edited)
+
+  -- Best-effort respawn in scene (user sees it reappear)
+  if removed.shapeName and removed.lastKnownPosition then
+    local ok = pcall(function()
+      local obj = createObject("TSStatic")
+      obj.shapeName = removed.shapeName
+      obj.useInstanceRenderData = true
+      obj.canSave = false  -- session-only respawn; actual restore happens when blacklist JSON is re-exported without this entry
+      obj:setPosRot(removed.lastKnownPosition[1], removed.lastKnownPosition[2], removed.lastKnownPosition[3], 0, 0, 0, 1)
+      obj:registerObject("bcm_props_restored_" .. idx)
+      if scenetree.MissionGroup then scenetree.MissionGroup:addObject(obj) end
+    end)
+    if not ok then log('W', logTag, 'Failed to respawn restored prop') end
+  end
+
+  log('I', logTag, 'Restored vanilla prop at idx ' .. idx)
+  triggerUIUpdate()
+end
+
 M.scanDaeFiles = scanDaeFiles
 M.addCustomProp = addCustomProp
 M.captureGarageImage = captureGarageImage
 M.captureDeliveryImage = captureDeliveryImage
+M.captureTravelImage = captureTravelImage
 M.goToStep = goToStep
 
 -- Delivery facility mode exports
@@ -4577,6 +5507,29 @@ M.goToGasStationStep = goToGasStationStep
 M.importVanillaStation = importVanillaStation
 M.updateVanillaOverrideField = updateVanillaOverrideField
 
+-- Props mode exports: defined directly on M above (near the props section)
+-- to avoid the 200-local limit of the main chunk.
+
+M.propsGetState = function()
+  local wipCore = extensions.bcm_devtoolV2_wipCore
+  local entry = wipCore and wipCore.get("props", "bcm_props")
+  local added   = entry and entry.edited.added   or {}
+  local removed = entry and entry.edited.removed or {}
+  return {
+    mode    = propsState.mode,
+    added   = added,
+    removed = removed,
+    hoveredTarget = propsState.hoveredRemoveTarget,
+    catalog = propsState.catalog,
+    rotation = propsState.rotationZDeg,
+    height = propsState.heightOffset,
+    snapToGround = propsState.snapToGround,
+  }
+end
+
+-- Diagnostic getter
+M.debugGetTravelNodes = function() return travelNodes end
+
 -- DAE Pack exports
 M.saveDaePack = saveDaePack
 M.applyDaePack = applyDaePack
@@ -4631,16 +5584,16 @@ M.adjustMarkerZ = function(markerType, index, delta)
 end
 
 -- ============================================================================
--- Delivery Hook Testing Panel (DLVR-04)
+-- Delivery Hook Testing Panel
 -- Console-accessible functions for testing trailer/coupler hooks and
 -- polling during live gameplay. Always active when extension is loaded.
 -- Usage:
---   extensions.load("bcm_devtoolV2")
---   bcm_devtoolV2.clearDeliveryLogs()
---   -- drive near trailer, couple it --
---   bcm_devtoolV2.deliveryHookSummary()
---   bcm_devtoolV2.testTrailerPolling()
---   bcm_devtoolV2.listDeliveryFacilities()
+-- extensions.load("bcm_devtoolV2")
+-- bcm_devtoolV2.clearDeliveryLogs
+-- -- drive near trailer, couple it --
+-- bcm_devtoolV2.deliveryHookSummary
+-- bcm_devtoolV2.testTrailerPolling
+-- bcm_devtoolV2.listDeliveryFacilities
 -- ============================================================================
 
 M._deliveryHookLog = {
@@ -4650,7 +5603,7 @@ M._deliveryHookLog = {
   pollingResults = {},
 }
 
--- Hook listeners — always active when extension is loaded (no isActive gate)
+-- Hook listeners â€” always active when extension is loaded (no isActive gate)
 M.onTrailerAttached = function(trailerId, pullerId)
   M._deliveryHookLog.trailerAttached = (M._deliveryHookLog.trailerAttached or 0) + 1
   log('I', logTag, 'DELIVERY HOOK: onTrailerAttached trailerId=' .. tostring(trailerId) .. ' pullerId=' .. tostring(pullerId))
@@ -4666,7 +5619,7 @@ M.onCouplerDetached = function(objId1, objId2, nodeId, obj2nodeId)
   log('I', logTag, 'DELIVERY HOOK: onCouplerDetached obj1=' .. tostring(objId1) .. ' obj2=' .. tostring(objId2) .. ' node1=' .. tostring(nodeId) .. ' node2=' .. tostring(obj2nodeId))
 end
 
--- Polling test — checks all vehicles for trailer attachment using core_trailerRespawn
+-- Polling test â€” checks all vehicles for trailer attachment using core_trailerRespawn
 testTrailerPolling = function()
   local playerId = be:getPlayerVehicleID(0)
   log('I', logTag, 'DELIVERY POLL TEST: Player vehicle ID = ' .. tostring(playerId))
@@ -4698,11 +5651,11 @@ testTrailerPolling = function()
 end
 M.testTrailerPolling = testTrailerPolling
 
--- Facility enumeration — lists delivery facilities from the generator module
+-- Facility enumeration â€” lists delivery facilities from the generator module
 listDeliveryFacilities = function()
   local generator = career_modules_delivery_generator
   if not generator then
-    log('W', logTag, 'DELIVERY FACILITIES: delivery generator not loaded — is career active?')
+    log('W', logTag, 'DELIVERY FACILITIES: delivery generator not loaded â€” is career active?')
     return
   end
 

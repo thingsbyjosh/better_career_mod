@@ -1,8 +1,8 @@
--- BCM Listing Generator
--- Stateless require()'able module for procedural marketplace listing generation.
--- NOT an extension — no lifecycle hooks, no state.
+﻿-- BCM Listing Generator
+-- Stateless require'able module for procedural marketplace listing generation.
+-- NOT an extension â€” no lifecycle hooks, no state.
 -- Produces listing data tables; caller manages persistence via bcm_marketplace.
--- Uses LCG for deterministic randomness — NEVER calls math.randomseed().
+-- Uses LCG for deterministic randomness â€” NEVER calls math.randomseed.
 -- v2: Archetype-consistent mileage, condition matrix, color, single-owner,
 -- suspicious mileage, freshness, Zipf model frequency.
 
@@ -13,7 +13,7 @@ local templates = require('lua/ge/extensions/bcm/listingTemplates')
 local curatedPool = require('lua/ge/extensions/bcm/curatedListings')
 
 -- ============================================================================
--- Price Overrides (loaded from JSON — per-mod value multipliers and class overrides)
+-- Price Overrides (loaded from JSON â€” per-mod value multipliers and class overrides)
 -- ============================================================================
 
 local _priceOverrides = nil  -- lazy-loaded cache
@@ -77,7 +77,7 @@ local DEFECT_TYPES = {
 -- Seed offset registry (avoid collisions):
 -- Existing: 1-6, 10-15, 20-21, 30-31, 40-50, 77
 -- New (v2): 60-69
--- Phase 52 defects: 70-79
+-- defects: 70-79
 
 -- Archetype-specific annual km bands
 local ARCHETYPE_KM_BANDS = {
@@ -311,10 +311,10 @@ local CLASS_MARKETPLACE_MULT = {
 -- v2 mileage generation: per-class Gaussian distribution with logistic saturation.
 -- Each vehicle class defines its own annual km curve and a ceiling.
 -- The Gaussian generates annual km, multiplied by age for raw km.
--- A logistic function then maps raw km → final km, asymptotically approaching
+-- A logistic function then maps raw km â†’ final km, asymptotically approaching
 -- the class ceiling without ever reaching it. No hard caps, no clamps.
 local CLASS_KM_CURVE = {
-  --               annualMin  annualMax   ceiling  (max km the class can ever approach)
+  -- annualMin annualMax ceiling (max km the class can ever approach)
   Economy   = { min = 8000,   max = 25000,  ceiling = 600000   },
   Sedan     = { min = 8000,   max = 22000,  ceiling = 500000   },
   Coupe     = { min = 3000,   max = 15000,  ceiling = 350000   },
@@ -346,10 +346,10 @@ local ARCHETYPE_KM_POSITION = {
 
 -- Logistic saturation: maps raw km to [0, ceiling) asymptotically.
 -- k controls how quickly the curve bends:
---   - At 50% of ceiling, output ≈ 45% of ceiling (almost linear)
---   - At 100% of ceiling, output ≈ 70% of ceiling (gentle bend)
---   - At 200% of ceiling, output ≈ 90% of ceiling (strong saturation)
---   - Never reaches ceiling
+-- - At 50% of ceiling, output â‰ˆ 45% of ceiling (almost linear)
+-- - At 100% of ceiling, output â‰ˆ 70% of ceiling (gentle bend)
+-- - At 200% of ceiling, output â‰ˆ 90% of ceiling (strong saturation)
+-- - Never reaches ceiling
 local function logisticSaturate(rawKm, ceiling, k)
   if rawKm <= 0 then return 0 end
   k = k or 1.2
@@ -365,14 +365,14 @@ generateMileage_v2 = function(year, archetypeKey, seed, vehicleClass)
 
   -- Annual km mean: interpolate within class range using archetype position
   local annualMean = curve.min + (curve.max - curve.min) * pos
-  -- Sigma: 1/6th of the range so ±3σ covers [min, max]
+  -- Sigma: 1/6th of the range so Â±3Ïƒ covers [min, max]
   local annualSigma = (curve.max - curve.min) / 6
 
   -- Sample annual km from Gaussian, clamp to positive
   local annualKm = pricingEngine.lcgGaussian(lcgChain(seed, 60), annualMean, annualSigma)
   annualKm = math.max(curve.min * 0.3, annualKm)
 
-  -- Raw km = annual × age (can exceed ceiling for old/high-use vehicles)
+  -- Raw km = annual Ã— age (can exceed ceiling for old/high-use vehicles)
   local rawKm = age * annualKm
 
   -- Logistic saturation: smoothly decelerates toward ceiling, never reaches it
@@ -381,7 +381,7 @@ generateMileage_v2 = function(year, archetypeKey, seed, vehicleClass)
   return math.max(200, baseKm)
 end
 
--- Determine fuel type (simplified — most BeamNG vehicles are gasoline)
+-- Determine fuel type (simplified â€” most BeamNG vehicles are gasoline)
 determineFuelType = function(vehicleData, seed)
   local roll = pricingEngine.lcgFloat(seed)
   if roll < 0.85 then
@@ -524,7 +524,7 @@ end
 -- ============================================================================
 -- Classify vehicle into 14 BCM classes: Economy, Sedan, Coupe, Sports, Muscle, Supercar,
 -- SUV, Family, Pickup, Van, HeavyDuty, Luxury, OffRoad, Special
--- Priority: Body Style (primary) → Derby Class (fallback) → heuristic (power/value/weight)
+-- Priority: Body Style (primary) â†’ Derby Class (fallback) â†’ heuristic (power/value/weight)
 -- Heuristic upgrades only apply to Economy, Sedan, Coupe base classes.
 
 -- Helper: get first key from an aggregates sub-table (they're stored as {key=true,...})
@@ -536,7 +536,7 @@ local function firstAggregateKey(vehicleData, field)
   return nil
 end
 
--- Derby Class → vehicleClass fallback mapping (only used when Body Style is absent)
+-- Derby Class â†’ vehicleClass fallback mapping (only used when Body Style is absent)
 local DERBY_FALLBACK = {
   ["Sports Car"]      = "Sports",
   ["Sub-Compact Car"] = "Economy",
@@ -550,7 +550,7 @@ local DERBY_FALLBACK = {
   ["Wheel Loader"]    = "HeavyDuty",
 }
 
--- Body Style → vehicleClass primary mapping (28 Body Style values from vanilla)
+-- Body Style â†’ vehicleClass primary mapping (28 Body Style values from vanilla)
 local BODY_STYLE_TO_CLASS = {
   ["Hatchback"]         = "Economy",
   ["Liftback"]          = "Economy",
@@ -583,7 +583,7 @@ local BODY_STYLE_TO_CLASS = {
 }
 
 classifyVehicle = function(vehicleData)
-  -- Step 0: Trailer detection — trailers have Type.Trailer in aggregates
+  -- Step 0: Trailer detection â€” trailers have Type.Trailer in aggregates
   local aType = vehicleData.aggregates and vehicleData.aggregates.Type
   if aType and (aType.Trailer or aType.Prop or aType.Utility) then
     return "Trailer"
@@ -758,7 +758,7 @@ generateSpecBlock = function(vehicleData, archetypeKey, language, seed, scamType
   end
 
   if language == "es" then
-    return string.format("%d cv, %d km, año %d", hp, km, year)
+    return string.format("%d cv, %d km, aÃ±o %d", hp, km, year)
   else
     return string.format("%d hp, %d km, year %d", hp, km, year)
   end
@@ -926,7 +926,7 @@ generateListing = function(params)
     end
   end
 
-  -- Phase 52: Generate hidden defects for scammer listings
+  -- Generate hidden defects for scammer listings
   local defects = nil
   if isScam then
     defects = {}
@@ -1001,7 +1001,7 @@ generateListing = function(params)
   -- v2: Single-owner premium
   priceCents = pricingEngine.applySingleOwnerPremium(priceCents, archetypeKey, singleOwnerClaim)
 
-  -- NOTE: applyClusteringBias is NOT called here — it's called by marketplaceApp
+  -- NOTE: applyClusteringBias is NOT called here â€” it's called by marketplaceApp
   -- because it needs active listing context to count similar cars.
 
   -- Apply demand multiplier if marketplace available
@@ -1021,8 +1021,8 @@ generateListing = function(params)
   local dynamicFloor = pricingEngine.dynamicFloorCents(vehiclePowerHP, vehicleWeightKg)
   priceCents = math.max(dynamicFloor, math.min(pricingEngine.PRICE_CEIL_CENTS, priceCents))
 
-  -- v2: Psychological rounding — LAST step so demand multiplier and floor clamp
-  -- don't break the nice rounded price (fixes $65,089 → $65,000 type issues)
+  -- v2: Psychological rounding â€” LAST step so demand multiplier and floor clamp
+  -- don't break the nice rounded price (fixes $65,089 â†’ $65,000 type issues)
   priceCents = pricingEngine.applyPsychologicalRounding(priceCents, archetypeKey)
 
   -- Mileage honesty
@@ -1040,7 +1040,7 @@ generateListing = function(params)
     end
   end
 
-  -- Phase 52: Compute real value for scammer vehicles using pricingEngine
+  -- Compute real value for scammer vehicles using pricingEngine
   -- This is the value of the vehicle with its REAL data (real mileage, real config, real power/weight)
   local realValueCents = nil
   if isScam and defects then
@@ -1222,7 +1222,7 @@ generateMarketplace = function(params)
   local curatedCount = math.floor(targetCount * curatedRatio)
   local proceduralCount = targetCount - curatedCount
 
-  -- Config diversity tracking — shared across curated AND procedural
+  -- Config diversity tracking â€” shared across curated AND procedural
   local MAX_SAME_CONFIG = 2  -- max listings with identical model+config
   local configUsage = {}     -- "brand|model|config" -> count
 
@@ -1309,15 +1309,15 @@ generateMarketplace = function(params)
   local shuffledVehicles = shufflePool(vehiclePool, dailySeed)
   local zipfWeights, zipfTotal = computeZipfWeights(#shuffledVehicles, 1.0)
 
-  -- Price tier quotas (% of targetCount) — bulk in 20-50k, few cheap
+  -- Price tier quotas (% of targetCount) â€” bulk in 20-50k, few cheap
   local tierQuotas = {
-    { min = 0,      max = 300000,    quota = math.ceil(targetCount * 0.04) },  -- 0-3k:   ~6
-    { min = 300000, max = 1000000,   quota = math.ceil(targetCount * 0.10) },  -- 3-10k:  ~15
+    { min = 0,      max = 300000,    quota = math.ceil(targetCount * 0.04) },  -- 0-3k: ~6
+    { min = 300000, max = 1000000,   quota = math.ceil(targetCount * 0.10) },  -- 3-10k: ~15
     { min = 1000000, max = 2000000,  quota = math.ceil(targetCount * 0.15) },  -- 10-20k: ~23
     { min = 2000000, max = 3500000,  quota = math.ceil(targetCount * 0.28) },  -- 20-35k: ~42
     { min = 3500000, max = 5000000,  quota = math.ceil(targetCount * 0.20) },  -- 35-50k: ~30
     { min = 5000000, max = 10000000, quota = math.ceil(targetCount * 0.13) },  -- 50-100k: ~20
-    { min = 10000000, max = math.huge, quota = math.ceil(targetCount * 0.10) }, -- 100k+:  ~15
+    { min = 10000000, max = math.huge, quota = math.ceil(targetCount * 0.10) }, -- 100k+: ~15
   }
   local tierCounts = {}
   for t = 1, #tierQuotas do tierCounts[t] = 0 end
@@ -1456,7 +1456,7 @@ M.applyPriceOverride = applyPriceOverride
 M.reloadPriceOverrides = function() _priceOverrides = nil end
 
 -- Inject vehicles with fixedValue overrides that vanilla filtered out (no Value in jbeam).
--- Call after getEligibleVehicles() to patch the pool with missing vehicles.
+-- Call after getEligibleVehicles to patch the pool with missing vehicles.
 M.injectFixedValueVehicles = function(vehiclePool)
   local overrides = getPriceOverrides()
   if not overrides or #overrides == 0 then return vehiclePool end

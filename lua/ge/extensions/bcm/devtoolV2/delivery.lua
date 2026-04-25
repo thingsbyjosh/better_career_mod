@@ -79,16 +79,33 @@ validate = function(f)
       end
     end
   end
-  -- Generators: min/max numeric, min <= max, integers
+  -- Generator validation. Two schemas:
+  --   parcel/veh/trailer generators use min/max (integers, min<=max)
+  --   material generators use capacity/rate/target/variance — no min/max
   for i, gen in ipairs(f.logisticGenerators or {}) do
-    local minVal = tonumber(gen.min)
-    local maxVal = tonumber(gen.max)
-    if not minVal or not maxVal then
-      table.insert(errors, "Generator " .. i .. ": min/max must be numeric")
-    elseif minVal > maxVal then
-      table.insert(errors, "Generator " .. i .. ": min > max")
-    elseif math.floor(minVal) ~= minVal or math.floor(maxVal) ~= maxVal then
-      table.insert(errors, "Generator " .. i .. ": min/max must be integers")
+    local gtype = tostring(gen.type or "")
+    if gtype:sub(1,8) == "material" then
+      local cap = tonumber(gen.capacity)
+      local rate = tonumber(gen.rate)
+      if not cap or cap <= 0 then
+        table.insert(errors, "Generator " .. i .. " (" .. gtype .. "): capacity must be positive numeric")
+      end
+      if not rate or rate <= 0 then
+        table.insert(errors, "Generator " .. i .. " (" .. gtype .. "): rate must be positive numeric")
+      end
+      if not gen.materialType or gen.materialType == "" then
+        table.insert(errors, "Generator " .. i .. " (" .. gtype .. "): materialType is required")
+      end
+    else
+      local minVal = tonumber(gen.min)
+      local maxVal = tonumber(gen.max)
+      if not minVal or not maxVal then
+        table.insert(errors, "Generator " .. i .. ": min/max must be numeric")
+      elseif minVal > maxVal then
+        table.insert(errors, "Generator " .. i .. ": min > max")
+      elseif math.floor(minVal) ~= minVal or math.floor(maxVal) ~= maxVal then
+        table.insert(errors, "Generator " .. i .. ": min/max must be integers")
+      end
     end
   end
   return #errors == 0, errors
@@ -328,6 +345,40 @@ serializeForFacilitiesJson = function(fac, levelName)
   }
 end
 
+-- Resolve a parking spot's sites.json rot quaternion from the WIP shape.
+-- WIP is not type-consistent across hydrate paths — a spot can carry:
+--   spot.rot : 4-element quat (future-proofing if capture ever writes rot directly)
+--   spot.dir : 4-element quat (standard delivery hydrate — stores rot in dir)
+--   spot.dir : 3-element vec3 (captured by getPlacementDirection at placement)
+-- Mirrors v1 devtool.lua:1593-1607 for the 3-vec branch. When spot.normal is
+-- available the quaternion is aligned to the terrain (projected forward × up),
+-- so parked vehicles sit flush on slopes instead of floating with world Z up.
+local function resolveParkingRot(spot)
+  if spot.rot and type(spot.rot) == "table" and #spot.rot == 4 then
+    return spot.rot
+  end
+  if spot.dir and type(spot.dir) == "table" and #spot.dir == 4 then
+    return spot.dir
+  end
+  if spot.dir and type(spot.dir) == "table" and #spot.dir == 3 then
+    local dir3 = vec3(spot.dir[1], spot.dir[2], spot.dir[3]):normalized()
+    local q
+    if spot.normal and type(spot.normal) == "table" and #spot.normal == 3 then
+      local up = vec3(spot.normal[1], spot.normal[2], spot.normal[3]):normalized()
+      local projFwd = dir3:cross(up):cross(up)
+      if projFwd:length() > 0.001 then
+        q = quatFromDir(projFwd, up)
+      else
+        q = quatFromDir(dir3, up)
+      end
+    else
+      q = quatFromDir(dir3)
+    end
+    return { q.x, q.y, q.z, q.w }
+  end
+  return { 0, 0, 0, 1 }
+end
+
 -- Entries for facilities/delivery/bcm_depots.sites.json (parkingSpots bucket).
 -- Returns {parkingSpots = [...]} bundle.
 -- CHANGES vs v1:
@@ -339,10 +390,7 @@ serializeForSitesJson = function(fac, levelName)
   local parkingEntries = {}
   for i, spot in ipairs(fac.parkingSpots or {}) do
     local spotName = fac.id .. "_parking" .. i
-    local rot = spot.dir  -- stored as quaternion from hydrate
-    if not rot or type(rot) ~= "table" or #rot ~= 4 then
-      rot = { 0, 0, 0, 1 }
-    end
+    local rot = resolveParkingRot(spot)
     nextOldId = nextOldId + 1
     table.insert(parkingEntries, {
       color = { 1, 1, 1 },

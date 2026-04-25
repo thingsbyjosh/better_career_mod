@@ -1,7 +1,7 @@
--- BCM Speed Traps Override
+﻿-- BCM Speed Traps Override
 -- Overrides vanilla career/modules/speedTraps.lua to route camera fines through
 -- BCM's economy system (banking, ledger, notifications) instead of vanilla's trivial fines.
--- Phase 61: Radar Cameras — fixed speed cameras + red-light cameras.
+-- Radar Cameras â€” fixed speed cameras + red-light cameras.
 -- Extension name: career_modules_speedTraps (override)
 
 local M = {}
@@ -26,7 +26,7 @@ local COOLDOWN_SECONDS = 45  -- Same camera cannot fine twice within 45 seconds
 -- Private state
 -- ============================================================================
 local activated = false
-local cooldownTimers = {}  -- { [triggerName] = os.clock() timestamp }
+local cooldownTimers = {}  -- { [triggerName] = os.clock timestamp }
 
 -- ============================================================================
 -- Helpers
@@ -43,7 +43,7 @@ getInventoryIdFromVehId = function(vehId)
   return invId
 end
 
--- License plate check — matches VANILLA pattern exactly:
+-- License plate check â€” matches VANILLA pattern exactly:
 -- Iterates ALL parts in partInventory, filters by part.location == inventoryId,
 -- checks part.name for "licenseplate" substring.
 hasLicensePlate = function(inventoryId)
@@ -78,7 +78,7 @@ onSpeedTrapTriggered = function(speedTrapData, playerSpeed, overSpeed)
     .. ' subjectID=' .. tostring(speedTrapData.subjectID) .. ' vehId=' .. tostring(speedTrapData.vehId)
     .. ' overSpeed=' .. tostring(overSpeed) .. ' playerSpeed=' .. tostring(playerSpeed))
 
-  -- Skip radar zone triggers — handled by bcm_police.onBeamNGTrigger instead
+  -- Skip radar zone triggers â€” handled by bcm_police.onBeamNGTrigger instead
   local trigName = speedTrapData.triggerName or ""
   if string.find(trigName, "bcmRadar_") then
     log('D', logTag, '[SPEEDCAM DEBUG] Skipping radar zone trigger: ' .. trigName)
@@ -117,10 +117,10 @@ onSpeedTrapTriggered = function(speedTrapData, playerSpeed, overSpeed)
     return
   end
 
-  -- License plate check — no plate means camera cannot identify vehicle
+  -- License plate check â€” no plate means camera cannot identify vehicle
   local inventoryId = getInventoryIdFromVehId(vehId)
   if not hasLicensePlate(inventoryId) then
-    log('I', logTag, 'No license plate — speed camera cannot identify vehicle at ' .. triggerName)
+    log('I', logTag, 'No license plate â€” speed camera cannot identify vehicle at ' .. triggerName)
     return
   end
 
@@ -200,7 +200,7 @@ onRedLightCamTriggered = function(data, vehSpeed)
   -- License plate check
   local inventoryId = getInventoryIdFromVehId(vehId)
   if not hasLicensePlate(inventoryId) then
-    log('I', logTag, 'No license plate — red-light camera cannot identify vehicle at ' .. triggerName)
+    log('I', logTag, 'No license plate â€” red-light camera cannot identify vehicle at ' .. triggerName)
     return
   end
 
@@ -242,7 +242,7 @@ end
 onCareerModulesActivated = function()
   activated = true
   cooldownTimers = {}
-  log('I', logTag, 'BCM Speed Traps override activated — camera fines routed through BCM economy')
+  log('I', logTag, 'BCM Speed Traps override activated â€” camera fines routed through BCM economy')
 end
 
 onExtensionUnloaded = function()

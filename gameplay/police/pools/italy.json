@@ -1,13 +1,20 @@
 {
   "country": "italy",
-  "version": 1,
-  "note": "Initial curated Italian police pool — Carabinieri (Autobello) plus European patrol configs from vanilla BeamNG. Expand as more Italian-flavor configs become available.",
+  "version": 2,
+  "note": "Curated Italian police pool — authentic Carabinieri/Polizia configs across brands plus German Autobahn and French Gendarmerie units as plausible cross-border highway patrols.",
   "configs": [
     "autobello/carabinieri",
-    "etki/police",
-    "etkc/kc6x_340_police_highway_A",
+    "midtruck/4x4_police_petrol",
+    "etk800/854_police_A_alt",
+    "hopper/carabinieri",
+    "sunburst2/polizia",
+    "vivace/vivace_polizia",
+    "vivace/tograc_polizia",
+    "bolide/polizia",
+    "scintilla/gts_polizia",
     "etk800/854_police_A",
-    "etk800/844_police_A",
-    "bx/police_A"
+    "etkc/kc6x_340_police_highway_A",
+    "vivace/vivace_S_gendarmerie",
+    "sunburst2/gendarmerie"
   ]
 }

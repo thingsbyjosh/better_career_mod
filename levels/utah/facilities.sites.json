@@ -11,7 +11,7 @@
         "values":{}
       },
       "name":"ut_garage_1_icon",
-      "oldId":8013,
+      "oldId":8044,
       "pos":[
         789.3310546875,
         -183.57661437988,
@@ -26,11 +26,26 @@
         "values":{}
       },
       "name":"ut_garage_2_icon",
-      "oldId":8018,
+      "oldId":8063,
       "pos":[
-        -790.62976074219,
-        -76.059135437012,
-        296.62423753738
+        624.14440917969,
+        -550.11480712891,
+        136.18128967285
+      ]
+    },
+    {
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "name":"ut_garage_3_icon",
+      "oldId":8057,
+      "pos":[
+        -324.85934448242,
+        -524.28466796875,
+        131.24264526367
       ]
     }
   ],
@@ -122,7 +137,7 @@
       },
       "isMultiSpot":false,
       "name":"ut_garage_1_parking1",
-      "oldId":8009,
+      "oldId":8040,
       "pos":[
         792.84936523438,
         -181.75057983398,
@@ -158,7 +173,7 @@
       },
       "isMultiSpot":false,
       "name":"ut_garage_1_parking2",
-      "oldId":8010,
+      "oldId":8041,
       "pos":[
         793.49768066406,
         -187.99961853027,
@@ -194,7 +209,7 @@
       },
       "isMultiSpot":false,
       "name":"ut_garage_1_parking3",
-      "oldId":8011,
+      "oldId":8042,
       "pos":[
         804.09283447266,
         -173.12782287598,
@@ -230,7 +245,7 @@
       },
       "isMultiSpot":false,
       "name":"ut_garage_1_parking4",
-      "oldId":8012,
+      "oldId":8043,
       "pos":[
         812.51428222656,
         -171.77880859375,
@@ -266,11 +281,11 @@
       },
       "isMultiSpot":false,
       "name":"ut_garage_2_parking1",
-      "oldId":8015,
+      "oldId":8059,
       "pos":[
-        -782.16900634766,
-        -81.120079040527,
-        296.62424468994
+        611.02423095703,
+        -548.79498291016,
+        135.20455992222
       ],
       "rot":[
         0,
@@ -302,11 +317,11 @@
       },
       "isMultiSpot":false,
       "name":"ut_garage_2_parking2",
-      "oldId":8016,
+      "oldId":8060,
       "pos":[
-        -785.88720703125,
-        -79.70344543457,
-        296.62423944473
+        610.98455810547,
+        -557.68896484375,
+        135.20456039906
       ],
       "rot":[
         0,
@@ -338,11 +353,443 @@
       },
       "isMultiSpot":false,
       "name":"ut_garage_2_parking3",
-      "oldId":8017,
+      "oldId":8061,
       "pos":[
-        -788.90014648438,
-        -78.568580627441,
-        296.62424468994
+        610.43634033203,
+        -563.52233886719,
+        135.20455920696
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_2_parking4",
+      "oldId":8062,
+      "pos":[
+        608.98937988281,
+        -570.42987060547,
+        135.20456051826
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking1",
+      "oldId":8046,
+      "pos":[
+        -322.90777587891,
+        -529.08062744141,
+        130.38307189941
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking2",
+      "oldId":8047,
+      "pos":[
+        -319.14859008789,
+        -530.10046386719,
+        130.38307189941
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking3",
+      "oldId":8048,
+      "pos":[
+        -327.8369140625,
+        -528.33850097656,
+        130.38307189941
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking4",
+      "oldId":8049,
+      "pos":[
+        -329.04690551758,
+        -533.74945068359,
+        130.38307189941
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking5",
+      "oldId":8050,
+      "pos":[
+        -324.29925537109,
+        -534.79095458984,
+        130.38307189941
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking6",
+      "oldId":8051,
+      "pos":[
+        -321.59750366211,
+        -535.33666992188,
+        130.38307189941
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking7",
+      "oldId":8052,
+      "pos":[
+        -325.32485961914,
+        -542.919921875,
+        130.11801314354
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking8",
+      "oldId":8053,
+      "pos":[
+        -318.58953857422,
+        -555.75793457031,
+        129.66118609905
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking9",
+      "oldId":8054,
+      "pos":[
+        -327.47583007813,
+        -553.87811279297,
+        129.6592284441
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking10",
+      "oldId":8055,
+      "pos":[
+        -333.89431762695,
+        -552.15148925781,
+        129.66238427162
+      ],
+      "rot":[
+        0,
+        0,
+        0,
+        1
+      ],
+      "scl":[
+        2.5,
+        5,
+        2.5
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"ut_garage_3_parking11",
+      "oldId":8056,
+      "pos":[
+        -320.07479858398,
+        -546.51031494141,
+        129.93201470375
       ],
       "rot":[
         0,
@@ -514,7 +961,7 @@
         "values":{}
       },
       "name":"ut_garage_1",
-      "oldId":8008,
+      "oldId":8039,
       "top":{
         "active":false,
         "normal":[
@@ -582,7 +1029,7 @@
         "values":{}
       },
       "name":"ut_garage_2",
-      "oldId":8014,
+      "oldId":8058,
       "top":{
         "active":false,
         "normal":[
@@ -598,24 +1045,97 @@
       },
       "vertices":[
         [
-          -788.09558105469,
-          -67.101905822754,
-          296.62424468994
+          624.30676269531,
+          -551.65502929688,
+          135.32830810547
         ],
         [
-          -776.93957519531,
-          -71.15495300293,
-          296.60961341858
+          618.08880615234,
+          -569.64245605469,
+          135.47230601311
         ],
         [
-          -782.68347167969,
-          -98.696701049805,
-          296.60749483109
+          600.61206054688,
+          -576.24395751953,
+          135.20456123352
         ],
         [
-          -795.68719482422,
-          -94.525909423828,
-          296.62424325943
+          601.30383300781,
+          -547.69146728516,
+          135.20455980301
+        ],
+        [
+          612.10070800781,
+          -541.32879638672,
+          135.20456147194
+        ],
+        [
+          628.51989746094,
+          -544.17218017578,
+          135.20455920696
+        ]
+      ]
+    },
+    {
+      "bot":{
+        "active":false,
+        "normal":[
+          0,
+          0,
+          -1
+        ],
+        "pos":[
+          0,
+          0,
+          -10
+        ]
+      },
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "name":"ut_garage_3",
+      "oldId":8045,
+      "top":{
+        "active":false,
+        "normal":[
+          0,
+          0,
+          1
+        ],
+        "pos":[
+          0,
+          0,
+          10
+        ]
+      },
+      "vertices":[
+        [
+          -315.43356323242,
+          -524.50494384766,
+          130.38307189941
+        ],
+        [
+          -314.67892456055,
+          -563.37731933594,
+          129.69269537926
+        ],
+        [
+          -343.24780273438,
+          -560.69812011719,
+          129.60833370686
+        ],
+        [
+          -330.45944213867,
+          -523.09771728516,
+          130.53607177734
         ]
       ]
     }

@@ -199,7 +199,7 @@
           "keyLabel":"Vehicle & Parts Shopping"
         }
       ],
-      "description":"ui.career.computer.bigmapLabel.garage",
+      "description":"Just outside Fastello, overlooking a small island that looks straight out of a postcard, this garage offers something not everyone can afford: peace… and the perfect excuse to never finish that project car.\n\nBetween tools, engines and the distant sound of the sea, some say that if you look closely, you might even find a coin hidden somewhere around here.\n\nWe don’t confirm it. But we don’t deny it either.",
       "doors":[
         [
           "bcm_Island_View_area",
@@ -222,7 +222,7 @@
       "iconLift":0.24,
       "iconOffsetHeight":0.24,
       "id":"bcm_Island_View_area",
-      "name":"Island View",
+      "name":"Isola Vista Garage",
       "preview":"",
       "screens":[
         "commercialGarageComputer_screen_2"
@@ -524,13 +524,18 @@
     },
     {
       "capacity":1,
-      "defaultPrice":200000,
-      "description":"",
+      "defaultPrice":350000,
+      "description":"Just outside Fastello, overlooking a small island that looks straight out of a postcard, this garage offers something not everyone can afford: peace… and the perfect excuse to never finish that project car.\n\nBetween tools, engines and the distant sound of the sea, some say that if you look closely, you might even find a coin hidden somewhere around here.\n\nWe don’t confirm it. But we don’t deny it either.",
       "icon":"poi_garage_2_round",
       "id":"bcm_Island_View",
-      "name":"Island View",
+      "name":"Isola Vista Garage",
       "parkingSpotNames":[
-        "bcm_Island_View_parking1"
+        "bcm_Island_View_parking1",
+        "bcm_Island_View_parking2",
+        "bcm_Island_View_parking3",
+        "bcm_Island_View_parking4",
+        "bcm_Island_View_parking5",
+        "bcm_Island_View_parking6"
       ],
       "preview":"bcm_Island_View.png",
       "tags":{},

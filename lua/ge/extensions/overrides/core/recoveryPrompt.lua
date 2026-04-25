@@ -1,4 +1,4 @@
--- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+﻿-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
 -- If a copy of the bCDDL was not distributed with this
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 
@@ -212,7 +212,7 @@ local buttonOptions = {
   flipMission = {
     type = "vehicle",
     label = "Flip Upright",
-    --includeCondition = function() return gameplay_missions_missionManager.getForegroundMissionId() ~= nil end,
+    --includeCondition = function return gameplay_missions_missionManager.getForegroundMissionId ~= nil end,
     includeConditions = {},
     enableConditions = {conditions.vehicleStopped},
     atFadeFunction = nop,
@@ -462,10 +462,10 @@ end
 
 local function addTaxiButtons()
   if not getCurrentLevelIdentifier() then return end
-  -- Plan 100.5-02: taxi only offers garages owned on the CURRENT map.
+  -- taxi only offers garages owned on the CURRENT map.
   -- The vanilla enumeration `freeroam_facilities.getFacilitiesByType("garage")`
-  -- returns every garage the cross-map discovery sync has touched — including
-  -- garages on other maps the player owns — and `career_modules_quickTravel`
+  -- returns every garage the cross-map discovery sync has touched â€” including
+  -- garages on other maps the player owns â€” and `career_modules_quickTravel`
   -- throws a Lua error the moment one of those off-map garages is tapped.
   -- Filtering the input list through the shared BCM helper keeps the taxi
   -- flow scoped to "owned here" and leaves the rest of the button-build loop
@@ -560,29 +560,6 @@ local function addTaxiButtons()
       icon = "car",
       price = getPrice,
       confirmationText = "Do you want to use the taxi?",
-      path = "taxi/",
-      noUniqueID = true,
-    }
-    buttonOptions.callTaxi = {
-      type = "walk",
-      label = function(options)
-        return "Call a taxi"
-      end,
-      order = 100,
-      menuTag = "taxi",
-      atFadeFunction = function()
-        gameplay_cab.callCab()
-        if career_career and career_career.isActive() then
-          career_modules_payment.pay({money = {amount = 50}}, {label = string.format("Called a taxi")})
-        end
-      end,
-      active = true,
-      enabled = true,
-      fadeStartSound = "event:>UI>Missions>Vehicle_Recover",
-      icon = "car",
-      fadeActive = false,
-      price = {money = {amount = 50}},
-      confirmationText = "Do you want to call a taxi?",
       path = "taxi/",
       noUniqueID = true,
     }
@@ -876,7 +853,7 @@ local function getRecoveryTargets()
     if vehId and vehId >= 0 then
       return {{type = "vehicle", vehId = vehId}}
     end
-    -- No valid vehicle and not walking — treat as walking for recovery targets
+    -- No valid vehicle and not walking â€” treat as walking for recovery targets
     return {{type = "walk"}}
   end
   local vehInFront = gameplay_walk.getVehicleInFront()
@@ -1047,7 +1024,7 @@ local function addButtonsForLevel(level)
 end
 
 -- ============================================================================
--- BCM Time Display + Sleep Button (Phase 31 — FIX-02)
+-- BCM Time Display + Sleep Button
 -- Adds BCM time info and Sleep action to the radial menu during career
 -- ============================================================================
 local function addBCMTimeEntries()

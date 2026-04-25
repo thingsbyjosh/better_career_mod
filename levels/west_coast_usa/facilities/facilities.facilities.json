@@ -357,7 +357,8 @@
       "parkingSpotNames":[
         "bcm_motel_parking1",
         "bcm_motel_parking2",
-        "bcm_motel_parking3"
+        "bcm_motel_parking3",
+        "bcm_motel_parking4"
       ],
       "preview":"bcm_motel.png",
       "tags":{},
@@ -399,7 +400,8 @@
         "bcm_chinatown_parking5",
         "bcm_chinatown_parking6",
         "bcm_chinatown_parking7",
-        "bcm_chinatown_parking8"
+        "bcm_chinatown_parking8",
+        "bcm_chinatown_parking9"
       ],
       "preview":"bcm_chinatown.png",
       "tags":{},

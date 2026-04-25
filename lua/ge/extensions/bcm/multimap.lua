@@ -1,4 +1,4 @@
--- bcm/multimap.lua
+﻿-- bcm/multimap.lua
 -- Travel graph engine: scans installed maps for bcm_travelNodes.json, builds a runtime
 -- connection graph, creates programmatic BeamNGTrigger objects at each node position,
 -- registers POIs on the minimap, and handles trigger enter events.
@@ -55,8 +55,8 @@ local getTravelGraphForUI
 -- ============================================================================
 -- 0. Vanilla kdtree fix (monkey-patch)
 -- ============================================================================
--- gameplay_playmodeMarkers.getPlaymodeClustersAsQuadtree() calls kdtree:build()
--- even with 0 clusters. build() does log10(0) = -inf → corrupt tree → crash loop
+-- gameplay_playmodeMarkers.getPlaymodeClustersAsQuadtree calls kdtree:build
+-- even with 0 clusters. build does log10(0) = -inf â†’ corrupt tree â†’ crash loop
 -- in markerInteraction.onPreRender every frame. Patch the function to skip build
 -- when there are no clusters. Module is already loaded so file override won't work.
 
@@ -159,7 +159,7 @@ end
 -- 2b. Discovery system (fog-of-war)
 -- ============================================================================
 
--- D-12: When visiting a map, discover all direct 1-hop neighbor maps
+--: When visiting a map, discover all direct 1-hop neighbor maps
 propagateDiscovery = function(mapName)
   if not mapName then return end
   discoveredMaps[mapName] = true
@@ -261,20 +261,29 @@ createTriggersForCurrentMap = function()
 
   local count = 0
   for nodeId, node in pairs(mapData.nodes) do
+    -- Mirrors vanilla flowgraph/nodes/scene/rectMarker.lua:335-354 exactly:
+    -- 1. createObject
+    -- 2. loadMode = 1
+    -- 3. setField triggerType = "Box" (capital B)
+    -- 4. registerObject BEFORE setPosition/scale/rotation
+    -- 5. setPosition, setScale, setField rotation â€” all AFTER register
+    -- setField on an unregistered SimObject doesn't persist reliably.
     local trigger = createObject("BeamNGTrigger")
-    trigger:setField("triggerType", 0, "box")
+    trigger.loadMode = 1
+    trigger:setField("triggerType", 0, "Box")
     trigger:setField("TriggerMode", 0, "Overlaps")
     trigger.canSave = false
+    trigger:registerObject("bcm_travel_" .. node.id)
 
     local sz = node.triggerSize or {8, 8, 4}
-    trigger.scale = vec3(sz[1], sz[2], sz[3])
+    trigger:setScale(vec3(sz[1], sz[2], sz[3]))
 
     trigger:setPosition(vec3(node.center[1], node.center[2], node.center[3]))
 
     local r = node.rotation or {0, 0, 0, 1}
-    trigger:setField("rotation", 0, string.format("%f %f %f %f", r[1], r[2], r[3], r[4]))
-
-    trigger:registerObject("bcm_travel_" .. node.id)
+    local rq = quat(r[1] or 0, r[2] or 0, r[3] or 0, r[4] or 1):toTorqueQuat()
+    trigger:setField("rotation", 0,
+      rq.x .. ' ' .. rq.y .. ' ' .. rq.z .. ' ' .. rq.w)
 
     if scenetree.MissionGroup then
       scenetree.MissionGroup:addObject(trigger)
@@ -342,7 +351,7 @@ onBeamNGTrigger = function(data)
   lastTriggeredNodeId = nodeId
 
   -- Travel picker is now opened via the vanilla facility interaction system
-  -- (player parks, presses E → onActivityAcceptGatherData → showTravelPicker).
+  -- (player parks, presses E â†’ onActivityAcceptGatherData â†’ showTravelPicker).
   -- The BeamNGTrigger remains for the walking marker scene object reference
   -- and for tracking lastTriggeredNodeId/discoveredNodes on drive-through.
 
@@ -357,7 +366,7 @@ getReachableDestinations = function(node)
   if not node.connections then return destinations end
 
   for _, conn in ipairs(node.connections) do
-    -- D-20: only include destinations whose maps are installed (exist in graph)
+    --: only include destinations whose maps are installed (exist in graph)
     if travelGraph[conn.targetMap] then
       local targetMapInfo = travelGraph[conn.targetMap].mapInfo or {}
       local displayName = targetMapInfo.displayName
@@ -415,6 +424,17 @@ onGetRawPoiListForLevel = function(levelIdentifier, elements)
       doors = triggerObj and {{triggerName, triggerName}} or {},
     }
 
+    -- Resolve preview image: devtool stores filename only (e.g. "bcm_travel_utah_road_1.png").
+    -- Build the full VFS path for the bigmap; fall back to vanilla placeholder when unset
+    -- or the file is missing.
+    local previewPath = "/ui/modules/gameContext/noPreview.jpg"
+    if node.preview and node.preview ~= "" then
+      local candidate = "/levels/" .. levelIdentifier .. "/facilities/" .. node.preview
+      if FS:fileExists(candidate) then
+        previewPath = candidate
+      end
+    end
+
     if triggerObj then
       -- Parking marker: vehicle-accessible (overlap mode), custom icon, simple cluster
       local e = {
@@ -427,7 +447,16 @@ onGetRawPoiListForLevel = function(levelIdentifier, elements)
         markerInfo = {
           parkingMarker = {
             pos = pos,
-            rot = quat(0, 0, 0, 1),
+            -- Use the node's stored rotation (was hardcoded identity quat,
+            -- which made every parking marker render pointing north
+            -- regardless of the BeamNGTrigger rotation).
+            rot = (function()
+              local r = node.rotation
+              if type(r) == "table" and #r == 4 then
+                return quat(r[1] or 0, r[2] or 0, r[3] or 0, r[4] or 1)
+              end
+              return quat(0, 0, 0, 1)
+            end)(),
             scl = vec3(6, 12, 20),
             mode = "overlap",
             icon = "poi_fasttravel_round_orange_green",
@@ -439,8 +468,8 @@ onGetRawPoiListForLevel = function(levelIdentifier, elements)
             icon = "poi_fasttravel_round_orange_green",
             name = node.name,
             description = desc,
-            previews = {},
-            thumbnail = "/ui/modules/gameContext/noPreview.jpg",
+            previews = { previewPath },
+            thumbnail = previewPath,
           }
         }
       }
@@ -456,8 +485,8 @@ onGetRawPoiListForLevel = function(levelIdentifier, elements)
             icon = "poi_fasttravel_round_orange_green",
             name = node.name,
             description = desc,
-            previews = {},
-            thumbnail = "/ui/modules/gameContext/noPreview.jpg",
+            previews = { previewPath },
+            thumbnail = previewPath,
           }
         }
       }
@@ -504,7 +533,7 @@ travelTo = function(targetMap, targetNode, toll, connectionType)
     return false
   end
 
-  -- D-04: Toll balance check and charge
+  --: Toll balance check and charge
   toll = toll or 0
   if toll > 0 then
     if not bcm_banking or not bcm_banking.getPersonalAccount then
@@ -523,7 +552,7 @@ travelTo = function(targetMap, targetNode, toll, connectionType)
     bcm_banking.removeFunds(account.id, tollCents, "toll", "Travel toll: " .. displayName)
   end
 
-  -- D-13: PlanEx auto-pause if route is active
+  --: PlanEx auto-pause if route is active
   if bcm_planex and bcm_planex.getRouteState then
     local routeState = bcm_planex.getRouteState()
     if routeState == 'en_route' or routeState == 'returning' then
@@ -531,7 +560,7 @@ travelTo = function(targetMap, targetNode, toll, connectionType)
     end
   end
 
-  -- Per-map heat swap (D-11)
+  -- Per-map heat swap
   swapHeatForMapChange(currentMap, targetMap)
 
   -- Discover and serialize the full vehicle train via journal
@@ -551,7 +580,7 @@ travelTo = function(targetMap, targetNode, toll, connectionType)
         return
       end
 
-      -- Split results: first entry is tractor, rest are trailers (per D-08)
+      -- Split results: first entry is tractor, rest are trailers (per )
       local tractorData = trainResults[1]
       local trainData = nil
       if #trainResults > 1 then
@@ -561,7 +590,7 @@ travelTo = function(targetMap, targetNode, toll, connectionType)
         end
       end
 
-      -- Write transit journal BEFORE level switch (per D-05, D-06)
+      -- Write transit journal BEFORE level switch (per, )
       local ok = bcm_transitJournal.writeJournal(
         "DEPARTING",
         currentMap,
@@ -653,10 +682,10 @@ onWorldReadyState = function(state)
   createTriggersForCurrentMap()
 
   -- Invalidate the rawPois cache so our travel nodes get registered with their
-  -- parkingMarkers. Vanilla builds the rawPois list during onClientStartMission →
+  -- parkingMarkers. Vanilla builds the rawPois list during onClientStartMission â†’
   -- first onPreRender, which runs BEFORE our onWorldReadyState(2) creates triggers.
   -- Without this clear, our onGetRawPoiListForLevel hook already ran while triggers
-  -- were nil and fell back to bigmap-only markers — travel nodes then only appear
+  -- were nil and fell back to bigmap-only markers â€” travel nodes then only appear
   -- after the player opens bigmap (which itself calls rawPois.clear).
   if gameplay_rawPois then gameplay_rawPois.clear() end
 
@@ -714,12 +743,12 @@ onCareerModulesActivated = function()
   buildTravelGraph()
 
   -- Load saved state (discoveredNodes, perMapHeat)
-  -- DO NOT reset preventPlayerSpawning here — vanilla manages it
-  -- DO NOT force switchCareerLevel based on savedMap — causes infinite loop
+  -- DO NOT reset preventPlayerSpawning here â€” vanilla manages it
+  -- DO NOT force switchCareerLevel based on savedMap â€” causes infinite loop
   loadState()
 
   -- Crash recovery is handled by onWorldReadyState via journal check on disk.
-  -- Do NOT run crash recovery here — onCareerModulesActivated fires AFTER onWorldReadyState
+  -- Do NOT run crash recovery here â€” onCareerModulesActivated fires AFTER onWorldReadyState
   -- and during normal travel the journal is still DEPARTING (restore is async). Running
   -- checkCrashRecovery here would incorrectly delete the journal mid-restore.
 end
@@ -756,7 +785,7 @@ loadState = function()
   local dataPath = autosavePath .. "/career/bcm/bcm_multimap.json"
   local data = jsonReadFile(dataPath)
 
-  -- Always use the live level identifier — saved currentMap may be stale during level switch
+  -- Always use the live level identifier â€” saved currentMap may be stale during level switch
   currentMap = getCurrentLevelIdentifier()
 
   if data then
@@ -989,5 +1018,7 @@ M.debugTravel = debugTravel
 M.debugStatus = debugStatus
 M.debugTeleportToNode = debugTeleportToNode
 M.debugCrashRecovery = debugCrashRecovery
+M.cleanupTriggers = cleanupTriggers
+M.createTriggersForCurrentMap = createTriggersForCurrentMap
 
 return M

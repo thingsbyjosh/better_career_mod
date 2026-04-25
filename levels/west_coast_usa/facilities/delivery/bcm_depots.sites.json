@@ -234,44 +234,8 @@
         "values":{}
       },
       "isMultiSpot":false,
-      "name":"bcmFacility_62_parking1",
-      "oldId":9009,
-      "pos":[
-        -560.24591064453,
-        -444.5888671875,
-        114.90789031982
-      ],
-      "rot":[
-        -0.031095752015731,
-        0.01033578671518,
-        0.71962600976793,
-        0.69358822927227
-      ],
-      "scl":[
-        2.5,
-        6,
-        3
-      ],
-      "spotAmount":1,
-      "spotDirection":"Left",
-      "spotOffset":0,
-      "spotRotation":0
-    },
-    {
-      "color":[
-        1,
-        1,
-        1
-      ],
-      "customFields":{
-        "names":{},
-        "tags":{},
-        "types":{},
-        "values":{}
-      },
-      "isMultiSpot":false,
       "name":"bcmFacility_35_parking1",
-      "oldId":9010,
+      "oldId":9009,
       "pos":[
         -265.37008666992,
         -817.17510986328,
@@ -307,7 +271,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_11_parking1",
-      "oldId":9011,
+      "oldId":9010,
       "pos":[
         -688.92633056641,
         -451.83590698242,
@@ -343,7 +307,7 @@
       },
       "isMultiSpot":false,
       "name":"lasventas_5_parking1",
-      "oldId":9012,
+      "oldId":9011,
       "pos":[
         -147.59515380859,
         -855.10321044922,
@@ -378,18 +342,18 @@
         "values":{}
       },
       "isMultiSpot":false,
-      "name":"freya_116_parking1",
-      "oldId":9013,
+      "name":"bcmFacility_45_parking1",
+      "oldId":9012,
       "pos":[
-        -765.09881591797,
-        -497.00881958008,
-        99.646423339844
+        -174.06504821777,
+        -773.25329589844,
+        131.81432723999
       ],
       "rot":[
-        -0.027450284664997,
-        0.023593381738786,
-        0.92142847440473,
-        -0.38685837300763
+        -0.020011052863124,
+        0.029803139664355,
+        0.99497740821559,
+        -0.093441360060916
       ],
       "scl":[
         2.5,
@@ -415,7 +379,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_52_parking1",
-      "oldId":9014,
+      "oldId":9013,
       "pos":[
         -376.99536132813,
         -577.65374755859,
@@ -451,7 +415,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_44_parking1",
-      "oldId":9015,
+      "oldId":9014,
       "pos":[
         -178.38543701172,
         -784.82183837891,
@@ -487,7 +451,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_59_parking1",
-      "oldId":9016,
+      "oldId":9015,
       "pos":[
         -491.61166381836,
         -501.15280151367,
@@ -523,7 +487,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_58_parking1",
-      "oldId":9017,
+      "oldId":9016,
       "pos":[
         -466.15795898438,
         -503.67895507813,
@@ -559,7 +523,7 @@
       },
       "isMultiSpot":false,
       "name":"lasventas_4_parking1",
-      "oldId":9018,
+      "oldId":9017,
       "pos":[
         -173.41282653809,
         -845.04333496094,
@@ -595,7 +559,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_67_parking1",
-      "oldId":9019,
+      "oldId":9018,
       "pos":[
         -601.15966796875,
         -627.76391601563,
@@ -631,7 +595,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_32_parking1",
-      "oldId":9020,
+      "oldId":9019,
       "pos":[
         -197.99183654785,
         -739.28039550781,
@@ -667,7 +631,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_66_parking1",
-      "oldId":9021,
+      "oldId":9020,
       "pos":[
         -658.34820556641,
         -442.53628540039,
@@ -703,7 +667,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_39_parking1",
-      "oldId":9022,
+      "oldId":9021,
       "pos":[
         -260.05407714844,
         -829.91107177734,
@@ -739,7 +703,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_38_parking1",
-      "oldId":9023,
+      "oldId":9022,
       "pos":[
         -270.4977722168,
         -824.21197509766,
@@ -775,7 +739,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmTelepizza_parking1",
-      "oldId":9024,
+      "oldId":9023,
       "pos":[
         -733.28479003906,
         603.67767333984,
@@ -811,7 +775,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_42_parking1",
-      "oldId":9025,
+      "oldId":9024,
       "pos":[
         -213.2741394043,
         -825.08135986328,
@@ -847,7 +811,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_49_parking1",
-      "oldId":9026,
+      "oldId":9025,
       "pos":[
         -322.51751708984,
         -626.95367431641,
@@ -883,7 +847,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_56_parking1",
-      "oldId":9027,
+      "oldId":9026,
       "pos":[
         -429.90875244141,
         -506.95489501953,
@@ -919,7 +883,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_48_parking1",
-      "oldId":9028,
+      "oldId":9027,
       "pos":[
         -312.94515991211,
         -636.55267333984,
@@ -955,7 +919,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_37_parking1",
-      "oldId":9029,
+      "oldId":9028,
       "pos":[
         -293.30828857422,
         -808.06774902344,
@@ -991,7 +955,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_25_parking1",
-      "oldId":9030,
+      "oldId":9029,
       "pos":[
         -344.84393310547,
         -618.63708496094,
@@ -1027,7 +991,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_36_parking1",
-      "oldId":9031,
+      "oldId":9030,
       "pos":[
         -294.80697631836,
         -796.80944824219,
@@ -1063,7 +1027,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_24_parking1",
-      "oldId":9032,
+      "oldId":9031,
       "pos":[
         -712.84954833984,
         -457.91418457031,
@@ -1099,7 +1063,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_61_parking1",
-      "oldId":9033,
+      "oldId":9032,
       "pos":[
         -525.46942138672,
         -458.59701538086,
@@ -1135,7 +1099,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_60_parking1",
-      "oldId":9034,
+      "oldId":9033,
       "pos":[
         -517.10180664063,
         -469.75885009766,
@@ -1151,6 +1115,42 @@
         2.5,
         6,
         3
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"dirt_track_b_parking1",
+      "oldId":9034,
+      "pos":[
+        174.5405884,
+        28.52080727,
+        128.7806854
+      ],
+      "rot":[
+        0,
+        -0,
+        -0.300499099,
+        0.9537820985
+      ],
+      "scl":[
+        3.25,
+        8,
+        4
       ],
       "spotAmount":1,
       "spotDirection":"Left",
@@ -1962,8 +1962,44 @@
         "values":{}
       },
       "isMultiSpot":false,
-      "name":"bcmFacility_17_parking1",
+      "name":"wc_delivery_1_parking1",
       "oldId":9057,
+      "pos":[
+        154.75886535645,
+        766.95202636719,
+        102.08214223385
+      ],
+      "rot":[
+        -0.0052013703017235,
+        -0.034315758611209,
+        0.87665099855176,
+        0.47987331786225
+      ],
+      "scl":[
+        3.25,
+        8,
+        4
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"bcmFacility_17_parking1",
+      "oldId":9058,
       "pos":[
         -508.45571899414,
         -500.53091430664,
@@ -1998,23 +2034,23 @@
         "values":{}
       },
       "isMultiSpot":false,
-      "name":"wc_delivery_1_parking1",
-      "oldId":9058,
+      "name":"lasventas_7_parking1",
+      "oldId":9059,
       "pos":[
-        154.75886535645,
-        766.95202636719,
-        102.08214223385
+        -170.60200500488,
+        -835.75256347656,
+        133.26678466797
       ],
       "rot":[
-        0,
-        0,
-        0,
-        1
+        0.040072925107694,
+        -0.01290477463773,
+        0.9041247312891,
+        0.42518948450812
       ],
       "scl":[
-        3.25,
-        8,
-        4
+        2.5,
+        6,
+        3
       ],
       "spotAmount":1,
       "spotDirection":"Left",
@@ -2035,7 +2071,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_16_parking1",
-      "oldId":9059,
+      "oldId":9060,
       "pos":[
         -515.64398193359,
         -489.9377746582,
@@ -2071,7 +2107,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_65_parking1",
-      "oldId":9060,
+      "oldId":9061,
       "pos":[
         -639.92437744141,
         -442.99838256836,
@@ -2107,7 +2143,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_53_parking1",
-      "oldId":9061,
+      "oldId":9062,
       "pos":[
         -392.3088684082,
         -560.62884521484,
@@ -2143,7 +2179,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_64_parking1",
-      "oldId":9062,
+      "oldId":9063,
       "pos":[
         -607.49847412109,
         -443.89370727539,
@@ -2178,18 +2214,18 @@
         "values":{}
       },
       "isMultiSpot":false,
-      "name":"lasventas_7_parking1",
-      "oldId":9063,
+      "name":"freya_116_parking1",
+      "oldId":9064,
       "pos":[
-        -170.60200500488,
-        -835.75256347656,
-        133.26678466797
+        -765.09881591797,
+        -497.00881958008,
+        99.646423339844
       ],
       "rot":[
-        0.040072925107694,
-        -0.01290477463773,
-        0.9041247312891,
-        0.42518948450812
+        -0.027450284664997,
+        0.023593381738786,
+        0.92142847440473,
+        -0.38685837300763
       ],
       "scl":[
         2.5,
@@ -2215,7 +2251,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_13_parking1",
-      "oldId":9064,
+      "oldId":9065,
       "pos":[
         -631.13446044922,
         -451.70684814453,
@@ -2251,7 +2287,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_43_parking1",
-      "oldId":9065,
+      "oldId":9066,
       "pos":[
         -192.4436340332,
         -805.13354492188,
@@ -2287,7 +2323,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_57_parking1",
-      "oldId":9066,
+      "oldId":9067,
       "pos":[
         -439.59692382813,
         -504.18759155273,
@@ -2323,7 +2359,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_23_parking1",
-      "oldId":9067,
+      "oldId":9068,
       "pos":[
         -380.39654541016,
         -587.79254150391,
@@ -2359,7 +2395,7 @@
       },
       "isMultiSpot":false,
       "name":"bcmFacility_34_parking1",
-      "oldId":9068,
+      "oldId":9069,
       "pos":[
         -223.33180236816,
         -822.19549560547,
@@ -2370,42 +2406,6 @@
         -0.0030487749360597,
         0.47852131131612,
         0.87771363848396
-      ],
-      "scl":[
-        2.5,
-        6,
-        3
-      ],
-      "spotAmount":1,
-      "spotDirection":"Left",
-      "spotOffset":0,
-      "spotRotation":0
-    },
-    {
-      "color":[
-        1,
-        1,
-        1
-      ],
-      "customFields":{
-        "names":{},
-        "tags":{},
-        "types":{},
-        "values":{}
-      },
-      "isMultiSpot":false,
-      "name":"bcmFacility_45_parking1",
-      "oldId":9069,
-      "pos":[
-        -174.06504821777,
-        -773.25329589844,
-        131.81432723999
-      ],
-      "rot":[
-        -0.020011052863124,
-        0.029803139664355,
-        0.99497740821559,
-        -0.093441360060916
       ],
       "scl":[
         2.5,
@@ -2442,6 +2442,42 @@
         -4.1466783844405e-06,
         0.9245570577661,
         0.38104362849743
+      ],
+      "scl":[
+        2.5,
+        6,
+        3
+      ],
+      "spotAmount":1,
+      "spotDirection":"Left",
+      "spotOffset":0,
+      "spotRotation":0
+    },
+    {
+      "color":[
+        1,
+        1,
+        1
+      ],
+      "customFields":{
+        "names":{},
+        "tags":{},
+        "types":{},
+        "values":{}
+      },
+      "isMultiSpot":false,
+      "name":"bcmFacility_62_parking1",
+      "oldId":9071,
+      "pos":[
+        -560.24591064453,
+        -444.5888671875,
+        114.90789031982
+      ],
+      "rot":[
+        -0.031095752015731,
+        0.01033578671518,
+        0.71962600976793,
+        0.69358822927227
       ],
       "scl":[
         2.5,

@@ -1,10 +1,9 @@
--- BCM Negotiation Engine v2
--- Stateless require()'able module for negotiation FSM computation.
+﻿-- BCM Negotiation Engine v2
+-- Stateless require'able module for negotiation FSM computation.
 -- NOT an extension -- no lifecycle hooks, no state.
 -- All money values in integer cents.
 -- Uses pricingEngine LCG for deterministic randomness (no math.random).
---
--- v2 changes (Phase 49.4):
+-- v2 changes:
 -- - Three-tier offer severity (classifyOffer replaces isInsultingOffer)
 -- - Mood-adjusted floor price (getEffectiveFloor)
 -- - Convergence-aware drain (transitionMood v2)
@@ -12,12 +11,11 @@
 -- - Counter-offer randomness jitter (computeCounterOffer v2)
 -- - Over-asking instant acceptance (evaluateOffer v2)
 -- - Per-archetype drain profiles and severity thresholds
---
 -- BCMNegotiationUpdate payload shape (for Vue consumption):
 -- { listingId, archetype, mood, isBlocked, isGhosting, dealReached, dealPriceCents,
---   dealExpiresGameDay, baselinePriceCents, lastSellerCounterCents, messages,
---   pendingResponse (bool), usedDefectIds, roundCount, isThinking,
---   lastPlayerOfferCents, archetypeSeverityThresholds }
+-- dealExpiresGameDay, baselinePriceCents, lastSellerCounterCents, messages,
+-- pendingResponse (bool), usedDefectIds, roundCount, isThinking,
+-- lastPlayerOfferCents, archetypeSeverityThresholds }
 
 local M = {}
 
@@ -95,7 +93,7 @@ local ARCHETYPE_DRAIN_PROFILE = {
   enthusiast     = { drainRate = 0.6, recovers = false },
 }
 
--- v3: Target price params — aspirational price relative to baseline.
+-- v3: Target price params â€” aspirational price relative to baseline.
 -- tMin/tMax: targetPriceCents = baselinePriceCents * (1 + t), t drawn from [tMin, tMax]
 -- probeMin/probeMax: how many "let me try to get more" turns before accepting a good offer
 local TARGET_PRICE_PARAMS = {
@@ -110,7 +108,7 @@ local TARGET_PRICE_PARAMS = {
   scammer        = { tMin = 0.02, tMax = 0.05, probeMin = 2, probeMax = 3 },
 }
 
--- v4: Reactive concession system — archetype parameters
+-- v4: Reactive concession system â€” archetype parameters
 local REACTIVE_ARCHETYPE_PARAMS = {
   urgent_seller  = { openMin = 0.14, openMax = 0.20, mult = 1.2 },
   grandmother    = { openMin = 0.08, openMax = 0.14, mult = 1.0 },
@@ -157,12 +155,12 @@ local RESPONSE_DELAY_PARAMS = {
 local THINKING_THRESHOLD = 15  -- seconds
 
 -- ============================================================================
--- NPC Buyer Archetypes (Phase 50.1 — Living Market)
+-- NPC Buyer Archetypes
 -- ============================================================================
 
 -- Each archetype has latent attribute ranges and preferred strategies.
 -- targetDiscount/maxPremium are relative to anchor/market price.
--- Actual per-buyer values are drawn from ranges in generateBuyerLatentAttributes().
+-- Actual per-buyer values are drawn from ranges in generateBuyerLatentAttributes.
 local BUYER_ARCHETYPES = {
   flipper       = { weight = 25, targetDiscount = {0.15, 0.35}, maxPremium = {0.0, 0.02}, knowledge = {0.7, 0.95}, risk = {0.6, 0.9}, strategies = {"PROBE_LOW", "MARKET_ONLY"} },
   dealer_pro    = { weight = 15, targetDiscount = {0.02, 0.10}, maxPremium = {0.0, 0.05}, knowledge = {0.85, 1.0}, risk = {0.3, 0.5}, strategies = {"MARKET_ONLY", "SPLIT_DIFF"} },
@@ -203,7 +201,7 @@ local computeTypingDelay
 local formatPrice
 local applyDefectLeverage
 local computeTimeSoftening
--- Phase 50.1: NPC buyer functions (Living Market)
+-- NPC buyer functions (Living Market)
 local pickBuyerArchetype
 local generateBuyerLatentAttributes
 local classifyPricingZone
@@ -215,7 +213,7 @@ local shouldBuyerGhost
 local shouldBuyerAcceptCounter
 
 -- ============================================================================
--- Price rounding — finer steps, directional variants
+-- Price rounding â€” finer steps, directional variants
 -- ============================================================================
 
 -- Step table: finer granularity for human-sounding numbers
@@ -232,7 +230,7 @@ local function getStep(cents)
   end
 end
 
--- Round DOWN (toward lower price) — for NPC seller counter-offers
+-- Round DOWN (toward lower price) â€” for NPC seller counter-offers
 roundToNicePrice = function(cents)
   local step = getStep(cents)
   return math.floor(cents / step) * step
@@ -241,13 +239,13 @@ end
 -- Alias: legacy name maps to roundDown behavior
 local roundDown = roundToNicePrice
 
--- Round UP (toward higher price) — for NPC buyer counter-offers
+-- Round UP (toward higher price) â€” for NPC buyer counter-offers
 roundUp = function(cents)
   local step = getStep(cents)
   return math.ceil(cents / step) * step
 end
 
--- Round to NEAREST — for listing generation, display prices
+-- Round to NEAREST â€” for listing generation, display prices
 roundNearest = function(cents)
   local step = getStep(cents)
   return math.floor((cents + step / 2) / step) * step
@@ -270,11 +268,11 @@ computeThreshold = function(listingSeed, archetypeKey, askingPriceCents, marketV
   local sigma = 0.05 + pricingEngine.lcgFloat(seed) * 0.08
 
   -- Anchor floor to market value (pre-markup base) instead of asking price.
-  -- This ensures inflated markups create real negotiation room — the seller asks
+  -- This ensures inflated markups create real negotiation room â€” the seller asks
   -- high but CAN accept near fair value if pushed hard enough.
   -- Firmness still controls how far below market value the floor goes:
-  --   firm sellers: floor ≈ market value (won't go below what it's worth)
-  --   flexible sellers: floor = well below market value (eager to sell)
+  -- firm sellers: floor â‰ˆ market value (won't go below what it's worth)
+  -- flexible sellers: floor = well below market value (eager to sell)
   local anchorCents = marketValueCents and marketValueCents > 0
     and marketValueCents
     or askingPriceCents  -- backward compat: if no market value, use asking
@@ -285,7 +283,7 @@ computeThreshold = function(listingSeed, archetypeKey, askingPriceCents, marketV
   -- When marketValue > askingPrice (negative-markup archetypes), the floor
   -- computed from marketValue can exceed the asking price. In that case,
   -- guarantee a minimum negotiation margin of 5% below asking so the
-  -- buyer can still haggle — the seller listed cheap but isn't immovable.
+  -- buyer can still haggle â€” the seller listed cheap but isn't immovable.
   local maxFloor = math.floor(askingPriceCents * 0.95)
   if modeCents > maxFloor then
     modeCents = maxFloor
@@ -331,7 +329,7 @@ computeSoftAcceptCents = function(session)
   local target = session.targetPriceCents or session.baselinePriceCents
   -- softAccept = max(floor, 96% of target)
   local softAccept = math.max(floor, math.floor(target * 0.96))
-  -- instantAccept = max(99.5% of target, baseline) — baseline is already "buy now"
+  -- instantAccept = max(99.5% of target, baseline) â€” baseline is already "buy now"
   local instantAccept = math.max(math.floor(target * 0.995), session.baselinePriceCents)
   return softAccept, instantAccept
 end
@@ -406,15 +404,15 @@ evaluateOffer = function(session, offerCents)
   local sigma = session.thresholdSigmaCents or math.floor(session.baselinePriceCents * 0.05)
   local probeTurns = session.probeTurnsRemaining or 0
 
-  -- Zone 1: instantAccept — accept (with MIN_EXCHANGES rule applied by caller)
+  -- Zone 1: instantAccept â€” accept (with MIN_EXCHANGES rule applied by caller)
   if offerCents >= instantAccept then
     return { accepted = true, probability = 0.95, zone = "instant_accept" }
   end
 
-  -- Zone 2: softAccept — good offer, but seller probes first
+  -- Zone 2: softAccept â€” good offer, but seller probes first
   if offerCents >= softAccept then
     if probeTurns > 0 then
-      -- Seller wants to "rascar" — reject and probe-counter
+      -- Seller wants to "rascar" â€” reject and probe-counter
       return { accepted = false, probability = 0, zone = "probe", isProbe = true }
     end
     -- No probes left: accept with moderate-high probability
@@ -426,7 +424,7 @@ evaluateOffer = function(session, offerCents)
     return { accepted = roll < baseProbability, probability = baseProbability, zone = "soft_accept" }
   end
 
-  -- Zone 3: between floor and softAccept — normal negotiation
+  -- Zone 3: between floor and softAccept â€” normal negotiation
   -- Center probability on softAccept, not on floor
   local distance = softAccept - offerCents
   if distance < 0 then distance = 0 end
@@ -481,7 +479,7 @@ transitionMood = function(currentMood, movement, session)
     return MOOD_LEVELS[newIdx]
   end
 
-  -- Good movement (> 20%): improve by 1 — always, regardless of drainRate
+  -- Good movement (> 20%): improve by 1 â€” always, regardless of drainRate
   if movement > 0.20 then
     local newIdx = math.max(1, currentIdx - 1)
     return MOOD_LEVELS[newIdx]
@@ -511,7 +509,7 @@ end
 -- ============================================================================
 
 isInsultingOffer = function(archetypeKey, offerCents, baselinePriceCents)
-  -- Deprecated alias — calls classifyOffer for backward compatibility
+  -- Deprecated alias â€” calls classifyOffer for backward compatibility
   return classifyOffer(archetypeKey, offerCents, baselinePriceCents) == "insulting"
 end
 
@@ -527,7 +525,7 @@ computeCounterOffer = function(session, playerOfferCents, currentGameDay, isProb
   local roundCount = session.roundCount or 0
   local target = session.targetPriceCents or baseline
 
-  -- v3: Probe counter — good offer, seller asks a little more but ALWAYS below baseline
+  -- v3: Probe counter â€” good offer, seller asks a little more but ALWAYS below baseline
   if isProbe then
     -- Clamp target to never exceed baseline (avoids price-raise bug)
     local clampedTarget = math.min(target, baseline)
@@ -550,7 +548,7 @@ computeCounterOffer = function(session, playerOfferCents, currentGameDay, isProb
     return counter
   end
 
-  -- Legacy concession mode (lowball → convergence toward mode)
+  -- Legacy concession mode (lowball â†’ convergence toward mode)
   local meta = pricingEngine.getArchetypeMetadata(session.archetype)
   local urgency = meta.urgency or 5
   local urgencyFactor = 0.8 + (urgency / 9) * 0.4  -- 0.8 to 1.2
@@ -606,11 +604,11 @@ pickMessage = function(session, messageType, currentGameDay)
   end
 
   -- Build a high-entropy seed from multiple session fields so that:
-  --   - different listings get different messages (listingSeed)
-  --   - different rounds get different messages (roundCount)
-  --   - different message types don't collide (messageType hash)
-  --   - different archetypes don't collide (archetype hash)
-  --   - even same-seed listings diverge (lastPlayerOfferCents as extra noise)
+  -- - different listings get different messages (listingSeed)
+  -- - different rounds get different messages (roundCount)
+  -- - different message types don't collide (messageType hash)
+  -- - different archetypes don't collide (archetype hash)
+  -- - even same-seed listings diverge (lastPlayerOfferCents as extra noise)
   local listingSeed = session.listingSeed or 0
   local roundCount = session.roundCount or 0
   local offerNoise = session.lastPlayerOfferCents or 0
@@ -791,7 +789,7 @@ computeTimeSoftening = function(listingAgeDays, archetypeKey)
 end
 
 -- ============================================================================
--- NPC Buyer Functions (Phase 50)
+-- NPC Buyer Functions
 -- ============================================================================
 
 -- Classify pricing zone based on ratio of asking price to market price
@@ -984,12 +982,12 @@ computeBuyerInitialOffer = function(session, seed)
   local offerCents
 
   if strategy == "CLOSE_FAST" then
-    -- Offer near anchor, ±5%
+    -- Offer near anchor, Â±5%
     local jitter = (lcgF(seed * 31337 + 54321) - 0.5) * 0.10
     offerCents = math.floor(anchor * (1.0 + jitter))
 
   elseif strategy == "MARKET_ONLY" then
-    -- Offer near market value, slightly below (±4%)
+    -- Offer near market value, slightly below (Â±4%)
     local jitter = (lcgF(seed * 31337 + 54321) - 0.5) * 0.08
     offerCents = math.floor(market * (0.96 + jitter))
 
@@ -1080,7 +1078,7 @@ computeBuyerCounterOffer = function(session, playerCounterCents, seed)
   })[strategy] or 1.0
 
   -- Buyer margin: room between current offer and buyerMax (hard ceiling).
-  -- Interest affects acceptance checks, NOT concession room — so the buyer
+  -- Interest affects acceptance checks, NOT concession room â€” so the buyer
   -- can still offer up to their real max. What changes with low interest is
   -- whether they'll actually close the deal, not how high they'll go.
   local buyerMargin = buyerMax - currentOffer
@@ -1101,7 +1099,7 @@ computeBuyerCounterOffer = function(session, playerCounterCents, seed)
   -- Hard ceiling: never exceed buyerMax
   newOffer = math.min(newOffer, buyerMax)
 
-  -- Add jitter ±$25
+  -- Add jitter Â±$25
   local jitter = lcgF(seed * 77777 + round * 999)
   newOffer = newOffer + math.floor((jitter - 0.5) * 5000)
 
@@ -1145,7 +1143,7 @@ end
 
 -- Check if buyer accepts player's counter-offer.
 -- Key principle: buyer only accepts if the ask is close to what they're already
--- offering. A buyer at $72k won't jump to accepting $75k — they need to converge
+-- offering. A buyer at $72k won't jump to accepting $75k â€” they need to converge
 -- through counter-offers first.
 shouldBuyerAcceptCounter = function(session, playerAskingCents, seed)
   local interest = session.buyerInterest or 0.5
@@ -1156,7 +1154,7 @@ shouldBuyerAcceptCounter = function(session, playerAskingCents, seed)
   local lastOffer = session.lastOfferCents or session.initialOfferCents or 0
 
   -- Proximity gate: player's ask must be within 5% of buyer's last offer.
-  -- If the gap is larger, force a counter round — don't skip to acceptance.
+  -- If the gap is larger, force a counter round â€” don't skip to acceptance.
   local proximityRatio = (lastOffer > 0) and (playerAskingCents / lastOffer) or 2.0
   if proximityRatio > 1.05 then
     return false, "gap_too_large"
@@ -1387,7 +1385,7 @@ M.TARGET_PRICE_PARAMS      = TARGET_PRICE_PARAMS
 M.MOOD_LEVELS              = MOOD_LEVELS
 M.MOOD_INDEX               = MOOD_INDEX
 
--- Phase 50.1: NPC Buyer (Living Market)
+-- NPC Buyer (Living Market)
 M.pickBuyerArchetype           = pickBuyerArchetype
 M.generateBuyerLatentAttributes = generateBuyerLatentAttributes
 M.classifyPricingZone          = classifyPricingZone

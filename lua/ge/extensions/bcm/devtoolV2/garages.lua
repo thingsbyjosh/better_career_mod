@@ -339,6 +339,40 @@ local function emptyCustomFields()
   }
 end
 
+-- Resolve a parking spot's sites.json rot quaternion from the WIP shape.
+-- WIP is not type-consistent across hydrate paths — a spot can carry:
+--   spot.rot : 4-element quat (preferred)
+--   spot.dir : 4-element quat (delivery-style hydrate stored the rot here)
+--   spot.dir : 3-element vec3 (captured by getPlacementDirection at placement)
+-- Mirrors v1 devtool.lua:1593-1607 for the 3-vec branch. When spot.normal is
+-- available the quaternion is aligned to the terrain (projected forward × up),
+-- so parked vehicles sit flush on slopes instead of floating with world Z up.
+local function resolveParkingRot(spot)
+  if spot.rot and type(spot.rot) == "table" and #spot.rot == 4 then
+    return spot.rot
+  end
+  if spot.dir and type(spot.dir) == "table" and #spot.dir == 4 then
+    return spot.dir
+  end
+  if spot.dir and type(spot.dir) == "table" and #spot.dir == 3 then
+    local dir3 = vec3(spot.dir[1], spot.dir[2], spot.dir[3]):normalized()
+    local q
+    if spot.normal and type(spot.normal) == "table" and #spot.normal == 3 then
+      local up = vec3(spot.normal[1], spot.normal[2], spot.normal[3]):normalized()
+      local projFwd = dir3:cross(up):cross(up)
+      if projFwd:length() > 0.001 then
+        q = quatFromDir(projFwd, up)
+      else
+        q = quatFromDir(dir3, up)
+      end
+    else
+      q = quatFromDir(dir3)
+    end
+    return { q.x, q.y, q.z, q.w }
+  end
+  return { 0, 0, 0, 1 }
+end
+
 serializeForSitesJson = function(garage, levelName)
   nextOldId = nextOldId + 1
   -- Full vanilla zone shape. bot/top/color are required by the sites
@@ -356,11 +390,7 @@ serializeForSitesJson = function(garage, levelName)
   }
   local parkingSpotEntries = {}
   for i, spot in ipairs(garage.parkingSpots or {}) do
-    -- rot: round-trip quaternion if stored, else identity
-    local rot = spot.rot or spot.dir
-    if not rot or type(rot) ~= "table" or #rot ~= 4 then
-      rot = { 0, 0, 0, 1 }
-    end
+    local rot = resolveParkingRot(spot)
     nextOldId = nextOldId + 1
     table.insert(parkingSpotEntries, {
       -- Full vanilla parkingSpot shape — missing any of these fields crashes

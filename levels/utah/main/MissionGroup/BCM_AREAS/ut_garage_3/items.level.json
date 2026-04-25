@@ -1,0 +1,3 @@
+{"position":[-324.85934448242,-524.28466796875,131.24264526367],"name":"ut_garage_3_icon","__parent":"ut_garage_3","class":"BeamNGPointOfInterest"}
+{"name":"ut_garage_3_area","__parent":"ut_garage_3","position":[-324.85934448242,-524.28466796875,131.24264526367],"scale":[2,2,2],"class":"BeamNGGameplayArea"}
+{"rotationMatrix":[1,0,0,0,1,0,0,0,1],"class":"TSStatic","shapeName":"/art/shapes/garage_and_dealership/garage/s_laptop.dae","position":[-324.90386962891,-524.36511230469,131.24264526367],"useInstanceRenderData":true,"__parent":"ut_garage_3"}

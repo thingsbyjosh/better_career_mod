@@ -1,4 +1,4 @@
--- BCM Defects Extension (Phase 52)
+﻿-- BCM Defects Extension
 -- Manages hidden defect discovery lifecycle: test drive (hybrid: custom spawn +
 -- vanilla testDrive module for timer/tether/damage/fade), inspector NPC,
 -- and post-purchase reveal. Integrates with negotiation for chat injection.
@@ -39,23 +39,23 @@ local activated = false
 -- Persisted state (saved with career)
 local defectState = nil
 -- Shape: {
---   inspectorContactId = nil,
---   discoveryMap = {},         -- [listingId] = { discoveredDefects = {}, inspectorCalled = bool, testDriveUsed = bool }
---   inspectorJobs = {},        -- [listingId] = { travelRemainingSecs, reviewRemainingSecs, status, listingId }
+-- inspectorContactId = nil,
+-- discoveryMap = {}, -- [listingId] = { discoveredDefects = {}, inspectorCalled = bool, testDriveUsed = bool }
+-- inspectorJobs = {}, -- [listingId] = { travelRemainingSecs, reviewRemainingSecs, status, listingId }
 -- }
 
 -- Volatile state (NOT persisted)
 local activeTestDrive = nil
 local debugTestDriveSecs = nil  -- override test drive duration from console
 -- Shape: {
---   listingId = "...",
---   phase = "traveling"|"driving",
---   elapsedRealSecs = 0,
---   defectsToReveal = {},
---   revealBreakpoints = {},
---   revealedCount = 0,
---   spawnedVehId = nil,
---   parkingSpotName = nil,
+-- listingId = "...",
+-- phase = "traveling"|"driving",
+-- elapsedRealSecs = 0,
+-- defectsToReveal = {},
+-- revealBreakpoints = {},
+-- revealedCount = 0,
+-- spawnedVehId = nil,
+-- parkingSpotName = nil,
 -- }
 
 -- ============================================================================
@@ -271,7 +271,7 @@ startTestDrive = function(listingId, listing)
     elseif count >= 3 then
       breakpoints = { 90, 180, 240 }  -- 30%, 60%, 80%
     end
-    -- false_specs (tier 1) reveals early — you see it's the wrong car quickly
+    -- false_specs (tier 1) reveals early â€” you see it's the wrong car quickly
     for i, d in ipairs(sorted) do
       if d.id == "false_specs" and d.tier == 1 then
         breakpoints[i] = 30
@@ -297,7 +297,7 @@ startTestDrive = function(listingId, listing)
     if newVeh then
       activeTestDrive.spawnedVehId = newVeh:getID()
 
-      -- Freeze and set mileage — use REAL mileage if km_rollback defect exists
+      -- Freeze and set mileage â€” use REAL mileage if km_rollback defect exists
       core_vehicleBridge.executeAction(newVeh, 'setIgnitionLevel', 0)
       core_vehicleBridge.executeAction(newVeh, 'setFreeze', true)
       local realKm = listing.mileageKm or 50000
@@ -381,7 +381,7 @@ startTestDrive = function(listingId, listing)
       id = #session.messages + 1,
       direction = "seller",
       text = lang == 'es'
-        and "Vale, te he dejado el coche en un parking. Te pongo la ubicación en el GPS."
+        and "Vale, te he dejado el coche en un parking. Te pongo la ubicaciÃ³n en el GPS."
         or "Alright, I left the car at a parking spot. I'm sending you the location.",
       gameDay = gameDay,
     }
@@ -406,7 +406,7 @@ stopTestDrive = function()
   -- (it will fire onTestDriveEndedAfterFade and we'll clean up there)
   if career_modules_testDrive and career_modules_testDrive.isActive and career_modules_testDrive.isActive() then
     career_modules_testDrive.stop()
-    -- Don't clean up here — onTestDriveEndedAfterFade will handle it
+    -- Don't clean up here â€” onTestDriveEndedAfterFade will handle it
     return
   end
 
@@ -429,7 +429,7 @@ stopTestDrive = function()
 
   activeTestDrive = nil
 
-  -- Extend deal expiry if it was frozen during test drive — give player 1 extra day
+  -- Extend deal expiry if it was frozen during test drive â€” give player 1 extra day
   local session = bcm_negotiation and bcm_negotiation.getSession and bcm_negotiation.getSession(listingId)
   local gameDay = getCurrentGameDay()
   if session and session.dealReached and session.dealExpiresGameDay and session.dealExpiresGameDay <= gameDay then
@@ -445,7 +445,7 @@ stopTestDrive = function()
       id = #session.messages + 1,
       direction = "seller",
       text = lang == 'es'
-        and "Bueno, ¿qué tal la prueba? ¿Te ha gustado el coche?"
+        and "Bueno, Â¿quÃ© tal la prueba? Â¿Te ha gustado el coche?"
         or "So, how was the test drive? Did you like the car?",
       gameDay = gameDay,
     }
@@ -478,12 +478,12 @@ end
 onTestDriveUpdate = function(dtReal)
   if not activeTestDrive then return end
 
-  -- Phase: traveling — wait for player to enter the spawned vehicle
+  -- Phase: traveling â€” wait for player to enter the spawned vehicle
   if activeTestDrive.phase == "traveling" then
     if activeTestDrive.spawnedVehId then
       local playerVeh = be:getPlayerVehicle(0)
       if playerVeh and playerVeh:getID() == activeTestDrive.spawnedVehId then
-        -- Player entered the test drive vehicle — switch to driving phase
+        -- Player entered the test drive vehicle â€” switch to driving phase
         activeTestDrive.phase = "driving"
         activeTestDrive.elapsedRealSecs = 0
 
@@ -517,7 +517,7 @@ onTestDriveUpdate = function(dtReal)
     return  -- Don't tick timer while traveling
   end
 
-  -- Phase: driving — tick defect breakpoint timer (vanilla handles the overall timer)
+  -- Phase: driving â€” tick defect breakpoint timer (vanilla handles the overall timer)
   activeTestDrive.elapsedRealSecs = activeTestDrive.elapsedRealSecs + dtReal
 
   -- Check breakpoints
@@ -536,7 +536,7 @@ onTestDriveUpdate = function(dtReal)
     end
   end
 
-  -- No manual timer expiry check — vanilla testDrive handles that and fires
+  -- No manual timer expiry check â€” vanilla testDrive handles that and fires
   -- onTestDriveEndedAfterFade when the timer expires
 end
 
@@ -548,8 +548,8 @@ end
 -- We use this to confirm driving phase
 M.onTestDriveStarted = function()
   if not activeTestDrive then return end
-  -- Already handled in onTestDriveUpdate traveling→driving transition
-  log('I', logTag, 'Vanilla onTestDriveStarted hook — driving confirmed for: ' .. tostring(activeTestDrive.listingId))
+  -- Already handled in onTestDriveUpdate travelingâ†’driving transition
+  log('I', logTag, 'Vanilla onTestDriveStarted hook â€” driving confirmed for: ' .. tostring(activeTestDrive.listingId))
 end
 
 -- Fired by vanilla testDrive.lua after fade + teleport back
@@ -560,7 +560,7 @@ M.onTestDriveEndedAfterFade = function()
   local listingId = activeTestDrive.listingId
   local spawnedVehId = activeTestDrive.spawnedVehId
 
-  log('I', logTag, 'Vanilla onTestDriveEndedAfterFade — cleaning up: ' .. tostring(listingId))
+  log('I', logTag, 'Vanilla onTestDriveEndedAfterFade â€” cleaning up: ' .. tostring(listingId))
 
   -- Reveal all remaining defects
   local defects = activeTestDrive.defectsToReveal or {}
@@ -584,7 +584,7 @@ M.onTestDriveEndedAfterFade = function()
       id = #session.messages + 1,
       direction = "seller",
       text = lang == 'es'
-        and "Bueno, ¿qué tal la prueba? ¿Te ha gustado el coche?"
+        and "Bueno, Â¿quÃ© tal la prueba? Â¿Te ha gustado el coche?"
         or "So, how was the test drive? Did you like the car?",
       gameDay = gameDay,
     }
@@ -612,7 +612,7 @@ requestInspector = function(listingId)
     return
   end
 
-  -- Inspector is an independent path — no test drive prerequisite
+  -- Inspector is an independent path â€” no test drive prerequisite
 
   -- Check if already called
   if map and map.inspectorCalled then
@@ -621,7 +621,7 @@ requestInspector = function(listingId)
       bcm_notifications.send({
         title = "Rudy Verduras",
         message = lang == 'es'
-          and "Ya inspeccioné ese vehiculo."
+          and "Ya inspeccionÃ© ese vehiculo."
           or "I already inspected this vehicle.",
         type = "info",
         duration = 4000,
@@ -1049,7 +1049,7 @@ end
 -- Push active test drive state to Vue (called on UI re-init to rehydrate)
 M.pushTestDriveState = function()
   if not activeTestDrive then
-    -- No active test drive — tell Vue to clear any stale state
+    -- No active test drive â€” tell Vue to clear any stale state
     guihooks.trigger('BCMTestDriveEnded', {})
     return
   end
