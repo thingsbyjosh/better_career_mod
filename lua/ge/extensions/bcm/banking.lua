@@ -899,6 +899,7 @@ M.getTransactions = getTransactions
 M.getRecentTransactions = getRecentTransactions
 M.getMonthSummary = getMonthSummary
 M.syncBalance = syncBalance
+M.triggerAccountUpdate = triggerAccountUpdate
 M.triggerFullState = triggerFullState
 M.dollarsToCents = dollarsToCents
 M.formatMoney = formatMoney
