@@ -448,9 +448,11 @@ local function onVehicleCapacityReady(inventoryId, capacity, largestContainer, t
     tractorCapacity  = tractorCapacity or capacity or 0,
     trailerCapacity  = trailerCapacity or 0,
   })
-  -- Generate cargo for all packs at full vehicle capacity (pricing from real manifests)
+  -- Generate cargo for all packs at slider-adjusted capacity so the listing
+  -- shows the real pay for the current slider position (no linear UI scaling).
   if bcm_planex and capacity and capacity > 0 then
-    bcm_planex.generateCargoForPool(capacity)
+    local effectiveCapacity = math.max(1, math.floor(capacity * cargoLoadPercent / 100))
+    bcm_planex.generateCargoForPool(effectiveCapacity, cargoLoadPercent)
   end
 end
 
@@ -768,6 +770,28 @@ M.optimizeRoute          = optimizeRoute
 M.pinStopAtPosition      = pinStopAtPosition
 M.setCargoLoadPercent    = function(pct) cargoLoadPercent = math.max(10, math.min(100, tonumber(pct) or 50)) end
 M.getCargoLoadPercent    = function() return cargoLoadPercent end
+
+-- Recompute pool estimates for the current slider position. Called from Vue
+-- after the player releases the cargo slider, so the listing always shows the
+-- real pay for that slider value (no linear UI approximation).
+M.recalcPoolForSlider    = function()
+  if not bcm_planex then return end
+  local rawCap = 0
+  local loanerTier = bcm_planex.getLoanerSelectedTier and bcm_planex.getLoanerSelectedTier()
+  if loanerTier then
+    local tiers = bcm_planex.getLoanerTiers and bcm_planex.getLoanerTiers()
+    if tiers then
+      for _, t in ipairs(tiers) do
+        if t.tier == loanerTier then rawCap = t.capacity or 0 break end
+      end
+    end
+  else
+    rawCap = lastQueriedCapacity or 0
+  end
+  if rawCap <= 0 then return end
+  local effectiveCapacity = math.max(1, math.floor(rawCap * cargoLoadPercent / 100))
+  bcm_planex.generateCargoForPool(effectiveCapacity, cargoLoadPercent)
+end
 M.onCareerModulesActivated = onCareerModulesActivated
 
 -- ============================================================================

@@ -800,10 +800,10 @@ M.debugPayCurve = function()
 end
 
 -- Generate cargo for all available packs and update their display estimates.
--- Called when the player selects a vehicle or loaner (with full vehicle capacity).
--- Uses real manifest generation (generateCargoForPack) so pricing matches actual gameplay.
--- The slider does NOT trigger this â€” slider scaling is display-only in Vue.
-M.generateCargoForPool = function(vehicleCapacity)
+-- Called when the player selects a vehicle/loaner OR moves the cargo slider.
+-- vehicleCapacity is the EFFECTIVE (slider-adjusted) capacity; appliedSliderPercent
+-- is the % the caller used so Vue can detect when its preview is in sync.
+M.generateCargoForPool = function(vehicleCapacity, appliedSliderPercent)
   if not vehicleCapacity or vehicleCapacity <= 0 then return end
   for _, pack in ipairs(planexState.pool) do
     if pack.status == 'available' then
@@ -815,8 +815,12 @@ M.generateCargoForPool = function(vehicleCapacity)
       pack.estimatedSlots    = pack.cargoSlotsUsed or 0
     end
   end
-  guihooks.trigger('BCMPlanexPoolUpdate', { packs = planexState.pool })
-  log('I', logTag, string.format('generateCargoForPool: regenerated %d packs for capacity=%d', #planexState.pool, vehicleCapacity))
+  guihooks.trigger('BCMPlanexPoolUpdate', {
+    packs = planexState.pool,
+    appliedSliderPercent = appliedSliderPercent or 100,
+  })
+  log('I', logTag, string.format('generateCargoForPool: regenerated %d packs for effectiveCapacity=%d (slider=%d%%)',
+    #planexState.pool, vehicleCapacity, appliedSliderPercent or 100))
 end
 
 -- ============================================================================
@@ -1412,8 +1416,12 @@ selectLoanerTier = function(tier, loadPercent)
       return
     end
     planexState.loanerSelectedTier = tier
-    -- Generate cargo for all packs at full loaner capacity
-    M.generateCargoForPool(def.capacity)
+    -- Generate cargo at the slider-adjusted capacity so the listing reflects
+    -- the real pay for the current slider position.
+    local sliderPct = (bcm_planexApp and bcm_planexApp.getCargoLoadPercent and bcm_planexApp.getCargoLoadPercent()) or 100
+    if loadPercent then sliderPct = math.max(10, math.min(100, tonumber(loadPercent) or sliderPct)) end
+    local effectiveCapacity = math.max(1, math.floor((def.capacity or 0) * sliderPct / 100))
+    M.generateCargoForPool(effectiveCapacity, sliderPct)
   end
   broadcastState()
 end
